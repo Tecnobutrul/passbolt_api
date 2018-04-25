@@ -38,6 +38,13 @@ if (!(extension_loaded('gd') || extension_loaded('imagick'))) {
     trigger_error('You must enable the gd or imagick extensions to use Passbolt.', E_USER_ERROR);
 }
 
+/**
+* Multi org bootstrap
+*/
+if (file_exists(__DIR__ . DS . 'bootstrap_mo.php')) {
+    require __DIR__ . DS . 'bootstrap_mo.php';
+}
+
 /*
  * Configure paths required to find CakePHP + general filepath
  * constants
@@ -85,6 +92,9 @@ try {
     Configure::load('default', 'default', false); // passbolt default config
     if (\file_exists(CONFIG . DS . 'passbolt.php')) {
         Configure::load('passbolt', 'default', true); // merge with default config
+    }
+    if (defined('PASSBOLT_ORG')) {
+        Configure::load('Org' . DS . PASSBOLT_ORG . DS . 'passbolt', 'default', true);
     }
     Configure::load('version', 'default', true);
 } catch (\Exception $e) {

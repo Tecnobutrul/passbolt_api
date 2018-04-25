@@ -14,6 +14,7 @@
  */
 namespace App;
 
+use App\Middleware\DomainMiddleware;
 use App\Middleware\GpgAuthHeadersMiddleware;
 use App\Middleware\GpgAuthSignMiddleware;
 use Cake\Core\Configure;
@@ -34,6 +35,8 @@ class Application extends BaseApplication
     public function middleware($middleware)
     {
         $middleware
+            // Extract application domain
+            ->add(DomainMiddleware::class)
             // Catch any exceptions in the lower layers,
             // and make an error page/response
             ->add(ErrorHandlerMiddleware::class)

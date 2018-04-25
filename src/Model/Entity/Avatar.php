@@ -74,6 +74,7 @@ class Avatar extends ImageStorage
         // Default options.
         $defaultOptions = [
             'version' => 'small',
+            'bucketPrefix' => true,
         ];
         $options = array_merge($options, $defaultOptions);
 
@@ -116,7 +117,13 @@ class Avatar extends ImageStorage
         $this->getEventManager()->dispatch($Event);
 
         if ($Event->isStopped()) {
-            return Configure::read('ImageStorage.publicPath') . $this->normalizePath($Event->data['path']);
+            $adapter = Configure::read('FileStorage.adapter');
+            $path = $this->normalizePath($Event->data['path']);
+            // If the adapter is the local file system, we need to add the public path in front of it.
+            if ($adapter == 'Local') {
+                $path = Configure::read('ImageStorage.publicPath') . $path;
+            }
+            return $path;
         } else {
             return false;
         }
