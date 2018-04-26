@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "2b3f3775851408c48d6de9d4d2255430",
@@ -3270,12 +3270,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/passbolt/passbolt_test_data.git",
-                "reference": "8171b08b1816f19adf468ad6848a5c3cb8a68127"
+                "reference": "0dff55de7b3cb6d0c49c077a8b2c44c3ff0cd5fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/passbolt/passbolt_test_data/zipball/8171b08b1816f19adf468ad6848a5c3cb8a68127",
-                "reference": "8171b08b1816f19adf468ad6848a5c3cb8a68127",
+                "url": "https://api.github.com/repos/passbolt/passbolt_test_data/zipball/0dff55de7b3cb6d0c49c077a8b2c44c3ff0cd5fc",
+                "reference": "0dff55de7b3cb6d0c49c077a8b2c44c3ff0cd5fc",
                 "shasum": ""
             },
             "require": {
@@ -3316,7 +3316,7 @@
                 "help": "https://www.passbolt.com/help",
                 "source": "https://github.com/passbolt/passbolt"
             },
-            "time": "2018-04-24T05:45:37+00:00"
+            "time": "2018-04-25T08:40:17+00:00"
         },
         {
             "name": "phar-io/manifest",

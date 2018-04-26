@@ -12,7 +12,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-namespace App\Middleware;
+namespace Passbolt\MultiOrg\Middleware;
 
 use App\Auth\GpgAuthenticate;
 use Aura\Intl\Exception;
