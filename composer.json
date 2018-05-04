@@ -67,7 +67,8 @@
             "App\\": "src",
             "PassboltTestData\\": "./plugins/PassboltTestData/src",
             "PassboltSeleniumApi\\": "./plugins/PassboltSeleniumApi/src",
-            "Passbolt\\MultiOrg\\": "./plugins/Passbolt/MultiOrg/src"
+            "Passbolt\\MultiTenant\\": "./plugins/Passbolt/MultiTenant/src",
+            "Passbolt\\MultiTenantAdmin\\": "./plugins/Passbolt/MultiTenantAdmin/src"
         }
     },
     "autoload-dev": {

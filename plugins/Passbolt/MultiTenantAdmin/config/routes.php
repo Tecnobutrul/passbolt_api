@@ -12,10 +12,19 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-return [
-    'passbolt' => [
-        'multiOrg' => [
-            'configDir' => env('CONFIG_ORG', CONFIG . 'Org'),
-        ]
-    ]
-];
+use Cake\Routing\RouteBuilder;
+use Cake\Routing\Router;
+
+/**
+ * MultiTenant organizations prefixed routes
+ */
+Router::plugin('Passbolt/MultiTenantAdmin', ['path' => '/multi_tenant'], function (RouteBuilder $routes) {
+    $routes->setExtensions(['json']);
+
+    $routes->connect('/organizations/:id', ['controller' => 'Organizations', 'action' => 'view'])
+            ->setPass(['id'])
+           ->setMethods(['GET']);
+
+    $routes->connect('/organizations', ['controller' => 'Organizations', 'action' => 'add'])
+           ->setMethods(['POST']);
+});

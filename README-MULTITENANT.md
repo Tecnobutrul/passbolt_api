@@ -21,9 +21,14 @@ rewrite ^/([^/]+)/favicon.ico$ /favicon.ico break;
 
 The main idea is to remove the site from the path so that cakephp understands where it should be accessed.
 
+## How to install
+### 1. Install the schema
+```./bin/cake migrations migrate -p Passbolt/MultiTenantAdmin```
+
+
 ## How to use
 ### 1. Use the shell to create an organization
-```./bin/cake organization create --name=acme```
+```bin/cake multi_tenant add_organization --slug=acme```
 
 ### 2. Create a user
 ./bin/cake passbolt register_user --org=acme --first-name=Firstname --last-name=Lastname --username=name@email.com --role=admin

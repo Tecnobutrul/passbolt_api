@@ -1,0 +1,83 @@
+<?php
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         2.0.0
+ */
+use Cake\Core\Configure;
+use Cake\Core\Configure\Engine\PhpConfig;
+use Cake\Event\EventManager;
+use Passbolt\MultiTenant\Middleware\DomainMiddleware;
+
+// Get cli details.
+$isCli = PHP_SAPI === 'cli';
+$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
+
+Configure::load('Passbolt/MultiTenant.config', 'default', true);
+
+// Extract organization from cli parameter, or url.
+if ($isCli) {
+    foreach ($argv as $i => $value) {
+        preg_match('/--org=(.+)/', $value, $match);
+        if (isset($match[1])) {
+            define('PASSBOLT_ORG', $match[1]);
+            break;
+        }
+    }
+} else {
+    $match = (explode('/', $_SERVER['REQUEST_URI'], 3));
+    if (isset($match[1])) {
+        define('PASSBOLT_ORG', $match[1]);
+    }
+}
+
+// Check if multitenant settings apply.
+$ignoreShells = [
+    'multi_tenant',
+    'migrations', // TODO: find a way to make the migrations shell understand the org command
+];
+$ignoreRoutes = [
+    '/multi_tenant/organizations'
+];
+$executeShell = isset($argv[1]) && !in_array($argv[1], $ignoreShells);
+$executeRoute = isset($_SERVER['REQUEST_URI']) && !in_array(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), $ignoreRoutes);
+// Organization will be ignored if set to 0.
+$ignoreMainOrganization = defined('PASSBOLT_ORG') && PASSBOLT_ORG == 0;
+$isMultiTenant = !$ignoreMainOrganization && ($executeShell || $executeRoute);
+
+if ($isMultiTenant) {
+    if ($isCli && (!defined('PASSBOLT_ORG'))) {
+        trigger_error('--org parameter should be provided', E_USER_ERROR);
+        exit;
+    }
+
+    // Load Middleware and put it first in the queue.
+    EventManager::instance()->on(
+        'Server.buildMiddleware',
+        function ($event, $middlewareQueue) {
+            $middlewareQueue->prepend(DomainMiddleware::class);
+        }
+    );
+
+    // Define CONFIG_ORG based on the plugin configuration.
+    define('CONFIG_ORG', Configure::read('passbolt.multiTenant.configDir'));
+
+    if (!defined('PASSBOLT_ORG') || !file_exists(CONFIG_ORG . DS . PASSBOLT_ORG . DS . 'passbolt.php')) {
+        echo 'This organization is missing.';
+        trigger_error('This organization is missing.', E_USER_ERROR);
+        exit;
+    }
+
+    if (defined('PASSBOLT_ORG')) {
+        Configure::config('org', new PhpConfig(CONFIG_ORG . DS));
+        Configure::load(PASSBOLT_ORG . DS . 'passbolt', 'org', true);
+    }
+}

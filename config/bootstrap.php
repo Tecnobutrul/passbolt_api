@@ -147,8 +147,11 @@ if ($isCli) {
  * Multi org management.
  * This has to be done here, after loading of the bootsrap_cli.
  */
-if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiOrg')) {
-    Plugin::load('Passbolt/MultiOrg', ['bootstrap' => true, 'routes' => false, 'middleware' => true]);
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiTenant')) {
+    Plugin::load('Passbolt/MultiTenant', ['bootstrap' => true, 'routes' => false, 'middleware' => true]);
+}
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiTenantAdmin')) {
+    Plugin::load('Passbolt/MultiTenantAdmin', ['bootstrap' => true, 'routes' => true]);
 }
 
 /*

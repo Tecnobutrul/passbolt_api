@@ -12,60 +12,51 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-namespace Passbolt\MultiOrg\Shell\Task;
+namespace Passbolt\MultiTenantAdmin\Utility;
 
-use Cake\Console\Shell;
+use App\Model\Entity\Role;
 use Cake\Core\Configure;
+use Cake\Core\Configure\Engine\PhpConfig;
+use Cake\Core\Exception\Exception;
 use Cake\Datasource\ConnectionManager;
+use Cake\Datasource\ModelAwareTrait;
 use Cake\Utility\Hash;
 use Cake\View\ViewVarsTrait;
 use Migrations\Migrations;
-use Cake\Core\Configure\Engine\PhpConfig;
 
-/**
- * Create Org shell command.
- */
-class CreateTask extends Shell
+class OrganizationManager
 {
+    // Will use models.
+    use ModelAwareTrait;
+
+    // Used to manipulate views.
     use ViewVarsTrait;
 
+    // Slug of the organization.
+    public $slug = '';
+
+    // Fingerprint of organization key.
     public $fingerprint = '';
 
-    public $options = [
-        'orgName' => '',
-    ];
-
     /**
-     * Gets the option parser instance and configures it.
+     * OrganizationManager constructor.
      *
-     * By overriding this method you can configure the ConsoleOptionParser before returning it.
-     *
-     * @return \Cake\Console\ConsoleOptionParser
-     * @link https://book.cakephp.org/3.0/en/console-and-shells.html#configuring-options-and-generating-help
+     * @param string $slug slug
      */
-    public function getOptionParser()
+    public function __construct($slug = '')
     {
-        $parser = parent::getOptionParser();
-
-        $parser->setDescription(__('Create an organization.'));
-        $parser->addOption('name', [
-            'help' => __('Organization name')
-        ]);
-
-        return $parser;
+        $this->slug = $slug;
     }
 
     /**
-     * main() method.
-     *
-     * @return bool|int|null Success or error code.
+     * Add an organization.
+     * @return void
      */
-    public function main()
+    public function add()
     {
-        $this->_extractOptions();
-
+        // Check if the organization exists already in the configuration or database.
         if ($this->_checkExist()) {
-            return $this->err(__('The org name already exists'));
+            throw new Exception(__('The organization already exists'));
         }
 
         $this->_createOrgDirectory();
@@ -74,17 +65,15 @@ class CreateTask extends Shell
         $this->_createConfigurationFile();
         $this->_loadOrgConfiguration();
         $this->_createSchema();
-
-        return true;
     }
 
     /**
      * Check if organization already exists.
      * @return bool
      */
-    public function _checkExist()
+    protected function _checkExist()
     {
-        $orgName = $this->options['orgName'];
+        $orgName = $this->slug;
 
         // Check if database exists.
         $connection = ConnectionManager::get('default');
@@ -98,18 +87,13 @@ class CreateTask extends Shell
     }
 
     /**
-     * Extract options provided and set them in an options variable.
-     */
-    protected function _extractOptions() {
-        $this->options['orgName'] = $this->param('name');
-    }
-
-    /**
      * Create GPG server keys.
+     * @return void
      */
-    protected function _createGpgServerKeys() {
+    protected function _createGpgServerKeys()
+    {
         $fingerprint = $this->_generateGpgKey([
-            'name' => $this->options['orgName'],
+            'name' => $this->slug,
             'email' => 'admin@passbolt.com',
             'comment' => ''
         ]);
@@ -119,8 +103,10 @@ class CreateTask extends Shell
 
     /**
      * Create organization top level directory.
+     * @return void
      */
-    protected function _createOrgDirectory() {
+    protected function _createOrgDirectory()
+    {
         // Create directory
         mkdir($this->_getConfigurationPath());
     }
@@ -131,14 +117,16 @@ class CreateTask extends Shell
      */
     protected function _getConfigurationPath()
     {
-        return Configure::read('passbolt.multiOrg.configDir') . DS . $this->options['orgName'];
+        return Configure::read('passbolt.multiTenant.configDir') . DS . $this->slug;
     }
 
     /**
      * Create configuration file for the given organization.
+     * @return void
      */
-    protected function _createConfigurationFile() {
-        $orgName = $this->options['orgName'];
+    protected function _createConfigurationFile()
+    {
+        $orgName = $this->slug;
 
         // Read existing connection parameters.
         Configure::load('passbolt', 'default', true);
@@ -180,7 +168,7 @@ class CreateTask extends Shell
         $confPath = $this->_getConfigurationPath();
         $this->set(['config' => $config]);
         $configView = $this->createView();
-        $configView->plugin = 'Passbolt/MultiOrg';
+        $configView->plugin = 'Passbolt/MultiTenantAdmin';
         $contents = $configView->render('Config/passbolt', 'ajax');
         $contents = "<?php\n$contents";
         file_put_contents($confPath . DS . 'passbolt.php', $contents);
@@ -188,12 +176,14 @@ class CreateTask extends Shell
 
     /**
      * Create database for the given organization.
+     * @return void
      */
-    protected function _createDatabase() {
+    protected function _createDatabase()
+    {
         Configure::load('passbolt', 'default', true);
 
         $connection = ConnectionManager::get('default');
-        $sql = "CREATE DATABASE {$this->options['orgName']}";
+        $sql = "CREATE DATABASE {$this->slug}";
         $connection->execute($sql);
     }
 
@@ -201,15 +191,18 @@ class CreateTask extends Shell
      * Get Gnupg keyring path for the organization.
      * @return string
      */
-    protected function _getGnupgKeyringPath() {
-        return  $this->_getConfigurationPath() . DS . 'gpg' . DS . '.gnupg';
+    protected function _getGnupgKeyringPath()
+    {
+        return $this->_getConfigurationPath() . DS . 'gpg' . DS . '.gnupg';
     }
 
     /**
      * Create keyring for the organization
+     * @return void
      */
-    protected function _createKeyring() {
-        $gpgKeyPath =  $this->_getGnupgKeyringPath();
+    protected function _createKeyring()
+    {
+        $gpgKeyPath = $this->_getGnupgKeyringPath();
         mkdir($gpgKeyPath, 0700, true);
         // Create keyring.
         putenv('GNUPGHOME=' . $this->_getGnupgKeyringPath());
@@ -218,12 +211,13 @@ class CreateTask extends Shell
 
     /**
      * Generate GPG key based on data provided.
-     * @param $keyData
+     * @param array $keyData key data
      *
      * @return mixed
      * TODO: move this as part of GPG utility.
      */
-    protected function _generateGpgKey($keyData) {
+    protected function _generateGpgKey($keyData)
+    {
         $this->_createKeyring();
         // Generate key.
         $generateKeyCmd = $this->_generateKeyCmdV2($keyData);
@@ -260,7 +254,7 @@ class CreateTask extends Shell
      */
     protected function _exportArmoredKeys($fingerprint)
     {
-        $gpgKeyPath =  $this->_getConfigurationPath() . DS . 'gpg';
+        $gpgKeyPath = $this->_getConfigurationPath() . DS . 'gpg';
         $publicKeyPath = $gpgKeyPath . DS . 'serverkey.asc';
         $privateKeyPath = $gpgKeyPath . DS . 'serverkey_private.asc';
 
@@ -303,6 +297,7 @@ EOF";
 
     /**
      * Reload configuration sequence from scratch to include the new changes.
+     * @return void
      */
     protected function _loadOrgConfiguration()
     {
@@ -319,10 +314,52 @@ EOF";
      * Create schema in db.
      * @return bool
      */
-    protected function _createSchema() {
+    protected function _createSchema()
+    {
         $migrations = new Migrations();
         $migrated = $migrations->migrate();
 
         return $migrated;
+    }
+
+    /**
+     * Add admin user to the newly created organization.
+     * @param array $data user data
+     *
+     * @return array user and token
+     * @throws Exception
+     */
+    public function addAdminUser($data)
+    {
+        $this->_loadOrgConfiguration();
+
+        $this->loadModel('Roles');
+        $this->loadModel('Users');
+        $this->loadModel('AuthenticationTokens');
+
+        $roleId = $this->Roles->getIdByName(Role::ADMIN);
+        if (empty($roleId)) {
+            throw new Exception('Cannot find role');
+        }
+
+        $user = $this->Users->buildEntity($data, Role::ADMIN);
+
+        $errors = $user->getErrors();
+        if (empty($errors)) {
+            $this->Users->checkRules($user);
+            $errors = $user->getErrors();
+        }
+        if (!empty($errors)) {
+            throw new Exception('Cannot validate user');
+        }
+
+        $saved = $this->Users->save($user, ['checkrules' => false]);
+        if (!$saved) {
+            throw new Exception('Cannot save user');
+        }
+
+        $token = $this->AuthenticationTokens->generate($user->id);
+
+        return ['user' => $user, 'token' => $token];
     }
 }

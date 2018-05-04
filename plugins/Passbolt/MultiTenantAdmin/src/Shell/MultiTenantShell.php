@@ -12,17 +12,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-namespace Passbolt\MultiOrg\Shell;
+namespace Passbolt\MultiTenantAdmin\Shell;
 
 use Cake\Console\Shell;
 
-class OrganizationShell extends Shell
+class MultiTenantShell extends Shell
 {
     /**
      * @var array of linked tasks
      */
     public $tasks = [
-        'Passbolt/MultiOrg.Create',
+        'Passbolt/MultiTenantAdmin.AddOrganization',
     ];
 
     /**
@@ -35,9 +35,9 @@ class OrganizationShell extends Shell
         $parser = parent::getOptionParser();
         $parser->setDescription(__('The Organization CLI offers an easy way to manage organizations.'));
 
-        $parser->addSubcommand('create', [
-            'help' => __d('cake_console', 'create a new organization.'),
-            'parser' => $this->Create->getOptionParser(),
+        $parser->addSubcommand('add_organization', [
+            'help' => __d('cake_console', 'add a new organization.'),
+            'parser' => $this->AddOrganization->getOptionParser(),
         ]);
 
         return $parser;

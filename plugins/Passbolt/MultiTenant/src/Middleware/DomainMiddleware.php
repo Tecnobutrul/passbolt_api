@@ -12,15 +12,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-namespace Passbolt\MultiOrg\Middleware;
+namespace Passbolt\MultiTenant\Middleware;
 
-use App\Auth\GpgAuthenticate;
-use Aura\Intl\Exception;
+use Cake\Core\Exception\Exception;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Cake\Core\Configure;
-use Burzum\FileStorage\Storage\StorageManager;
-use Cake\Datasource\ConnectionManager;
 
 class DomainMiddleware
 {
@@ -31,7 +27,7 @@ class DomainMiddleware
     {
         // Get organization name and rewrite urls
         $path = $request->getUri()->getPath();
-        $path = (explode('/', $path ,3));
+        $path = (explode('/', $path, 3));
         if (!count($path)) {
             throw new Exception('The organization is not defined in request');
         } else {
