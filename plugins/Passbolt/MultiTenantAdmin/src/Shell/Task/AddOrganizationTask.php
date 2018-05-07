@@ -35,8 +35,8 @@ class AddOrganizationTask extends Shell
         $parser = parent::getOptionParser();
 
         $parser->setDescription(__('Create an organization.'));
-        $parser->addOption('slug', [
-            'help' => __('Organization slug. It will then be accessible by https:://cloud.domain/slug')
+        $parser->addOption('name', [
+            'help' => __('Organization name (slug). It will then be accessible by https:://cloud.domain/name')
         ]);
 
         return $parser;

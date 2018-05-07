@@ -28,7 +28,7 @@ The main idea is to remove the site from the path so that cakephp understands wh
 
 ## How to use
 ### 1. Use the shell to create an organization
-```bin/cake multi_tenant add_organization --slug=acme```
+```bin/cake multi_tenant add_organization --name=acme```
 
 ### 2. Create a user
 ./bin/cake passbolt register_user --org=acme --first-name=Firstname --last-name=Lastname --username=name@email.com --role=admin
