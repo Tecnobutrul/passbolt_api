@@ -21,7 +21,12 @@ use Passbolt\MultiTenant\Middleware\DomainMiddleware;
 $isCli = PHP_SAPI === 'cli';
 $argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
 
+// Load default plugin configuration file while keeping plugin conf defined in passbolt.php.
+$original = Configure::read('passbolt.multiTenant');
 Configure::load('Passbolt/MultiTenant.config', 'default', true);
+$defaults = Configure::read('passbolt.multiTenant');
+$merged = array_merge($defaults, $original);
+Configure::write('passbolt.multiTenant', $merged);
 
 // Extract organization from cli parameter, or url.
 if ($isCli) {

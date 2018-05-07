@@ -14,8 +14,15 @@
  */
 return [
     'passbolt' => [
+        // MultiTenant configuration.
+        // This is the default configuration. It can be overriden directly in the passbolt.php file.
         'multiTenant' => [
+            // Defines where the configuration files will be kept for each organization.
             'configDir' => env('CONFIG_ORG', CONFIG . 'Org'),
+            // Authentication secret, for json calls.
+            'auth' => [
+                'secret' => 'argon2secret'
+            ]
         ]
     ]
 ];
