@@ -53,7 +53,7 @@ $ignoreRoutes = [
     '/\/multi_tenant\/organizations/',
 ];
 $executeShell = isset($argv[1]) && !in_array($argv[1], $ignoreShells);
-$executeRoute = true;
+$executeRoute = isset($_SERVER['REQUEST_URI']);
 if (isset($_SERVER['REQUEST_URI'])) {
     $matches = array_filter($ignoreRoutes, function($regexp) {
         $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
