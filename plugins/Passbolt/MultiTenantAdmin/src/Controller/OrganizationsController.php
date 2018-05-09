@@ -142,6 +142,10 @@ class OrganizationsController extends MultiTenantAdminController
      */
     protected function _buildAndValidateOrganizationEntity($data)
     {
+        if(isset($data['organization']['slug'])) {
+            $data['organization']['slug'] = strtolower( $data['organization']['slug']);
+        }
+
         // Build entity and perform basic check.
         $organization = $this->Organizations->newEntity(
             $data,
