@@ -23,7 +23,9 @@ The main idea is to remove the site from the path so that cakephp understands wh
 
 ## How to install
 ### 1. Install the schema
+First, create a separate database, and a connection in the configuration for emailQueue. Then:
 ```./bin/cake migrations migrate -p Passbolt/MultiTenantAdmin```
+```./bin/cake migrations migrate --plugin EmailQueue --connection emailQueue```
 
 
 ## How to use

@@ -22,6 +22,11 @@
     "repositories": [
         {
             "type": "vcs",
+            "url": "https://github.com/passbolt/cakephp-email-queue.git",
+            "no-api": true
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/passbolt/migrations.git",
             "no-api": true
         },
@@ -46,7 +51,7 @@
         "singpolyma/openpgp-php": "^0.3.0",
         "thadafinser/user-agent-parser": "^2.0",
         "donatj/phpuseragentparser": "^0.7.0",
-        "lorenzo/cakephp-email-queue": "^3.1",
+        "lorenzo/cakephp-email-queue": "^3.1.4001",
         "burzum/file-storage": "1.2.1",
         "burzum/cakephp-imagine-plugin": "2.1.1",
         "aws/aws-sdk-php":"3.55.0",

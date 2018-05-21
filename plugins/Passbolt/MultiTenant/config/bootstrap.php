@@ -48,6 +48,8 @@ if ($isCli) {
 $ignoreShells = [
     'multi_tenant',
     'migrations', // TODO: find a way to make the migrations shell understand the org command
+    'EmailQueue.sender',
+    'EmailQueue.preview'
 ];
 $ignoreRoutes = [
     '/\/multi_tenant\/organizations/',
