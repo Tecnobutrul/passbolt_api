@@ -35,6 +35,9 @@ class OrganizationManager
     // Slug of the organization.
     public $slug = '';
 
+    // Database name.
+    public $databaseName = '';
+
     // Fingerprint of organization key.
     public $fingerprint = '';
 
@@ -46,6 +49,7 @@ class OrganizationManager
     public function __construct($slug = '')
     {
         $this->slug = $slug;
+        $this->databaseName = str_replace('-', '_', $slug);
     }
 
     /**
@@ -73,15 +77,13 @@ class OrganizationManager
      */
     protected function _checkExist()
     {
-        $orgName = $this->slug;
-
         // Check if database exists.
         $connection = ConnectionManager::get('default');
-        $databaseExist = $connection->execute("SHOW DATABASES LIKE '$orgName'")->fetchAll();
+        $databaseExist = $connection->execute("SHOW DATABASES LIKE '{$this->databaseName}'")->fetchAll();
         $databaseExist = count($databaseExist) > 0;
 
         // Check if directory exists.
-        $confExist = file_exists(CONFIG . 'Org' . DS . $orgName);
+        $confExist = file_exists(CONFIG . 'Org' . DS . $this->slug);
 
         return $databaseExist || $confExist;
     }
@@ -145,7 +147,7 @@ class OrganizationManager
                 'port' => $existingDbConfig['port'],
                 'username' => $existingDbConfig['username'],
                 'password' => $existingDbConfig['password'],
-                'database' => $orgName,
+                'database' => $this->databaseName,
             ],
             'email' => [
                 'host' => Configure::read('EmailTransport.default.host'),
@@ -183,7 +185,7 @@ class OrganizationManager
         Configure::load('passbolt', 'default', true);
 
         $connection = ConnectionManager::get('default');
-        $sql = "CREATE DATABASE {$this->slug}";
+        $sql = "CREATE DATABASE '{$this->databaseName}'";
         $connection->execute($sql);
     }
 
