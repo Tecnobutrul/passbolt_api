@@ -185,7 +185,7 @@ class OrganizationManager
         Configure::load('passbolt', 'default', true);
 
         $connection = ConnectionManager::get('default');
-        $sql = "CREATE DATABASE '{$this->databaseName}'";
+        $sql = "CREATE DATABASE {$this->databaseName}";
         $connection->execute($sql);
     }
 
