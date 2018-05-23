@@ -344,6 +344,8 @@ EOF";
             throw new Exception('Cannot find role');
         }
 
+        // Force role and build entity.
+        $data['role_id'] = $roleId;
         $user = $this->Users->buildEntity($data, Role::ADMIN);
 
         $errors = $user->getErrors();
