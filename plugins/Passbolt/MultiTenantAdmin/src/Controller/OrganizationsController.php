@@ -134,6 +134,47 @@ class OrganizationsController extends MultiTenantAdminController
     }
 
     /**
+     * List all organizations.
+     * filters:
+     * from-date : timestamp (default : today at 0:00:00)
+     * to-date: timestamp (default : today at 23:59:59)
+     * @return void
+     */
+    public function index() {
+        $this->loadModel('Passbolt/MultiTenantAdmin.Organizations');
+
+        $from = $this->request->getQuery('from-date');
+        $to = $this->request->getQuery('to-date');
+
+        $from = 100;
+
+        if (!empty($from)) {
+            // Filter.
+            $from = date('Y-m-d H:i:s', $from);
+        }
+        else {
+            $from = date('Y-m-d 00:00:00');
+        }
+
+        if (!empty($to)) {
+            $to = date('Y-m-d h:i:s', $to);
+        } else {
+            $to = date('Y-m-d 23:59:59');
+        }
+
+        $organizations = $this->Organizations->find()
+            ->where([
+                'created >=' => $from,
+                'created <=' => $to,
+            ])
+            ->all();
+
+        $this->viewBuilder()->setClassName('LegacyJson');
+
+        $this->success('Organization found', $organizations);
+    }
+
+    /**
      * Build and validate organization entity.
      *
      * @param array $data data

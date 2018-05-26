@@ -21,6 +21,9 @@ use Cake\Routing\Router;
 Router::plugin('Passbolt/MultiTenantAdmin', ['path' => '/multi_tenant'], function (RouteBuilder $routes) {
     $routes->setExtensions(['json']);
 
+    $routes->connect('/organizations', ['controller' => 'Organizations', 'action' => 'index'])
+           ->setMethods(['GET']);
+
     $routes->connect('/organizations/:id', ['controller' => 'Organizations', 'action' => 'view'])
             ->setPass(['id'])
            ->setMethods(['GET']);
