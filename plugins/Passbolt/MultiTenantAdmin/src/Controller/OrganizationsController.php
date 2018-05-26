@@ -146,8 +146,6 @@ class OrganizationsController extends MultiTenantAdminController
         $from = $this->request->getQuery('from-date');
         $to = $this->request->getQuery('to-date');
 
-        $from = 100;
-
         if (!empty($from)) {
             // Filter.
             $from = date('Y-m-d H:i:s', $from);
