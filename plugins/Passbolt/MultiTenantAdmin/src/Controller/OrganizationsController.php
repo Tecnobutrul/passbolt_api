@@ -155,7 +155,7 @@ class OrganizationsController extends MultiTenantAdminController
         }
 
         if (!empty($to)) {
-            $to = date('Y-m-d h:i:s', $to);
+            $to = date('Y-m-d H:i:s', $to);
         } else {
             $to = date('Y-m-d 23:59:59');
         }
