@@ -39,8 +39,13 @@ if ($isCli) {
     }
 } else {
     $match = (explode('/', $_SERVER['REQUEST_URI'], 3));
-    if (isset($match[1])) {
+    if (isset($match[1]) && !empty($match[1])) {
         define('PASSBOLT_ORG', $match[1]);
+    } else {
+        // Redirect to main website if the root is requested.
+        $redirectUrl = Configure::read('passbolt.multiTenant.rootRedirectUrl');
+        header('Location: ' . $redirectUrl, true, 301);
+        die();
     }
 }
 

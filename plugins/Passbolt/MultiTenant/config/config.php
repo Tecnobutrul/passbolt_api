@@ -22,7 +22,8 @@ return [
             // Authentication secret, for json calls.
             'auth' => [
                 'secret' => 'argon2secret'
-            ]
+            ],
+            'rootRedirectUrl' => 'https://www.passbolt.com/free_trial',
         ]
     ]
 ];
