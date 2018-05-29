@@ -496,6 +496,11 @@ class ResourcesTable extends Table
             throw new \InvalidArgumentException(__('The user id should be a valid uuid.'));
         }
 
+        // Build the list of allowed permission types.
+        $allowedPermissionTypes = array_filter(PermissionsTable::ALLOWED_TYPES, function ($type) use ($permissionType) {
+            return $type >= $permissionType;
+        });
+
         // Retrieve the groups ids the user is member of.
         $groupsIds = $this->_findGroupsByUserId($userId)
             ->extract('id')
@@ -510,7 +515,7 @@ class ResourcesTable extends Table
         $where = [
             'Permissions.aco_foreign_key = Resources.id',
             'Permissions.aro_foreign_key' => $userId,
-            'Permissions.type >=' => $permissionType,
+            'Permissions.type IN' => $allowedPermissionTypes,
         ];
 
         // A permission is defined for a group the user is member of and for a given resource.
@@ -519,7 +524,7 @@ class ResourcesTable extends Table
                 'OR' => [ $where, [
                 'Permissions.aco_foreign_key = Resources.id',
                 'Permissions.aro_foreign_key IN' => $groupsIds,
-                'Permissions.type >=' => $permissionType,
+                'Permissions.type IN' => $allowedPermissionTypes,
                 ]]];
         }
         $permissionSubquery->where($where);
@@ -965,5 +970,29 @@ class ResourcesTable extends Table
             'foreign_key' => $resourceId,
             'user_id IN' => $usersId
         ]);
+    }
+
+    /**
+     * Soft delete a list of resources by Ids
+     *
+     * @param string $resourceIds uuid of Resources
+     * @param bool $cascade true
+     * @return void
+     */
+    public function softDeleteAll($resourceIds, $cascade = true)
+    {
+        $Resources = TableRegistry::get('Resources');
+        $Resources->updateAll(['deleted' => true], ['id IN' => $resourceIds]);
+
+        if ($cascade) {
+            $Favorites = TableRegistry::get('Favorites');
+            $Favorites->deleteAll(['foreign_key IN' => $resourceIds]);
+
+            $Secrets = TableRegistry::get('Secrets');
+            $Secrets->deleteAll(['resource_id IN' => $resourceIds]);
+
+            $Permissions = TableRegistry::get('Permissions');
+            $Permissions->deleteAll(['aco_foreign_key IN' => $resourceIds]);
+        }
     }
 }
