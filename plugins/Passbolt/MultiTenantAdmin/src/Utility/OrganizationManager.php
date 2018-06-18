@@ -134,6 +134,8 @@ class OrganizationManager
     public function migrate() {
         $this->_loadOrgConfiguration();
         $migrations = new Migrations();
+        // Do not remove this line. It forces the migration plugin to clear its cache regarding the conf.
+        $migrations->status();
         $migrated = $migrations->migrate();
 
         return $migrated;
