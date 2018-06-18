@@ -23,6 +23,7 @@ use Cake\Datasource\ModelAwareTrait;
 use Cake\Utility\Hash;
 use Cake\View\ViewVarsTrait;
 use Migrations\Migrations;
+use Passbolt\MultiTenantAdmin\Model\Table\OrganizationsTable;
 
 class OrganizationManager
 {
@@ -50,11 +51,14 @@ class OrganizationManager
     {
         $this->slug = $slug;
         $this->databaseName = str_replace('-', '_', $slug);
+
+        $this->Organizations = $this->loadModel('Organizations');
     }
 
     /**
      * Add an organization.
      * @return void
+     * @throws \Exception
      */
     public function add()
     {
@@ -63,12 +67,76 @@ class OrganizationManager
             throw new Exception(__('The organization already exists'));
         }
 
+        // Build data.
+        $data = [
+            'organization' => [
+                'slug' => $this->slug,
+                'plan' => 'trial',
+                'max_users' => 2,
+                'created' => date('Y-m-d H:i:s'),
+                'modified' => date('Y-m-d H:i:s'),
+            ],
+        ];
+
+        $organization = $this->_buildAndValidateOrganizationEntity($data['organization']);
+        $errors = $organization->getErrors();
+        if (!empty($errors)) {
+            throw new \Exception(__('Could not validate organization data.'));
+        }
+
+        if (!$this->Organizations->save($organization)) {
+            $errors = $organization->getErrors();
+            if (!empty($errors)) {
+                throw new \Exception(__('Could not save organization.'));
+            }
+        }
+
         $this->_createOrgDirectory();
         $this->_createDatabase();
         $this->_createGpgServerKeys();
         $this->_createConfigurationFile();
         $this->_loadOrgConfiguration();
         $this->_createSchema();
+    }
+
+    /**
+     * Build and validate organization entity.
+     *
+     * @param array $data data
+     *
+     * @return Passbolt\MultiTenantAdmin\Model\Entity $organization organization entity
+     */
+    protected function _buildAndValidateOrganizationEntity($data)
+    {
+        if(isset($data['organization']['slug'])) {
+            $data['organization']['slug'] = strtolower($data['organization']['slug']);
+        }
+
+        // Build entity and perform basic check.
+        $organization = $this->Organizations->newEntity(
+            $data,
+            [
+                'accessibleFields' => [
+                    'slug' => true,
+                    'plan' => true,
+                    'max_users' => true,
+                ],
+            ]
+        );
+
+        return $organization;
+    }
+
+    /**
+     * Migrate schema.
+     * @return bool
+     */
+    public function migrate() {
+        $this->_loadOrgConfiguration();
+        $migrations = new Migrations();
+        $migrated = $migrations->migrate();
+
+        return $migrated;
     }
 
     /**

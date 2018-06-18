@@ -27,12 +27,14 @@ First, create a separate database, and a connection in the configuration for ema
 ```./bin/cake migrations migrate -p Passbolt/MultiTenantAdmin```
 ```./bin/cake migrations migrate --plugin EmailQueue --connection emailQueue```
 
+### 2. Migrate existing schemas
+```./bin/cake multi_tenant migrate_organizations```
 
 ## How to use
 ### 1. Use the shell to create an organization
 ```bin/cake multi_tenant add_organization --name=acme```
 
 ### 2. Create a user
-./bin/cake passbolt register_user --org=acme --first-name=Firstname --last-name=Lastname --username=name@email.com --role=admin
+```./bin/cake passbolt register_user --org=acme --first-name=Firstname --last-name=Lastname --username=name@email.com --role=admin```
 
 ### 3. For prod, don't forget to set the crontab for this instance.

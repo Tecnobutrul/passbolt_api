@@ -23,6 +23,7 @@ class MultiTenantShell extends Shell
      */
     public $tasks = [
         'Passbolt/MultiTenantAdmin.AddOrganization',
+        'Passbolt/MultiTenantAdmin.MigrateOrganizations',
     ];
 
     /**
@@ -38,6 +39,11 @@ class MultiTenantShell extends Shell
         $parser->addSubcommand('add_organization', [
             'help' => __d('cake_console', 'add a new organization.'),
             'parser' => $this->AddOrganization->getOptionParser(),
+        ]);
+
+        $parser->addSubcommand('migrate_organizations', [
+            'help' => __d('cake_console', 'migrate all organizations to new database version.'),
+            'parser' => $this->MigrateOrganizations->getOptionParser(),
         ]);
 
         return $parser;
