@@ -16,6 +16,8 @@ namespace App\Shell;
 
 use App\Shell\AppShellBootstrap;
 use Cake\Console\Shell;
+use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
 
 /**
  * Application Shell
@@ -47,6 +49,26 @@ class AppShell extends Shell
     protected function _welcome()
     {
         $this->out();
+    }
+
+    /**
+     * Gets the option parser instance and configures it.
+     *
+     * By overriding this method you can configure the ConsoleOptionParser before returning it.
+     *
+     * @return \Cake\Console\ConsoleOptionParser
+     * @link https://book.cakephp.org/3.0/en/console-and-shells.html#configuring-options-and-generating-help
+     */
+
+    public function getOptionParser()
+    {
+        $parser = parent::getOptionParser();
+
+        $parser->addOption('org', [
+            'help' => 'Organization for which this operation is for.',
+            'default' => null,
+        ]);
+        return $parser;
     }
 
     /**

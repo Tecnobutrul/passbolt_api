@@ -143,6 +143,17 @@ if ($isCli) {
     require __DIR__ . '/bootstrap_cli.php';
 }
 
+/**
+ * Multi org management.
+ * This has to be done here, after loading of the bootsrap_cli.
+ */
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiTenant')) {
+    Plugin::load('Passbolt/MultiTenant', ['bootstrap' => true, 'routes' => false, 'middleware' => true]);
+}
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiTenantAdmin')) {
+    Plugin::load('Passbolt/MultiTenantAdmin', ['bootstrap' => true, 'routes' => true]);
+}
+
 /*
  * Set the full base URL.
  * This URL is used as the base of all absolute links.
