@@ -34,6 +34,7 @@ if ($isCli) {
         preg_match('/--org=(.+)/', $value, $match);
         if (isset($match[1])) {
             define('PASSBOLT_ORG', $match[1]);
+            define('CACHE_ORG', CACHE . PASSBOLT_ORG . DS);
             break;
         }
     }
@@ -41,6 +42,7 @@ if ($isCli) {
     $match = (explode('/', $_SERVER['REQUEST_URI'], 3));
     if (isset($match[1]) && !empty($match[1])) {
         define('PASSBOLT_ORG', $match[1]);
+        define('CACHE_ORG', CACHE . PASSBOLT_ORG . DS);
     } else {
         // Redirect to main website if the root is requested.
         $redirectUrl = Configure::read('passbolt.multiTenant.rootRedirectUrl');
