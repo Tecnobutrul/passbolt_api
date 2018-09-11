@@ -108,7 +108,7 @@ class GroupsUpdateDryRunControllerTest extends AppIntegrationTestCase
 
         // Update the group users.
         $this->authenticateAs('jean');
-        $this->putJson("/groups/$groupId/dry-run.json", ['groups_users' => $changes]);
+        $this->putJson("/groups/$groupId/dry-run.json?api-version=v1", ['groups_users' => $changes]);
         $this->assertSuccess();
         $result = json_decode(json_encode($this->_responseJsonBody), true);
         $this->assertNotEmpty($result);
@@ -167,7 +167,7 @@ class GroupsUpdateDryRunControllerTest extends AppIntegrationTestCase
 
         // Update the group name.
         $this->authenticateAs('admin');
-        $this->putJson("/groups/$groupId/dry-run.json", $data);
+        $this->putJson("/groups/$groupId/dry-run.json?api-version=v1", $data);
         $this->assertSuccess();
 
         // No secrets should be requested nor source secrets given.
@@ -186,7 +186,7 @@ class GroupsUpdateDryRunControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('ada');
         $groupId = 'invalid-id';
-        $this->putJson("/groups/$groupId/dry-run.json");
+        $this->putJson("/groups/$groupId/dry-run.json?api-version=v1");
         $this->assertError(400, 'The group id is not valid.');
     }
 
@@ -194,7 +194,7 @@ class GroupsUpdateDryRunControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('ada');
         $groupId = UuidFactory::uuid();
-        $this->putJson("/groups/$groupId/dry-run.json");
+        $this->putJson("/groups/$groupId/dry-run.json?api-version=v1");
         $this->assertError(404, 'The group does not exist.');
     }
 
@@ -202,7 +202,7 @@ class GroupsUpdateDryRunControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('admin');
         $groupId = UuidFactory::uuid('group.id.deleted');
-        $this->putJson("/groups/$groupId/dry-run.json");
+        $this->putJson("/groups/$groupId/dry-run.json?api-version=v1");
         $this->assertError(404, 'The group does not exist.');
     }
 
@@ -210,7 +210,7 @@ class GroupsUpdateDryRunControllerTest extends AppIntegrationTestCase
     {
         $groupId = UuidFactory::uuid('group.id.freelancer');
         $this->authenticateAs('ada');
-        $this->putJson("/groups/$groupId/dry-run.json");
+        $this->putJson("/groups/$groupId/dry-run.json?api-version=v1");
         $this->assertForbiddenError('You are not authorized to access that location.');
     }
 
@@ -218,7 +218,7 @@ class GroupsUpdateDryRunControllerTest extends AppIntegrationTestCase
     {
         $groupId = UuidFactory::uuid('group.id.freelancer');
         $postData = [];
-        $this->putJson("/groups/$groupId/dry-run.json", $postData);
+        $this->putJson("/groups/$groupId/dry-run.json?api-version=v1", $postData);
         $this->assertAuthenticationError();
     }
 }

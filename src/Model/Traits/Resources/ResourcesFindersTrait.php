@@ -17,6 +17,7 @@ namespace App\Model\Traits\Resources;
 use App\Model\Entity\Permission;
 use App\Model\Table\PermissionsTable;
 use Cake\Collection\CollectionInterface;
+use Cake\Core\Configure;
 use Cake\Validation\Validation;
 
 trait ResourcesFindersTrait
@@ -89,6 +90,11 @@ trait ResourcesFindersTrait
             $query->contain('Favorites', function ($q) use ($userId) {
                 return $q->where(['Favorites.user_id' => $userId]);
             });
+        }
+
+        // If plugin tag is present and request contains tags
+        if (Configure::read('passbolt.plugins.tags')) {
+            $query = \Passbolt\Tags\Model\Table\TagsTable::decorateForeignFind($query, $options, $userId);
         }
 
         /*
