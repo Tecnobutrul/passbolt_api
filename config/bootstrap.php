@@ -71,6 +71,10 @@ use Cake\Utility\Inflector;
 use Cake\Utility\Security;
 use App\Mailer\Transport\DebugSmtpTransport;
 
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiTenant' . DS . 'config' . DS . 'bootstrap_0.php')) {
+    require PLUGINS . DS . 'Passbolt' . DS . 'MultiTenant' . DS . 'config' . DS . 'bootstrap_0.php';
+}
+
 /*
  * Read configuration file and inject configuration into various
  * CakePHP classes.
