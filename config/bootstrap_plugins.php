@@ -41,3 +41,8 @@ if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'Export')) {
 if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'Tags')) {
     Plugin::load('Passbolt/Tags', ['bootstrap' => true, 'routes' => true]);
 }
+
+// Add AccountSettings plugin if present
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'AccountSettings')) {
+    Plugin::load('Passbolt/AccountSettings', ['bootstrap' => true, 'routes' => true]);
+}

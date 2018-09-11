@@ -75,7 +75,8 @@
             "PassboltSeleniumApi\\": "./plugins/PassboltSeleniumApi/src",
             "Passbolt\\MultiTenant\\": "./plugins/Passbolt/MultiTenant/src",
             "Passbolt\\MultiTenantAdmin\\": "./plugins/Passbolt/MultiTenantAdmin/src",
-            "Passbolt\\Tags\\": "./plugins/Passbolt/Tags/src"
+            "Passbolt\\Tags\\": "./plugins/Passbolt/Tags/src",
+            "Passbolt\\AccountSettings\\": "./plugins/Passbolt/AccountSettings/src"
         }
     },
     "autoload-dev": {
@@ -83,6 +84,7 @@
             "App\\Test\\": "tests",
             "Cake\\Test\\": "./vendor/cakephp/cakephp/tests",
             "PassboltSeleniumApi\\Test\\": "./plugins/PassboltSeleniumApi/tests",
+            "Passbolt\\AccountSettings\\Test\\": "./plugins/Passbolt/AccountSettings/tests",
             "Passbolt\\Tags\\Test\\": "./plugins/Passbolt/Tags/tests"
         }
     },
