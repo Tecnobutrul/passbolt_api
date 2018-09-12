@@ -72,11 +72,11 @@ RUN apt-get update \
     && rm /etc/nginx/sites-enabled/default \
     && apt-get purge -y --auto-remove $PASSBOLT_DEV_PACKAGES \
     && echo 'php_flag[expose_php] = off' > /usr/local/etc/php-fpm.d/expose.conf \
-    && sed -i 's/# server_tokens/server_tokens/' /etc/nginx/nginx.conf \
     && rm -rf /var/lib/apt/lists/* \
     && rm /usr/local/bin/composer
 
 COPY docker/conf/passbolt.conf /etc/nginx/conf.d/default.conf
+COPY docker/conf/nginx.conf /etc/nginx/nginx.conf
 COPY docker/conf/supervisor/*.conf /etc/supervisor/conf.d/
 COPY docker/bin/docker-entrypoint.sh /docker-entrypoint.sh
 
