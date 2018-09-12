@@ -40,5 +40,8 @@ if ($isCli) {
 
 if (defined('PASSBOLT_ORG')) {
     // Load configuration for the cache.
-    define('CACHE_ORG', CACHE . PASSBOLT_ORG . DS);
+    define('CACHE_PREFIX_ORG', '_' . PASSBOLT_ORG);
+} else {
+    // Define default cache for jobs that are not linked with an org.
+    define('CACHE_PREFIX_ORG', '_passbolt');
 }
