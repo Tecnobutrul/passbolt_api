@@ -21,6 +21,8 @@ use Passbolt\MultiTenant\Middleware\DomainMiddleware;
 $isCli = PHP_SAPI === 'cli';
 $argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
 
+
+
 // Load default plugin configuration file while keeping plugin conf defined in passbolt.php.
 $original = Configure::read('passbolt.multiTenant');
 Configure::load('Passbolt/MultiTenant.config', 'default', true);
@@ -29,24 +31,11 @@ $merged = array_merge($defaults, $original);
 Configure::write('passbolt.multiTenant', $merged);
 
 // Extract organization from cli parameter, or url.
-if ($isCli) {
-    foreach ($argv as $i => $value) {
-        preg_match('/--org=(.+)/', $value, $match);
-        if (isset($match[1])) {
-            define('PASSBOLT_ORG', $match[1]);
-            break;
-        }
-    }
-} else {
-    $match = (explode('/', $_SERVER['REQUEST_URI'], 3));
-    if (isset($match[1]) && !empty($match[1])) {
-        define('PASSBOLT_ORG', $match[1]);
-    } else {
-        // Redirect to main website if the root is requested.
-        $redirectUrl = Configure::read('passbolt.multiTenant.rootRedirectUrl');
-        header('Location: ' . $redirectUrl, true, 301);
-        die();
-    }
+if (!$isCli && !defined('PASSBOLT_ORG')) {
+    // Redirect to main website if the root is requested.
+    $redirectUrl = Configure::read('passbolt.multiTenant.rootRedirectUrl');
+    header('Location: ' . $redirectUrl, true, 301);
+    die();
 }
 
 // Check if multitenant settings apply.
