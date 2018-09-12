@@ -38,3 +38,14 @@ First, create a separate database, and a connection in the configuration for ema
 ```./bin/cake passbolt register_user --org=acme --first-name=Firstname --last-name=Lastname --username=name@email.com --role=admin```
 
 ### 3. For prod, don't forget to set the crontab for this instance.
+
+## Important
+### Cache configuration
+
+The cache configuration needs to be isolated for each organization. To do so, DO NOT FORGET to set each cache configuration with a path. 
+The correct cache option to do so is as below:
+```
+'prefix' => CACHE_PREFIX_ORG
+```
+
+CACHE_PREFIX_ORG will be set at bootstrap with a unique value for each org.
