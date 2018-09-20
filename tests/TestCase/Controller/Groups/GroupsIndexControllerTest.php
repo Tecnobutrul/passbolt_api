@@ -106,7 +106,8 @@ class GroupsIndexControllerTest extends AppIntegrationTestCase
     public function testContainApiV1SSuccess()
     {
         $this->authenticateAs('ada');
-        $urlParameter = 'contain[modifier]=1';
+        $urlParameter = 'api-version=v1';
+        $urlParameter .= '&contain[modifier]=1';
         $urlParameter .= '&contain[modifier.profile]=1';
         $urlParameter .= '&contain[user]=1';
         $urlParameter .= '&contain[group_user]=1';

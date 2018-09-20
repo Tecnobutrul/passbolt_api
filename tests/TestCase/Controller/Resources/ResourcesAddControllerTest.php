@@ -232,7 +232,7 @@ W3AI8+rWjK8MGH2T88hCYI/6
     public function testResourcesAddErrorNotAuthenticated()
     {
         $data = $this->_getDummyPostData();
-        $this->postJson("/resources.json?api-version=v1", $data);
+        $this->postJson("/resources.json?api-version=v2", $data);
         $this->assertAuthenticationError();
     }
 }
