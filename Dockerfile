@@ -5,6 +5,7 @@ LABEL maintainer="diego@passbolt.com"
 
 ARG PHP_EXTENSIONS="gd \
       intl \
+      ldap \
       pdo_mysql \
       xsl"
 
@@ -16,6 +17,7 @@ ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
       libpng-dev \
       libjpeg62-turbo-dev \
       libicu-dev \
+      libldap2-dev \
       libxslt1-dev \
       libmcrypt-dev \
       unzip \
