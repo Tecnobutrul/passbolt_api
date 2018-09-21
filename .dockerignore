@@ -1,0 +1,9 @@
+spec
+tests
+.git
+.github
+*.md
+docker-compose-dev.yml
+Rakefile
+Gemfile*
+.travis.yml
