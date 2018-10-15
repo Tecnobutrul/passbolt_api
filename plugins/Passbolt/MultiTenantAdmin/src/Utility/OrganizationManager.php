@@ -14,6 +14,7 @@
  */
 namespace Passbolt\MultiTenantAdmin\Utility;
 
+use App\Model\Entity\AuthenticationToken;
 use App\Model\Entity\Role;
 use Cake\Core\Configure;
 use Cake\Core\Configure\Engine\PhpConfig;
@@ -432,7 +433,7 @@ EOF";
             throw new Exception('Cannot save user');
         }
 
-        $token = $this->AuthenticationTokens->generate($user->id);
+        $token = $this->AuthenticationTokens->generate($user->id, AuthenticationToken::TYPE_REGISTER);
 
         return ['user' => $user, 'token' => $token];
     }
