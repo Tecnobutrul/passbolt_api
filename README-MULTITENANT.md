@@ -49,3 +49,6 @@ The correct cache option to do so is as below:
 ```
 
 CACHE_PREFIX_ORG will be set at bootstrap with a unique value for each org.
+
+## Troubleshooting
+The clear cache function does not work for now. It has to be fixed
