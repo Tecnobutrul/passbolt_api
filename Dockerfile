@@ -7,6 +7,7 @@ ARG PHP_EXTENSIONS="gd \
       intl \
       ldap \
       pdo_mysql \
+      opcache \
       xsl"
 
 ARG PECL_PASSBOLT_EXTENSIONS="gnupg \
