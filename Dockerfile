@@ -76,7 +76,8 @@ RUN apt-get update \
     && apt-get purge -y --auto-remove $PASSBOLT_DEV_PACKAGES \
     && echo 'php_flag[expose_php] = off' > /usr/local/etc/php-fpm.d/expose.conf \
     && rm -rf /var/lib/apt/lists/* \
-    && rm /usr/local/bin/composer
+    && rm /usr/local/bin/composer \
+    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 COPY docker/conf/passbolt.conf /etc/nginx/conf.d/default.conf
 COPY docker/conf/nginx.conf /etc/nginx/nginx.conf
