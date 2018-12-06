@@ -31,6 +31,7 @@ use App\Test\Lib\Utility\ArrayTrait;
 use App\Test\Lib\Utility\EntityTrait;
 use App\Test\Lib\Utility\ObjectTrait;
 use App\Utility\UuidFactory;
+use Cake\Core\Configure;
 use Cake\TestSuite\IntegrationTestCase;
 use PHPUnit\Framework\Assert;
 
@@ -80,6 +81,8 @@ abstract class AppIntegrationTestCase extends IntegrationTestCase
     {
         parent::setUp();
         $this->initAvatarEvents();
+        // The tests should configure themselves their environment.
+        Configure::write('passbolt.plugins', []);
         $this->enableCsrfToken();
     }
 
@@ -257,11 +260,12 @@ abstract class AppIntegrationTestCase extends IntegrationTestCase
      * methods to check the response.
      *
      * @param string|array $url The URL to request.
+     * @param array $data The data for the request.
      * @return void
      */
-    public function deleteJson($url)
+    public function deleteJson($url, $data = [])
     {
-        $this->delete($url);
+        $this->_sendRequest($url, 'DELETE', $data);
         $this->_responseJson = json_decode($this->_getBodyAsString());
         if (empty($this->_responseJson)) {
             Assert::fail('The result of the request is not a valid json.');
