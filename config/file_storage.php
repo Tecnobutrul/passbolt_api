@@ -6,12 +6,10 @@ use Burzum\FileStorage\Event\LocalFileStorageListener;
 use Cake\Core\Configure;
 use Cake\Event\EventManager;
 
-// Image storage paths.
-Configure::write('ImageStorage.basePath', WWW_ROOT . 'img' . DS . 'public');
-Configure::write('ImageStorage.publicPath', 'img' . DS . 'public');
-
 // Image versions configuration.
 Configure::write('FileStorage', [
+    // File storage adapter (Local or S3Image);
+    'adapter' => 'S3Image',
     // Configure the `basePath` for the Local adapter, not needed when not using it
     'basePath' => APP . 'FileStorage' . DS,
     'imageDefaults' => [
@@ -53,11 +51,42 @@ $listener = new ImageProcessingListener();
 EventManager::instance()->on($listener);
 
 StorageUtils::generateHashes();
-StorageManager::setConfig('Local', [
-    'adapterOptions' => [
-        Configure::read('ImageStorage.basePath'),
-        true,
-    ],
-    'adapterClass' => '\Gaufrette\Adapter\Local',
-    'class' => '\Gaufrette\Filesystem'
-]);
+
+// Image storage paths.
+Configure::write('ImageStorage.basePath', WWW_ROOT . 'img' . DS . 'public');
+Configure::write('ImageStorage.publicPath', 'img' . DS . 'public');
+
+if (Configure::read('FileStorage.adapter') === 'Local') {
+    StorageManager::setConfig('Local', [
+        'adapterOptions' => [
+            Configure::read('ImageStorage.basePath'),
+            true,
+        ],
+        'adapterClass' => '\Gaufrette\Adapter\Local',
+        'class' => '\Gaufrette\Filesystem'
+    ]);
+} elseif (Configure::read('FileStorage.adapter') === 'S3Image') {
+    $S3Client = \Aws\S3\S3Client::factory([
+        'credentials' => array(
+            // AWS key id
+            'key' => 'aws-key',
+            // AWS key secret
+            'secret' => 'aws-secret'
+        ),
+        'region' => 'us-west-2',
+        'version' => 'latest',
+    ]);
+
+    StorageManager::setConfig('S3Image', array(
+            'adapterOptions' => array(
+                $S3Client,
+                'passbolt-avatars',
+                array(
+                ),
+                true
+            ),
+            'adapterClass' => '\Gaufrette\Adapter\AwsS3',
+            'class' => '\Gaufrette\Filesystem'
+        )
+    );
+}

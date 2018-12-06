@@ -151,7 +151,7 @@ class AvatarsTable extends ImageStorageTable
     public function beforeMarshal(Event $event, \ArrayAccess $data)
     {
         parent::beforeMarshal($event, $data);
-        $data['adapter'] = 'Local';
+        $data['adapter'] = Configure::read('FileStorage.adapter');
         $data['model'] = 'Avatar';
     }
 

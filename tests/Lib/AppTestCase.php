@@ -30,7 +30,7 @@ use App\Test\Lib\Utility\ObjectTrait;
 use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
 
-class AppTestCase extends TestCase
+abstract class AppTestCase extends TestCase
 {
     // Do not load all the traits here
     // load them were needed instead
@@ -57,6 +57,7 @@ class AppTestCase extends TestCase
     {
         parent::setUp();
         $this->initAvatarEvents();
+        // The tests should configure themselves their environment.
         Configure::write('passbolt.plugins', []);
     }
 

@@ -69,6 +69,10 @@ use Cake\Network\Request;
 use Cake\Utility\Security;
 use Passbolt\WebInstaller\Middleware\WebInstallerMiddleware;
 
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiTenant' . DS . 'config' . DS . 'bootstrap_0.php')) {
+    require PLUGINS . DS . 'Passbolt' . DS . 'MultiTenant' . DS . 'config' . DS . 'bootstrap_0.php';
+}
+
 /*
  * Read configuration file and inject configuration into various
  * CakePHP classes.
@@ -146,6 +150,17 @@ if ($isCli) {
  */
 if ($isCli) {
     require __DIR__ . '/bootstrap_cli.php';
+}
+
+/**
+ * Multi org management.
+ * This has to be done here, after loading of the bootsrap_cli.
+ */
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiTenant')) {
+    Plugin::load('Passbolt/MultiTenant', ['bootstrap' => true, 'routes' => false, 'middleware' => true]);
+}
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiTenantAdmin')) {
+    Plugin::load('Passbolt/MultiTenantAdmin', ['bootstrap' => true, 'routes' => true]);
 }
 
 /*
