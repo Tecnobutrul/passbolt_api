@@ -23,7 +23,17 @@ if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'RememberMe')) {
     Plugin::load('Passbolt/RememberMe', ['bootstrap' => true, 'routes' => false]);
 }
 
-// Add tags plugin if present.
+// Add AccountSettings plugin if present
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'AccountSettings')) {
+    Plugin::load('Passbolt/AccountSettings', ['bootstrap' => true, 'routes' => true]);
+}
+
+// Add MFA plugin if present
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiFactorAuthentication')) {
+    Plugin::load('Passbolt/MultiFactorAuthentication', ['bootstrap' => true, 'routes' => true]);
+}
+
+// Add webinstaller plugin if present.
 if (defined('PASSBOLT_IS_CONFIGURED') && !PASSBOLT_IS_CONFIGURED) {
     if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'WebInstaller')) {
         Plugin::load('Passbolt/WebInstaller', ['bootstrap' => true, 'routes' => true]);
