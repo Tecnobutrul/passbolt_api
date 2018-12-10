@@ -3,7 +3,7 @@ services:
   db:
     image: mariadb:10.3
     env_file:
-      - env/mysql.env
+      - docker/env/mysql.env
     volumes:
       - database_volume:/var/lib/mysql
     ports:
@@ -20,7 +20,7 @@ services:
       - db
     volumes:
       - images_volume:/var/www/passbolt/webroot/img/public/images
-      - ./scripts/wait-for.sh:/usr/bin/wait-for.sh
+      - ${PWD}/docker/scripts/wait-for.sh:/usr/bin/wait-for.sh
       - ${PWD}/docker/app.php:/var/www/passbolt/config/app.php
       - ${PWD}/docker/passbolt.php:/var/www/passbolt/config/passbolt.php
     command: ["/usr/bin/wait-for.sh", "db:3306", "--", "/docker-entrypoint.sh"]
