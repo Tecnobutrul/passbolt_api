@@ -36,7 +36,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
     public function testUsersEditNotLoggedInError()
     {
         $data = [];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.nope') . '.json', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.nope') . '.json?api-version=v1', $data);
         $this->assertAuthenticationError();
     }
 
@@ -44,7 +44,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('ada');
         $data = [];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.nope') . '.json', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.nope') . '.json?api-version=v1', $data);
         $this->assertError('403', 'You are not authorized to access that location.');
     }
 
@@ -52,7 +52,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('admin');
         $data = [];
-        $this->postJson('/users/notauuid.json', $data);
+        $this->postJson('/users/notauuid.json?api-version=v1', $data);
         $this->assertError('400', 'The user id must be a valid uuid.');
     }
 
@@ -60,7 +60,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('ada');
         $data = [];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json?api-version=v1', $data);
         $this->assertError('400', 'Some user data must be provided.');
     }
 
@@ -70,7 +70,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
         $data = [
             'id' => UuidFactory::uuid('user.id.betty')
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json?api-version=v1', $data);
         $this->assertError('400', 'Some user data must be provided.');
     }
 
@@ -83,7 +83,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
                 'first_name' => 'sofia edited'
             ]
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.sofia') . '.json', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.sofia') . '.json?api-version=v1', $data);
         $this->assertError('400', 'The user does not exist or has been deleted.');
     }
 
@@ -96,7 +96,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
                 'first_name' => '💁'
             ]
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json?api-version=v1', $data);
         $this->assertError('400', 'Could not validate user data.');
         $error = $this->_responseJsonBody->User->profile->first_name->utf8;
         $this->assertEquals($error, 'First name should be a valid utf8 string.');
@@ -111,7 +111,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
                 'first_name' => 'ada edited'
             ]
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json?api-version=v1', $data);
         $this->assertSuccess();
         $this->assertEquals($this->_responseJsonBody->Profile->first_name, 'Ada edited');
     }
@@ -129,7 +129,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
                 'first_name' => 'ada edited'
             ]
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json?api-version=v1', $data);
         $this->assertSuccess();
         $this->assertEquals($this->_responseJsonBody->Profile->first_name, 'Ada edited');
         $this->assertEquals($this->_responseJsonBody->User->active, true);
@@ -148,7 +148,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
                 'first_name' => 'ada edited',
             ]
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json?api-version=v1', $data);
         $this->assertSuccess();
         $this->assertEquals($this->_responseJsonBody->Profile->first_name, 'Ada edited');
         $this->assertEquals($this->_responseJsonBody->User->username, 'ada@passbolt.com');
@@ -163,7 +163,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
             'id' => UuidFactory::uuid('user.id.ada'),
             'role_id' => UuidFactory::uuid('role.id.admin')
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json?api-version=v1', $data);
         $this->assertSuccess();
         $this->assertEquals($this->_responseJsonBody->Role->name, Role::ADMIN);
     }
@@ -180,7 +180,7 @@ class UsersEditControllerTest extends AppIntegrationTestCase
                 'id' => UuidFactory::uuid('role.id.admin')
             ]
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.ada') . '.json?api-version=v1', $data);
         $this->assertSuccess();
         $this->assertEquals($this->_responseJsonBody->Role->name, Role::USER);
     }

@@ -20,6 +20,7 @@ use App\Model\Entity\Permission;
 use App\Model\Entity\Role;
 use App\Model\Rule\IsNotSoftDeletedRule;
 use App\Model\Traits\Resources\ResourcesFindersTrait;
+use Cake\Core\Configure;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
@@ -90,6 +91,12 @@ class ResourcesTable extends Table
             'foreignKey' => 'resource_id',
             'saveStrategy' => 'replace'
         ]);
+
+        if (Configure::read('passbolt.plugins.tags')) {
+            $this->belongsToMany('Tags', [
+                'through' => 'Passbolt/Tags.ResourcesTags',
+            ]);
+        }
     }
 
     /**
@@ -347,6 +354,14 @@ class ResourcesTable extends Table
         // Remove all the associated favorites.
         $this->association('Favorites')
             ->deleteAll(['Favorites.foreign_key' => $resource->id]);
+
+        // Delete all tags
+        if (Configure::read('passbolt.plugins.tags')) {
+            $ResourcesTags = TableRegistry::get('Passbolt/Tags.ResourcesTags');
+            $ResourcesTags->deleteAll(['resource_id' => $resource->id]);
+            $Tags = TableRegistry::get('Passbolt/Tags.Tags');
+            $Tags->deleteAllUnusedTags();
+        }
 
         return true;
     }
@@ -642,6 +657,16 @@ class ResourcesTable extends Table
             'foreign_key' => $resourceId,
             'user_id IN' => $usersId
         ]);
+
+        if (Configure::read('passbolt.plugins.tags')) {
+            $ResourcesTags = TableRegistry::get('Passbolt/Tags.ResourcesTags');
+            $ResourcesTags->deleteAll([
+                'resource_id' => $resourceId,
+                'user_id IN' => $usersId
+            ]);
+            $Tags = TableRegistry::get('Passbolt/Tags.Tags');
+            $Tags->deleteAllUnusedTags();
+        }
     }
 
     /**
@@ -665,6 +690,13 @@ class ResourcesTable extends Table
 
             $Permissions = TableRegistry::get('Permissions');
             $Permissions->deleteAll(['aco_foreign_key IN' => $resourceIds]);
+
+            if (Configure::read('passbolt.plugins.tags')) {
+                $ResourcesTags = TableRegistry::get('Passbolt/Tags.ResourcesTags');
+                $ResourcesTags->deleteAll(['resource_id IN' => $resourceIds]);
+                $Tags = TableRegistry::get('Passbolt/Tags.Tags');
+                $Tags->deleteAllUnusedTags();
+            }
         }
     }
 }

@@ -80,7 +80,7 @@ hcciUFw5
 
         // Update the group users.
         $this->authenticateAs('jean');
-        $this->putJson("/groups/$groupId.json", ['groups_users' => $changes]);
+        $this->putJson("/groups/$groupId.json?api-version=v1", ['groups_users' => $changes]);
         $this->assertSuccess();
 
         // Jean and Nancy should still have access to the resources.
@@ -143,7 +143,7 @@ hcciUFw5
 
         // Update the group users.
         $this->authenticateAs('jean');
-        $this->putJson("/groups/$groupId.json", ['groups_users' => $changes, 'secrets' => $secrets]);
+        $this->putJson("/groups/$groupId.json?api-version=v1", ['groups_users' => $changes, 'secrets' => $secrets]);
         $this->assertSuccess();
 
         // Frances should have access to the group resources.
@@ -192,7 +192,7 @@ hcciUFw5
 
         // Update the group users.
         $this->authenticateAs('jean');
-        $this->putJson("/groups/$groupId.json", ['groups_users' => $changes]);
+        $this->putJson("/groups/$groupId.json?api-version=v1", ['groups_users' => $changes]);
         $this->assertSuccess();
 
         // kathleen should not have anymore access to the group resources.
@@ -279,7 +279,7 @@ hcciUFw5
 
         // Update the group users.
         $this->authenticateAs('jean');
-        $this->putJson("/groups/$groupId.json", ['groups_users' => $changes, 'secrets' => $secrets]);
+        $this->putJson("/groups/$groupId.json?api-version=v1", ['groups_users' => $changes, 'secrets' => $secrets]);
         $this->assertSuccess();
 
         // Jean and Nancy should still have access to the resources.
@@ -319,7 +319,7 @@ hcciUFw5
 
         // Update the group name.
         $this->authenticateAs('jean');
-        $this->putJson("/groups/$groupId.json", $data);
+        $this->putJson("/groups/$groupId.json?api-version=v1", $data);
         $this->assertSuccess();
 
         // The name of the group should be updated
@@ -344,7 +344,7 @@ hcciUFw5
 
         // Update the group name.
         $this->authenticateAs('admin');
-        $this->putJson("/groups/$groupId.json", $data);
+        $this->putJson("/groups/$groupId.json?api-version=v1", $data);
         $this->assertSuccess();
 
         // The name of the group should be updated
@@ -378,7 +378,7 @@ hcciUFw5
 
         // Update the group users.
         $this->authenticateAs('admin');
-        $this->putJson("/groups/$groupId.json", ['groups_users' => $changes]);
+        $this->putJson("/groups/$groupId.json?api-version=v1", ['groups_users' => $changes]);
         $this->assertSuccess();
 
         // Jean and Nancy should still have access to the resources.
@@ -422,7 +422,7 @@ hcciUFw5
 
         // Update the group users.
         $this->authenticateAs('admin');
-        $this->putJson("/groups/$groupId.json", ['groups_users' => $changes]);
+        $this->putJson("/groups/$groupId.json?api-version=v1", ['groups_users' => $changes]);
         $this->assertSuccess();
 
         // kathleen should not have anymore access to the group resources.
@@ -471,7 +471,7 @@ hcciUFw5
 
         // Update the group users.
         $this->authenticateAs('admin');
-        $this->putJson("/groups/$groupId.json", $data);
+        $this->putJson("/groups/$groupId.json?api-version=v1", $data);
         $this->assertSuccess();
 
         // The name of the group should be updated
@@ -503,7 +503,7 @@ hcciUFw5
 
         // Update the group name.
         $this->authenticateAs('admin');
-        $this->putJson("/groups/$groupId.json", ['groups_users' => $changes]);
+        $this->putJson("/groups/$groupId.json?api-version=v1", ['groups_users' => $changes]);
         $this->assertSuccess();
 
         // The user carol shouldn't be member of the group
@@ -550,7 +550,7 @@ hcciUFw5
 
         // Update the group name.
         $this->authenticateAs('admin');
-        $this->putJson("/groups/$groupId.json", ['groups_users' => $changes]);
+        $this->putJson("/groups/$groupId.json?api-version=v1", ['groups_users' => $changes]);
         $this->assertSuccess();
 
         // The user Kathleen should still be member of the group
@@ -567,7 +567,7 @@ hcciUFw5
     {
         $this->authenticateAs('ada');
         $groupId = 'invalid-id';
-        $this->putJson("/groups/$groupId.json");
+        $this->putJson("/groups/$groupId.json?api-version=v1");
         $this->assertError(400, 'The group id is not valid.');
     }
 
@@ -575,7 +575,7 @@ hcciUFw5
     {
         $this->authenticateAs('ada');
         $groupId = UuidFactory::uuid();
-        $this->putJson("/groups/$groupId.json");
+        $this->putJson("/groups/$groupId.json?api-version=v1");
         $this->assertError(404, 'The group does not exist.');
     }
 
@@ -583,7 +583,7 @@ hcciUFw5
     {
         $this->authenticateAs('admin');
         $groupId = UuidFactory::uuid('group.id.deleted');
-        $this->putJson("/groups/$groupId.json");
+        $this->putJson("/groups/$groupId.json?api-version=v1");
         $this->assertError(404, 'The group does not exist.');
     }
 
@@ -591,7 +591,7 @@ hcciUFw5
     {
         $groupId = UuidFactory::uuid('group.id.freelancer');
         $this->authenticateAs('ada');
-        $this->putJson("/groups/$groupId.json");
+        $this->putJson("/groups/$groupId.json?api-version=v1");
         $this->assertForbiddenError('You are not authorized to access that location.');
     }
 
@@ -599,7 +599,7 @@ hcciUFw5
     {
         $groupId = UuidFactory::uuid('group.id.freelancer');
         $postData = [];
-        $this->putJson("/groups/$groupId.json", $postData);
+        $this->putJson("/groups/$groupId.json?api-version=v1", $postData);
         $this->assertAuthenticationError();
     }
 

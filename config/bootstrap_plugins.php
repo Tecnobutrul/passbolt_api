@@ -17,15 +17,54 @@ use Cake\Core\Plugin;
 /**
  * Insert below all passbolt plugins.
  */
+// Add passbolt pro main plugin if present.
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'Pro')) {
+    Plugin::load('Passbolt/Pro', ['bootstrap' => true, 'routes' => false]);
+}
+
+// Add webinstaller plugin if present.
+if (defined('PASSBOLT_IS_CONFIGURED') && !PASSBOLT_IS_CONFIGURED) {
+    if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'WebInstaller')) {
+        Plugin::load('Passbolt/WebInstaller', ['bootstrap' => true, 'routes' => true]);
+    }
+}
+
+// Add tags plugin if present.
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'Tags')) {
+    Plugin::load('Passbolt/Tags', ['bootstrap' => true, 'routes' => true]);
+}
+
+// Add import plugin if present.
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'Import')) {
+    Plugin::load('Passbolt/Import', ['bootstrap' => true, 'routes' => true]);
+}
+
+// Add export plugin if present.
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'Export')) {
+    Plugin::load('Passbolt/Export', ['bootstrap' => true, 'routes' => false]);
+}
 
 // Add remember me plugin if present.
 if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'RememberMe')) {
     Plugin::load('Passbolt/RememberMe', ['bootstrap' => true, 'routes' => false]);
 }
 
-// Add tags plugin if present.
-if (defined('PASSBOLT_IS_CONFIGURED') && !PASSBOLT_IS_CONFIGURED) {
-    if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'WebInstaller')) {
-        Plugin::load('Passbolt/WebInstaller', ['bootstrap' => true, 'routes' => true]);
-    }
+// Add license plugin if present.
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'License')) {
+    Plugin::load('Passbolt/License', ['bootstrap' => true, 'routes' => false]);
+}
+
+// Add AccountSettings plugin if present
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'AccountSettings')) {
+    Plugin::load('Passbolt/AccountSettings', ['bootstrap' => true, 'routes' => true]);
+}
+
+// Add DirectorySync plugin if present.
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'DirectorySync')) {
+    Plugin::load('Passbolt/DirectorySync', ['bootstrap' => true, 'routes' => true]);
+}
+
+// Add MFA plugin if present
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiFactorAuthentication')) {
+    Plugin::load('Passbolt/MultiFactorAuthentication', ['bootstrap' => true, 'routes' => true]);
 }
