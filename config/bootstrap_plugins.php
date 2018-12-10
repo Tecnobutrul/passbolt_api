@@ -56,3 +56,9 @@ if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'DirectorySync')) {
 if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'MultiFactorAuthentication')) {
     Plugin::load('Passbolt/MultiFactorAuthentication', ['bootstrap' => true, 'routes' => true]);
 }
+
+if (defined('PASSBOLT_IS_CONFIGURED') && !PASSBOLT_IS_CONFIGURED) {
+    if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'WebInstaller')) {
+        Plugin::load('Passbolt/WebInstaller', ['bootstrap' => true, 'routes' => true]);
+    }
+}

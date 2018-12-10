@@ -83,7 +83,8 @@
             "Passbolt\\Tags\\": "./plugins/Passbolt/Tags/src",
             "Passbolt\\AccountSettings\\": "./plugins/Passbolt/AccountSettings/src",
             "Passbolt\\DirectorySync\\": "./plugins/Passbolt/DirectorySync/src",
-            "Passbolt\\MultiFactorAuthentication\\": "./plugins/Passbolt/MultiFactorAuthentication/src"
+            "Passbolt\\MultiFactorAuthentication\\": "./plugins/Passbolt/MultiFactorAuthentication/src",
+            "Passbolt\\WebInstaller\\": "./plugins/Passbolt/WebInstaller/src"
         }
     },
     "autoload-dev": {
@@ -91,8 +92,8 @@
             "App\\Test\\": "tests",
             "Cake\\Test\\": "./vendor/cakephp/cakephp/tests",
             "PassboltSeleniumApi\\Test\\": "./plugins/PassboltSeleniumApi/tests",
-            "PassboltSeleniumApi\\Test\\": "./plugins/PassboltSeleniumApi/tests",
             "Passbolt\\Tags\\Test\\": "./plugins/Passbolt/Tags/tests",
+            "Passbolt\\WebInstaller\\Test\\": "./plugins/Passbolt/WebInstaller/tests",
             "Passbolt\\AccountSettings\\Test\\": "./plugins/Passbolt/AccountSettings/tests",
             "Passbolt\\DirectorySync\\Test\\": "./plugins/Passbolt/DirectorySync/tests",
             "Passbolt\\MultiFactorAuthentication\\Test\\": "./plugins/Passbolt/MultiFactorAuthentication/tests"
