@@ -16,7 +16,12 @@
         <testsuite name="App Test Suite">
             <directory>./tests/TestCase</directory>
             <directory>./plugins/PassboltSeleniumApi/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/Tags/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/License/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/AccountSettings/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/DirectorySync/tests/TestCase</directory>
             <directory>./plugins/Passbolt/WebInstaller/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/MultiFactorAuthentication/tests/TestCase</directory>
         </testsuite>
         <!-- Add plugin test suites here. -->
     </testsuites>
@@ -36,7 +41,7 @@
     <filter>
         <whitelist>
             <directory suffix=".php">./src/</directory>
-            <!-- <directory suffix=".php">./plugins/*/src/</directory> -->
+            <directory suffix=".php">./plugins/*/src/</directory>
         </whitelist>
     </filter>
 </phpunit>

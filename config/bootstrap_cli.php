@@ -40,6 +40,11 @@ if (Configure::read('debug') > 0 && Configure::read('passbolt.selenium.active'))
     Plugin::load('PassboltTestData', ['bootstrap' => true, 'routes' => false]);
 }
 
+// Add directory sync plugin if present.
+if (file_exists(PLUGINS . DS . 'Passbolt' . DS . 'DirectorySync')) {
+    Plugin::load('Passbolt/DirectorySync', ['bootstrap' => true, 'routes' => false]);
+}
+
 if (defined('TEST_IS_RUNNING')) {
     Configure::write('Testing.Datasources.test', Configure::read('Datasources.test'));
 }
