@@ -1,0 +1,116 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--tag=gcr.io/$PROJECT_ID/passbolt-cloud:$SHORT_SHA'
+      - '--tag=gcr.io/$PROJECT_ID/passbolt-cloud:$BUILD_ID'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args:
+      - 'cp'
+      - 'gs://pb-config-$PROJECT_ID/bb-config.enc'
+      - '/config/bb-config.enc'
+    volumes:
+      - name: 'config'
+        path: /config
+
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args:
+      - 'cp'
+      - 'gs://pb-config-$PROJECT_ID/bb-ssh-key.enc'
+      - '/config/bb-ssh-key.enc'
+    volumes:
+      - name: 'config'
+        path: /config
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        base64 -d /config/bb-config.enc | gcloud kms decrypt \
+          --location europe-west1 \
+          --project $PROJECT_ID \
+          --keyring $PROJECT_ID-passbolt \
+          --key $PROJECT_ID-passbolt-crypto-key \
+          --plaintext-file /config/bb-config \
+          --ciphertext-file - \
+        && base64 -d /config/bb-ssh-key.enc | gcloud kms decrypt \
+          --location europe-west1 \
+          --project $PROJECT_ID \
+          --keyring $PROJECT_ID-passbolt \
+          --key $PROJECT_ID-passbolt-crypto-key \
+          --plaintext-file /config/bb-ssh-key \
+          --ciphertext-file -
+
+    volumes:
+      - name: 'config'
+        path: /config
+
+  - name: 'gcr.io/$PROJECT_ID/sops'
+    entrypoint: 'bash'
+    env:
+      - 'BUILD_ID=$BUILD_ID'
+      - 'SHORT_SHA=$SHORT_SHA'
+    args:
+      - '-c'
+      - |
+        mkdir -p /root/.ssh \
+        && ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts \
+        && cp /config/bb-ssh-key /root/.ssh/id_rsa \
+        && chmod 600 /root/.ssh/id_rsa \
+        && git clone git@bitbucket.org:$_DEPLOYMENT_REPO /chart \
+        && cd /chart
+        if [[ "$BRANCH_NAME" == "$_CODE_PRODUCTION_BRANCH" ]]; then
+          git checkout -b feature/$BUILD_ID origin/$_CHARTS_PRODUCTION_BRANCH
+        else
+          git checkout $_CHARTS_STAGING_BRANCH
+        fi
+        sops --decrypt values.enc.yaml > values.yaml \
+        && python /usr/local/bin/tag-image.py \
+        && sops --encrypt --encrypted-suffix _encrypted --gcp-kms \
+          projects/$PROJECT_ID/locations/europe-west1/keyRings/$PROJECT_ID-passbolt/cryptoKeys/$PROJECT_ID-passbolt-crypto-key values.yaml > values.enc.yaml \
+        && rm values.yaml \
+        && git add values.enc.yaml \
+        && git config --global user.email sysops@passbolt.com \
+        && git config --global user.name "Passbolt cloud build bot" \
+        && git commit -m ":robot_face: Updated image tag BUILD: $BUILD_ID"
+        if [[ "$BRANCH_NAME" == "$_CODE_PRODUCTION_BRANCH" ]]; then
+          git push origin feature/$BUILD_ID \
+          && curl --retry "$_RETRIES" -X POST -H "Content-Type: application/json" \
+             --netrc-file /config/bb-config \
+             https://bitbucket.org/api/2.0/repositories/$_DEPLOYMENT_REPO/pullrequests -d @- <<EOF |
+          {
+           "title": "Deployment to $_CHARTS_PRODUCTION_BRANCH",
+           "description": "Build deployment: $BUILD_ID",
+           "source": {
+               "branch": { "name": "feature/$BUILD_ID" },
+               "repository": { "full_name": "$_DEPLOYMENT_REPO" }
+             },
+           "destination": { "branch": { "name": "$_CHARTS_PRODUCTION_BRANCH" } },
+           "close_source_branch": true
+          }
+        EOF
+          jq -er \
+            'if (.type == "pullrequest") and (.state == "OPEN") then
+              "PR Submitted"
+            else
+              error("Something went wrong")
+            end'
+        else
+          git push origin $_CHARTS_STAGING_BRANCH
+        fi
+    volumes:
+      - name: 'config'
+        path: /config
+
+substitutions:
+  _DEPLOYMENT_REPO: passbolt/charts-passbolt-cloud
+  _CHARTS_PRODUCTION_BRANCH: master
+  _CHARTS_STAGING_BRANCH: develop
+  _CODE_PRODUCTION_BRANCH: production
+  _RETRIES: "5"
+images:
+  - 'gcr.io/$PROJECT_ID/passbolt-cloud:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/passbolt-cloud:$BUILD_ID'

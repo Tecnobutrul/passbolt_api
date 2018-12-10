@@ -13,6 +13,7 @@
  * @since         2.4.0
  */
 use Cake\Core\Configure;
+use Cake\Routing\Router;
 ?>
 <!DOCTYPE html>
 <html class="passbolt" lang="en">
@@ -24,7 +25,6 @@ use Cake\Core\Configure;
     <?= $this->fetch('css') ?>
 
     <?= $this->fetch('js') ?>
-
 </head>
 <body>
 <div id="container" class="container page <?= $this->fetch('pageClass') ?>">

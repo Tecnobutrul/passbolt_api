@@ -80,10 +80,7 @@
             "Passbolt\\MultiTenant\\": "./plugins/Passbolt/MultiTenant/src",
             "Passbolt\\MultiTenantAdmin\\": "./plugins/Passbolt/MultiTenantAdmin/src",
             "Passbolt\\RememberMe\\": "./plugins/Passbolt/RememberMe/src",
-            "Passbolt\\WebInstaller\\": "./plugins/Passbolt/WebInstaller/src"
             "Passbolt\\Tags\\": "./plugins/Passbolt/Tags/src",
-            "Passbolt\\WebInstaller\\": "./plugins/Passbolt/WebInstaller/src",
-            "Passbolt\\License\\": "./plugins/Passbolt/License/src",
             "Passbolt\\AccountSettings\\": "./plugins/Passbolt/AccountSettings/src",
             "Passbolt\\DirectorySync\\": "./plugins/Passbolt/DirectorySync/src",
             "Passbolt\\MultiFactorAuthentication\\": "./plugins/Passbolt/MultiFactorAuthentication/src"
@@ -94,10 +91,7 @@
             "App\\Test\\": "tests",
             "Cake\\Test\\": "./vendor/cakephp/cakephp/tests",
             "PassboltSeleniumApi\\Test\\": "./plugins/PassboltSeleniumApi/tests",
-            "Passbolt\\WebInstaller\\Test\\": "./plugins/Passbolt/WebInstaller/tests"
             "PassboltSeleniumApi\\Test\\": "./plugins/PassboltSeleniumApi/tests",
-            "Passbolt\\WebInstaller\\Test\\": "./plugins/Passbolt/WebInstaller/tests",
-            "Passbolt\\License\\Test\\": "./plugins/Passbolt/License/tests",
             "Passbolt\\Tags\\Test\\": "./plugins/Passbolt/Tags/tests",
             "Passbolt\\AccountSettings\\Test\\": "./plugins/Passbolt/AccountSettings/tests",
             "Passbolt\\DirectorySync\\Test\\": "./plugins/Passbolt/DirectorySync/tests",

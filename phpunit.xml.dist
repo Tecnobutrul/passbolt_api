@@ -17,7 +17,6 @@
             <directory>./tests/TestCase</directory>
             <directory>./plugins/PassboltSeleniumApi/tests/TestCase</directory>
             <directory>./plugins/Passbolt/Tags/tests/TestCase</directory>
-            <directory>./plugins/Passbolt/License/tests/TestCase</directory>
             <directory>./plugins/Passbolt/AccountSettings/tests/TestCase</directory>
             <directory>./plugins/Passbolt/DirectorySync/tests/TestCase</directory>
             <directory>./plugins/Passbolt/WebInstaller/tests/TestCase</directory>
