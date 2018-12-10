@@ -126,12 +126,15 @@ module.exports = function(grunt) {
             // Login page 3rd party logo
             'third_party/firefox_logo.png',
             'third_party/ChromeWebStore.png',
-            'third_party/gnupg_logo_disabled.png', 'third_party/gnupg_logo.png',
+            'third_party/gnupg_logo_disabled.png',
+            'third_party/gnupg_logo.png',
             // Chosen images
             'third_party/chosen-sprite@2x.png', 'third_party/chosen-sprite.png',
             'third_party/duo.svg',
             'third_party/google-authenticator.svg',
             'third_party/yubikey.svg',
+            // Chosen images
+            'third_party/chosen-sprite@2x.png', 'third_party/chosen-sprite.png',
             // Themes preview
             'themes/*.png',
             // Fontawesome
