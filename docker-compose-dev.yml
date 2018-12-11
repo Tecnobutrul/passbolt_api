@@ -3,7 +3,7 @@ services:
   db:
     image: mariadb:10.3
     env_file:
-      - env/mysql.env
+      - docker/env/mysql.env
     volumes:
       - database_volume:/var/lib/mysql
     ports:
@@ -20,10 +20,17 @@ services:
       - db
     volumes:
       - images_volume:/var/www/passbolt/webroot/img/public/images
-      - ./scripts/wait-for.sh:/usr/bin/wait-for.sh
+      - ${PWD}/docker/conf/ssl/server.crt:/etc/ssl/certs/passbolt/server.crt
+      - ${PWD}/docker/conf/ssl/server-key.pem:/etc/ssl/certs/passbolt/server-key.pem
+      - ${PWD}/docker/scripts/wait-for.sh:/usr/bin/wait-for.sh
       - ${PWD}/docker/app.php:/var/www/passbolt/config/app.php
       - ${PWD}/docker/passbolt.php:/var/www/passbolt/config/passbolt.php
-    command: ["/usr/bin/wait-for.sh", "db:3306", "--", "/docker-entrypoint.sh"]
+    command:
+      - /bin/bash
+      - -c
+      - |
+        /usr/bin/wait-for.sh db:3306 -- mysql -h db -u root -ptest -e "create database if not exists email_queue;" \
+        && /docker-entrypoint.sh
     ports:
       - 80:80
       - 443:443
