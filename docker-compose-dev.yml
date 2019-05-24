@@ -18,19 +18,45 @@ services:
       context: .
     depends_on:
       - db
+    env_file:
+      - docker/env/passbolt.env
     volumes:
       - images_volume:/var/www/passbolt/webroot/img/public/images
+      - ${PWD}/config/gpg/unsecure.key:/var/www/passbolt/config/gpg/serverkey.key
+      - ${PWD}/config/gpg/unsecure_private.key:/var/www/passbolt/config/gpg/serverkey_private.key
       - ${PWD}/docker/conf/ssl/server.crt:/etc/ssl/certs/passbolt/server.crt
       - ${PWD}/docker/conf/ssl/server-key.pem:/etc/ssl/certs/passbolt/server-key.pem
       - ${PWD}/docker/scripts/wait-for.sh:/usr/bin/wait-for.sh
-      - ${PWD}/docker/app.php:/var/www/passbolt/config/app.php
-      - ${PWD}/docker/passbolt.php:/var/www/passbolt/config/passbolt.php
+      - ${PWD}:/var/www/passbolt
     command:
       - /bin/bash
       - -c
       - |
+        ln -s /var/www/passbolt/docker/conf/passbolt.php /var/www/passbolt/config/passbolt.php
+        ln -s /var/www/passbolt/docker/conf/app.php /var/www/passbolt/config/app.php
+        if [ "$$PHP_COMPOSER" ]; then
+          apt-get update
+          apt-get install -y git unzip
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php -r "if (hash_file('sha384', 'composer-setup.php') === '48e3236262b34d30969dca3c37281b3b4bbe3221bda826ac6a9a62d6444cdb0dcd0615698a5cbe587c3f0fe57a54d8f5') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+          php composer-setup.php
+          php -r "unlink('composer-setup.php');"
+          mv composer.phar /usr/bin/composer
+          composer install
+          rm -rf cache
+          rm -rf pear
+        fi
         /usr/bin/wait-for.sh db:3306 -- mysql -h db -u root -ptest -e "create database if not exists email_queue;" \
-        && /docker-entrypoint.sh
+        mysql -h db -u root -ptest -e "grant all on email_queue.* to passbolt@'%' identified by 'P4ssb0lt';"
+        mysql -h db -u root -ptest -e "grant all on *.* to passbolt@'%' identified by 'P4ssb0lt';"
+        su -c "./bin/cake migrations migrate -p Passbolt/MultiTenantAdmin" -s /bin/bash www-data
+        su -c "./bin/cake migrations migrate -p EmailQueue --connection emailQueue" -s /bin/bash www-data
+        su -c "./bin/cake multi_tenant migrate_organizations" -s /bin/bash www-data
+        su -c "./bin/cake multi_tenant add_organization --name=acme" -s /bin/bash www-data
+        echo "================================================================"
+        su -c "./bin/cake passbolt register_user --org=acme -f Wile -l Coyote -r admin -u coyote@cloud.passbolt.local" -s /bin/bash www-data
+        echo "================================================================"
+        /docker-entrypoint.sh
     ports:
       - 80:80
       - 443:443
