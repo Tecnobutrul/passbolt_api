@@ -8,6 +8,11 @@
 /config/license
 /config/ldap.php
 
+# Cloud specific
+config/gpg/serverkey.key
+config/gpg/serverkey_private.key
+plugins/Passbolt/MultiTenantAdmin/config/Migrations/schema-dump-default.lock
+
 # Dependencies #
 ################
 /vendor/*
