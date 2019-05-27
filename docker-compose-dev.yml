@@ -4,8 +4,8 @@ services:
     image: mariadb:10.3
     env_file:
       - docker/env/mysql.env
-    volumes:
-      - database_volume:/var/lib/mysql
+    tmpfs:
+      - /var/lib/mysql
     ports:
       - 3306
   redis:
@@ -47,7 +47,8 @@ services:
           rm -rf pear
         fi
         /usr/bin/wait-for.sh db:3306 -- mysql -h db -u root -ptest -e "create database if not exists email_queue;" \
-        mysql -h db -u root -ptest -e "grant all on email_queue.* to passbolt@'%' identified by 'P4ssb0lt';"
+        mysql -h db -u root -ptest -e "create database if not exists passbolt_test;"
+        mysql -h db -u root -ptest -e "create database if not exists email_queue_test;"
         mysql -h db -u root -ptest -e "grant all on *.* to passbolt@'%' identified by 'P4ssb0lt';"
         su -c "./bin/cake migrations migrate -p Passbolt/MultiTenantAdmin" -s /bin/bash www-data
         su -c "./bin/cake migrations migrate -p EmailQueue --connection emailQueue" -s /bin/bash www-data

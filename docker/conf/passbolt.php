@@ -26,54 +26,14 @@
  * An installation issue? Ask for help to the community: https://community.passbolt.com/
  */
 return [
-    'debug' => false,
-    'App' => [
-        // A base URL to use for absolute links.
-        // The url where the passbolt instance will be reachable to your end users.
-        // This information is need to render images in emails for example
-        'fullBaseUrl' => env('APP_FULL_BASE_URL'),
-    ],
-
     // Database configuration.
     'Datasources' => [
-        'default' => [
-            'className' => 'Cake\Database\Connection',
-            'driver' => env('DATASOURCES_DEFAULT_DRIVER', 'Cake\Database\Driver\Mysql'),
-            'persistent' => false,
-            'host' => env('DATASOURCES_DEFAULT_HOST', 'localhost'),
-            'port' => env('DATASOURCES_DEFAULT_PORT', 3306),
-            /**
-             * CakePHP will use the default DB port based on the driver selected
-             * MySQL on MAMP uses port 8889, MAMP users will want to uncomment
-             * the following line and set the port accordingly
-             */
-            //'port' => 'non_standard_port_number',
-            'username' => env('DATASOURCES_DEFAULT_USERNAME', ''),
-            'password' => env('DATASOURCES_DEFAULT_PASSWORD', ''),
-            'database' => env('DATASOURCES_DEFAULT_DATABASE', ''),
-            'ssl_key' => env('DATASOURCES_DEFAULT_SSL_KEY', ''),
-            'ssl_cert' => env('DATASOURCES_DEFAULT_SSL_CERT', ''),
-            'ssl_ca' => env('DATASOURCES_DEFAULT_SSL_CA', ''),
-            'encoding' => 'utf8mb4',
-            'timezone' => 'UTC',
-            'flags' => [],
-            'cacheMetadata' => true,
-            'log' => false,
-            'quoteIdentifiers' => false,
-            'url' => env('DATASOURCES_DEFAULT_URL', null),
-        ],
         'emailQueue' => [
             'className' => 'Cake\Database\Connection',
             'driver' => env('DATASOURCES_EMAILQUEUE_DRIVER', 'Cake\Database\Driver\Mysql'),
             'persistent' => false,
             'host' => env('DATASOURCES_EMAILQUEUE_HOST', 'localhost'),
             'port' => env('DATASOURCES_EMAILQUEUE_PORT', 3306),
-            /**
-             * CakePHP will use the default DB port based on the driver selected
-             * MySQL on MAMP uses port 8889, MAMP users will want to uncomment
-             * the following line and set the port accordingly
-             */
-            //'port' => 'non_standard_port_number',
             'username' => env('DATASOURCES_EMAILQUEUE_USERNAME', ''),
             'password' => env('DATASOURCES_EMAILQUEUE_PASSWORD', ''),
             'database' => env('DATASOURCES_EMAILQUEUE_DATABASE', ''),
@@ -87,6 +47,26 @@ return [
             'log' => false,
             'quoteIdentifiers' => false,
             'url' => env('DATASOURCES_EMAILQUEUE_URL', null),
+        ],
+        'test_emailQueue' => [
+            'className' => 'Cake\Database\Connection',
+            'driver' => env('DATASOURCES_TEST_DRIVER', 'Cake\Database\Driver\Mysql'),
+            'persistent' => false,
+            'host' => env('DATASOURCES_TEST_HOST', 'localhost'),
+            'port' => env('DATASOURCES_TEST_PORT', 3306),
+            'username' => env('DATASOURCES_TEST_USERNAME', 'my_app'),
+            'password' => env('DATASOURCES_TEST_PASSWORD', 'secret'),
+            'database' => env('DATASOURCES_TEST_DATABASE', 'my_app'),
+            'ssl_key' => env('DATASOURCES_TEST_SSL_KEY', ''),
+            'ssl_cert' => env('DATASOURCES_TEST_SSL_CERT', ''),
+            'ssl_ca' => env('DATASOURCES_TEST_SSL_CA', ''),
+            'encoding' => 'utf8mb4',
+            'timezone' => 'UTC',
+            'cacheMetadata' => true,
+            'quoteIdentifiers' => false,
+            'log' => false,
+            //'init' => ['SET GLOBAL innodb_stats_on_metadata = 0'],
+            'url' => env('DATASOURCES_TEST_URL', null),
         ],
     ],
 
@@ -117,21 +97,6 @@ return [
         'datasource' => 'emailQueue',
     ],
     'passbolt' => [
-        // GPG Configuration.
-        // The keyring must to be owned and accessible by the webserver user.
-        // Example: www-data user on Debian
-        //'gpg' => [
-        //    // Main server key.
-        //    'serverKey' => [
-        //        // Server private key fingerprint.
-        //        'fingerprint' => '7EE80D0A883A535BA6A13950F468D047F09FC8CA',
-        //        'public' => CONFIG . DS . 'gpg' . DS . 'serverkey.asc',
-        //        'private' => CONFIG . DS . 'gpg' . DS . 'serverkey_private.asc',
-        //    ],
-        //],
-        'registration' => [
-            'public' => false,
-        ],
         'ssl' => [
             'force' => true,
         ],
