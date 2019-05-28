@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -17,19 +17,21 @@ namespace App\Test\TestCase\Controller\Notifications;
 
 use App\Test\TestCase\Controller\Resources\ResourcesUpdateControllerTest;
 use App\Utility\UuidFactory;
-use Cake\Core\Configure;
+use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 
 class ResourcesUpdateNotificationTest extends ResourcesUpdateControllerTest
 {
+    use EmailNotificationSettingsTestTrait;
+
     public $fixtures = [
-        'app.Base/users', 'app.Base/groups', 'app.Base/resources', 'app.Base/secrets', 'app.Base/gpgkeys',
-        'app.Base/favorites', 'app.Base/email_queue', 'app.Base/profiles', 'app.Base/roles',
-        'app.Base/groups_users', 'app.Base/permissions', 'app.Base/avatars'
+        'app.Base/Users', 'app.Base/Groups', 'app.Base/Resources', 'app.Base/Secrets', 'app.Base/Gpgkeys',
+        'app.Base/Favorites', 'app.Base/EmailQueue', 'app.Base/Profiles', 'app.Base/Roles',
+        'app.Base/GroupsUsers', 'app.Base/Permissions', 'app.Base/Avatars'
     ];
 
     public function testResourcesUpdateNotificationDisabled()
     {
-        Configure::write('passbolt.email.send.password.update', false);
+        $this->setEmailNotificationSetting('send.password.update', false);
 
         // Get and update resource
         $resourceId = UuidFactory::uuid('resource.id.apache');
@@ -49,7 +51,7 @@ class ResourcesUpdateNotificationTest extends ResourcesUpdateControllerTest
 
     public function testResourcesUpdateNotificationSuccess()
     {
-        Configure::write('passbolt.email.send.password.update', true);
+        $this->setEmailNotificationSetting('send.password.update', true);
 
         // Get and update resource
         $resourceId = UuidFactory::uuid('resource.id.apache');

@@ -14,8 +14,11 @@
  */
 namespace Passbolt\DirectorySync\Utility\DirectoryEntry;
 
+use App\Utility\UuidFactory;
+use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectCollection;
 use LdapTools\Object\LdapObjectType;
+use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 /**
  * Class DirectoryResults
@@ -42,6 +45,11 @@ class DirectoryResults
     private $mappingRules;
 
     /**
+     * Directory settings
+     */
+    private $directorySettings;
+
+    /**
      * Groups
      * @var array
      */
@@ -54,17 +62,34 @@ class DirectoryResults
     private $users;
 
     /**
+     * Invalid users which will be ignored.
+     * @var
+     */
+    private $invalidUsers;
+
+    /**
+     * Invalid groups which will be ignored.
+     * @var
+     */
+    private $invalidGroups;
+
+    /**
      * DirectoryResults constructor.
      *
      * @param array $mappingRules mapping rules
+     * @param DirectoryOrgSettings $settings settings. If null, will retrieve settings through standard way.
+     * @return void
      */
-    public function __construct(array $mappingRules)
+    public function __construct(array $mappingRules, DirectoryOrgSettings $settings = null)
     {
         $this->mappingRules = $mappingRules;
+        $this->directorySettings = $settings !== null ? $settings : DirectoryOrgSettings::get();
         $this->ldapUsers = [];
         $this->ldapGroups = [];
         $this->users = [];
         $this->groups = [];
+        $this->invalidUsers = [];
+        $this->invalidGroups = [];
     }
 
     /**
@@ -72,19 +97,28 @@ class DirectoryResults
      * @param LdapObjectCollection $ldapUsers ldap users
      * @param LdapObjectCollection $ldapGroups ldap groups
      * @return void
+     * @throws \Exception
      */
     public function initializeWithLdapResults(LdapObjectCollection $ldapUsers, LdapObjectCollection $ldapGroups)
     {
         $this->ldapGroups = $ldapGroups;
         $this->ldapUsers = $ldapUsers;
 
+        // Transform ldap users and groups according to config. (add emails or ids if missing).
+        $this->transformLdapUsers();
+        $this->transformLdapGroups();
+
+        // Populate users and groups with their corresponding entries.
         $this->_populateUsers();
         $this->_populateGroups();
+
+        // Process users and groups relationships.
         $this->_populateAllGroupsUsersDetails();
     }
 
     /**
      * Initialize results with list of entries.
+     * This function is mainly available for testing.
      * @param array $userEntries user entries
      * @param array $groupEntries group entries
      * @return void
@@ -111,6 +145,93 @@ class DirectoryResults
         $this->_populateAllGroupsUsersDetails();
     }
 
+
+    /**
+     * Transform ldap users.
+     * @return void
+     */
+    public function transformLdapUsers()
+    {
+        foreach ($this->ldapUsers as $ldapUser) {
+            $this->transformLdapUser($ldapUser);
+        }
+    }
+
+    /**
+     * Transform ldap groups.
+     * @return void
+     */
+    public function transformLdapGroups()
+    {
+        foreach ($this->ldapGroups as $ldapGroup) {
+            $this->transformLdapGroup($ldapGroup);
+        }
+    }
+
+    /**
+     * Transform one ldap group.
+     * Add a uuid if not present (based on cn)
+     * @param LdapObject $ldapGroup ldap group
+     *
+     * @return LdapObject ldap object
+     */
+    public function transformLdapGroup(LdapObject $ldapGroup)
+    {
+        $this->_transformId($ldapGroup);
+
+        return $ldapGroup;
+    }
+
+    /**
+     * Transform one ldap user.
+     * Add a uuid if not present (based on cn)
+     * Build an email if defined in the configuration.
+     * @param LdapObject $ldapUser ldap user
+     *
+     * @return LdapObject ldap object
+     */
+    public function transformLdapUser(LdapObject $ldapUser)
+    {
+        $this->_transformId($ldapUser);
+        $this->_transformEmail($ldapUser);
+
+        return $ldapUser;
+    }
+
+    /**
+     * Transform ldap object email based on provided configuration.
+     * @param LdapObject $ldapUser ldap user
+     * @return void
+     */
+    protected function _transformEmail(LdapObject $ldapUser)
+    {
+        $emailAttribute = $this->mappingRules[LdapObjectType::USER]['username'];
+        $useEmailPrefixSuffix = $this->directorySettings->getUseEmailPrefixSuffix();
+
+        if (!$ldapUser->has($emailAttribute) && $useEmailPrefixSuffix) {
+            $emailPrefix = $this->directorySettings->getEmailPrefix();
+            $prefix = $ldapUser->get($emailPrefix);
+            $suffix = $this->directorySettings->getEmailSuffix();
+            $ldapUser->set($emailAttribute, $prefix . $suffix);
+        }
+    }
+
+    /**
+     * Adds a uuid to the ldap object if not present and if a dn exists.
+     * @param LdapObject $ldapObject ldap object
+     *
+     * @return LdapObject ldap object
+     */
+    protected function _transformId(LdapObject $ldapObject)
+    {
+        $idAttribute = $this->mappingRules[$ldapObject->getType()]['id'];
+        if (!$ldapObject->has($idAttribute) && $ldapObject->has('dn')) {
+            $ldapObject->add($idAttribute, UuidFactory::uuid($ldapObject->getDn()));
+        }
+
+        return $ldapObject;
+    }
+
     /**
      * Populate groups list from Ldap results.
      * @return void
@@ -120,9 +241,46 @@ class DirectoryResults
     {
         foreach ($this->ldapGroups as $ldapGroup) {
             if (!isset($this->groups[$ldapGroup->getDn()])) {
-                $this->groups[$ldapGroup->getDn()] = GroupEntry::fromLdapObject($ldapGroup, $this->mappingRules);
+                $groupEntry = GroupEntry::fromLdapObject($ldapGroup, $this->mappingRules);
+                if (!empty($ldapGroup->getDn())) {
+                    $this->groups[$ldapGroup->getDn()] = $groupEntry;
+                } else {
+                    $this->invalidGroups[] = $groupEntry;
+                }
             }
         }
+    }
+
+    /**
+     * Get invalid groups.
+     * Invalid groups are groups that do not match the expected format and that will be ignored.
+     * @return array
+     */
+    public function getInvalidGroups()
+    {
+        $invalidGroups = [];
+        foreach ($this->groups as $group) {
+            if ($group->hasErrors()) {
+                $invalidGroups[] = $group;
+            }
+        }
+        return array_merge($this->invalidGroups, $invalidGroups);
+    }
+
+    /**
+     * get invalid users.
+     * Invalid users are users that do not match the expected format and that will be ignored.
+     * @return array
+     */
+    public function getInvalidUsers()
+    {
+        $invalidUsers = [];
+        foreach ($this->users as $user) {
+            if ($user->hasErrors()) {
+                $invalidUsers[] = $user;
+            }
+        }
+        return array_merge($this->invalidUsers, $invalidUsers);
     }
 
     /**
@@ -134,7 +292,12 @@ class DirectoryResults
     {
         foreach ($this->ldapUsers as $ldapUser) {
             if (!isset($this->users[$ldapUser->getDn()])) {
-                $this->users[$ldapUser->getDn()] = UserEntry::fromLdapObject($ldapUser, $this->mappingRules);
+                $userEntry = UserEntry::fromLdapObject($ldapUser, $this->mappingRules);
+                if (!empty($ldapUser->getDn())) {
+                    $this->users[$ldapUser->getDn()] = $userEntry;
+                } else {
+                    $this->invalidUsers[] = $userEntry;
+                }
             }
         }
     }
@@ -180,20 +343,42 @@ class DirectoryResults
 
     /**
      * Get users.
+     * @param bool $validOnly whether to return only valid users (without validation errors)
      * @return array
      */
-    public function getUsers()
+    public function getUsers(bool $validOnly = false)
     {
-        return $this->users;
+        if (!$validOnly) {
+            return $this->users;
+        }
+
+        $users = [];
+        foreach($this->users as $key => $user) {
+            if (!$user->hasErrors()) {
+                $users[$key] = $user;
+            }
+        }
+        return $users;
     }
 
     /**
      * Get groups.
+     * @param bool $validOnly whether to return only valid groups (without validation errors)
      * @return array
      */
-    public function getGroups()
+    public function getGroups(bool $validOnly = false)
     {
-        return $this->groups;
+        if (!$validOnly) {
+            return $this->groups;
+        }
+
+        $groups = [];
+        foreach($this->groups as $key => $group) {
+            if (!$group->hasErrors()) {
+                $groups[$key] = $group;
+            }
+        }
+        return $groups;
     }
 
     /**
@@ -390,8 +575,16 @@ class DirectoryResults
      */
     private function _getFlattenedChildrenRecursive(GroupEntry &$group, array &$flatTree, int $level)
     {
-        $group->level = $level;
-        $flatTree[] = $group;
+        $g = clone $group;
+        $g->level = $level;
+        $flatTree[] = $g;
+
+        foreach ($group['group']['users'] as $u) {
+            $user = clone $u;
+            $user->level = $level;
+            $flatTree[] = $user;
+        }
+
         foreach ($group['group']['groups'] as $g) {
             $this->_getFlattenedChildrenRecursive($g, $flatTree, ++ $level);
         }
@@ -409,7 +602,7 @@ class DirectoryResults
         foreach ($tree as $entity) {
             if ($entity->isUser()) {
                 $entity->level = $level;
-                $flatTree[] = $entity;
+                $flatTree[] = clone $entity;
             }
         }
         foreach ($tree as $entity) {
@@ -455,7 +648,7 @@ class DirectoryResults
     }
 
     /**
-     * Lookup for a group by its name.
+     * Lookup for a group by its case insensitive name.
      * @param string $name group name
      *
      * @return array|null the corresponding GroupEntry
@@ -463,7 +656,7 @@ class DirectoryResults
     public function lookupGroupByGroupName(string $name)
     {
         foreach ($this->groups as $group) {
-            if ($group['group']['name'] === $name) {
+            if (strtolower($group['group']['name']) === strtolower($name)) {
                 return $group;
             }
         }
@@ -472,13 +665,15 @@ class DirectoryResults
     }
 
     /**
-     * Return the list of users in a simple array format.
+     * Return the list of valid users in a simple array format.
+     * @param bool $validOnly whether to return only valid users (without validation errors)
      * @return array array of users.
      */
-    public function getUsersAsArray()
+    public function getUsersAsArray(bool $validOnly = false)
     {
         $results = [];
-        foreach ($this->users as $user) {
+        $validUsers = $this->getUsers($validOnly);
+        foreach ($validUsers as $user) {
             $results[] = $user->toArray();
         }
 
@@ -486,13 +681,15 @@ class DirectoryResults
     }
 
     /**
-     * Return the list of groups in a simple array format.
+     * Return the list of valid groups in a simple array format.
+     * @param bool $validOnly whether to return only valid groups (without validation errors)
      * @return array array of groups.
      */
-    public function getGroupsAsArray()
+    public function getGroupsAsArray(bool $validOnly = false)
     {
         $results = [];
-        foreach ($this->groups as $group) {
+        $validGroups = $this->getGroups($validOnly);
+        foreach ($validGroups as $group) {
             $results[] = $group->toArray();
         }
 

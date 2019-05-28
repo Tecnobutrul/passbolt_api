@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -16,10 +16,10 @@ namespace App\Controller\Events\EmailTraits;
 
 use App\Model\Entity\Resource;
 use App\Model\Entity\User;
-use Cake\Core\Configure;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
+use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettings;
 
 trait ShareEmailTrait
 {
@@ -50,7 +50,7 @@ trait ShareEmailTrait
         $userIds = Hash::extract($changes['secrets'], '{n}.user_id');
         if (!empty($userIds)) {
             // Get the details of whoever did the changes
-            $Users = TableRegistry::get('Users');
+            $Users = TableRegistry::getTableLocator()->get('Users');
             $owner = $Users->findFirstForEmail($ownerId);
             $this->sendNewShareEmail($event, $resource, $changes['secrets'], $userIds, $owner);
         }
@@ -66,13 +66,13 @@ trait ShareEmailTrait
      * @param User $owner person who did the change
      * @return void
      */
-    public function sendNewShareEmail(Event $event, Resource $resource, array $secrets, array $userIds, \App\Model\Entity\User $owner)
+    public function sendNewShareEmail(Event $event, Resource $resource, array $secrets, array $userIds, User $owner)
     {
-        if (!Configure::read('passbolt.email.send.password.share')) {
+        if (!EmailNotificationSettings::get('send.password.share')) {
             return;
         }
 
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $users = $Users->find()
             ->select(['id', 'username'])
             ->where(['id IN' => $userIds])

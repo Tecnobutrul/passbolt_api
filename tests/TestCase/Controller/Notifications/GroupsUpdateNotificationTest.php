@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -17,14 +17,15 @@ namespace App\Test\TestCase\Controller\Notifications;
 
 use App\Test\Lib\AppIntegrationTestCase;
 use App\Utility\UuidFactory;
-use Cake\Core\Configure;
+use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 
 class GroupsUpdateNotificationTest extends AppIntegrationTestCase
 {
+    use EmailNotificationSettingsTestTrait;
 
-    public $fixtures = ['app.Base/groups', 'app.Base/groups_users', 'app.Base/resources', 'app.Base/permissions', 'app.Base/users',
-        'app.Base/secrets', 'app.Base/profiles', 'app.Base/gpgkeys', 'app.Base/roles', 'app.Base/favorites', 'app.Base/email_queue',
-        'app.Base/avatars'];
+    public $fixtures = ['app.Base/Groups', 'app.Base/GroupsUsers', 'app.Base/Resources', 'app.Base/Permissions', 'app.Base/Users',
+        'app.Base/Secrets', 'app.Base/Profiles', 'app.Base/Gpgkeys', 'app.Base/Roles', 'app.Base/Favorites', 'app.Base/EmailQueue',
+        'app.Base/Avatars'];
 
     public function testUpdateNotificationAddMemberSuccess()
     {
@@ -74,7 +75,7 @@ class GroupsUpdateNotificationTest extends AppIntegrationTestCase
 
     public function testUpdateNotificationAddUserDisabled()
     {
-        Configure::write('passbolt.email.send.group.user.add', false);
+        $this->setEmailNotificationSetting('send.group.user.add', false);
 
         // Define actors of this tests
         $groupId = UuidFactory::uuid('group.id.freelancer');
@@ -116,7 +117,7 @@ class GroupsUpdateNotificationTest extends AppIntegrationTestCase
 
     public function testUpdateNotificationRemoveMemberDisabled()
     {
-        Configure::write('passbolt.email.send.group.user.delete', false);
+        $this->setEmailNotificationSetting('send.group.user.delete', false);
 
         // Define actors of this tests
         $groupId = UuidFactory::uuid('group.id.freelancer');
@@ -136,7 +137,7 @@ class GroupsUpdateNotificationTest extends AppIntegrationTestCase
 
     public function testUpdateNotificationUpdateMembershipSuccess()
     {
-        Configure::write('passbolt.email.send.group.user.delete', false);
+        $this->setEmailNotificationSetting('send.group.user.delete', false);
 
         // Define actors of this tests
         $groupId = UuidFactory::uuid('group.id.freelancer');
@@ -162,7 +163,7 @@ class GroupsUpdateNotificationTest extends AppIntegrationTestCase
 
     public function testUpdateNotificationUpdateMembershipDisabled()
     {
-        Configure::write('passbolt.email.send.group.user.update', false);
+        $this->setEmailNotificationSetting('send.group.user.update', false);
 
         // Define actors of this tests
         $groupId = UuidFactory::uuid('group.id.freelancer');
@@ -219,7 +220,7 @@ class GroupsUpdateNotificationTest extends AppIntegrationTestCase
 
     public function testUpdateNotificationUpdateAdminSummaryDisabled()
     {
-        Configure::write('passbolt.email.send.group.manager.update', false);
+        $this->setEmailNotificationSetting('send.group.manager.update', false);
 
         // Define actors of this tests
         $groupId = UuidFactory::uuid('group.id.human_resource');
