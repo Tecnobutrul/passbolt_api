@@ -241,7 +241,7 @@ class OrganizationManager
         $confPath = $this->_getConfigurationPath();
         $this->set(['config' => $config]);
         $configView = $this->createView();
-        $configView->plugin = 'Passbolt/MultiTenantAdmin';
+        $configView->setPlugin('Passbolt/MultiTenantAdmin');
         $contents = $configView->render('Config/passbolt', 'ajax');
         $contents = "<?php\n$contents";
         file_put_contents($confPath . DS . 'passbolt.php', $contents);

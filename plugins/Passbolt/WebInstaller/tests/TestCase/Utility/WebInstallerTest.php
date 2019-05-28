@@ -83,10 +83,7 @@ class WebInstallerTest extends WebInstallerIntegrationTestCase
 
     public function testWebInstallerUtilityWritePassboltConfigFileSuccess()
     {
-<<<<<<< HEAD
-=======
         $this->loadPlugins(['Passbolt/WebInstaller']);
->>>>>>> pro-develop
         $webInstaller = new WebInstaller(null);
 
         // Add the database configuration.

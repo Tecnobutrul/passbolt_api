@@ -69,43 +69,13 @@ return [
             'url' => env('DATASOURCES_TEST_URL', null),
         ],
     ],
-
-    // Email configuration.
-    'EmailTransport' => [
-        'default' => [
-            'host' => '',
-            'port' => 587,
-            'username' => '',
-            'password' => '',
-            // Is this a secure connection? true if yes, null if no.
-            'tls' => true,
-            //'timeout' => 30,
-            //'client' => null,
-            //'url' => null,
-        ],
-    ],
-    'Email' => [
-        'default' => [
-            // Defines the default name and email of the sender of the emails.
-            'from' => ['no-reply@passbolt.com' => 'Passbolt'],
-            //'charset' => 'utf-8',
-            //'headerCharset' => 'utf-8',
-        ],
-    ],
     // Which connection to use with emailQueue.
     'EmailQueue' => [
         'datasource' => 'emailQueue',
     ],
     'passbolt' => [
-        'ssl' => [
-            'force' => true,
-        ],
         'multiTenant' => [
-            'configDir' => '/home/www-data',
-            'auth' => [
-                'secret' => ''
-            ],
-            'rootRedirectUrl' => '',
+            'configDir' => '/home/www-data'
         ],
     ],
 ];

@@ -13,11 +13,13 @@
  * @since         2.0.0
  */
 use Cake\Core\Configure;
+use Cake\Routing\Router;
 
 $this->assign('title',	__('Recover a user account'));
 $this->Html->css('themes/default/api_login.min.css?v=' . Configure::read('passbolt.version'), ['block' => 'css', 'fullBase' => true]);
 $this->assign('pageClass', 'recover');
 $formContext = [
+    'url' => Router::url('/users/recover', true),
     'context' => [
         'validator' => [
             'Users' => 'recover',
