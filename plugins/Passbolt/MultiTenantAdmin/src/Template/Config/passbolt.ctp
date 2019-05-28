@@ -11,20 +11,6 @@ return [
             'database' => '<?= $config['database']['database'] ?>',
         ],
     ],
-    'EmailTransport' => [
-        'default' => [
-            'host' => '<?= $config['email']['host'] ?>',
-            'port' => <?= $config['email']['port'] ?>,
-            'username' => '<?= $config['email']['username'] ?>',
-            'password' => '<?= $config['email']['password'] ?>',
-            'tls' => <?= $config['email']['tls'] ? 'true' : 'null' ?>,
-        ],
-    ],
-    'Email' => [
-        'default' => [
-            'from' => ['<?= $config['email']['sender_email'] ?>' => '<?= $config['email']['sender_name'] ?>'],
-        ],
-    ],
     'passbolt' => [
         'meta' => [
             'title' => '<?= $config['meta']['title'] ?>',

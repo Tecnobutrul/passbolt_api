@@ -19,6 +19,7 @@ $this->assign('title',	__('Register'));
 $this->Html->css('themes/default/api_login.min.css?v=' . Configure::read('passbolt.version'), ['block' => 'css', 'fullBase' => true]);
 $this->assign('pageClass', 'register');
 $formContext = [
+    'url' => Router::url('/users/register', true),
     'context' => [
         'validator' => [
             'Users' => 'register',

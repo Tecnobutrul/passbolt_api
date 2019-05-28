@@ -69,6 +69,14 @@ return [
             'url' => env('DATASOURCES_TEST_URL', null),
         ],
     ],
+    'Email' => [
+        'default' => [
+            // Defines the default name and email of the sender of the emails.
+            'from' => ['no-reply@passbolt.com' => 'Passbolt'],
+            //'charset' => 'utf-8',
+            //'headerCharset' => 'utf-8',
+        ],
+    ],
     // Which connection to use with emailQueue.
     'EmailQueue' => [
         'datasource' => 'emailQueue',
