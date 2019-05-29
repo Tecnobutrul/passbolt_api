@@ -20,7 +20,12 @@ use App\Test\Lib\Model\AvatarsModelTrait;
 use App\Utility\UuidFactory;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
+use Cake\Http\Client;
+use Cake\Network\Socket;
 use Cake\ORM\TableRegistry;
+use App\Utility\ImageStorage\GoogleCloudStorageListener;
+use Burzum\FileStorage\Storage\Listener\ImageProcessingListener;
+use Cake\Event\EventManager;
 
 class CreateTest extends AppTestCase
 {
@@ -33,7 +38,16 @@ class CreateTest extends AppTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->loadPlugins(['Burzum/FileStorage', 'Burzum/Imagine']);
+
+        $this->loadPlugins([
+            'Burzum/FileStorage' => ['bootstrap' => false, 'routes' => true],
+            'Burzum/Imagine' => ['bootstrap' => true, 'routes' => true]
+        ]);
+        $listener = new GoogleCloudStorageListener();
+        EventManager::instance()->on($listener);
+        $listener = new ImageProcessingListener();
+        EventManager::instance()->on($listener);
+
         $this->Avatars = TableRegistry::getTableLocator()->get('Avatars');
 
         // delete default ada avatar / it may not be reachable
@@ -73,8 +87,12 @@ class CreateTest extends AppTestCase
         $this->assertNotEmpty(Configure::read('ImageStorage.publicPath'));
 
         $avatar = $this->_createAvatar('ada');
-        $this->assertTrue(file_exists(WWW_ROOT . $avatar['url']['small']));
-        $this->assertTrue(file_exists(WWW_ROOT . $avatar['url']['medium']));
+
+        $http = new Client();
+        $response = $http->get($avatar['url']['small']);
+        $this->assertTrue($response->isOk());
+        $response = $http->get($avatar['url']['medium']);
+        $this->assertTrue($response->isOk());
     }
 
     public function testCreateAvatarDeleteFormerVersionAfterCreate()
@@ -82,15 +100,22 @@ class CreateTest extends AppTestCase
         $this->assertNotEmpty(Configure::read('ImageStorage.publicPath'));
         $avatar = $this->_createAvatar('ada');
 
-        $this->assertTrue(file_exists(WWW_ROOT . $avatar['url']['small']));
-        $this->assertTrue(file_exists(WWW_ROOT . $avatar['url']['medium']));
+        $http = new Client();
+        $response = $http->get($avatar['url']['small']);
+        $this->assertTrue($response->isOk());
+        $response = $http->get($avatar['url']['medium']);
+        $this->assertTrue($response->isOk());
 
         $avatar1 = $this->_createAvatar('ada');
-        $this->assertTrue(file_exists(WWW_ROOT . $avatar1['url']['small']));
-        $this->assertTrue(file_exists(WWW_ROOT . $avatar1['url']['medium']));
+        $response = $http->get($avatar1['url']['small']);
+        $this->assertTrue($response->isOk());
+        $response = $http->get($avatar1['url']['medium']);
+        $response->isOk();
 
         // Assert that the previous avatar files have been deleted.
-        $this->assertFalse(file_exists(WWW_ROOT . $avatar['url']['small']));
-        $this->assertFalse(file_exists(WWW_ROOT . $avatar['url']['medium']));
+        $response = $http->get($avatar['url']['small']);
+        $this->assertFalse($response->isOk());
+        $response = $http->get($avatar['url']['medium']);
+        $this->assertFalse($response->isOk());
     }
 }

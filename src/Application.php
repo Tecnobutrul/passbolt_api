@@ -16,14 +16,18 @@ namespace App;
 
 use App\Middleware\CsrfProtectionMiddleware;
 use App\Middleware\GpgAuthHeadersMiddleware;
+use App\Utility\ImageStorage\GoogleCloudStorageListener;
+use Burzum\FileStorage\Storage\Listener\ImageProcessingListener;
 use Cake\Core\Configure;
+use Cake\Core\Plugin;
 use Cake\Core\Exception\MissingPluginException;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
+use Cake\Event\EventManager;
 use Cake\Http\BaseApplication;
 use Cake\Http\Middleware\SecurityHeadersMiddleware;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
-use Passbolt\WebInstaller\Middleware\WebInstallerMiddleware;
+
 
 class Application extends BaseApplication
 {
@@ -126,10 +130,23 @@ class Application extends BaseApplication
     protected function addVendorPlugins()
     {
         $this->addPlugin('EmailQueue');
-        $this->addPlugin('Burzum/FileStorage');
+        $this->addPlugin('Burzum/FileStorage', ['bootstrap' => false, 'routes' => true]);
+        $this->bootstrapFileStorage();
         $this->addPlugin('Burzum/Imagine');
 
         return $this;
+    }
+
+    /**
+     *
+     */
+    protected function bootstrapFileStorage()
+    {
+        $listener = new GoogleCloudStorageListener();
+        EventManager::instance()->on($listener);
+
+        $listener = new ImageProcessingListener();
+        EventManager::instance()->on($listener);
     }
 
     /**

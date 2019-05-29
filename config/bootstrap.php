@@ -177,4 +177,12 @@ define('PROCESS_USER', $user['name']);
 // Are we running passbolt pro?
 define('PASSBOLT_PRO', Configure::read('passbolt.edition') === 'pro');
 
-require __DIR__ . '/file_storage.php';
+/*
+ * File storage
+ * Allow switching to a custom file storage instead of default local one
+ */
+if (file_exists(__DIR__ . '/file_storage_custom.php')) {
+    require __DIR__ . '/file_storage_custom.php';
+} else {
+    require __DIR__ . '/file_storage.php';
+}

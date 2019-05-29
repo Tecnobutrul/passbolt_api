@@ -73,6 +73,6 @@ class FindTest extends AppTestCase
         $this->assertTrue(!empty(Hash::get($adaUser, 'profile.avatar.url.small')));
         $this->assertNotEquals(Hash::get($adaUser, 'profile.avatar.url.small'), Configure::read('FileStorage.imageDefaults.Avatar.small'));
         $this->assertNotEquals(Hash::get($adaUser, 'profile.avatar.url.medium'), Configure::read('FileStorage.imageDefaults.Avatar.medium'));
-        $this->assertTextContains('img/public/Avatar', Hash::get($adaUser, 'profile.avatar.url.medium'));
+        $this->assertTextContains('/Avatar/', Hash::get($adaUser, 'profile.avatar.url.medium'));
     }
 }
