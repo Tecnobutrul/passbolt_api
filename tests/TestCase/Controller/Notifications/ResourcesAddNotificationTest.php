@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -17,18 +17,21 @@ namespace App\Test\TestCase\Controller\Notifications;
 
 use App\Test\TestCase\Controller\Resources\ResourcesAddControllerTest;
 use App\Utility\UuidFactory;
-use Cake\Core\Configure;
+use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 
 class ResourcesAddNotificationTest extends ResourcesAddControllerTest
 {
+    use EmailNotificationSettingsTestTrait;
+
     public $fixtures = [
-        'app.Base/users', 'app.Base/groups', 'app.Base/groups_users', 'app.Base/resources', 'app.Base/secrets',
-        'app.Base/favorites', 'app.Base/permissions', 'app.Base/email_queue', 'app.Base/profiles', 'app.Base/roles', 'app.Base/avatars'
+        'app.Base/Users', 'app.Base/Groups', 'app.Base/GroupsUsers', 'app.Base/Resources', 'app.Base/Secrets',
+        'app.Base/Favorites', 'app.Base/Permissions', 'app.Base/EmailQueue', 'app.Base/Profiles', 'app.Base/Roles', 'app.Base/Avatars'
     ];
 
     public function testResourcesAddNotificationDisabled()
     {
-        Configure::write('passbolt.email.send.password.create', false);
+        $this->setEmailNotificationSetting('send.password.create', false);
+
         $this->authenticateAs('ada');
         $data = $this->_getDummyPostData();
         $this->postJson("/resources.json?api-version=v1", $data);
@@ -42,7 +45,8 @@ class ResourcesAddNotificationTest extends ResourcesAddControllerTest
 
     public function testResourcesAddNotificationSuccess()
     {
-        Configure::write('passbolt.email.send.password.create', true);
+        $this->setEmailNotificationSetting('send.password.create', true);
+
         $this->authenticateAs('ada');
         $userId = UuidFactory::uuid('user.id.ada');
         $data = $this->_getDummyPostData();

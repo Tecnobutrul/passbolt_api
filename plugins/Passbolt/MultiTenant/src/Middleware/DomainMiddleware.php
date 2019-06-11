@@ -25,14 +25,13 @@ class DomainMiddleware
      */
     public function __invoke(RequestInterface $request, ResponseInterface $response, $next)
     {
-        // Get organization name and rewrite urls
+        // Remove organization name from urls
+        // So that regular passbolt url works
         $path = $request->getUri()->getPath();
         $path = (explode('/', $path, 3));
         if (!count($path)) {
             throw new Exception('The organization is not defined in request');
         } else {
-            // Define passbolt domain
-            $org = $path[1];
             // Redefine new path
             if (isset($path[2])) {
                 $newpath = '/' . $path[2];

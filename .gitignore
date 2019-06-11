@@ -7,6 +7,12 @@
 /config/gpg/serverkey_private.asc
 /config/license
 /config/ldap.php
+/config/DirectorySync/schema/*
+
+# Cloud specific
+config/gpg/serverkey.key
+config/gpg/serverkey_private.key
+plugins/Passbolt/MultiTenantAdmin/config/Migrations/schema-dump-default.lock
 
 # Dependencies #
 ################

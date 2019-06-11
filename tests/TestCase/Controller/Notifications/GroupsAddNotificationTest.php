@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -17,20 +17,23 @@ namespace App\Test\TestCase\Controller\Notifications;
 
 use App\Test\Lib\AppIntegrationTestCase;
 use App\Utility\UuidFactory;
-use Cake\Core\Configure;
+use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 
 class GroupsAddNotificationTest extends AppIntegrationTestCase
 {
+    use EmailNotificationSettingsTestTrait;
+
     public $Groups;
 
     public $fixtures = [
-        'app.Base/groups', 'app.Base/users', 'app.Base/groups_users', 'app.Base/profiles', 'app.Base/roles',
-        'app.Base/email_queue', 'app.Base/avatars', 'app.Base/gpgkeys'
+        'app.Base/Groups', 'app.Base/Users', 'app.Base/GroupsUsers', 'app.Base/Profiles', 'app.Base/Roles',
+        'app.Base/EmailQueue', 'app.Base/Avatars', 'app.Base/Gpgkeys'
     ];
 
     public function testGroupsUsersAddNotificationDisabled()
     {
-        Configure::write('passbolt.email.send.group.user.add', false);
+        $this->setEmailNotificationSetting('send.group.user.add', false);
+
         $this->authenticateAs('admin');
         $this->postJson('/groups.json?api-version=v1', [
             'Group' => ['name' => 'Temp Group'],
@@ -52,7 +55,8 @@ class GroupsAddNotificationTest extends AppIntegrationTestCase
 
     public function testGroupsUsersAddNotificationSuccess()
     {
-        Configure::write('passbolt.email.send.group.user.add', true);
+        $this->setEmailNotificationSetting('send.group.user.add', true);
+
         $this->authenticateAs('admin');
         $this->postJson('/groups.json?api-version=v1', [
             'Group' => ['name' => 'Temp Group'],

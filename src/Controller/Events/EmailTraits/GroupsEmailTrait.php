@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -20,6 +20,7 @@ use Cake\Core\Configure;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
+use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettings;
 
 trait GroupsEmailTrait
 {
@@ -43,10 +44,11 @@ trait GroupsEmailTrait
      */
     public function sendGroupUserAddEmail(Event $event, Group $group)
     {
-        if (!Configure::read('passbolt.email.send.group.user.add')) {
+        if (!EmailNotificationSettings::get('send.group.user.add')) {
             return;
         }
-        $Users = TableRegistry::get('Users');
+
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $admin = $Users->findFirstForEmail($group->created_by);
 
         $userIds = Hash::extract($group->groups_users, '{n}.user_id');
@@ -75,11 +77,11 @@ trait GroupsEmailTrait
      */
     public function sendGroupDeleteEmail(Event $event, Group $group, string $deletedBy)
     {
-        if (!Configure::read('passbolt.email.send.group.delete')) {
+        if (!EmailNotificationSettings::get('send.group.delete')) {
             return;
         }
 
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $admin = $Users->findFirstForEmail($deletedBy);
         $usersIds = Hash::extract($group->groups_users, '{n}.user_id');
         $userNames = $Users->find()->select(['id', 'username'])->where(['id IN' => $usersIds])->all();
@@ -117,7 +119,7 @@ trait GroupsEmailTrait
         string $modifiedById
     ) {
         // Get the details of whoever did the changes
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $modifiedBy = $Users->findFirstForEmail($modifiedById);
 
         $this->sendAddUserGroupUpdateEmail($event, $group, $addedGroupsUsers, $modifiedBy);
@@ -144,13 +146,13 @@ trait GroupsEmailTrait
      */
     public function sendAddUserGroupUpdateEmail(Event $event, Group $group, array $addedGroupsUsers, User $modifiedBy)
     {
-        if (empty($addedGroupsUsers) || !Configure::read('passbolt.email.send.group.user.add')) {
+        if (empty($addedGroupsUsers) || !EmailNotificationSettings::get('send.group.user.add')) {
             return;
         }
 
         // Retrieve the users to send an email to.
         $usersIds = Hash::extract($addedGroupsUsers, '{n}.user_id');
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $users = $Users->find()
             ->select(['id', 'username'])
             ->where(['id IN' => $usersIds])
@@ -178,13 +180,13 @@ trait GroupsEmailTrait
      */
     public function sendUpdateMembershipGroupUpdateEmail(Event $event, Group $group, array $updatedGroupsUsers, User $modifiedBy)
     {
-        if (empty($updatedGroupsUsers) || !Configure::read('passbolt.email.send.group.user.update')) {
+        if (empty($updatedGroupsUsers) || !EmailNotificationSettings::get('send.group.user.update')) {
             return;
         }
 
         // Retrieve the users to send an email to.
         $usersIds = Hash::extract($updatedGroupsUsers, '{n}.user_id');
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $users = $Users->find()
             ->select(['id', 'username'])
             ->where(['id IN' => $usersIds])
@@ -212,13 +214,13 @@ trait GroupsEmailTrait
      */
     public function sendDeleteUserGroupUpdateEmail(Event $event, Group $group, array $removedGroupsUsers, User $modifiedBy)
     {
-        if (empty($removedGroupsUsers) || !Configure::read('passbolt.email.send.group.user.delete')) {
+        if (empty($removedGroupsUsers) || !EmailNotificationSettings::get('send.group.user.delete')) {
             return;
         }
 
         // Retrieve the users to send an email to.
         $usersIds = Hash::extract($removedGroupsUsers, '{n}.user_id');
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $users = $Users->find()
             ->select(['id', 'username'])
             ->where(['id IN' => $usersIds])
@@ -253,11 +255,11 @@ trait GroupsEmailTrait
         User $modifiedBy
     ) {
         if ((empty($addedGroupsUsers) && empty($updatedGroupsUsers) && empty($removedGroupsUsers))
-            || !Configure::read('passbolt.email.send.group.manager.update')) {
+            || !EmailNotificationSettings::get('send.group.manager.update')) {
             return;
         }
 
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $whoIsAdmin = [];
         $usersIds = [];
         $addedUsersIds = $removedUsersIds = $updatedUsersIds = [];
@@ -337,10 +339,10 @@ trait GroupsEmailTrait
         }
 
         // Get group managers of group.
-        $GroupsUsers = TableRegistry::get('GroupsUsers');
+        $GroupsUsers = TableRegistry::getTableLocator()->get('GroupsUsers');
         $adminGroupUsers = $GroupsUsers->find()->where(['group_id' => $group->id, 'is_admin' => true])->contain(['Users'])->all();
 
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $admin = $Users->findFirstForEmail($accessControl->userId());
 
         $subject = __("{0} requested you to add members to {1}", $admin->profile->first_name, $group->name);
@@ -369,7 +371,7 @@ trait GroupsEmailTrait
             return [];
         }
 
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
 
         return $Users->find()
             ->contain('Profiles')

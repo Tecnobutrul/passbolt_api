@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -15,7 +15,7 @@
 namespace App\Model\Table;
 
 use App\Error\Exception\ValidationException;
-use App\Utility\Gpg;
+use App\Utility\OpenPGP\OpenPGPBackendFactory;
 use Cake\Core\Configure;
 use Cake\Core\Exception\Exception;
 use Cake\I18n\FrozenTime;
@@ -85,7 +85,7 @@ class GpgkeysTable extends Table
             ->requirePresence('armored_key', 'create')
             ->notEmpty('armored_key')
             ->add('armored_key', ['custom' => [
-                'rule' => [$this, 'isParsableArmoredPublicKeyRule'],
+                'rule' => [$this, 'isParsableArmoredPublicKey'],
                 'message' => __('The key should be a valid OpenPGPG ASCII armored key.')
             ]]);
 
@@ -203,11 +203,11 @@ class GpgkeysTable extends Table
      * @param array $context not in use
      * @return bool
      */
-    public function isParsableArmoredPublicKeyRule(string $value, array $context = null)
+    public function isParsableArmoredPublicKey(string $value, array $context = null)
     {
-        $gpg = new Gpg();
+        $gpg = OpenPGPBackendFactory::get();
 
-        return $gpg->isParsableArmoredPublicKeyRule($value);
+        return $gpg->isParsableArmoredPublicKey($value);
     }
 
     /**
@@ -358,7 +358,7 @@ class GpgkeysTable extends Table
             throw new \InvalidArgumentException(__('The user id should be a valid uuid.'));
         }
         try {
-            $gpg = new Gpg();
+            $gpg = OpenPGPBackendFactory::get();
             $info = $gpg->getPublicKeyInfo($armoredKey);
         } catch (Exception $e) {
             throw new ValidationException(__('Could not create Gpgkey from armored key.'));

@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -15,15 +15,18 @@
 namespace App\Test\TestCase\Controller\Notifications;
 
 use App\Test\Lib\AppIntegrationTestCase;
-use Cake\Core\Configure;
+use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 
 class UsersRegisterNotificationTest extends AppIntegrationTestCase
 {
-    public $fixtures = ['app.Base/users', 'app.Base/roles', 'app.Base/profiles', 'app.Base/authentication_tokens', 'app.Base/email_queue', 'app.Base/avatars'];
+    use EmailNotificationSettingsTestTrait;
+
+    public $fixtures = ['app.Base/Users', 'app.Base/Roles', 'app.Base/Profiles', 'app.Base/AuthenticationTokens', 'app.Base/EmailQueue', 'app.Base/Avatars'];
 
     public function testUserRegisterNotificationDisabled()
     {
-        Configure::write('passbolt.email.send.user.create', false);
+        $this->setEmailNotificationSetting('send.user.create', false);
+
         $this->post('/users/register', [
             'username' => 'aurore@passbolt.com',
             'profile' => [
@@ -41,7 +44,8 @@ class UsersRegisterNotificationTest extends AppIntegrationTestCase
 
     public function testUserRegisterNotificationSuccess()
     {
-        Configure::write('passbolt.email.send.user.create', true);
+        $this->setEmailNotificationSetting('send.user.create', true);
+
         $this->post('/users/register', [
             'username' => 'aurore@passbolt.com',
             'profile' => [

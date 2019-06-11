@@ -14,6 +14,7 @@
  */
 namespace Passbolt\DirectorySync\Utility\DirectoryEntry;
 
+use LdapTools\Utilities\LdapUtilities;
 use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectType;
 
@@ -54,6 +55,7 @@ class GroupEntry extends DirectoryEntry
             'groups' => [],
             'users' => [],
         ];
+        $this->validate();
 
         return $this;
     }
@@ -92,11 +94,12 @@ class GroupEntry extends DirectoryEntry
         $members = isset($data['group']['members']) ? $data['group']['members'] : [];
 
         $this->group = [
-            'name' => $data['group']['name'],
+            'name' => isset($data['group']['name']) ? $data['group']['name'] : '',
             'members' => !empty($members) ? $members : $groupsUsers,
             'groups' => $groups,
             'users' => $users,
         ];
+        $this->validate();
 
         return $this;
     }
@@ -115,6 +118,35 @@ class GroupEntry extends DirectoryEntry
     }
 
     /**
+     * Validate Group entry.
+     */
+    public function validate() {
+        return $this->_validate();
+    }
+
+    /**
+     * Validate group entry.
+     * @return bool
+     */
+    protected function _validate() {
+        parent::_validate();
+
+        if (empty($this->group['name'])) {
+            $this->_addError('name', 'group name could not be retrieved');
+        }
+
+        if (isset($this->group['members']) && !empty($this->group['members'])) {
+            foreach($this->group['members'] as $groupMember) {
+                if (!LdapUtilities::isValidLdapObjectDn($groupMember)) {
+                    $this->_addError('members', 'a group member does not match the expected DN format');
+                }
+            }
+        }
+
+        return !$this->hasErrors();
+    }
+
+    /**
      * Transforms the Group entry into an array.
      * @return array
      */
@@ -123,6 +155,23 @@ class GroupEntry extends DirectoryEntry
         $extraData = [
             'group' => $this->group,
         ];
+
+        // Transform children into arrays too.
+        if (isset($extraData['group']['groups']) && !empty($extraData['group']['groups'])) {
+            foreach ($extraData['group']['groups'] as $key => $group) {
+                if (is_object($group)) {
+                    $extraData['group']['groups'][$key] = $group->toArray();
+                }
+            }
+        }
+
+        if (isset($extraData['group']['users']) && !empty($extraData['group']['users'])) {
+            foreach ($extraData['group']['users'] as $key => $user) {
+                if (is_object($user)) {
+                    $extraData['group']['users'][$key] = $user->toArray();
+                }
+            }
+        }
 
         return array_merge(parent::toArray(), $extraData);
     }
