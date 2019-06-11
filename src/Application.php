@@ -27,6 +27,7 @@ use Cake\Http\BaseApplication;
 use Cake\Http\Middleware\SecurityHeadersMiddleware;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use Passbolt\MultiTenant\Middleware\DomainMiddleware;
 
 
 class Application extends BaseApplication
@@ -160,7 +161,7 @@ class Application extends BaseApplication
         $this->addPlugin('Passbolt/MultiTenantAdmin', ['bootstrap' => true, 'routes' => true]);
 
         // Do not load extra modules if in admin mode
-        if (!defined('PASSBOLT_ORG')) {
+        if (!DomainMiddleware::isMultiTenant()) {
             return $this;
         }
 

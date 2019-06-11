@@ -15,8 +15,8 @@
 namespace Passbolt\MultiTenantAdmin\Controller;
 
 use App\Error\Exception\CustomValidationException;
-use Cake\Core\Exception\Exception;
 use Cake\Http\Exception\BadRequestException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\Routing\Router;
 use Cake\Validation\Validation;
 use Passbolt\MultiTenantAdmin\Model\Entity\Organization;
@@ -56,7 +56,7 @@ class OrganizationsController extends MultiTenantAdminController
         $this->viewBuilder()->setClassName('LegacyJson');
 
         if (empty($this->request->getData())) {
-            return $this->error('Invalid request');
+            throw new BadRequestException('The request should not be empty');
         }
 
         $data = $this->request->getData();
@@ -75,23 +75,15 @@ class OrganizationsController extends MultiTenantAdminController
 //            ]
 //        ];
 
-        try {
-            $organization = $this->_buildAndValidateOrganizationEntity($data['organization']);
-            if (!$this->Organizations->save($organization)) {
-                $this->_handleValidationErrors($organization);
-            }
-        } catch (BadRequestException $e) {
-            return $this->error($e->getMessage());
+        $organization = $this->_buildAndValidateOrganizationEntity($data['organization']);
+        if (!$this->Organizations->save($organization)) {
+            $this->_handleValidationErrors($organization);
         }
 
-        try {
-            // Add organization.
-            $organizationManager = new OrganizationManager($data['organization']['slug']);
-            $organizationManager->add();
-            $userData = $organizationManager->addAdminUser($data['user']);
-        } catch (Exception $e) {
-            return $this->error($e->getMessage());
-        }
+        // Add organization.
+        $organizationManager = new OrganizationManager($data['organization']['slug']);
+        $organizationManager->add();
+        $userData = $organizationManager->addAdminUser($data['user']);
 
         $setupUrl = Router::url('/setup/install/' . $userData['user']->id . '/' . $userData['token']->token, true);
 
@@ -127,7 +119,7 @@ class OrganizationsController extends MultiTenantAdminController
 
         $this->viewBuilder()->setClassName('LegacyJson');
         if (empty($organization)) {
-            return $this->error("Not found");
+            throw new NotFoundException();
         }
 
         $this->success('Organization found', $organization);

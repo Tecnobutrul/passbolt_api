@@ -39,7 +39,7 @@ class AuthTokenComponent extends Component
     public function initialize(array $config)
     {
         $controller = $this->_registry->getController();
-        $this->_request = $controller->request;
+        $this->_request = $controller->getRequest();
     }
 
     /**
@@ -49,7 +49,7 @@ class AuthTokenComponent extends Component
      */
     public function identify()
     {
-        $authToken = $this->_request->query('auth_token');
+        $authToken = $this->_request->getQuery(['auth_token']);
         if (is_null($authToken)) {
             throw new ForbiddenException('You are not authorized to access this location');
         }
