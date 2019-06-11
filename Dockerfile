@@ -66,6 +66,7 @@ RUN apt-get update \
          exit 1; \
        fi \
     && php composer-setup.php \
+    && rm composer-setup.php \
     && mv composer.phar /usr/local/bin/composer \
     && composer install -n --no-dev --optimize-autoloader \
     && chown -R www-data:www-data . \
@@ -84,6 +85,8 @@ COPY docker/conf/passbolt.conf /etc/nginx/conf.d/default.conf
 COPY docker/conf/nginx.conf /etc/nginx/nginx.conf
 COPY docker/conf/supervisor/*.conf /etc/supervisor/conf.d/
 COPY docker/bin/docker-entrypoint.sh /docker-entrypoint.sh
+
+RUN rm -rf docker
 
 EXPOSE 80 443
 
