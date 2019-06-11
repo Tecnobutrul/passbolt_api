@@ -8,6 +8,7 @@
 /config/license
 /config/ldap.php
 /config/DirectorySync/schema/*
+/config/service-account.json
 
 # Cloud specific
 config/gpg/serverkey.key

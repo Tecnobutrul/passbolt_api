@@ -14,8 +14,9 @@
  */
 namespace Passbolt\MultiTenantAdmin\Controller;
 
+use App\Error\Exception\CustomValidationException;
 use Cake\Core\Exception\Exception;
-use Cake\Network\Exception\BadRequestException;
+use Cake\Http\Exception\BadRequestException;
 use Cake\Routing\Router;
 use Cake\Validation\Validation;
 use Passbolt\MultiTenantAdmin\Model\Entity\Organization;
@@ -59,7 +60,6 @@ class OrganizationsController extends MultiTenantAdminController
         }
 
         $data = $this->request->getData();
-
 //        $data = [
 //            'organization' => [
 //                'slug' => 'acme',
@@ -209,14 +209,13 @@ class OrganizationsController extends MultiTenantAdminController
      *
      * @param  \Passbolt\MultiTenantAdmin\Model\Entity\Organization $organization organization
      * @throws BadRequestException
-     * @throws NotFoundException
      * @return void
      */
     protected function _handleValidationErrors(Organization $organization)
     {
         $errors = $organization->getErrors();
         if (!empty($errors)) {
-            throw new BadRequestException(__('Could not validate organization data.'));
+            throw new CustomValidationException(__('Could not validate organization data.'), $errors, $this->Organizations);
         }
     }
 }
