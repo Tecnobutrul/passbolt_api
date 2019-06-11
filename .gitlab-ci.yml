@@ -10,8 +10,7 @@ stages:
 
 include:
   - template: Code-Quality.gitlab-ci.yml
-  - local: '/.gitlab-ci/Jobs/php_unit_tests.yml'
-  - local: '/.gitlab-ci/Jobs/artifact_build.yml'
+  - local: '/.gitlab-ci/Jobs/cloud_php_unit_tests.yml'
   - local: '/.gitlab-ci/Jobs/style_check.yml'
 
 ############################################################
@@ -21,8 +20,26 @@ include:
 ############################################################
 
 .local-debug-functions: &local-debug-functions |
+  function setup_svc_account() {
+    echo $SVC_ACCOUNT | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
+  }
+
   function init_test_db() {
-    mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL ON $DATASOURCES_TEST_DATABASE.* to $DATASOURCES_TEST_USERNAME@'%' identified by '$DATASOURCES_TEST_PASSWORD';"
+    mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $DATASOURCES_EMAILQUEUE_DATABASE;" mysql
+    mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $DATASOURCES_TEST_DATABASE;" mysql
+    mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL ON $DATASOURCES_TEST_DATABASE.* to $DATASOURCES_TEST_USERNAME@'%' identified by '$DATASOURCES_TEST_PASSWORD';" mysql
+    mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL ON $DATASOURCES_EMAILQUEUE_DATABASE.* to $DATASOURCES_EMAILQUEUE_USERNAME@'%' identified by '$DATASOURCES_EMAILQUEUE_PASSWORD';" mysql
+    mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL ON $ORG_NAME.* to $DATASOURCES_TEST_USERNAME@'%' identified by '$DATASOURCES_TEST_PASSWORD';" mysql
+  }
+
+  function run_migrations() {
+    bin/cake migrations migrate -p Passbolt/MultiTenantAdmin
+    bin/cake migrations migrate -p EmailQueue --connection emailQueue
+  }
+
+  create_test_org() {
+    bin/cake multi_tenant add_organization --name=$ORG_NAME
+    bin/cake multi_tenant migrate_organizations
   }
 
   function interactive_debug() {
@@ -44,42 +61,63 @@ local-debug:
     MYSQL_PASSWORD: testing-password
     MYSQL_ROOT_PASSWORD: testing-password2
     MYSQL_DATABASE: test
+    MYSQL_DATABASE_EMAILQUEUE: email_queue_test
+    # Organization settings
+    ORG_NAME: acme
 
     # Passbolt unit test job common variables
     DEBUG: "true"
+    # Database settings
     DATASOURCES_DEFAULT_DATABASE: $MYSQL_DATABASE
     DATASOURCES_DEFAULT_USERNAME: $MYSQL_USER
     DATASOURCES_DEFAULT_PASSWORD: $MYSQL_PASSWORD
-    DATASOURCES_DEFAULT_HOST: mariadb
+    DATASOURCES_DEFAULT_HOST: mysql
+    # Database Test settings
     DATASOURCES_TEST_DATABASE: $MYSQL_DATABASE
     DATASOURCES_TEST_USERNAME: $MYSQL_USER
     DATASOURCES_TEST_PASSWORD: $MYSQL_PASSWORD
-    DATASOURCES_TEST_HOST: mariadb
+    DATASOURCES_TEST_HOST: mysql
+    # Emailqueue DB settings
+    DATASOURCES_EMAILQUEUE_HOST: mysql
+    DATASOURCES_EMAILQUEUE_USERNAME: $MYSQL_USER
+    DATASOURCES_EMAILQUEUE_PASSWORD: $MYSQL_PASSWORD
+    DATASOURCES_EMAILQUEUE_DATABASE: $MYSQL_DATABASE_EMAILQUEUE
+    DATASOURCES_EMAILQUEUE_PORT: '3306'
+
+    # Image storage settings
+    GOOGLE_APPLICATION_CREDENTIALS: /tmp/service-account.json
+    GOOGLE_IMAGE_STORAGE_BUCKET: passbolt-ci-images600aa548
     PASSBOLT_GPG_SERVER_KEY_PUBLIC: config/gpg/unsecure.key
     PASSBOLT_GPG_SERVER_KEY_PRIVATE: config/gpg/unsecure_private.key
     APP_FULL_BASE_URL: http://127.0.0.1
-    PASSBOLT_REGISTRATION_PUBLIC: "true"
-    PASSBOLT_SELENIUM_ACTIVE: "true"
+    PASSBOLT_REGISTRATION_PUBLIC: '1'
+    PASSBOLT_SELENIUM_ACTIVE: '1'
     # This is the development dummy fingerprint
     PASSBOLT_GPG_SERVER_KEY_FINGERPRINT: 2FC8945833C51946E937F9FED47B0811573EE67E
     PHPUNIT_COMMAND: vendor/bin/phpunit --log-junit unitreport.xml
+    # You should set this env variables before running the local-debug
+    #GOOGLE_APPLICATION_CREDENTIALS=/var/www/passbolt/docker/conf/service-account.json
+    #GOOGLE_IMAGE_STORAGE_BUCKET=gaufrette45d9b56128e2
   services:
-    - name: mariadb:10.4
-      command:
-        - /bin/bash
-        - -c
-        - |
-          mount -t tmpfs -o size=1024m tmpfs /var/lib/mysql
-          docker-entrypoint.sh mysqld
+  - name: $DATABASE_ENGINE_VERSION
+    command:
+      - /bin/bash
+      - -c
+      - |
+        mount -t tmpfs -o size=1024m tmpfs /var/lib/mysql
+        docker-entrypoint.sh mysqld
   image: $CI_REGISTRY_IMAGE_TEST:$PHP_VERSION
   script:
+    - setup_svc_account
     - init_test_db
-    - cp config/app.default.php config/app.php
+    - cp docker/conf/app.php config/app.php
+    - cp docker/conf/passbolt.php config/passbolt.php
     - composer install --dev --no-interaction
-    - composer cs-check
     - gpg --import config/gpg/unsecure_private.key
     - gpg --import config/gpg/unsecure.key
-    - interactive_debug
+    - run_migrations
+    - create_test_org
+    - $PHPUNIT_COMMAND
   when: manual
   before_script:
     - *local-debug-functions
