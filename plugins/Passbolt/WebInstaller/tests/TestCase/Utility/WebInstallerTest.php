@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.5.0
@@ -18,16 +18,15 @@ use App\Model\Entity\AuthenticationToken;
 use App\Model\Entity\Role;
 use Cake\Core\Configure;
 use Cake\Core\Exception\Exception;
-use Cake\Datasource\ConnectionManager;
 use Cake\ORM\TableRegistry;
-use Cake\TestSuite\TestCase;
-use Passbolt\WebInstaller\Form\GpgKeyForm;
 use Passbolt\WebInstaller\Test\Lib\ConfigurationTrait;
 use Passbolt\WebInstaller\Test\Lib\DatabaseTrait;
+use Passbolt\WebInstaller\Test\Lib\WebInstallerIntegrationTestCase;
+use Passbolt\WebInstaller\Test\TestCase\Form\GpgKeyFormTest;
 use Passbolt\WebInstaller\Utility\DatabaseConfiguration;
 use Passbolt\WebInstaller\Utility\WebInstaller;
 
-class WebInstallerTest extends TestCase
+class WebInstallerTest extends WebInstallerIntegrationTestCase
 {
     use ConfigurationTrait;
     use DatabaseTrait;
@@ -48,25 +47,23 @@ class WebInstallerTest extends TestCase
     public function testWebInstallerUtilityInitDatabaseConnectionSuccess()
     {
         $webInstaller = new WebInstaller(null);
-        $databaseSettings = Configure::read('Testing.Datasources.test');
+        $databaseSettings = $this->getTestDatasourceFromConfig();
         $webInstaller->setSettings('database', $databaseSettings);
         $webInstaller->initDatabaseConnection();
-        $connection = ConnectionManager::get('test');
-        $connected = DatabaseConfiguration::testConnection($connection);
+        $connected = DatabaseConfiguration::testConnection();
         $this->assertTrue($connected);
     }
 
     public function testWebInstallerUtilityInitDatabaseConnectionError()
     {
-        $this->markTestIncomplete('Cannot be tested, the PDO Exception is not caught by the DatabaseConfiguration::testConnection function when executed in a testsuite. Isolating the tests make it working but break other tests such as the GpgGenerateKey tests.');
         $webInstaller = new WebInstaller(null);
-        $databaseSettings = Configure::read('Testing.Datasources.test');
+        $databaseSettings = $this->getTestDatasourceFromConfig();
         $databaseSettings['host'] = 'invalid-host';
         $webInstaller->setSettings('database', $databaseSettings);
         $webInstaller->initDatabaseConnection();
-        $connection = ConnectionManager::get('test');
-        $connected = DatabaseConfiguration::testConnection($connection);
+        $connected = DatabaseConfiguration::testConnection();
         $this->assertFalse($connected);
+        $this->restoreTestConnection();
     }
 
     public function testWebInstallerUtilityGpgImportKeySuccess()
@@ -86,10 +83,11 @@ class WebInstallerTest extends TestCase
 
     public function testWebInstallerUtilityWritePassboltConfigFileSuccess()
     {
+        $this->loadPlugins(['Passbolt/WebInstaller']);
         $webInstaller = new WebInstaller(null);
 
         // Add the database configuration.
-        $databaseSettings = Configure::read('Testing.Datasources.test');
+        $databaseSettings = $this->getTestDatasourceFromConfig();
         $webInstaller->setSettings('database', $databaseSettings);
 
         // Add the gpg configuration to generate a new server key.
@@ -125,8 +123,9 @@ class WebInstallerTest extends TestCase
 
     public function testWebInstallerUtilityInstallDatabaseSuccess()
     {
+        $this->loadPlugins(['Migrations']);
         $webInstaller = new WebInstaller(null);
-        $databaseSettings = Configure::read('Testing.Datasources.test');
+        $databaseSettings = $this->getTestDatasourceFromConfig();
         $webInstaller->setSettings('database', $databaseSettings);
         $webInstaller->initDatabaseConnection();
         $this->truncateTables();
@@ -141,13 +140,13 @@ class WebInstallerTest extends TestCase
 
     public function testWebInstallerUtilityCreateFirstUserSuccess()
     {
+        $this->loadPlugins(['Migrations']);
         $webInstaller = new WebInstaller(null);
-        $databaseSettings = Configure::read('Testing.Datasources.test');
+        $databaseSettings = $this->getTestDatasourceFromConfig();
         $webInstaller->setSettings('database', $databaseSettings);
         $webInstaller->initDatabaseConnection();
-        $this->truncateTables();
         $webInstaller->installDatabase();
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $roleAdminId = $Users->Roles->getIdByName(Role::ADMIN);
         $userSettings = [
             'username' => 'aurore@passbolt.com',

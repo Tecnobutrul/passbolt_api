@@ -1,3 +1,24 @@
+# Using docker
+## Run using the docker compose
+Run the container using:
+```
+docker-compose -f docker-compose-dev.yml up
+```
+
+This will use the configuration files in the `docker/conf` directory, by maping `config/passbolt.php` to 
+`docker/conf/passbolt.php`.
+
+You can also use the environment variables in `docker/env/passbolt.env` alternatively.
+By default it will fetch the composer dependencies, if you do not want this behavior you can
+set the env `PHP_COMPOSER` to false.
+
+To connect to the running container:
+`docker-compose -f docker-compose-dev.yml exec passbolt bash`
+
+Similarly to connect to mysql:
+`docker-compose -f docker-compose-dev.yml exec db bash`
+
+# Manual configuration
 ##Configure Nginx
 For multi-tenant to work in Nginx, the following rewrite rules need to be added to the configuration file.
 ```
@@ -21,16 +42,15 @@ rewrite ^/([^/]+)/favicon.ico$ /favicon.ico break;
 
 The main idea is to remove the site from the path so that cakephp understands where it should be accessed.
 
-## How to install
-### 1. Install the schema
+## Install the base schema
 First, create a separate database, and a connection in the configuration for emailQueue. Then:
 ```./bin/cake migrations migrate -p Passbolt/MultiTenantAdmin```
 ```./bin/cake migrations migrate --plugin EmailQueue --connection emailQueue```
 
-### 2. Migrate existing schemas
+## Migrate existing schemas
 ```./bin/cake multi_tenant migrate_organizations```
 
-## How to use
+# How to use
 ### 1. Use the shell to create an organization
 ```bin/cake multi_tenant add_organization --name=acme```
 

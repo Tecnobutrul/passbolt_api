@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -30,15 +30,15 @@ class SaveTest extends AppTestCase
     public $Secrets;
 
     public $fixtures = [
-        'app.Base/resources', 'app.Base/secrets', 'app.Base/permissions',
-        'app.Base/users', 'app.Base/groups', 'app.Base/groups_users'
+        'app.Base/Resources', 'app.Base/Secrets', 'app.Base/Permissions',
+        'app.Base/Users', 'app.Base/Groups', 'app.Base/GroupsUsers'
     ];
 
     public function setUp()
     {
         parent::setUp();
-        $this->Permissions = TableRegistry::get('Permissions');
-        $this->Secrets = TableRegistry::get('Secrets');
+        $this->Permissions = TableRegistry::getTableLocator()->get('Permissions');
+        $this->Secrets = TableRegistry::getTableLocator()->get('Secrets');
     }
 
     public function tearDown()
@@ -66,7 +66,7 @@ class SaveTest extends AppTestCase
     /* FORMAT VALIDATION TESTS */
     /* ************************************************************** */
 
-    public function testValidationUserId()
+    public function testSecretsSaveValidationUserId()
     {
         $testCases = [
             'uuid' => self::getUuidTestCases(),
@@ -76,7 +76,7 @@ class SaveTest extends AppTestCase
         $this->assertFieldFormatValidation($this->Secrets, 'user_id', self::getDummySecret(), self::getEntityDefaultOptions(), $testCases);
     }
 
-    public function testValidationResourceId()
+    public function testSecretsSaveValidationResourceId()
     {
         $testCases = [
             'uuid' => self::getUuidTestCases(),
@@ -86,7 +86,7 @@ class SaveTest extends AppTestCase
         $this->assertFieldFormatValidation($this->Secrets, 'resource_id', self::getDummySecret(), self::getEntityDefaultOptions(), $testCases);
     }
 
-    public function testValidationData()
+    public function testSecretsSaveValidationData()
     {
         $testCases = [
             'isValidGpgMessage' => self::getGpgMessageTestCases(),
@@ -100,7 +100,7 @@ class SaveTest extends AppTestCase
     /* LOGIC VALIDATION TESTS */
     /* ************************************************************** */
 
-    public function testSuccess()
+    public function testSecretsSaveSuccess()
     {
         $data = self::getDummySecret();
         $options = self::getEntityDefaultOptions();

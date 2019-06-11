@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -82,9 +82,8 @@ return [
                         'update' => filter_var(env('PASSBOLT_EMAIL_SEND_GROUP_USER_UPDATE', true), FILTER_VALIDATE_BOOLEAN),
                     ],
                     'manager' => [
-                        // Notify manager when a group user is updated / deleted.
+                        // Notify managers when group membership changes.
                         'update' => filter_var(env('PASSBOLT_EMAIL_SEND_GROUP_MANAGER_UPDATE', true), FILTER_VALIDATE_BOOLEAN),
-                        'delete' => filter_var(env('PASSBOLT_EMAIL_SEND_GROUP_MANAGER_DELETE', true), FILTER_VALIDATE_BOOLEAN),
                     ]
                 ]
             ]
@@ -108,7 +107,11 @@ return [
 
         // GPG Configuration.
         'gpg' => [
-            // Tell GPG where to find the keyring.
+            // Tell passbolt which OpenPGP backend to use
+            // Default is PHP-GNUPG with some help from OpenPGP-PHP
+            'backend' => env('PASSBOLT_GPG_BACKEND', 'Gnupg'),
+
+            // Tell passbolt where to find the GnuPG keyring.
             // If putenv is set to false, gnupg will use the default path ~/.gnupg.
             // For example :
             // - Apache on Centos it would be in '/usr/share/httpd/.gnupg'
@@ -141,7 +144,12 @@ return [
 
         // Wich plugins are enabled
         'plugins' => [
-
+            'import' => [
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_IMPORT_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
+            ],
+            'export' => [
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_EXPORT_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
+            ],
         ],
 
         // Is public registration allowed.
@@ -172,6 +180,18 @@ return [
         // false will render your installation insecure.
         'ssl' => [
             'force' => filter_var(env('PASSBOLT_SSL_FORCE', true), FILTER_VALIDATE_BOOLEAN)
+        ],
+
+        // MultiTenant configuration.
+        // This is the default configuration. It can be overridden directly in the passbolt.php file.
+        'multiTenant' => [
+            // Defines where the configuration files will be kept for each organization.
+            'configDir' => env('PASSBOLT_MULTITENANT_CONFIG_DIR', CONFIG . 'Org'),
+            'auth' => [
+                // Authentication secret, for json calls.
+                'secret' => env('PASSBOLT_MULTITENANT_AUTH_SECRET','argon2secret'),
+            ],
+            'rootRedirectUrl' => env('PASSBOLT_MULTITENANT_ROOT_REDIRECT_URL','https://www.passbolt.com/free_trial')
         ]
     ],
     // Override the Cake ExceptionRenderer.

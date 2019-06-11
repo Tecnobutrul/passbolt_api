@@ -18,6 +18,7 @@ use ArrayAccess;
 use Cake\I18n\FrozenTime;
 use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectType;
+use LdapTools\Utilities\LdapUtilities;
 
 abstract class DirectoryEntry implements ArrayAccess
 {
@@ -62,6 +63,12 @@ abstract class DirectoryEntry implements ArrayAccess
      * @var null
      */
     private $mappingRules = null;
+
+    /**
+     * Validation errors.
+     * @var
+     */
+    private $errors = [];
 
     /**
      * DirectoryEntry constructor.
@@ -195,10 +202,94 @@ abstract class DirectoryEntry implements ArrayAccess
 
         $this->id = $this->getFieldValue('id');
         $this->dn = $ldapObject->getDn();
-        $this->created = new FrozenTime($this->getFieldValue('created'));
-        $this->modified = new FrozenTime($this->getFieldValue('modified'));
+
+        $created = $this->getFieldValue('created');
+        if (!empty($created)) {
+            $this->created = new FrozenTime($created);
+        }
+
+        $modified = $this->getFieldValue('modified');
+        if (!empty($modified)) {
+            $this->modified = new FrozenTime($modified);
+        }
 
         return $this;
+    }
+
+    /**
+     * Validate a DirectoryEntry object and populate errors accordingly.
+     * @return bool
+     */
+    protected function _validate() {
+        $this->errors = [];
+
+        if (empty($this->id)) {
+            $this->_addError('id', 'id could not be retrieved');
+        } elseif (!LdapUtilities::isValidGuid($this->id)) {
+            $this->_addError('id', 'id does not match the expected Guid format');
+        }
+
+        if (empty($this->dn)) {
+            $this->_addError('dn', 'dn could not be retrieved');
+        } elseif (!LdapUtilities::isValidLdapObjectDn($this->dn)) {
+            $this->_addError('dn', 'dn does not match the expected DN format');
+        }
+
+        if (empty($this->created)) {
+            $this->_addError('created', 'created could not be retrieved');
+        }
+        if (empty($this->modified)) {
+            $this->_addError('modified', 'modified could not be retrieved');
+        }
+
+        return $this->hasErrors();
+    }
+
+    /**
+     * Add a validation error in the list of errors.
+     * @param string $field field name
+     * @param string $errorMsg error message
+     */
+    protected function _addError(string $field, string $errorMsg)
+    {
+        if (!isset($this->errors[$field])) {
+            $this->errors[$field] = [];
+        }
+
+        $this->errors[$field][] = $errorMsg;
+    }
+
+    /**
+     * Return validation errors. an empty array if none.
+     * @return array validation errors.
+     */
+    public function errors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * Return errors as a single string.
+     * @return string validation errors as a single string.
+     */
+    public function getErrorsAsString()
+    {
+        $str = "";
+        foreach($this->errors as $field => $errors) {
+            foreach($errors as $errorMsg) {
+                $str .= "$field: $errorMsg\n";
+            }
+        }
+
+        return $str;
+    }
+
+    /**
+     * Check if Directory entry has validation errors.
+     * @return bool true if errors, false otherwise.
+     */
+    public function hasErrors() {
+        return !empty($this->errors());
     }
 
     /**
@@ -207,12 +298,19 @@ abstract class DirectoryEntry implements ArrayAccess
      */
     public function toArray()
     {
-        return [
+        $res = [
+            'type' => $this->type,
             'id' => $this->id,
             'directory_name' => $this->dn,
             'directory_created' => $this->created,
             'directory_modified' => $this->modified,
         ];
+
+        if ($this->hasErrors()) {
+            $res['errors'] = $this->errors();
+        }
+
+        return $res;
     }
 
     /**

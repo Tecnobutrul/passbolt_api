@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -17,21 +17,24 @@ namespace App\Test\TestCase\Controller\Notifications;
 
 use App\Test\Lib\AppIntegrationTestCase;
 use App\Utility\UuidFactory;
-use Cake\Core\Configure;
+use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 
 class CommentsAddNotificationTest extends AppIntegrationTestCase
 {
+    use EmailNotificationSettingsTestTrait;
+
     public $Comments;
 
     public $fixtures = [
-        'app.Base/users', 'app.Base/groups', 'app.Base/resources', 'app.Base/comments', 'app.Base/profiles',
-        'app.Alt0/permissions', 'app.Alt0/groups_users', 'app.Base/roles',
-        'app.Base/email_queue', 'app.Base/avatars', 'app.Base/gpgkeys'
+        'app.Base/Users', 'app.Base/Groups', 'app.Base/Resources', 'app.Base/Comments', 'app.Base/Profiles',
+        'app.Alt0/Permissions', 'app.Alt0/GroupsUsers', 'app.Base/Roles',
+        'app.Base/EmailQueue', 'app.Base/Avatars', 'app.Base/Gpgkeys', 'app.Base/OrganizationSettings'
     ];
 
     public function testCommentsAddNotificationGroupSuccess()
     {
-        Configure::write('passbolt.email.send.comment.add', true);
+        $this->setEmailNotificationSetting('send.comment.add', true);
+
         $this->authenticateAs('dame');
         $postData = ['Comment' => ['content' => 'this is a test']];
         $this->postJson('/comments/resource/' . UuidFactory::uuid('resource.id.docker') . '.json?api-version=v1', $postData);
@@ -54,7 +57,8 @@ class CommentsAddNotificationTest extends AppIntegrationTestCase
 
     public function testCommentsAddNotificationUserSuccess()
     {
-        Configure::write('passbolt.email.send.comment.add', true);
+        $this->setEmailNotificationSetting('send.comment.add', true);
+
         $this->authenticateAs('betty');
         $postData = ['Comment' => ['content' => 'this is a test']];
         $this->postJson('/comments/resource/' . UuidFactory::uuid('resource.id.bower') . '.json?api-version=v1', $postData);
@@ -75,8 +79,8 @@ class CommentsAddNotificationTest extends AppIntegrationTestCase
 
     public function testCommentsAddNotificationDoNotShowContent()
     {
-        Configure::write('passbolt.email.send.comment.add', true);
-        Configure::write('passbolt.email.show.comment', false);
+        $this->setEmailNotificationSetting('show.comment', false);
+
         $this->authenticateAs('betty');
         $postData = ['Comment' => ['content' => 'this is a test']];
         $this->postJson('/comments/resource/' . UuidFactory::uuid('resource.id.bower') . '.json?api-version=v1', $postData);
@@ -90,7 +94,8 @@ class CommentsAddNotificationTest extends AppIntegrationTestCase
 
     public function testCommentsAddNotificationDisabled()
     {
-        Configure::write('passbolt.email.send.comment.add', false);
+        $this->setEmailNotificationSetting('send.comment.add', false);
+
         $this->authenticateAs('betty');
         $postData = ['Comment' => ['content' => 'this is a test']];
         $this->postJson('/comments/resource/' . UuidFactory::uuid('resource.id.bower') . '.json?api-version=v1', $postData);
