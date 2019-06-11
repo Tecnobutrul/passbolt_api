@@ -46,6 +46,12 @@ use Cake\Utility\Security;
 $argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
 
 /*
+ * Cloud specific bootstrap part 1
+ * Define ORG and CACHE constants so that they can be use in app.php
+ */
+require __DIR__ . '/bootstrap_cloud_env.php';
+
+/*
  * Read configuration file and inject configuration into various
  * CakePHP classes.
  *
@@ -69,7 +75,8 @@ try {
 }
 
 /*
- * Cloud specific bootstrap
+ * Cloud specific bootstrap part II
+ *
  */
 require __DIR__ . '/bootstrap_cloud.php';
 

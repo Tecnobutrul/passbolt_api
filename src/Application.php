@@ -159,6 +159,11 @@ class Application extends BaseApplication
         $this->addPlugin('Passbolt/MultiTenant', ['bootstrap' => true, 'routes' => false]);
         $this->addPlugin('Passbolt/MultiTenantAdmin', ['bootstrap' => true, 'routes' => true]);
 
+        // Do not load extra modules if in admin mode
+        if (!defined('PASSBOLT_ORG')) {
+            return $this;
+        }
+
         if (Configure::read('debug') && Configure::read('passbolt.selenium.active')) {
             $this->addPlugin('PassboltSeleniumApi', ['bootstrap' => true, 'routes' => true]);
             $this->addPlugin('PassboltTestData', ['bootstrap' => true, 'routes' => false]);
