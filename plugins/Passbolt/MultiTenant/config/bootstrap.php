@@ -12,4 +12,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-// See bootstrap_cloud.php
+
+// @see bootstrap_cloud.php
+
+use Cake\Event\EventManager;
+use Passbolt\MultiTenant\Event\EmailQueueInitializeListener;
+
+$listener = new EmailQueueInitializeListener();
+EventManager::instance()->on($listener);
