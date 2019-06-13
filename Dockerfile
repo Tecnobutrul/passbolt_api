@@ -12,7 +12,8 @@ ARG PHP_EXTENSIONS="gd \
 
 ARG PECL_PASSBOLT_EXTENSIONS="gnupg \
       redis \
-      mcrypt"
+      mcrypt \
+      grpc"
 
 ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
       libpng-dev \
@@ -26,7 +27,7 @@ ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
 
 ENV PECL_BASE_URL="https://pecl.php.net/get"
 ENV PHP_EXT_DIR="/usr/src/php/ext"
-ENV NR_VERSION="8.5.0.235"
+ENV NR_VERSION="8.7.0.242"
 ENV NR_URL="https://download.newrelic.com/php_agent/release/newrelic-php5-${NR_VERSION}-linux.tar.gz"
 
 COPY --chown=www-data:www-data . /var/www/passbolt
@@ -65,6 +66,7 @@ RUN apt-get update \
          exit 1; \
        fi \
     && php composer-setup.php \
+    && rm composer-setup.php \
     && mv composer.phar /usr/local/bin/composer \
     && composer install -n --no-dev --optimize-autoloader \
     && chown -R www-data:www-data . \
@@ -83,6 +85,8 @@ COPY docker/conf/passbolt.conf /etc/nginx/conf.d/default.conf
 COPY docker/conf/nginx.conf /etc/nginx/nginx.conf
 COPY docker/conf/supervisor/*.conf /etc/supervisor/conf.d/
 COPY docker/bin/docker-entrypoint.sh /docker-entrypoint.sh
+
+RUN rm -rf docker
 
 EXPOSE 80 443
 

@@ -55,6 +55,9 @@ class LdapConfigurationForm extends Form
         'user_object_class' => 'userObjectClass',
         'group_path' => 'groupPath',
         'user_path' => 'userPath',
+        'use_email_prefix_suffix' => 'useEmailPrefixSuffix',
+        'email_prefix' => 'emailPrefix',
+        'email_suffix' => 'emailSuffix',
         'default_user' => 'defaultUser',
         'default_group_admin_user' => 'defaultGroupAdminUser',
         'users_parent_group' => 'usersParentGroup',
@@ -87,6 +90,9 @@ class LdapConfigurationForm extends Form
             ->addField('user_object_class', 'string')
             ->addField('group_path', 'string')
             ->addField('user_path', 'string')
+            ->addField('use_email_prefix_suffix', 'boolean')
+            ->addField('email_prefix', 'string')
+            ->addField('email_suffix', 'string')
             ->addField('default_user', 'string')
             ->addField('default_group_admin_user', 'string')
             ->addField('users_parent_group', 'string')
@@ -117,13 +123,11 @@ class LdapConfigurationForm extends Form
             ->utf8('domain_name', __('The domain name should be a valid utf8 string.'));
 
         $validator
-            ->requirePresence('username', 'create', __('A username is required.'))
-            ->notEmpty('username', __('A username is required.'))
+            ->allowEmpty('username', __('Username can be empty.'))
             ->utf8('username', __('The username should be a valid utf8 string.'));
 
         $validator
-            ->requirePresence('password', 'create', __('A password is required.'))
-            ->notEmpty('password', __('A password is required.'))
+            ->allowEmpty('password', __('Password can be empty.'))
             ->utf8('password', __('The password should be a valid utf8 string.'));
 
         $validator
@@ -181,6 +185,18 @@ class LdapConfigurationForm extends Form
             ->utf8('user_path', __('User path should be a valid utf8 string.'));
 
         $validator
+            ->allowEmpty('use_email_prefix_suffix')
+            ->boolean('use_email_prefix_suffix', __('UseEmailPrefixSuffix should be a boolean.'));
+
+        $validator
+            ->allowEmpty('email_prefix')
+            ->utf8('email_prefix', __('Email prefix should be a valid utf8 string.'));
+
+        $validator
+            ->allowEmpty('email_suffix')
+            ->utf8('email_suffix', __('Email suffix should be a valid utf8 string.'));
+
+        $validator
             ->allowEmpty('users_parent_group', __('Users parent group cannot be empty.'))
             ->utf8('users_parent_group', __('Users parent group should be a valid utf8 string.'));
 
@@ -224,7 +240,7 @@ class LdapConfigurationForm extends Form
      */
     public function isValidAdmin(string $value, array $context = null)
     {
-        $User = TableRegistry::get('Users');
+        $User = TableRegistry::getTableLocator()->get('Users');
         $exist = $User->find()->contain(['Roles'])->where(['Users.id' => $value, 'Users.active' => 1, 'Users.deleted' => 0, 'Roles.name' => Role::ADMIN])->count();
         if ($exist) {
             return true;
@@ -242,7 +258,7 @@ class LdapConfigurationForm extends Form
      */
     public function isValidUser(string $value, array $context = null)
     {
-        $User = TableRegistry::get('Users');
+        $User = TableRegistry::getTableLocator()->get('Users');
         $exist = $User->find()->where(['Users.id' => $value, 'Users.active' => 1, 'Users.deleted' => 0])->count();
         if ($exist) {
             return true;
@@ -265,7 +281,7 @@ class LdapConfigurationForm extends Form
             return $data;
         }
 
-        $User = TableRegistry::get('Users');
+        $User = TableRegistry::getTableLocator()->get('Users');
         $data['default_user'] = $User->find()->where(['Users.id' => $data['default_user']])->first()->get('username');
         $data['default_group_admin_user'] = $User->find()->where(['Users.id' => $data['default_group_admin_user']])->first()->get('username');
 
@@ -296,7 +312,7 @@ class LdapConfigurationForm extends Form
             return $data;
         }
 
-        $User = TableRegistry::get('Users');
+        $User = TableRegistry::getTableLocator()->get('Users');
         if (isset($settings['defaultUser'])) {
             $defaultUser = $User->find()->where(['Users.username' => $settings['defaultUser']])->first();
             if (empty($defaultUser)) {

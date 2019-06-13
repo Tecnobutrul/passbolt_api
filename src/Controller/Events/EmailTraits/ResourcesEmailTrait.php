@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -16,10 +16,10 @@ namespace App\Controller\Events\EmailTraits;
 
 use App\Model\Entity\Resource;
 use App\Model\Entity\Role;
-use Cake\Core\Configure;
 use Cake\Datasource\ResultSetInterface;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
+use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettings;
 
 trait ResourcesEmailTrait
 {
@@ -43,17 +43,29 @@ trait ResourcesEmailTrait
      */
     public function sendResourceCreateEmail(Event $event, Resource $resource)
     {
-        if (!Configure::read('passbolt.email.send.password.create')) {
+        if (!EmailNotificationSettings::get('send.password.create')) {
             return;
         }
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $user = $Users->findFirstForEmail($resource->created_by);
+        $showUsername = EmailNotificationSettings::get('show.username');
+        $showUri = EmailNotificationSettings::get('show.uri');
+        $showDescription = EmailNotificationSettings::get('show.description');
+        $showSecret = EmailNotificationSettings::get('show.secret');
         $subject = __("You added the password {0}", $resource->name);
         $template = 'LU/resource_create';
-        $data = ['body' => ['user' => $user, 'resource' => $resource], 'title' => $subject];
+        $data = [
+            'body' => [
+                'user' => $user,
+                'resource' => $resource,
+                'showUsername' => $showUsername,
+                'showUri' => $showUri,
+                'showDescription' => $showDescription,
+                'showSecret' => $showSecret
+            ], 'title' => $subject
+        ];
         $this->_send($user->username, $subject, $data, $template);
     }
-
     /**
      * Send resource update email
      *
@@ -63,22 +75,33 @@ trait ResourcesEmailTrait
      */
     public function sendResourceUpdateEmail(Event $event, Resource $resource)
     {
-        if (!Configure::read('passbolt.email.send.password.update')) {
+        if (!EmailNotificationSettings::get('send.password.update')) {
             return;
         }
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $owner = $Users->findFirstForEmail($resource->modified_by);
+        $showUsername = EmailNotificationSettings::get('show.username');
+        $showUri = EmailNotificationSettings::get('show.uri');
+        $showDescription = EmailNotificationSettings::get('show.description');
+        $showSecret = EmailNotificationSettings::get('show.secret');
         $subject = __("{0} edited the password {1}", $owner->profile->first_name, $resource->name);
         $template = 'LU/resource_update';
 
         // Get the users that can access this resource
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $options = ['contain' => ['Roles'], 'filter' => ['has-access' => [$resource->id]]];
         $users = $Users->findIndex(Role::USER, $options)->all();
 
         // Send emails to everybody that can see the resource
         foreach ($users as $user) {
-            $data = ['body' => ['user' => $owner, 'resource' => $resource], 'title' => $subject];
+            $data = ['body' => [
+                'user' => $owner,
+                'resource' => $resource,
+                'showUsername' => $showUsername,
+                'showUri' => $showUri,
+                'showDescription' => $showDescription,
+                'showSecret' => $showSecret
+            ], 'title' => $subject];
             $this->_send($user->username, $subject, $data, $template);
         }
     }
@@ -94,10 +117,10 @@ trait ResourcesEmailTrait
      */
     public function sendResourceDeleteEmail(Event $event, Resource $resource, string $deletedBy, ResultSetInterface $users)
     {
-        if (!Configure::read('passbolt.email.send.password.delete')) {
+        if (!EmailNotificationSettings::get('send.password.delete')) {
             return;
         }
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $admin = $Users->findFirstForEmail($deletedBy);
 
         // if there is nobody or just one user, give it up
@@ -105,13 +128,22 @@ trait ResourcesEmailTrait
             return;
         }
 
+        $showUsername = EmailNotificationSettings::get('show.username');
+        $showUri = EmailNotificationSettings::get('show.uri');
+        $showDescription = EmailNotificationSettings::get('show.description');
         $subject = __("{0} deleted the password {1}", $admin->profile->first_name, $resource->name);
         $template = 'LU/resource_delete';
         foreach ($users as $user) {
             if ($user->id === $deletedBy) {
                 continue;
             }
-            $data = ['body' => ['user' => $admin, 'resource' => $resource], 'title' => $subject];
+            $data = ['body' => [
+                'user' => $admin,
+                'resource' => $resource,
+                'showUsername' => $showUsername,
+                'showUri' => $showUri,
+                'showDescription' => $showDescription,
+            ], 'title' => $subject];
             $this->_send($user->username, $subject, $data, $template);
         }
     }

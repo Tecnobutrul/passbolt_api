@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.5.0
@@ -19,7 +19,7 @@ use App\Model\Table\OrganizationSettingsTable;
 use App\Utility\UserAccessControl;
 use Cake\Core\Configure;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Network\Exception\InternalErrorException;
+use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\Locator\TableLocator;
 use Cake\ORM\TableRegistry;
 
@@ -64,7 +64,7 @@ class MfaOrgSettings
         }
         $settings[MfaSettings::PROVIDERS] = $this->formatProviders($settings[MfaSettings::PROVIDERS]);
         $this->settings = $settings;
-        $this->OrganizationSettings = TableRegistry::get('OrganizationSettings');
+        $this->OrganizationSettings = TableRegistry::getTableLocator()->get('OrganizationSettings');
     }
 
     /**
@@ -74,7 +74,8 @@ class MfaOrgSettings
      * @param array $providers
      * @return array
      */
-    private function formatProviders(array $providers) {
+    private function formatProviders(array $providers)
+    {
         $result = $providers;
         if (count(array_filter(array_keys($providers), 'is_string')) > 0) {
             $result = [];
@@ -84,6 +85,7 @@ class MfaOrgSettings
                 }
             }
         }
+
         return $result;
     }
 
@@ -202,7 +204,8 @@ class MfaOrgSettings
      *
      * @return array
      */
-    public function getConfig() {
+    public function getConfig()
+    {
         $providers = $this->getEnabledProviders();
         $results = ['providers' => $providers];
         foreach ($providers as $provider) {
@@ -234,7 +237,8 @@ class MfaOrgSettings
      * @throws CustomValidationException if the data does not validate
      * @return bool if data validates
      */
-    public function validate(array $data) {
+    public function validate(array $data)
+    {
         if (!isset($data) || empty($data)) {
             throw new CustomValidationException(__('The MFA settings data cannot be empty.'));
         }
@@ -248,14 +252,14 @@ class MfaOrgSettings
                 case MfaSettings::PROVIDER_YUBIKEY:
                     try {
                         $this->validateYubikeySettings($data);
-                    } catch(CustomValidationException $exception) {
+                    } catch (CustomValidationException $exception) {
                         $errors = $exception->getErrors();
                     }
                     break;
                 case MfaSettings::PROVIDER_DUO:
                     try {
                         $this->validateDuoSettings($data);
-                    } catch(CustomValidationException $exception) {
+                    } catch (CustomValidationException $exception) {
                         $errors = $exception->getErrors();
                     }
                     break;
@@ -285,7 +289,8 @@ class MfaOrgSettings
      * @param array $data user provided input
      * @param UserAccessControl $uac user access control
      */
-    public function save(array $data, UserAccessControl $uac) {
+    public function save(array $data, UserAccessControl $uac)
+    {
         if (isset($data[MfaSettings::PROVIDERS])) {
             $data[MfaSettings::PROVIDERS] = $this->formatProviders($data[MfaSettings::PROVIDERS]);
         }

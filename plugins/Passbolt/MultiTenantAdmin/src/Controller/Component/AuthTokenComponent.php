@@ -17,7 +17,7 @@ namespace Passbolt\MultiTenantAdmin\Controller\Component;
 use Cake\Auth\DefaultPasswordHasher;
 use Cake\Controller\Component;
 use Cake\Core\Configure;
-use Cake\Network\Exception\ForbiddenException;
+use Cake\Http\Exception\ForbiddenException;
 use Cake\Utility\Security;
 
 /**
@@ -39,7 +39,7 @@ class AuthTokenComponent extends Component
     public function initialize(array $config)
     {
         $controller = $this->_registry->getController();
-        $this->_request = $controller->request;
+        $this->_request = $controller->getRequest();
     }
 
     /**
@@ -49,7 +49,7 @@ class AuthTokenComponent extends Component
      */
     public function identify()
     {
-        $authToken = $this->_request->query('auth_token');
+        $authToken = $this->_request->getQuery(['auth_token']);
         if (is_null($authToken)) {
             throw new ForbiddenException('You are not authorized to access this location');
         }
@@ -59,7 +59,7 @@ class AuthTokenComponent extends Component
 
         //$token = '30f7f212-dfa7-4e94-8285-c8038e9a27bd';
         // The line below generates the secret.
-//        var_dump(password_hash($token . Security::getSalt(),PASSWORD_ARGON2I));
+        //var_dump(password_hash($token . Security::getSalt(),PASSWORD_ARGON2I));
         //var_dump((new DefaultPasswordHasher)->hash($token . Security::getSalt()));
 
         $isValidAuthToken = (new DefaultPasswordHasher)->check($authToken . Security::getSalt(), $authSecret);

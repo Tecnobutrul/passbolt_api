@@ -15,15 +15,19 @@
 namespace Passbolt\DirectorySync\Controller;
 
 use App\Error\Exception\CustomValidationException;
-use App\Model\Entity\Role;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Network\Exception\BadRequestException;
-use Cake\Network\Exception\ForbiddenException;
+use Cake\Http\Exception\BadRequestException;
+use Cake\Http\Exception\ForbiddenException;
+use Cake\View\ViewVarsTrait;
 use Passbolt\DirectorySync\Form\LdapConfigurationForm;
+use Passbolt\DirectorySync\Utility\DirectoryEntry\DirectoryResults;
+use Passbolt\DirectorySync\Utility\DirectoryFactory;
 use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 class DirectorySettingsController extends DirectoryController
 {
+    use ViewVarsTrait;
+
     /**
      * Retrieve the settings
      *
@@ -60,7 +64,7 @@ class DirectorySettingsController extends DirectoryController
         $data = $this->request->getData();
         $form = new LdapConfigurationForm();
         if (!$form->validate($data)) {
-            $errors = $form->errors();
+            $errors = $form->getErrors();
             throw new CustomValidationException('The settings are not valid', $errors);
         }
         try {
@@ -78,6 +82,59 @@ class DirectorySettingsController extends DirectoryController
     }
 
     /**
+     * Test provided settings without saving them, and return directory results.
+     *
+     * @return void
+     */
+    public function test()
+    {
+        if (!$this->User->isAdmin()) {
+            throw new ForbiddenException(__('You are not authorized to access that location'));
+        }
+
+        $data = $this->request->getData();
+        $form = new LdapConfigurationForm();
+        if (!$form->validate($data)) {
+            $errors = $form->getErrors();
+            throw new CustomValidationException('The settings are not valid', $errors);
+        }
+        try {
+            $form->execute($data);
+        } catch (\Exception $e) {
+            throw new BadRequestException('The settings provided are incorrect. ' . $e->getMessage());
+        }
+
+        try {
+            $settings = LdapConfigurationForm::formatFormDataToOrgSettings($data);
+            $orgSettings = new DirectoryOrgSettings($settings);
+            $directory = DirectoryFactory::get($orgSettings);
+            $filteredDirectoryResults = $directory->getFilteredDirectoryResults();
+            $outputData = [
+                'users' => $this->_toArray(array_values($filteredDirectoryResults->getUsers())),
+                'groups' => $this->_toArray(array_values($filteredDirectoryResults->getGroups())),
+            ];
+        } catch (\Exception $e) {
+            throw new BadRequestException('The users and groups cannot be retrieved. ' . $e->getMessage());
+        }
+
+        try {
+            $outputData['tree'] = $this->_toArray($filteredDirectoryResults->getTree());
+        } catch (\Exception $e) {
+            throw new BadRequestException('The directory structure cannot be retrieved. ' . $e->getMessage());
+        }
+
+        try {
+            $invalidObjects = $filteredDirectoryResults->getInvalidGroups();
+            $invalidObjects = array_merge($invalidObjects, $filteredDirectoryResults->getInvalidUsers());
+            $outputData['errors'] = $this->_toArray($invalidObjects);
+        } catch (\Exception $e) {
+            throw new BadRequestException('There was an issue while retrieving the invalid entries. ' . $e->getMessage());
+        }
+
+        $this->success(__('The operation was successful.'), $outputData);
+    }
+
+    /**
      * Disable the ldap integration.
      *
      * @return void
@@ -89,8 +146,21 @@ class DirectorySettingsController extends DirectoryController
         }
 
         $uac = $this->User->getAccessControl();
-        $directoryOrgSettings = DirectoryOrgSettings::disable($uac);
+        DirectoryOrgSettings::disable($uac);
 
         $this->success(__('The operation was successful.'));
+    }
+
+    /**
+     * Transform a list of entries to arrays, for output purpose.
+     * @param $entries
+     */
+    private function _toArray($entries)
+    {
+        foreach ($entries as $key => $entry) {
+            $entries[$key] = $entry->toArray();
+        }
+
+        return $entries;
     }
 }

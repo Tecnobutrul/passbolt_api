@@ -210,8 +210,8 @@ class OrganizationManager
             ],
             'options' => [
                 'full_base_url' => Configure::read('App.fullBaseUrl') . '/' . $orgName,
-                'public_registration' => false,
-                'force_ssl' => false,
+                'public_registration' => Configure::read('passbolt.registration.public'),
+                'force_ssl' => true,
             ],
             'database' => [
                 'host' => $existingDbConfig['host'],
@@ -219,15 +219,6 @@ class OrganizationManager
                 'username' => $existingDbConfig['username'],
                 'password' => $existingDbConfig['password'],
                 'database' => $this->databaseName,
-            ],
-            'email' => [
-                'host' => Configure::read('EmailTransport.default.host'),
-                'port' => Configure::read('EmailTransport.default.port'),
-                'username' => Configure::read('EmailTransport.default.username'),
-                'password' => Configure::read('EmailTransport.default.password'),
-                'tls' => Configure::read('EmailTransport.default.tls'),
-                'sender_email' => key(Configure::read('Email.default.from')),
-                'sender_name' => Configure::read('Email.default.from')[key(Configure::read('Email.default.from'))]
             ],
             'gpg' => [
                 'keyring' => $this->_getGnupgKeyringPath(),
@@ -241,7 +232,7 @@ class OrganizationManager
         $confPath = $this->_getConfigurationPath();
         $this->set(['config' => $config]);
         $configView = $this->createView();
-        $configView->plugin = 'Passbolt/MultiTenantAdmin';
+        $configView->setPlugin('Passbolt/MultiTenantAdmin');
         $contents = $configView->render('Config/passbolt', 'ajax');
         $contents = "<?php\n$contents";
         file_put_contents($confPath . DS . 'passbolt.php', $contents);

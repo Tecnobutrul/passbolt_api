@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.2.0
@@ -20,7 +20,7 @@ use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Filesystem\File;
 use Cake\Filesystem\Folder;
 use Cake\Log\Log;
-use Cake\Network\Exception\InternalErrorException;
+use Cake\Http\Exception\InternalErrorException;
 use Cake\Routing\Router;
 use Cake\Utility\Hash;
 use Cake\Validation\Validator;
@@ -33,7 +33,8 @@ trait ThemeSettingsTrait
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    protected function themeValidationDefault(Validator $validator) {
+    protected function themeValidationDefault(Validator $validator)
+    {
         $validator
             ->add('value', ['isValidTheme' => [
                 'on' => function ($context) {
@@ -42,6 +43,7 @@ trait ThemeSettingsTrait
                 'rule' => [$this, 'isValidTheme'],
                 'message' => __('This theme is not supported.')
             ]]);
+
         return $validator;
     }
 
