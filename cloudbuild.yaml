@@ -105,6 +105,7 @@ steps:
       - name: 'config'
         path: /config
 
+timeout: '1200s'
 substitutions:
   _DEPLOYMENT_REPO: passbolt/charts-passbolt-cloud
   _CHARTS_PRODUCTION_BRANCH: master
