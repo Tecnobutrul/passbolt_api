@@ -12,8 +12,7 @@ ARG PHP_EXTENSIONS="gd \
 
 ARG PECL_PASSBOLT_EXTENSIONS="gnupg \
       redis \
-      mcrypt \
-      grpc"
+      mcrypt"
 
 ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
       libpng-dev \
