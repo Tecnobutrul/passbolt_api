@@ -12,11 +12,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-
-// @see bootstrap_cloud.php
-
 use Cake\Event\EventManager;
 use Passbolt\MultiTenant\Event\EmailQueueInitializeListener;
 
+// Override the email_queue database datasource on initialize the email_queue table.
 $listener = new EmailQueueInitializeListener();
 EventManager::instance()->on($listener);
