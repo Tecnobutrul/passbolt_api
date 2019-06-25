@@ -40,7 +40,9 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.2",
+        "ext-json" : "*",
+        "ext-posix" : "*",
         "cakephp/cakephp": "^3.7.10",
         "cakephp/migrations": "^2.1",
         "cakephp/plugin-installer": "^1.1",
@@ -66,7 +68,7 @@
         "phpunit/phpunit": "^5.7|^6.0",
         "cakephp/cakephp-codesniffer": "^3.0",
         "passbolt/passbolt_selenium_api": "^2.10.0",
-        "passbolt/passbolt_test_data": "^2.10.0"
+        "passbolt/passbolt_test_data": "^2.10.1"
     },
     "autoload": {
         "psr-4": {
