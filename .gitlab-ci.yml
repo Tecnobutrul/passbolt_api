@@ -89,9 +89,13 @@ local-debug:
     # This is the development dummy fingerprint
     PASSBOLT_GPG_SERVER_KEY_FINGERPRINT: 2FC8945833C51946E937F9FED47B0811573EE67E
     PHPUNIT_COMMAND: vendor/bin/phpunit --log-junit unitreport.xml
-    # You should set this env variables before running the local-debug
-    #GOOGLE_APPLICATION_CREDENTIALS=/var/www/passbolt/docker/conf/service-account.json
-    #GOOGLE_IMAGE_STORAGE_BUCKET=gaufrette45d9b56128e2
+
+    # Opengpg backend
+    PASSBOLT_GPG_BACKEND: 'http'
+    PASSBOLT_GPG_HTTP_PROJECT: 'passbolt-testing-78757'
+    PASSBOLT_GPG_HTTP_REGION: 'europe-west1'
+    #PASSBOLT_GPG_HTTP_USERNAME: see variables
+    #PASSBOLT_GPG_HTTP_AUTH_PASSWORD: see variables
   services:
   - name: $DATABASE_ENGINE_VERSION
     command:
