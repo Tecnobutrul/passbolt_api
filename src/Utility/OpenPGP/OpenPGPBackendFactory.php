@@ -35,8 +35,8 @@ class OpenPGPBackendFactory
      * Instantiate an OpenPGP Backend
      *
      * @param string $backend one of the supported backend
-     * @return OpenPGPBackend
      * @throws InternalErrorException if backend if not supported
+     * @return OpenPGPBackend
      */
     public static function create(string $backend = self::GNUPG)
     {
@@ -44,13 +44,6 @@ class OpenPGPBackendFactory
             case self::GNUPG:
                 try {
                     return new Gnupg();
-                } catch (Exception $exception) {
-                    throw new InternalErrorException($exception->getMessage());
-                }
-                break;
-            case self::HTTP:
-                try {
-                    return new Http();
                 } catch (Exception $exception) {
                     throw new InternalErrorException($exception->getMessage());
                 }
@@ -72,12 +65,15 @@ class OpenPGPBackendFactory
             return self::$instance;
         }
         self::$instance = self::create(Configure::read('passbolt.gpg.backend'));
+
         return self::$instance;
     }
 
     /**
      * Reset current instance
      * Useful if you want to change the config on the fly
+     *
+     * @return void
      */
     public static function reset()
     {
