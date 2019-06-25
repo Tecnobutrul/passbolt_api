@@ -25,6 +25,11 @@
     "repositories": [
         {
             "type": "vcs",
+            "url": "https://github.com/passbolt/cakephp.git",
+            "no-api": true
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/passbolt/passbolt_selenium_api.git",
             "no-api": true
         },
@@ -36,7 +41,7 @@
     ],
     "require": {
         "php": ">=7.0",
-        "cakephp/cakephp": "^3.7",
+        "cakephp/cakephp": "^3.7.10",
         "cakephp/migrations": "^2.1",
         "cakephp/plugin-installer": "^1.1",
         "mobiledetect/mobiledetectlib": "2.*",
@@ -67,16 +72,12 @@
         "psr-4": {
             "App\\": "src",
             "Passbolt\\MultiTenant\\": "./plugins/Passbolt/MultiTenant/src",
-            "Passbolt\\MultiTenantAdmin\\": "./plugins/Passbolt/MultiTenantAdmin/src",
             "Passbolt\\AccountSettings\\": "./plugins/Passbolt/AccountSettings/src",
-            "Passbolt\\DirectorySync\\": "./plugins/Passbolt/DirectorySync/src",
-            "Passbolt\\License\\": "./plugins/Passbolt/License/src",
             "Passbolt\\RememberMe\\": "./plugins/Passbolt/RememberMe/src",
             "Passbolt\\MultiFactorAuthentication\\": "./plugins/Passbolt/MultiFactorAuthentication/src",
             "Passbolt\\Tags\\": "./plugins/Passbolt/Tags/src",
             "Passbolt\\Log\\": "./plugins/Passbolt/Log/src",
             "Passbolt\\AuditLog\\": "./plugins/Passbolt/AuditLog/src",
-            "Passbolt\\WebInstaller\\": "./plugins/Passbolt/WebInstaller/src",
             "Passbolt\\EmailNotificationSettings\\": "./plugins/Passbolt/EmailNotificationSettings/src"
         }
     },
@@ -85,13 +86,10 @@
             "App\\Test\\": "tests",
             "Cake\\Test\\": "./vendor/cakephp/cakephp/tests",
             "Passbolt\\AccountSettings\\Test\\": "./plugins/Passbolt/AccountSettings/tests",
-            "Passbolt\\DirectorySync\\Test\\": "./plugins/Passbolt/DirectorySync/tests",
-            "Passbolt\\License\\Test\\": "./plugins/Passbolt/License/tests",
             "Passbolt\\MultiFactorAuthentication\\Test\\": "./plugins/Passbolt/MultiFactorAuthentication/tests",
             "Passbolt\\Tags\\Test\\": "./plugins/Passbolt/Tags/tests",
             "Passbolt\\Log\\Test\\": "./plugins/Passbolt/Log/tests",
             "Passbolt\\AuditLog\\Test\\": "./plugins/Passbolt/AuditLog/tests",
-            "Passbolt\\WebInstaller\\Test\\": "./plugins/Passbolt/WebInstaller/tests",
             "Passbolt\\EmailNotificationSettings\\Test\\": "./plugins/Passbolt/EmailNotificationSettings/tests"
         }
     },

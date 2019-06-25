@@ -14,6 +14,8 @@ ARG PECL_PASSBOLT_EXTENSIONS="gnupg \
       redis \
       mcrypt"
 
+ARG REDIS_PINNED_VERSION="4.3.0"
+
 ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
       libpng-dev \
       libjpeg62-turbo-dev \
@@ -52,9 +54,10 @@ RUN apt-get update \
          mkdir $PHP_EXT_DIR/$i; \
          curl -sSL $PECL_BASE_URL/$i | tar zxf - -C $PHP_EXT_DIR/$i --strip-components 1; \
        done \
+    && PECL_PASSBOLT_EXTENSIONS_SLUGS="$(echo $PECL_PASSBOLT_EXTENSIONS | sed -e 's/-$REDIS_PINNED_VERSION//')" \
     && docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install -j4 $PHP_EXTENSIONS $PECL_PASSBOLT_EXTENSIONS \
-    && docker-php-ext-enable $PHP_EXTENSIONS $PECL_PASSBOLT_EXTENSIONS \
+    && docker-php-ext-install -j4 $PHP_EXTENSIONS $PECL_PASSBOLT_EXTENSIONS_SLUGS \
+    && docker-php-ext-enable $PHP_EXTENSIONS $PECL_PASSBOLT_EXTENSIONS_SLUGS \
     && docker-php-source delete \
     && EXPECTED_SIGNATURE=$(curl -s https://composer.github.io/installer.sig) \
     && curl -o composer-setup.php https://getcomposer.org/installer \

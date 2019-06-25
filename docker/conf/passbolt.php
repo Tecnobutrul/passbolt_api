@@ -80,10 +80,5 @@ return [
     // Which connection to use with emailQueue.
     'EmailQueue' => [
         'datasource' => 'emailQueue',
-    ],
-    'passbolt' => [
-        'multiTenant' => [
-            'configDir' => '/home/www-data'
-        ],
-    ],
+    ]
 ];

@@ -181,18 +181,6 @@ return [
         'ssl' => [
             'force' => filter_var(env('PASSBOLT_SSL_FORCE', true), FILTER_VALIDATE_BOOLEAN)
         ],
-
-        // MultiTenant configuration.
-        // This is the default configuration. It can be overridden directly in the passbolt.php file.
-        'multiTenant' => [
-            // Defines where the configuration files will be kept for each organization.
-            'configDir' => env('PASSBOLT_MULTITENANT_CONFIG_DIR', CONFIG . 'Org'),
-            'auth' => [
-                // Authentication secret, for json calls.
-                'secret' => env('PASSBOLT_MULTITENANT_AUTH_SECRET','argon2secret'),
-            ],
-            'rootRedirectUrl' => env('PASSBOLT_MULTITENANT_ROOT_REDIRECT_URL','https://www.passbolt.com/free_trial')
-        ]
     ],
     // Override the Cake ExceptionRenderer.
     'Error' => [
