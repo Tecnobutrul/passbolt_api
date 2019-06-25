@@ -25,6 +25,11 @@
     "repositories": [
         {
             "type": "vcs",
+            "url": "https://github.com/passbolt/cakephp.git",
+            "no-api": true
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/passbolt/passbolt_selenium_api.git",
             "no-api": true
         },
@@ -36,7 +41,7 @@
     ],
     "require": {
         "php": ">=7.0",
-        "cakephp/cakephp": "^3.7",
+        "cakephp/cakephp": "^3.7.10",
         "cakephp/migrations": "^2.1",
         "cakephp/plugin-installer": "^1.1",
         "mobiledetect/mobiledetectlib": "2.*",
