@@ -131,7 +131,7 @@ return [
                 'private' => env('PASSBOLT_GPG_SERVER_KEY_PRIVATE', CONFIG . 'gpg' . DS . 'serverkey_private.asc'),
 
                 // PHP Gnupg module currently does not support passphrase, please leave blank.
-                'passphrase' => ''
+                'passphrase' => env('PASSBOLT_GPG_SERVER_KEY_PASSPHRASE', '')
             ],
 
             // Http backend configuration

@@ -87,9 +87,9 @@ return [
         'default' => [
             'className' => 'Redis',
             'prefix' => CACHE_PREFIX_ORG,
-            'server' => env('CACHE_DEFAULT_SERVER', 'redis-master'),
+            'server' => env('CACHE_CAKE_DEFAULT_SERVER', 'redis-master'),
             'database' => (int)env('CACHE_DEFAULT_DATABASE', 1),
-            'password' => env('CACHE_DEFAULT_PASSWORD', ''),
+            'password' => env('CACHE_CAKE_DEFAULT_PASSWORD', ''),
             'port' => 6379,
         ],
 
@@ -102,9 +102,9 @@ return [
         '_cake_core_' => [
             'className' => 'Redis',
             'duration' => '+1 week',
-            'server' => env('CACHE_CAKE_CORE_SERVER', 'redis-master'),
-            'database' => (int)env('CACHE_CAKE_CORE_DATABASE', 1),
-            'password' => env('CACHE_CAKE_CORE_PASSWORD', ''),
+            'server' => env('CACHE_CAKE_DEFAULT_SERVER', 'redis-master'),
+            'database' => (int)env('CACHE_CAKE_CORE_DATABASE', 2),
+            'password' => env('CACHE_CAKE_DEFAULT_PASSWORD', ''),
             'port' => 6379,
         ],
 
@@ -117,9 +117,9 @@ return [
         '_cake_model_' => [
             'className' => 'Redis',
             'duration' => '+1 week',
-            'server' => env('CACHE_CAKE_MODEL_SERVER', 'redis-master'),
-            'database' => (int)env('CACHE_CAKE_MODEL_DATABASE', 1),
-            'password' => env('CACHE_CAKE_MODEL_PASSWORD', ''),
+            'server' => env('CACHE_CAKE_DEFAULT_SERVER', 'redis-master'),
+            'database' => (int)env('CACHE_CAKE_MODEL_DATABASE', 3),
+            'password' => env('CACHE_CAKE_DEFAULT_PASSWORD', ''),
             'port' => 6379
         ],
     ],
@@ -210,7 +210,7 @@ return [
     'Email' => [
         'default' => [
             'transport' => env('EMAIL_DEFAULT_TRANSPORT', 'default'),
-            'from' => env('EMAIL_DEFAULT_FROM', 'you@localhost'),
+            'from' => env('EMAIL_DEFAULT_FROM', 'no-reply@passbolt.com'),
             //'charset' => 'utf-8',
             //'headerCharset' => 'utf-8',
         ],
@@ -229,7 +229,7 @@ return [
             'className' => 'Cake\Database\Connection',
             'driver' => env('DATASOURCES_DEFAULT_DRIVER', 'Cake\Database\Driver\Mysql'),
             'persistent' => false,
-            'host' => env('DATASOURCES_DEFAULT_HOST', 'localhost'),
+            'host' => env('DATASOURCES_DEFAULT_HOST', '127.0.0.1'),
             'port' => env('DATASOURCES_DEFAULT_PORT', 3306),
             /**
              * CakePHP will use the default DB port based on the driver selected
