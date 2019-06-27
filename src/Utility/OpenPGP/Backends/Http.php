@@ -15,7 +15,6 @@
 namespace App\Utility\OpenPGP\Backends;
 
 use App\Utility\OpenPGP\OpenPGPBackend;
-use App\Utility\OpenPGP\OpenPGPCommonAsserts;
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Core\Exception\Exception;
@@ -26,8 +25,6 @@ use Cake\Log\Log;
 
 class Http extends OpenPGPBackend
 {
-    use OpenPGPCommonAsserts;
-
     private $_passphrase = null;
 
     /** @var Client */
