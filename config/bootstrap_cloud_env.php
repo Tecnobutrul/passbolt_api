@@ -10,7 +10,8 @@ $isCli = PHP_SAPI === 'cli';
 $argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
 
 if (!defined('PASSBOLT_PLUGINS_MULTITENANT_NOORGREDIRECT')) {
-    define('PASSBOLT_PLUGINS_MULTITENANT_NOORGREDIRECT', 'https://www.passbolt.com/free_trial');
+    $noOrgRedirectUrl = env('PASSBOLT_PLUGINS_MULTITENANT_NOORGREDIRECT', 'https://www.passbolt.com/cloud/signup');
+    define('PASSBOLT_PLUGINS_MULTITENANT_NOORGREDIRECT', $noOrgRedirectUrl);
 }
 
 if (!defined('PASSBOLT_ORG')) {
