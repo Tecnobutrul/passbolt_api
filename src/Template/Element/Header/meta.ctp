@@ -15,7 +15,6 @@
 use Cake\Core\Configure;
 use Cake\Routing\Router;
 ?>
-<?= $this->element('Header/banner'); ?>
     <meta name="description" content="<?= Configure::read('passbolt.meta.description'); ?>">
     <meta name="keywords" content="Passbolt, password manager, online password manager, open source password manager">
     <meta name="robots" content="<?= Configure::read('passbolt.meta.robots'); ?>">
