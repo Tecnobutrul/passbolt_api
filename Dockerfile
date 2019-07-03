@@ -12,8 +12,8 @@ ARG PHP_EXTENSIONS="gd \
 
 ARG PECL_PASSBOLT_EXTENSIONS="gnupg \
       redis \
-      mcrypt \
-      grpc"
+      apcu \
+      mcrypt"
 
 ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
       libpng-dev \
@@ -69,11 +69,8 @@ RUN apt-get update \
     && rm composer-setup.php \
     && mv composer.phar /usr/local/bin/composer \
     && composer install -n --no-dev --optimize-autoloader \
+    && chmod -R 755 /var/www/passbolt/tmp \
     && chown -R www-data:www-data . \
-    && chmod 775 $(find /var/www/passbolt/tmp -type d) \
-    && chmod 664 $(find /var/www/passbolt/tmp -type f) \
-    && chmod 775 $(find /var/www/passbolt/webroot/img/public -type d) \
-    && chmod 664 $(find /var/www/passbolt/webroot/img/public -type f) \
     && rm /etc/nginx/sites-enabled/default \
     && apt-get purge -y --auto-remove $PASSBOLT_DEV_PACKAGES \
     && echo 'php_flag[expose_php] = off' > /usr/local/etc/php-fpm.d/expose.conf \
@@ -81,6 +78,8 @@ RUN apt-get update \
     && rm /usr/local/bin/composer \
     && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
+COPY docker/conf/passbolt.php config/passbolt.php
+COPY docker/conf/app.php config/app.php
 COPY docker/conf/passbolt.conf /etc/nginx/conf.d/default.conf
 COPY docker/conf/nginx.conf /etc/nginx/nginx.conf
 COPY docker/conf/supervisor/*.conf /etc/supervisor/conf.d/
