@@ -1,7 +1,7 @@
 substitutions:
   _DEPLOYMENT_REPO: passbolt/charts-passbolt-cloud
   _CHARTS_PRODUCTION_BRANCH: master
-  _CHARTS_STAGING_BRANCH: feature/helm-secrets
+  _CHARTS_STAGING_BRANCH: develop
   _CODE_PRODUCTION_BRANCH: production
   _RETRIES: "5"
   _BUCKET_NAME: cloudbuild-confige079506e
