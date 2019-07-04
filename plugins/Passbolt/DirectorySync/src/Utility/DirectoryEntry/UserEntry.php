@@ -107,14 +107,16 @@ class UserEntry extends DirectoryEntry
 
     /**
      * Validate user entry.
+     *
      * @return bool
      */
-    protected function _validate() {
+    protected function _validate()
+    {
         parent::_validate();
 
         if (empty($this->user['username'])) {
             $this->_addError('email', 'user email could not be retrieved');
-        } elseif(!Validation::email($this->user['username'], false)) {
+        } elseif (!Validation::email($this->user['username'], false)) {
             $this->_addError('email', 'user email does not seem to have a valid email format');
         }
         if (empty($this->user['profile']['first_name'])) {
@@ -129,8 +131,11 @@ class UserEntry extends DirectoryEntry
 
     /**
      * Validate User entry.
+     *
+     * @return bool
      */
-    public function validate() {
+    public function validate()
+    {
         return $this->_validate();
     }
 

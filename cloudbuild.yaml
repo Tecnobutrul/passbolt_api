@@ -1,15 +1,27 @@
+substitutions:
+  _DEPLOYMENT_REPO: passbolt/charts-passbolt-cloud
+  _CHARTS_PRODUCTION_BRANCH: master
+  _CHARTS_STAGING_BRANCH: develop
+  _CODE_PRODUCTION_BRANCH: production
+  _RETRIES: "5"
+  _BUCKET_NAME: cloudbuild-confige079506e
+  _KMS_LOCATION: europe-west1
+  _KMS_KEYRING: cloud-ring-00
+  _KMS_KEY: cloud-key-00
+  _IMAGE_NAME: passbolt-cloud
+
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
-      - '--tag=gcr.io/$PROJECT_ID/passbolt-cloud:$SHORT_SHA'
-      - '--tag=gcr.io/$PROJECT_ID/passbolt-cloud:$BUILD_ID'
+      - '--tag=gcr.io/$PROJECT_ID/$_IMAGE_NAME:$SHORT_SHA'
+      - '--tag=gcr.io/$PROJECT_ID/$_IMAGE_NAME:$BUILD_ID'
       - '.'
 
   - name: 'gcr.io/cloud-builders/gsutil'
     args:
       - 'cp'
-      - 'gs://pb-config-$PROJECT_ID/bb-config.enc'
+      - 'gs://$_BUCKET_NAME/bb-config.enc'
       - '/config/bb-config.enc'
     volumes:
       - name: 'config'
@@ -18,7 +30,7 @@ steps:
   - name: 'gcr.io/cloud-builders/gsutil'
     args:
       - 'cp'
-      - 'gs://pb-config-$PROJECT_ID/bb-ssh-key.enc'
+      - 'gs://$_BUCKET_NAME/bb-ssh-key.enc'
       - '/config/bb-ssh-key.enc'
     volumes:
       - name: 'config'
@@ -30,25 +42,24 @@ steps:
       - '-c'
       - |
         base64 -d /config/bb-config.enc | gcloud kms decrypt \
-          --location europe-west1 \
+          --location $_KMS_LOCATION \
           --project $PROJECT_ID \
-          --keyring $PROJECT_ID-passbolt \
-          --key $PROJECT_ID-passbolt-crypto-key \
+          --keyring $_KMS_KEYRING \
+          --key $_KMS_KEY \
           --plaintext-file /config/bb-config \
           --ciphertext-file - \
         && base64 -d /config/bb-ssh-key.enc | gcloud kms decrypt \
-          --location europe-west1 \
+          --location $_KMS_LOCATION \
           --project $PROJECT_ID \
-          --keyring $PROJECT_ID-passbolt \
-          --key $PROJECT_ID-passbolt-crypto-key \
+          --keyring $_KMS_KEYRING \
+          --key $_KMS_KEY \
           --plaintext-file /config/bb-ssh-key \
           --ciphertext-file -
-
     volumes:
       - name: 'config'
         path: /config
 
-  - name: 'gcr.io/$PROJECT_ID/sops'
+  - name: 'debian:stable-slim'
     entrypoint: 'bash'
     env:
       - 'BUILD_ID=$BUILD_ID'
@@ -56,24 +67,40 @@ steps:
     args:
       - '-c'
       - |
-        mkdir -p /root/.ssh \
-        && ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts \
+        apt-get update \
+        && apt-get install -y --no-install-recommends \
+          git \
+          openssh-client \
+          python \
+          python-yaml \
+        && mkdir -p /root/.ssh \
+        && echo "bitbucket.org ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==" >> /root/.ssh/known_hosts \
         && cp /config/bb-ssh-key /root/.ssh/id_rsa \
         && chmod 600 /root/.ssh/id_rsa \
         && git clone git@bitbucket.org:$_DEPLOYMENT_REPO /chart \
         && cd /chart
         if [[ "$BRANCH_NAME" == "$_CODE_PRODUCTION_BRANCH" ]]; then
           git checkout -b feature/$BUILD_ID origin/$_CHARTS_PRODUCTION_BRANCH
+          export DEPLOY_ENV=production
         else
           git checkout $_CHARTS_STAGING_BRANCH
+          export DEPLOY_ENV=staging
         fi
-        sops --decrypt values.enc.yaml > values.yaml \
-        && python /usr/local/bin/tag-image.py \
-        && sops --encrypt --encrypted-suffix _encrypted --gcp-kms \
-          projects/$PROJECT_ID/locations/europe-west1/keyRings/$PROJECT_ID-passbolt/cryptoKeys/$PROJECT_ID-passbolt-crypto-key values.yaml > values.enc.yaml \
-        && rm values.yaml \
-        && git add values.enc.yaml \
-        && git config --global user.email sysops@passbolt.com \
+        python << END
+        import yaml, os
+        deploy_env = os.environ.get('DEPLOY_ENV')
+        file_path = 'values_{env}.yaml'.format(env=deploy_env)
+        with open(file_path, 'r') as f:
+            values = yaml.safe_load(f)
+        if 'SHORT_SHA' in os.environ:
+            values['cloudApi']['image']['tag'] = os.environ.get('SHORT_SHA')
+        else:
+            values['cloudApi']['image']['tag'] = os.environ.get('BUILD_ID')
+        with open(file_path, 'w') as f:
+            yaml.dump(values, f, default_flow_style=False)
+        END
+        git config --global user.email sysops@passbolt.com \
+        && git add . \
         && git config --global user.name "Passbolt cloud build bot" \
         && git commit -m ":robot_face: Updated image tag BUILD: $BUILD_ID"
         if [[ "$BRANCH_NAME" == "$_CODE_PRODUCTION_BRANCH" ]]; then
@@ -105,12 +132,6 @@ steps:
       - name: 'config'
         path: /config
 
-substitutions:
-  _DEPLOYMENT_REPO: passbolt/charts-passbolt-cloud
-  _CHARTS_PRODUCTION_BRANCH: master
-  _CHARTS_STAGING_BRANCH: develop
-  _CODE_PRODUCTION_BRANCH: production
-  _RETRIES: "5"
 images:
-  - 'gcr.io/$PROJECT_ID/passbolt-cloud:$SHORT_SHA'
-  - 'gcr.io/$PROJECT_ID/passbolt-cloud:$BUILD_ID'
+  - 'gcr.io/$PROJECT_ID/$_IMAGE_NAME:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/$_IMAGE_NAME:$BUILD_ID'

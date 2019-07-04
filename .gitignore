@@ -10,9 +10,10 @@
 /config/DirectorySync/schema/*
 
 # Cloud specific
+config/service-account.json
 config/gpg/serverkey.key
 config/gpg/serverkey_private.key
-plugins/Passbolt/MultiTenantAdmin/config/Migrations/schema-dump-default.lock
+docker/conf/service-account.json
 
 # Dependencies #
 ################

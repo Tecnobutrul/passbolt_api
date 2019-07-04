@@ -19,7 +19,6 @@ use App\Middleware\GpgAuthHeadersMiddleware;
 use App\Utility\ImageStorage\GoogleCloudStorageListener;
 use Burzum\FileStorage\Storage\Listener\ImageProcessingListener;
 use Cake\Core\Configure;
-use Cake\Core\Plugin;
 use Cake\Core\Exception\MissingPluginException;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
 use Cake\Event\EventManager;
@@ -27,7 +26,7 @@ use Cake\Http\BaseApplication;
 use Cake\Http\Middleware\SecurityHeadersMiddleware;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
-
+use Passbolt\MultiTenant\Middleware\MultitenantRoutingMiddleware;
 
 class Application extends BaseApplication
 {
@@ -39,6 +38,9 @@ class Application extends BaseApplication
      */
     public function middleware($middleware)
     {
+        // Multitenant route middleware.
+        $middleware->prepend(MultitenantRoutingMiddleware::class);
+
         /*
          * Default Middlewares
          * - Catch any exceptions in the lower layers, and make an error page/response
@@ -157,14 +159,12 @@ class Application extends BaseApplication
     protected function addPassboltPlugins()
     {
         $this->addPlugin('Passbolt/MultiTenant', ['bootstrap' => true, 'routes' => false]);
-        $this->addPlugin('Passbolt/MultiTenantAdmin', ['bootstrap' => true, 'routes' => true]);
 
         if (Configure::read('debug') && Configure::read('passbolt.selenium.active')) {
             $this->addPlugin('PassboltSeleniumApi', ['bootstrap' => true, 'routes' => true]);
             $this->addPlugin('PassboltTestData', ['bootstrap' => true, 'routes' => false]);
         }
 
-        $this->addPlugin('Passbolt/License', ['bootstrap' => true, 'routes' => false]);
         $this->addPlugin('Passbolt/Pro', ['bootstrap' => true, 'routes' => false]);
 
         // Add Common plugins.
@@ -177,11 +177,6 @@ class Application extends BaseApplication
         $mfaEnabled = Configure::read('passbolt.plugins.multiFactorAuthentication.enabled');
         if (!isset($mfaEnabled) || $mfaEnabled) {
             $this->addPlugin('Passbolt/MultiFactorAuthentication', ['bootstrap' => true, 'routes' => true]);
-        }
-
-        $ldapEnabled = Configure::read('passbolt.plugins.directorySync.enabled');
-        if (!isset($ldapEnabled) || $ldapEnabled) {
-            $this->addPlugin('Passbolt/DirectorySync', ['bootstrap' => true, 'routes' => true]);
         }
 
         // Allow switching on / off tags plugin

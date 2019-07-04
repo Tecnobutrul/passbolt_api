@@ -19,59 +19,61 @@ if (env('GOOGLE_APPLICATION_CREDENTIALS') === null) {
         putenv('GOOGLE_APPLICATION_CREDENTIALS=' . __DIR__ . DS . 'service-account.json');
     }
 }
+
 // File storage and images
-Configure::write('ImageStorage.adapter', 'gcsBucket');
-Configure::write('ImageStorage.basePath', WWW_ROOT . 'img' . DS . 'public' . DS . PASSBOLT_ORG);
 if (defined('PASSBOLT_ORG')) {
+    Configure::write('ImageStorage.adapter', 'gcsBucket');
+    Configure::write('ImageStorage.basePath', WWW_ROOT . 'img' . DS . 'public' . DS . PASSBOLT_ORG);
     Configure::write('ImageStorage.publicPath', $gcpImageBaseUrl . '/' . $gcpImageBucketName . '/' . PASSBOLT_ORG . '/');
+
+    Configure::write('FileStorage', array(
+        // Configure the `basePath` for the Local adapter, not needed when not using it
+        'basePath' => APP . 'FileStorage' . DS . PASSBOLT_ORG,
+        'imageDefaults' => [
+            'Avatar' => [
+                'medium' =>  'img' . DS . 'avatar' . DS . 'user_medium.png',
+                'small' =>  'img' . DS . 'avatar' . DS . 'user.png',
+            ]
+        ],
+        // Configure image versions on a per model base
+        'imageSizes' => [
+            'Avatar' => [
+                'medium' => [
+                    'thumbnail' => [
+                        'mode' => 'outbound',
+                        'width' => 200,
+                        'height' => 200
+                    ],
+                ],
+                'small' => [
+                    'thumbnail' => [
+                        'mode' => 'outbound',
+                        'width' => 80,
+                        'height' => 80
+                    ],
+                    'crop' => [
+                        'width' => 80,
+                        'height' => 80
+                    ],
+                ],
+            ]
+        ]
+    ));
+
+    StorageUtils::generateHashes();
+    $client = new Google_Client();
+    $client->useApplicationDefaultCredentials();
+    $client->addScope(\Google_Service_Storage::DEVSTORAGE_FULL_CONTROL);
+    $service = new \Google_Service_Storage($client);
+
+    StorageManager::config('gcsBucket', [
+        'adapterOptions' => [
+            $service, $gcpImageBucketName, array(
+                'directory' => PASSBOLT_ORG,
+                'acl' => 'public',
+            ), true
+        ],
+        'adapterClass' => '\Gaufrette\Adapter\GoogleCloudStorage',
+        'class' => '\Gaufrette\Filesystem'
+    ]);
 }
-Configure::write('FileStorage', array(
-    // Configure the `basePath` for the Local adapter, not needed when not using it
-    'basePath' => APP . 'FileStorage' . DS . PASSBOLT_ORG,
-    'imageDefaults' => [
-        'Avatar' => [
-            'medium' =>  'img' . DS . 'avatar' . DS . 'user_medium.png',
-            'small' =>  'img' . DS . 'avatar' . DS . 'user.png',
-        ]
-    ],
-    // Configure image versions on a per model base
-    'imageSizes' => [
-        'Avatar' => [
-            'medium' => [
-                'thumbnail' => [
-                    'mode' => 'outbound',
-                    'width' => 200,
-                    'height' => 200
-                ],
-            ],
-            'small' => [
-                'thumbnail' => [
-                    'mode' => 'outbound',
-                    'width' => 80,
-                    'height' => 80
-                ],
-                'crop' => [
-                    'width' => 80,
-                    'height' => 80
-                ],
-            ],
-        ]
-    ]
-));
-
-StorageUtils::generateHashes();
-$client = new Google_Client();
-$client->useApplicationDefaultCredentials();
-$client->addScope(\Google_Service_Storage::DEVSTORAGE_FULL_CONTROL);
-$service = new \Google_Service_Storage($client);
-
-StorageManager::config('gcsBucket', [
-    'adapterOptions' => [
-        $service, $gcpImageBucketName, array(
-            'directory' => PASSBOLT_ORG,
-            'acl' => 'public',
-        ), true
-    ],
-    'adapterClass' => '\Gaufrette\Adapter\GoogleCloudStorage',
-    'class' => '\Gaufrette\Filesystem'
-]);

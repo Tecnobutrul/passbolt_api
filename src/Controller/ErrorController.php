@@ -15,6 +15,8 @@
 namespace App\Controller;
 
 use App\Utility\UserAction;
+use App\Utility\UuidFactory;
+use Cake\Core\Exception\Exception;
 use Cake\Event\Event;
 use Cake\Routing\Router;
 use Cake\Utility\Hash;
@@ -58,15 +60,25 @@ class ErrorController extends AppController
                 $body = '';
             }
 
+            try {
+                $userActionId = UserAction::getInstance()->getUserActionId();
+            } catch (Exception $e) {
+                $userActionId = UuidFactory::uuid();
+            }
+            try {
+                $actionId = UserAction::getInstance()->getActionId();
+            } catch (Exception $e) {
+                $actionId = 'undefined';
+            }
             $prefix = strtolower($this->request->getParam('prefix'));
             $action = $this->request->getParam('action');
             $this->set([
                 'header' => [
-                    'id' => UserAction::getInstance()->getUserActionId(),
+                    'id' => $userActionId,
                     'status' => 'error',
                     'servertime' => time(),
                     'title' => 'app_' . $prefix . '_' . $action . '_error',
-                    'action' => UserAction::getInstance()->getActionId(),
+                    'action' => $actionId,
                     'message' => $this->viewVars['message'],
                     'url' => Router::url(),
                     'code' => $this->viewVars['code'],

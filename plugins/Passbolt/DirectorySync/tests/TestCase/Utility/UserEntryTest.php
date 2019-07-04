@@ -15,16 +15,11 @@
 namespace Passbolt\DirectorySync\Test\TestCase\Actions;
 
 use App\Utility\UuidFactory;
+use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
 use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectType;
-use Passbolt\DirectorySync\Actions\AllSyncAction;
-use Passbolt\DirectorySync\Actions\GroupSyncAction;
-use Passbolt\DirectorySync\Actions\UserSyncAction;
-use Passbolt\DirectorySync\Error\Exception\ValidationException;
 use Passbolt\DirectorySync\Test\Utility\DirectorySyncIntegrationTestCase;
-use Cake\Core\Configure;
-use Passbolt\DirectorySync\Utility\DirectoryEntry\DirectoryResults;
 use Passbolt\DirectorySync\Utility\DirectoryEntry\UserEntry;
 
 class UserEntryTest extends DirectorySyncIntegrationTestCase
@@ -54,13 +49,13 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $userData = array_merge($userData, $modify);
 
         // Remove elements that should be removed.
-        foreach($userData as $key => $value) {
+        foreach ($userData as $key => $value) {
             if ($value === null) {
                 unset($userData[$key]);
             }
         }
 
-        $ldapObject = new LdapObject($userData,LdapObjectType::USER);
+        $ldapObject = new LdapObject($userData, LdapObjectType::USER);
 
         return $ldapObject;
     }
@@ -79,7 +74,6 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertEquals($userEntry->dn, 'CN=john,OU=accounts,OU=passbolt,OU=local');
         $this->assertEquals($userEntry->id, UuidFactory::uuid('ldap.user.id.john'));
         $this->assertTrue($userEntry->validate());
-
     }
 
     public function testValidateErrorNoId()

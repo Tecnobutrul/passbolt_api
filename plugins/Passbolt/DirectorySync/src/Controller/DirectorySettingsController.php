@@ -153,10 +153,13 @@ class DirectorySettingsController extends DirectoryController
 
     /**
      * Transform a list of entries to arrays, for output purpose.
-     * @param $entries
+     *
+     * @param array $entries array of DirectoryEntry
+     * @return array
      */
-    private function _toArray($entries) {
-        foreach($entries as $key => $entry) {
+    private function _toArray($entries)
+    {
+        foreach ($entries as $key => $entry) {
             $entries[$key] = $entry->toArray();
         }
 

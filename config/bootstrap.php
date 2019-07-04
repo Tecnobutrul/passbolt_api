@@ -31,6 +31,12 @@ require __DIR__ . '/paths.php';
  */
 require CORE_PATH . 'config' . DS . 'bootstrap.php';
 
+/*
+ * Bootstrap the cloud
+ * Define ORG and CACHE constants so that they can be use in app.php
+ */
+require __DIR__ . '/bootstrap_cloud_env.php';
+
 use Cake\Cache\Cache;
 use Cake\Console\ConsoleErrorHandler;
 use Cake\Core\Configure;
@@ -61,17 +67,13 @@ try {
         Configure::load('passbolt', 'default', true); // merge with default config
     }
     Configure::load('version', 'default', true);
+    Configure::load('cloud', 'default', true); // cloud config
 } catch (\Exception $e) {
     // let cli handle issues
     if (!$isCli) {
         exit($e->getMessage() . "\n");
     }
 }
-
-/*
- * Cloud specific bootstrap
- */
-require __DIR__ . '/bootstrap_cloud.php';
 
 /*
  * When debug = true the metadata cache should only last

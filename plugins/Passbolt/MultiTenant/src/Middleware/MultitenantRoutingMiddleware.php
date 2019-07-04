@@ -14,11 +14,10 @@
  */
 namespace Passbolt\MultiTenant\Middleware;
 
-use Cake\Core\Exception\Exception;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class DomainMiddleware
+class MultitenantRoutingMiddleware
 {
     /**
      * {@inheritdoc}
@@ -27,19 +26,17 @@ class DomainMiddleware
     {
         // Remove organization name from urls
         // So that regular passbolt url works
-        $path = $request->getUri()->getPath();
-        $path = (explode('/', $path, 3));
-        if (!count($path)) {
-            throw new Exception('The organization is not defined in request');
-        } else {
-            // Redefine new path
-            if (isset($path[2])) {
-                $newpath = '/' . $path[2];
-            } else {
-                $newpath = '/';
+        $isCli = PHP_SAPI === 'cli';
+        if (!$isCli) {
+            $path = $request->getUri()->getPath();
+            $arr = (explode('/', $path, 3));
+            $newpath = '/';
+            if (isset($arr[2])) {
+                $newpath = '/' . $arr[2];
             }
+
+            $request = $request->withUri($request->getUri()->withPath($newpath));
         }
-        $request = $request->withUri($request->getUri()->withPath($newpath));
 
         // Calling $next() delegates control to the *next* middleware
         // In your application's queue.

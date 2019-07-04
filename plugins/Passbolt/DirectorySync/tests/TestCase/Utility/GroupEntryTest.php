@@ -15,12 +15,11 @@
 namespace Passbolt\DirectorySync\Test\TestCase\Actions;
 
 use App\Utility\UuidFactory;
+use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
 use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectType;
-use Passbolt\DirectorySync\Error\Exception\ValidationException;
 use Passbolt\DirectorySync\Test\Utility\DirectorySyncIntegrationTestCase;
-use Cake\Core\Configure;
 use Passbolt\DirectorySync\Utility\DirectoryEntry\GroupEntry;
 
 class GroupEntryTest extends DirectorySyncIntegrationTestCase
@@ -48,13 +47,13 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
         $groupData = array_merge($groupData, $modify);
 
         // Remove elements that should be removed.
-        foreach($groupData as $key => $value) {
+        foreach ($groupData as $key => $value) {
             if ($value === null) {
                 unset($groupData[$key]);
             }
         }
 
-        $ldapObject = new LdapObject($groupData,LdapObjectType::GROUP);
+        $ldapObject = new LdapObject($groupData, LdapObjectType::GROUP);
 
         return $ldapObject;
     }
@@ -71,7 +70,6 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertEquals($groupEntry->dn, 'CN=john,OU=posixGroups,OU=passbolt,OU=local');
         $this->assertEquals($groupEntry->id, UuidFactory::uuid('ldap.group.id.john'));
         $this->assertTrue($groupEntry->validate());
-
     }
 
     public function testValidateErrorNoId()
