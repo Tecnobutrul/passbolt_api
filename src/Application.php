@@ -159,6 +159,7 @@ class Application extends BaseApplication
     protected function addPassboltPlugins()
     {
         $this->addPlugin('Passbolt/MultiTenant', ['bootstrap' => true, 'routes' => false]);
+        $this->addPlugin('Passbolt/MultiTenantAnalytics', ['bootstrap' => true, 'routes' => false]);
 
         if (Configure::read('debug') && Configure::read('passbolt.selenium.active')) {
             $this->addPlugin('PassboltSeleniumApi', ['bootstrap' => true, 'routes' => true]);
