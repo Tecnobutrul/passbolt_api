@@ -17,7 +17,6 @@ use App\Shell\AppShell;
 use Cake\Core\Configure;
 use Cake\Http\Client;
 use Cake\ORM\TableRegistry;
-use http\Env\Response;
 
 class SendTask extends AppShell
 {
@@ -59,10 +58,26 @@ class SendTask extends AppShell
      */
     public function main()
     {
-        $analytics = $this->getAnalytics();
-        $this->publishAnalytics($analytics);
+        $data = $this->getData();
+        $this->publish($data);
 
         return true;
+    }
+
+    /**
+     * get data that will be sent to the entry point.
+     * @return array
+     */
+    public function getData()
+    {
+        $data = [
+            "org" => [
+                "slug" => PASSBOLT_ORG
+            ],
+            "analytics" => $this->getAnalytics(),
+        ];
+
+        return $data;
     }
 
     /**
@@ -97,7 +112,7 @@ class SendTask extends AppShell
      * @param array $data data
      * @return Client\Response
      */
-    public function publishAnalytics(array $data)
+    public function publish(array $data)
     {
         $url = Configure::read('passbolt.multiTenantAnalytics.entryPoint.url');
         $username = Configure::read('passbolt.multiTenantAnalytics.entryPoint.username');
