@@ -18,6 +18,12 @@ use Cake\Utility\Hash;
 
 class OrganizationConfiguration
 {
+    /**
+     * The organization database prefix.
+     *
+     * @var string
+     */
+    const ORG_DB_PREFIX = 'pb_org_';
 
     /**
      * Get a an organization database name.
@@ -27,9 +33,7 @@ class OrganizationConfiguration
      */
     public static function getDatabaseName(string $slug)
     {
-        $databasePrefix = env('PASSBOLT_PLUGINS_MULTITENANT_ORGANIZATION_DATABASEPREFIX', 'passbolt_cloud_organization_');
-
-        return $databasePrefix . str_replace('-', '_', $slug);
+        return self::ORG_DB_PREFIX . str_replace('-', '_', $slug);
     }
 
     /**

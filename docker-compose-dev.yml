@@ -46,9 +46,9 @@ services:
           rm -rf cache
           rm -rf pear
         fi
-        /usr/bin/wait-for.sh db:3306 -- mysql -h db -u root -ptest -e "create database if not exists passbolt_cloud_organization_acme;"
+        /usr/bin/wait-for.sh db:3306 -- mysql -h db -u root -ptest -e "create database if not exists pb_org_acme;"
         mysql -h db -u root -ptest -e "create database if not exists passbolt_cloud_email_queue;"
-        mysql -h db -u root -ptest -e "create database if not exists passbolt_cloud_organization_acme_test;"
+        mysql -h db -u root -ptest -e "create database if not exists pb_org_acme_test;"
         mysql -h db -u root -ptest -e "create database if not exists passbolt_cloud_email_queue_test;"
         mysql -h db -u root -ptest -e "grant all on *.* to passbolt@'%' identified by 'P4ssb0lt';"
         su -c "./bin/cake migrations migrate -p EmailQueue --connection emailQueue" -s /bin/bash www-data
