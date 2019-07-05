@@ -32,7 +32,7 @@ if (!$response) {
 $json = \json_decode($response);
 
 if (is_null($json) || !is_array($json->body)) {
-    echo "The response of the cloud catalog service is not a valid.\n";
+    echo "The response of the cloud catalog service is not valid.\n";
     exit(1);
 }
 
@@ -45,12 +45,12 @@ if (empty($organizations)) {
 
 foreach ($organizations as $organization) {
     if (!preg_match('/^[a-z0-9]+[a-z0-9\-_]*[a-z0-9]+$/i', $organization->slug)) {
-        echo "Cannot migrate: {$organization->slug}.\n";
+        echo "Cannot migrate the organization {$organization->slug}. The organization slug is not valid.\n";
         continue;
     }
 
     $slugParam = escapeshellarg($organization->slug);
-    $command = __DIR__ . "/cake passbolt migrate --org={$slugParam}";
+    $command = __DIR__ . "/../cake passbolt migrate --org={$slugParam}";
     echo "Migrated: {$organization->slug}.\n";
     $output = shell_exec($command);
 }

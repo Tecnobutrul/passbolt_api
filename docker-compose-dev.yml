@@ -53,8 +53,8 @@ services:
         mysql -h db -u root -ptest -e "grant all on *.* to passbolt@'%' identified by 'P4ssb0lt';"
         su -c "./bin/cake migrations migrate -p EmailQueue --connection emailQueue" -s /bin/bash www-data
         su -c "gpg --import /var/www/passbolt/config/gpg/serverkey_private.key" -s /bin/bash www-data
-        su -c "php ./bin/migrate_orgs.php" -s /bin/bash www-data
-        su -c "./bin/cake passbolt install --org=acme --no-admin" -s /bin/bash www-data
+        su -c "php ./bin/passbolt/migrate_orgs.php" -s /bin/bash www-data
+        su -c "./bin/cake passbolt migrate --org=acme" -s /bin/bash www-data
         su -c "./bin/cake passbolt register_user --org=acme --first-name=Wile --last-name=Coyote --username=coyote@cloud.passbolt.local --role=admin" -s /bin/bash www-data
         /docker-entrypoint.sh
     ports:
