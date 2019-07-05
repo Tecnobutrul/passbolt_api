@@ -160,6 +160,7 @@ class Application extends BaseApplication
     {
         $this->addPlugin('Passbolt/MultiTenant', ['bootstrap' => true, 'routes' => false]);
         if (env('PASSBOLT_PLUGINS_MULTITENANTADMIN_ENABLED', false)) {
+            $this->addPlugin('Passbolt/MultiTenantAnalytics', ['bootstrap' => true, 'routes' => false]);
             $this->addPlugin('Passbolt/MultiTenantAdmin', ['bootstrap' => true, 'routes' => true]);
         }
 
