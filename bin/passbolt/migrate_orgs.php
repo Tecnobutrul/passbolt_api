@@ -15,6 +15,10 @@ $username = getenv('PASSBOLT_SCRIPT_CATALOG_AUTH_USERNAME');
 $password = getenv('PASSBOLT_SCRIPT_CATALOG_AUTH_PASSWORD');
 $authorizationHeader = 'Basic ' . base64_encode("$username:$password");
 $opts = [
+    'ssl' => [
+        'verify_peer'      => false,
+        'verify_peer_name' => false,
+      ],
     'http' => [
         'method' => 'GET',
         'header' => "Authorization: $authorizationHeader"
