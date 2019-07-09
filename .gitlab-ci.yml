@@ -33,13 +33,7 @@ include:
   }
 
   function run_migrations() {
-    bin/cake migrations migrate -p Passbolt/MultiTenantAdmin
     bin/cake migrations migrate -p EmailQueue --connection emailQueue
-  }
-
-  create_test_org() {
-    bin/cake multi_tenant add_organization --name=$ORG_NAME
-    bin/cake multi_tenant migrate_organizations
   }
 
   function interactive_debug() {
@@ -95,9 +89,13 @@ local-debug:
     # This is the development dummy fingerprint
     PASSBOLT_GPG_SERVER_KEY_FINGERPRINT: 2FC8945833C51946E937F9FED47B0811573EE67E
     PHPUNIT_COMMAND: vendor/bin/phpunit --log-junit unitreport.xml
-    # You should set this env variables before running the local-debug
-    #GOOGLE_APPLICATION_CREDENTIALS=/var/www/passbolt/docker/conf/service-account.json
-    #GOOGLE_IMAGE_STORAGE_BUCKET=gaufrette45d9b56128e2
+
+    # Opengpg backend
+    PASSBOLT_GPG_BACKEND: 'http'
+    PASSBOLT_GPG_HTTP_PROJECT: 'passbolt-testing-78757'
+    PASSBOLT_GPG_HTTP_REGION: 'europe-west1'
+    #PASSBOLT_GPG_HTTP_USERNAME: see variables
+    #PASSBOLT_GPG_HTTP_AUTH_PASSWORD: see variables
   services:
   - name: $DATABASE_ENGINE_VERSION
     command:
@@ -116,7 +114,6 @@ local-debug:
     - gpg --import config/gpg/unsecure_private.key
     - gpg --import config/gpg/unsecure.key
     - run_migrations
-    - create_test_org
     - $PHPUNIT_COMMAND
   when: manual
   before_script:

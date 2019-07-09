@@ -1,0 +1,60 @@
+#!/usr/bin/env php
+<?php
+
+echo "     ____                  __          ____  \n";
+echo "    / __ \____  _____ ____/ /_  ____  / / /_ \n";
+echo "   / /_/ / __ `/ ___/ ___/ __ \/ __ \/ / __/ \n";
+echo "  / ____/ /_/ (__  |__  ) /_/ / /_/ / / /    \n";
+echo " /_/    \__,_/____/____/_.___/\____/_/\__/   \n";
+echo "\n";
+echo " Passbolt Cloud API Admin - Send organizations analytics\n";
+echo "\n";
+
+$cloudApiAdminUrl = getenv('PASSBOLT_SCRIPT_CATALOG_URL');
+$username = getenv('PASSBOLT_SCRIPT_CATALOG_AUTH_USERNAME');
+$password = getenv('PASSBOLT_SCRIPT_CATALOG_AUTH_PASSWORD');
+$authorizationHeader = 'Basic ' . base64_encode("$username:$password");
+$opts = [
+    'ssl' => [
+        'verify_peer'      => false,
+        'verify_peer_name' => false,
+      ],
+    'http' => [
+        'method' => 'GET',
+        'header' => "Authorization: $authorizationHeader"
+    ]
+];
+$context = stream_context_create($opts);
+$url = "{$cloudApiAdminUrl}/multi_tenant/organizations.json";
+
+$response = file_get_contents($url, false, $context);
+if (!$response) {
+    echo "Unable to connect to the cloud catalog service.\n";
+    exit(1);
+}
+
+$json = \json_decode($response);
+
+if (is_null($json) || !is_array($json->body)) {
+    echo "The response of the cloud catalog service is not valid.\n";
+    exit(1);
+}
+
+$organizations = $json->body;
+
+if (empty($organizations)) {
+    echo "No organization to send analytics for.\n";
+    exit;
+}
+
+foreach ($organizations as $organization) {
+    if (!preg_match('/^[a-z0-9]+[a-z0-9\-_]*[a-z0-9]+$/i', $organization->slug)) {
+        echo "Cannot send analytics for {$organization->slug}. The organization slug is not valid.\n";
+        continue;
+    }
+
+    $slugParam = escapeshellarg($organization->slug);
+    $command = __DIR__ . "/../cake multi_tenant_analytics send --org={$slugParam}";
+    shell_exec($command);
+    echo "Analytics sent for {$organization->slug}.\n";
+}

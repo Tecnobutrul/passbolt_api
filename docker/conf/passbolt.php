@@ -32,7 +32,7 @@ return [
             'className' => 'Cake\Database\Connection',
             'driver' => env('DATASOURCES_EMAILQUEUE_DRIVER', 'Cake\Database\Driver\Mysql'),
             'persistent' => false,
-            'host' => env('DATASOURCES_EMAILQUEUE_HOST', 'localhost'),
+            'host' => env('DATASOURCES_EMAILQUEUE_HOST', '127.0.0.1'),
             'port' => env('DATASOURCES_EMAILQUEUE_PORT', 3306),
             'username' => env('DATASOURCES_EMAILQUEUE_USERNAME', ''),
             'password' => env('DATASOURCES_EMAILQUEUE_PASSWORD', ''),
@@ -80,10 +80,5 @@ return [
     // Which connection to use with emailQueue.
     'EmailQueue' => [
         'datasource' => 'emailQueue',
-    ],
-    'passbolt' => [
-        'multiTenant' => [
-            'configDir' => '/home/www-data'
-        ],
-    ],
+    ]
 ];

@@ -109,7 +109,7 @@ return [
         'gpg' => [
             // Tell passbolt which OpenPGP backend to use
             // Default is PHP-GNUPG with some help from OpenPGP-PHP
-            'backend' => env('PASSBOLT_GPG_BACKEND', 'Gnupg'),
+            'backend' => env('PASSBOLT_GPG_BACKEND', 'gnupg'),
 
             // Tell passbolt where to find the GnuPG keyring.
             // If putenv is set to false, gnupg will use the default path ~/.gnupg.
@@ -131,8 +131,26 @@ return [
                 'private' => env('PASSBOLT_GPG_SERVER_KEY_PRIVATE', CONFIG . 'gpg' . DS . 'serverkey_private.asc'),
 
                 // PHP Gnupg module currently does not support passphrase, please leave blank.
-                'passphrase' => ''
+                'passphrase' => env('PASSBOLT_GPG_SERVER_KEY_PASSPHRASE', '')
             ],
+
+            // Http backend configuration
+            'http' => [
+                'domain' => env('PASSBOLT_GPG_HTTP_DOMAIN', 'cloudfunctions.net'),
+                'project' => env('PASSBOLT_GPG_HTTP_PROJECT', null),
+                'region' => env('PASSBOLT_GPG_HTTP_REGION', null),
+                'auth' => [
+                    'username' => env('PASSBOLT_GPG_HTTP_USERNAME', null),
+                    'password' => env('PASSBOLT_GPG_HTTP_AUTH_PASSWORD', null)
+                ],
+                'functions' => [
+                    'encrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_ENCRYPT', 'onOpenpgpEncrypt'),
+                    'decrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_DECRYPT', 'onOpenpgpDecrypt'),
+                    'keyinfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_KEYINFO', 'onOpenpgpGetKeyInfo'),
+                    'msginfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_MSGINFO', 'onOpenpgpGetMessageInfo'),
+                    'verify' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_VERIFY', 'onOpenpgpVerifyCleartext')
+                ]
+            ]
         ],
 
         // Legal
@@ -181,18 +199,6 @@ return [
         'ssl' => [
             'force' => filter_var(env('PASSBOLT_SSL_FORCE', true), FILTER_VALIDATE_BOOLEAN)
         ],
-
-        // MultiTenant configuration.
-        // This is the default configuration. It can be overridden directly in the passbolt.php file.
-        'multiTenant' => [
-            // Defines where the configuration files will be kept for each organization.
-            'configDir' => env('PASSBOLT_MULTITENANT_CONFIG_DIR', CONFIG . 'Org'),
-            'auth' => [
-                // Authentication secret, for json calls.
-                'secret' => env('PASSBOLT_MULTITENANT_AUTH_SECRET','argon2secret'),
-            ],
-            'rootRedirectUrl' => env('PASSBOLT_MULTITENANT_ROOT_REDIRECT_URL','https://www.passbolt.com/free_trial')
-        ]
     ],
     // Override the Cake ExceptionRenderer.
     'Error' => [

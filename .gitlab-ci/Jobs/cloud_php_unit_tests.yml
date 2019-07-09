@@ -58,7 +58,6 @@
     - gpg --import config/gpg/unsecure_private.key
     - gpg --import config/gpg/unsecure.key
     - run_migrations
-    - create_test_org
     - $PHPUNIT_COMMAND
   only:
     - branches
@@ -93,13 +92,7 @@ php7.2-mysql5.7:
   }
 
   function run_migrations() {
-    bin/cake migrations migrate -p Passbolt/MultiTenantAdmin
     bin/cake migrations migrate -p EmailQueue --connection emailQueue
-  }
-
-  create_test_org() {
-    bin/cake multi_tenant add_organization --name=$ORG_NAME
-    bin/cake multi_tenant migrate_organizations
   }
 
 before_script:
