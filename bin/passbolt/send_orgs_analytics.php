@@ -30,6 +30,7 @@ if (!$response) {
 }
 
 $json = \json_decode($response);
+var_dump($json);
 
 if (is_null($json) || !is_array($json->body)) {
     echo "The response of the cloud catalog service is not valid.\n";
@@ -48,9 +49,9 @@ foreach ($organizations as $organization) {
         echo "Cannot send analytics for {$organization->slug}. The organization slug is not valid.\n";
         continue;
     }
+    echo "Processing analytics for {$organization->slug}.\n";
 
     $slugParam = escapeshellarg($organization->slug);
     $command = __DIR__ . "/../cake multi_tenant_analytics send --org={$slugParam}";
-    shell_exec($command);
     echo "Analytics sent for {$organization->slug}.\n";
 }
