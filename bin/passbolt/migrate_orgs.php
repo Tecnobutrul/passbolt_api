@@ -21,7 +21,7 @@ $opts = [
     ]
 ];
 $context = stream_context_create($opts);
-$url = "{$cloudApiAdminUrl}/multi_tenant/organizations.json";
+$url = "{$cloudApiAdminUrl}/multi_tenant/organizations.json?from=0";
 
 $response = file_get_contents($url, false, $context);
 if (!$response) {
