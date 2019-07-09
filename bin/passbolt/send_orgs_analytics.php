@@ -25,7 +25,7 @@ $opts = [
     ]
 ];
 $context = stream_context_create($opts);
-$url = "{$cloudApiAdminUrl}/multi_tenant/organizations.json";
+$url = "{$cloudApiAdminUrl}/multi_tenant/organizations.json?from=0";
 
 $response = file_get_contents($url, false, $context);
 if (!$response) {
@@ -34,7 +34,6 @@ if (!$response) {
 }
 
 $json = \json_decode($response);
-var_dump($json);
 
 if (is_null($json) || !is_array($json->body)) {
     echo "The response of the cloud catalog service is not valid.\n";
