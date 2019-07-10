@@ -1,46 +1,51 @@
 <?php
+
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.0.0
+ * @since         2.11.0
  */
-namespace Passbolt\MultiTenantAdmin\Controller;
 
+namespace Passbolt\MultiTenantAdmin\Lib\Controller;
+
+use App\Model\Entity\Role;
+use App\Utility\UserAccessControl;
+use App\Utility\UserAction;
 use Cake\Controller\Controller;
 use Cake\Routing\Router;
 use Cake\Utility\Text;
 
 /**
- * MultiTenant Controller
+ * MultiTenant Admin Controller
  */
-class MultiTenantAdminController extends Controller
+abstract class MultiTenantAdminController extends Controller
 {
-
     /**
      * Initialization hook method.
+     * Used to add common initialization code like loading components.
      *
-     * Use this method to add common initialization code like loading components.
-     *
-     * e.g. `$this->loadComponent('Security');`
-     *
+     * @throws \Exception If a component class cannot be found.
      * @return void
      */
     public function initialize()
     {
         parent::initialize();
-
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Passbolt/MultiTenantAdmin.AuthToken');
 
         $this->AuthToken->identify();
+
+        // Init user action.
+        $uac = new UserAccessControl(Role::ADMIN);
+        UserAction::initFromRequest($uac, $this->request);
     }
 
     /**

@@ -62,7 +62,7 @@ class ErrorController extends AppController
 
             try {
                 $userActionId = UserAction::getInstance()->getUserActionId();
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 $userActionId = UuidFactory::uuid();
             }
             try {

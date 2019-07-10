@@ -65,7 +65,7 @@ return [
      *   You should treat it as extremely sensitive data.
      */
     'Security' => [
-        'salt' => env('SECURITY_SALT', '0536f437b90dd20d8340e7cddcf0a869e1fb981e81990e4c4dbe2f50a9a40c62'),
+        'salt' => env('SECURITY_SALT', '0a2cf3998dd6dbf8905c7d41934a02c2807bf931ac447158706d5d14787d0aeb'),
     ],
 
     /**
@@ -85,9 +85,12 @@ return [
      */
     'Cache' => [
         'default' => [
-            'className' => 'File',
-            'path' => CACHE,
-            'url' => env('CACHE_DEFAULT_URL', null),
+            'className' => 'Redis',
+            'prefix' => CACHE_PREFIX_ORG,
+            'server' => env('CACHE_CAKE_DEFAULT_SERVER', 'redis-master'),
+            'database' => (int)env('CACHE_DEFAULT_DATABASE', 1),
+            'password' => env('CACHE_CAKE_DEFAULT_PASSWORD', ''),
+            'port' => 6379,
         ],
 
         /**
@@ -97,12 +100,12 @@ return [
          * If you set 'className' => 'Null' core cache will be disabled.
          */
         '_cake_core_' => [
-            'className' => 'File',
-            'prefix' => 'myapp_cake_core_',
-            'path' => CACHE . 'persistent/',
-            'serialize' => true,
-            'duration' => '+1 years',
-            'url' => env('CACHE_CAKECORE_URL', null),
+            'className' => 'Redis',
+            'duration' => '+1 week',
+            'server' => env('CACHE_CAKE_DEFAULT_SERVER', 'redis-master'),
+            'database' => (int)env('CACHE_CAKE_CORE_DATABASE', 2),
+            'password' => env('CACHE_CAKE_DEFAULT_PASSWORD', ''),
+            'port' => 6379,
         ],
 
         /**
@@ -112,12 +115,12 @@ return [
          * Duration will be set to '+2 minutes' in bootstrap.php when debug = true
          */
         '_cake_model_' => [
-            'className' => 'File',
-            'prefix' => 'myapp_cake_model_',
-            'path' => CACHE . 'models/',
-            'serialize' => true,
-            'duration' => '+1 years',
-            'url' => env('CACHE_CAKEMODEL_URL', null),
+            'className' => 'Redis',
+            'duration' => '+1 week',
+            'server' => env('CACHE_CAKE_DEFAULT_SERVER', 'redis-master'),
+            'database' => (int)env('CACHE_CAKE_MODEL_DATABASE', 3),
+            'password' => env('CACHE_CAKE_DEFAULT_PASSWORD', ''),
+            'port' => 6379
         ],
     ],
 
@@ -207,7 +210,7 @@ return [
     'Email' => [
         'default' => [
             'transport' => env('EMAIL_DEFAULT_TRANSPORT', 'default'),
-            'from' => env('EMAIL_DEFAULT_FROM', 'you@localhost'),
+            'from' => env('EMAIL_DEFAULT_FROM', 'no-reply@passbolt.com'),
             //'charset' => 'utf-8',
             //'headerCharset' => 'utf-8',
         ],
@@ -226,7 +229,7 @@ return [
             'className' => 'Cake\Database\Connection',
             'driver' => env('DATASOURCES_DEFAULT_DRIVER', 'Cake\Database\Driver\Mysql'),
             'persistent' => false,
-            'host' => env('DATASOURCES_DEFAULT_HOST', 'localhost'),
+            'host' => env('DATASOURCES_DEFAULT_HOST', '127.0.0.1'),
             'port' => env('DATASOURCES_DEFAULT_PORT', 3306),
             /**
              * CakePHP will use the default DB port based on the driver selected
@@ -298,14 +301,16 @@ return [
      */
     'Log' => [
         'debug' => [
-            'className' => 'Cake\Log\Engine\FileLog',
+            'engine' => env('LOG_DEBUG_ENGINE', 'File'),
+            'className' => env('LOG_DEBUG_CLASS_NAME', 'Cake\Log\Engine\FileLog'),
             'path' => LOGS,
             'file' => 'debug',
             'levels' => ['notice', 'info', 'debug'],
             'url' => env('LOG_DEBUG_URL', null),
         ],
         'error' => [
-            'className' => 'Cake\Log\Engine\FileLog',
+            'engine' => env('LOG_ERROR_ENGINE', 'File'),
+            'className' => env('LOG_ERROR_CLASS_NAME', 'Cake\Log\Engine\FileLog'),
             'path' => LOGS,
             'file' => 'error',
             'levels' => ['warning', 'error', 'critical', 'alert', 'emergency'],
@@ -352,6 +357,7 @@ return [
      * To use database sessions, load the SQL file located at config/Schema/sessions.sql
      */
     'Session' => [
-        'defaults' => env('SESSION_DEFAULTS', 'php'),
+        'defaults' => env('SESSION_DEFAULTS', 'cache'),
+        'duration' => '+1 day'
     ],
 ];
