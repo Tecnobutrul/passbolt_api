@@ -4,7 +4,8 @@ substitutions:
   _CHARTS_STAGING_BRANCH: develop
   _CODE_PRODUCTION_BRANCH: production
   _RETRIES: "5"
-  _BUCKET_NAME: cloudbuild-confige079506e
+  _BUCKET_STAGING_NAME: cloudbuild-confige079506e
+  _BUCKET_PRODUCTION_NAME: cloudbuild-configfdb9ca2c
   _KMS_LOCATION: europe-west1
   _KMS_KEYRING: cloud-ring-00
   _KMS_KEY: cloud-key-00
@@ -19,19 +20,17 @@ steps:
       - '.'
 
   - name: 'gcr.io/cloud-builders/gsutil'
+    entrypoint: /bin/bash
     args:
-      - 'cp'
-      - 'gs://$_BUCKET_NAME/bb-config.enc'
-      - '/config/bb-config.enc'
-    volumes:
-      - name: 'config'
-        path: /config
-
-  - name: 'gcr.io/cloud-builders/gsutil'
-    args:
-      - 'cp'
-      - 'gs://$_BUCKET_NAME/bb-ssh-key.enc'
-      - '/config/bb-ssh-key.enc'
+      - '-c'
+      - |
+        if [[ "$BRANCH_NAME" == "$_CODE_PRODUCTION_BRANCH" ]]; then
+          gsutil cp gs://$_BUCKET_PRODUCTION_NAME/bb-config.enc /config/bb-config.enc
+          gsutil cp gs://$_BUCKET_PRODUCTION_NAME/bb-ssh-key.enc /config/bb-ssh-key.enc
+        else
+          gsutil cp gs://$_BUCKET_STAGING_NAME/bb-config.enc /config/bb-config.enc
+          gsutil cp gs://$_BUCKET_STAGING_NAME/bb-ssh-key.enc /config/bb-ssh-key.enc
+        fi
     volumes:
       - name: 'config'
         path: /config
@@ -70,6 +69,9 @@ steps:
         apt-get update \
         && apt-get install -y --no-install-recommends \
           git \
+          curl \
+          jq \
+          ca-certificates \
           openssh-client \
           python \
           python-yaml \
