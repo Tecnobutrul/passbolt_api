@@ -45,6 +45,11 @@ RUN apt-get update \
     && curl -L $NR_URL | tar -C /tmp -zx \
     && NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 /tmp/newrelic-php5-*/newrelic-install install \
     && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall* \
+    && sed -i \
+        -e "s/;\?newrelic.enabled =.*/newrelic.enabled = \${NEW_RELIC_ENABLED}/" \
+        -e "s/newrelic.license =.*/newrelic.license = \${NEW_RELIC_LICENSE_KEY}/" \
+        -e "s/newrelic.appname =.*/newrelic.appname = \${NEW_RELIC_APP_NAME}/" \
+        /usr/local/etc/php/conf.d/newrelic.ini \
     && mkdir /home/www-data \
     && chown -R www-data:www-data /home/www-data \
     && usermod -d /home/www-data www-data \
