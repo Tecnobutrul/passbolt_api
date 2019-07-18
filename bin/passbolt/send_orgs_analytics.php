@@ -56,5 +56,6 @@ foreach ($organizations as $organization) {
 
     $slugParam = escapeshellarg($organization->slug);
     $command = __DIR__ . "/../cake multi_tenant_analytics send --org={$slugParam}";
+    $output = shell_exec($command);
     echo "Analytics sent for {$organization->slug}.\n";
 }
