@@ -41,7 +41,6 @@ RUN apt-get update \
          libmcrypt4 \
          mysql-client \
          supervisor \
-         cron \
     && curl -L $NR_URL | tar -C /tmp -zx \
     && NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 /tmp/newrelic-php5-*/newrelic-install install \
     && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall* \
