@@ -88,8 +88,9 @@ COPY docker/conf/passbolt.conf /etc/nginx/conf.d/default.conf
 COPY docker/conf/nginx.conf /etc/nginx/nginx.conf
 COPY docker/conf/supervisor/*.conf /etc/supervisor/conf.d/
 COPY docker/bin/docker-entrypoint.sh /docker-entrypoint.sh
-
-RUN rm -rf docker
+# Cleaning docker directory
+RUN rm -rf docker \
+    && rm Dockerfile
 
 EXPOSE 80 443
 
