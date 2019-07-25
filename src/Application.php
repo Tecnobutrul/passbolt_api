@@ -51,12 +51,12 @@ class Application extends BaseApplication
          * - Apply CSRF protection
          */
         $middleware
-            ->add(new NameTransactionMiddleware())
             ->add(new ErrorHandlerMiddleware(null, Configure::read('Error')))
             ->add(new AssetMiddleware([
                 'cacheTime' => Configure::read('Asset.cacheTime')
             ]))
             ->add(new RoutingMiddleware($this))
+            ->add(new NameTransactionMiddleware())
             ->add(GpgAuthHeadersMiddleware::class)
             ->add(new CsrfProtectionMiddleware());
 
