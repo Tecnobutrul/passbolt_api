@@ -26,6 +26,7 @@ use Cake\Http\BaseApplication;
 use Cake\Http\Middleware\SecurityHeadersMiddleware;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use NewRelic\Middleware\NameTransactionMiddleware;
 use Passbolt\MultiTenant\Middleware\MultitenantRoutingMiddleware;
 
 class Application extends BaseApplication
@@ -50,6 +51,7 @@ class Application extends BaseApplication
          * - Apply CSRF protection
          */
         $middleware
+            ->add(new NameTransactionMiddleware())
             ->add(new ErrorHandlerMiddleware(null, Configure::read('Error')))
             ->add(new AssetMiddleware([
                 'cacheTime' => Configure::read('Asset.cacheTime')
