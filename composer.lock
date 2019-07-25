@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca54025eb54a440fdd102584c0d70dac",
+    "content-hash": "097df9bf8036b89052fd171095e23394",
     "packages": [
         {
             "name": "aura/intl",
@@ -152,6 +152,46 @@
                 "validation"
             ],
             "time": "2019-05-28T15:27:37+00:00"
+        },
+        {
+            "name": "brunitto/cakephp-new-relic",
+            "version": "1.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/brunitto/cakephp-new-relic.git",
+                "reference": "d66db01a9bcf591509b4253e01a0f3f34d0a2d77"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brunitto/cakephp-new-relic/zipball/d66db01a9bcf591509b4253e01a0f3f34d0a2d77",
+                "reference": "d66db01a9bcf591509b4253e01a0f3f34d0a2d77",
+                "shasum": ""
+            },
+            "require": {
+                "cakephp/cakephp": ">=3.6 <4.0"
+            },
+            "require-dev": {
+                "cakephp/cakephp-codesniffer": "dev-master",
+                "phpunit/phpunit": ">=7.1 <8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "NewRelic\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bruno Moyle",
+                    "email": "brunitto@gmail.com"
+                }
+            ],
+            "description": "CakePHP New Relic plugin.",
+            "time": "2018-06-23T00:24:32+00:00"
         },
         {
             "name": "burzum/cakephp-file-storage",
@@ -454,23 +494,23 @@
         },
         {
             "name": "cakephp/migrations",
-            "version": "2.1.1",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cakephp/migrations.git",
-                "reference": "96e3cc00ede11f28bb8bcefcab95f07c487177cf"
+                "reference": "38fbee62e7f387dbe0dc7ef492aa7dddb8e304fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cakephp/migrations/zipball/96e3cc00ede11f28bb8bcefcab95f07c487177cf",
-                "reference": "96e3cc00ede11f28bb8bcefcab95f07c487177cf",
+                "url": "https://api.github.com/repos/cakephp/migrations/zipball/38fbee62e7f387dbe0dc7ef492aa7dddb8e304fc",
+                "reference": "38fbee62e7f387dbe0dc7ef492aa7dddb8e304fc",
                 "shasum": ""
             },
             "require": {
                 "cakephp/cache": "^3.6.0",
                 "cakephp/orm": "^3.6.0",
                 "php": ">=5.6.0",
-                "robmorgan/phinx": "~0.10.3"
+                "robmorgan/phinx": "^0.10.3"
             },
             "require-dev": {
                 "cakephp/bake": "^1.7.0",
@@ -484,7 +524,7 @@
             "type": "cakephp-plugin",
             "autoload": {
                 "psr-4": {
-                    "Migrations\\": "src"
+                    "Migrations\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -503,7 +543,7 @@
                 "cakephp",
                 "migrations"
             ],
-            "time": "2019-02-07T15:20:33+00:00"
+            "time": "2019-07-22T03:02:47+00:00"
         },
         {
             "name": "cakephp/plugin-installer",
@@ -831,16 +871,16 @@
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.104",
+            "version": "v0.105",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-api-php-client-services.git",
-                "reference": "d41fea99f90d7935bd57cf654bf271072fe584f1"
+                "reference": "0f87a3d7ce90d7f7b92428c86239b828af92aba0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/d41fea99f90d7935bd57cf654bf271072fe584f1",
-                "reference": "d41fea99f90d7935bd57cf654bf271072fe584f1",
+                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/0f87a3d7ce90d7f7b92428c86239b828af92aba0",
+                "reference": "0f87a3d7ce90d7f7b92428c86239b828af92aba0",
                 "shasum": ""
             },
             "require": {
@@ -864,7 +904,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2019-06-23T00:23:39+00:00"
+            "time": "2019-07-23T21:43:24+00:00"
         },
         {
             "name": "google/auth",

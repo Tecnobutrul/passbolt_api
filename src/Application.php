@@ -26,6 +26,7 @@ use Cake\Http\BaseApplication;
 use Cake\Http\Middleware\SecurityHeadersMiddleware;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use NewRelic\Middleware\NameTransactionMiddleware;
 use Passbolt\MultiTenant\Middleware\MultitenantRoutingMiddleware;
 
 class Application extends BaseApplication
@@ -55,6 +56,7 @@ class Application extends BaseApplication
                 'cacheTime' => Configure::read('Asset.cacheTime')
             ]))
             ->add(new RoutingMiddleware($this))
+            ->add(new NameTransactionMiddleware())
             ->add(GpgAuthHeadersMiddleware::class)
             ->add(new CsrfProtectionMiddleware());
 

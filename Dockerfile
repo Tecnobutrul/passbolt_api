@@ -41,7 +41,6 @@ RUN apt-get update \
          libmcrypt4 \
          mysql-client \
          supervisor \
-         cron \
     && curl -L $NR_URL | tar -C /tmp -zx \
     && NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 /tmp/newrelic-php5-*/newrelic-install install \
     && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall* \
@@ -89,8 +88,9 @@ COPY docker/conf/passbolt.conf /etc/nginx/conf.d/default.conf
 COPY docker/conf/nginx.conf /etc/nginx/nginx.conf
 COPY docker/conf/supervisor/*.conf /etc/supervisor/conf.d/
 COPY docker/bin/docker-entrypoint.sh /docker-entrypoint.sh
-
-RUN rm -rf docker
+# Cleaning docker directory
+RUN rm -rf docker \
+    && rm Dockerfile
 
 EXPOSE 80 443
 
