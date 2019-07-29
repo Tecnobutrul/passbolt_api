@@ -31,7 +31,7 @@ class SubscriptionStatusController extends AppController
     public function beforeFilter(Event $event)
     {
         $this->Auth->allow('getDisabled');
-        $this->Auth->allow('getArchived');
+        $this->Auth->allow('getNotFound');
         return parent::beforeFilter($event);
     }
 
@@ -57,11 +57,11 @@ class SubscriptionStatusController extends AppController
      *
      * @return void
      */
-    public function getArchived() {
+    public function getNotFound() {
         if (!$this->request->is('json')) {
             $this->viewBuilder()
                 ->setLayout('default')
-                ->setTemplate(ucfirst('archived'));
+                ->setTemplate(ucfirst('notfound'));
         } else {
             $msg = __('This Passbolt cloud instance was deleted due to inactivity.');
             throw new ForbiddenException($msg);

@@ -1,6 +1,6 @@
 <?php
 use Cake\Core\Configure;
-$title = __('Sorry, this Passbolt Cloud workspace is disabled');
+$title = __('This is not the workspace you are looking for.');
 $this->assign('title',	$title);
 $this->assign('pageClass', 'cloud cloud-archived');
 $this->Html->css('themes/default/api_cloud.min.css?v=' . Configure::read('passbolt.version'), ['block' => 'css', 'fullBase' => true]);
@@ -29,12 +29,11 @@ $this->Html->css('themes/default/api_cloud.min.css?v=' . Configure::read('passbo
                 <?= $title; ?>
             </h2>
             <p>
-                <?= __('This workspace is disabled because your subscription or free trial has expired.'); ?>
-                <?= __('Please check your mailbox to proceed to checkout in order to continue using passbolt.'); ?>
-                <?= __('Your workspace data will be deleted if inactive for more than 30 days.'); ?>
+                <?= __('This workspace does not exist or has been deleted due to inactivity.'); ?>
+                <?= __('Check the name of the organization in the url or get in touch with support if you think this is a mistake.'); ?>
             </p>
-            <a class="button primary" href="https://www.passbolt.com/contact/passbolt-cloud-enterprise">
-                <?= __('contact the sales team'); ?>
+            <a class="button primary" href="https://www.passbolt.com/contact/passbolt-cloud-enterprise" class="secondary-cta">
+                <?= __('contact support'); ?>
             </a>
         </div>
     </div>

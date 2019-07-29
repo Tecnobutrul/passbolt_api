@@ -21,6 +21,6 @@ Router::plugin('Passbolt/CloudSubscription', ['path' => '/subscription'], functi
     $routes->connect('/disabled', ['controller' => 'SubscriptionStatus', 'action' => 'getDisabled'])
         ->setMethods(['GET']);
 
-    $routes->connect('/archived', ['controller' => 'SubscriptionStatus', 'action' => 'getArchived'])
+    $routes->connect('/notfound', ['controller' => 'SubscriptionStatus', 'action' => 'getNotFound'])
         ->setMethods(['GET']);
 });

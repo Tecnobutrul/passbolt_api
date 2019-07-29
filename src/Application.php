@@ -43,9 +43,6 @@ class Application extends BaseApplication
         // Multitenant route middleware.
         $middleware->prepend(MultitenantRoutingMiddleware::class);
 
-        $middleware
-            ->add(CloudSubscriptionStatusMiddleware::class);
-
         /*
          * Default Middlewares
          * - Catch any exceptions in the lower layers, and make an error page/response
@@ -168,7 +165,11 @@ class Application extends BaseApplication
         if (env('PASSBOLT_PLUGINS_MULTITENANTADMIN_ENABLED', false)) {
             $this->addPlugin('Passbolt/MultiTenantAnalytics', ['bootstrap' => true, 'routes' => false]);
             $this->addPlugin('Passbolt/MultiTenantAdmin', ['bootstrap' => true, 'routes' => true]);
-            $this->addPlugin('Passbolt/CloudSubscription', ['bootstrap' => true, 'routes' => true]);
+
+//            $subscriptionEnabled = Configure::read('passbolt.plugins.cloudSubscription.enabled');
+//            if (!isset($subscriptionEnabled) || $subscriptionEnabled) {
+//                $this->addPlugin('Passbolt/CloudSubscription', ['bootstrap' => true, 'routes' => true]);
+//            }
         }
 
         if (Configure::read('debug') && Configure::read('passbolt.selenium.active')) {

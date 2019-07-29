@@ -15,7 +15,9 @@ namespace Passbolt\Log\Events\Traits;
 
 use App\Utility\UserAction;
 use Cake\Event\Event;
+use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
+use PDOException;
 
 trait ControllerActionTrait
 {
@@ -27,10 +29,16 @@ trait ControllerActionTrait
      */
     public function logControllerAction(Event $event)
     {
-        $statusCode = $event->getSubject()->response->getStatusCode();
-        $status = (int)($statusCode === 200);
-        $userAction = UserAction::getInstance();
-        $ActionLogs = TableRegistry::getTableLocator()->get('Passbolt/Log.ActionLogs');
-        $ActionLogs->create($userAction, $status);
+        try {
+            $statusCode = $event->getSubject()->response->getStatusCode();
+            $status = (int)($statusCode === 200);
+            $userAction = UserAction::getInstance();
+            $ActionLogs = TableRegistry::getTableLocator()->get('Passbolt/Log.ActionLogs');
+            $ActionLogs->create($userAction, $status);
+        } catch(PDOException $exception) {
+            // Fail gracefully if database connection is not available.
+            // Useful if we are already rendering an error page related to PDOException
+            Log::error('Could not connect to Database.');
+        }
     }
 }

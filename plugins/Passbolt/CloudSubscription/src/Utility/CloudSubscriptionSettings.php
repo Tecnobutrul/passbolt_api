@@ -20,6 +20,7 @@ use App\Model\Table\OrganizationSettingsTable;
 use App\Model\Table\UsersTable;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
+use Cake\Chronos\Date;
 use Cake\Core\Configure;
 use Cake\Core\Exception\Exception;
 use Cake\Datasource\Exception\RecordNotFoundException;
@@ -107,18 +108,11 @@ class CloudSubscriptionSettings
     }
 
     /**
-     * Return true if the instance is considered as archived
-     * Default archive time is expiry date +30 days.
-     * See
      * @return bool
      */
-    public function isArchived()
+    public function isTrial()
     {
-        if ($this->isExpired()) {
-            $archiveAfter = Configure::read('passbolt.cloud.subscription.archiveAfter');
-            $archivalDate = $this->expiryDate->modify($archiveAfter);
-            return $archivalDate->isPast();
-        }
+        return $this->isTrial;
     }
 
     /**
@@ -131,11 +125,11 @@ class CloudSubscriptionSettings
         try {
             /** @var OrganizationSettingsTable $OrganizationSettings */
             $OrganizationSettings = TableRegistry::getTableLocator()->get('OrganizationSettings');
-            $json = $OrganizationSettings->getFirstSettingOrFail(static::NAMESPACE);
+            $setting = $OrganizationSettings->getFirstSettingOrFail(static::NAMESPACE);
         } catch (RecordNotFoundException $exception) {
             throw new RecordNotFoundException(__('No cloud subscription found.'));
         }
-        $settings = json_decode($json, true);
+        $settings = json_decode($setting['value'], true);
         if ($settings === null) {
             throw new RecordNotFoundException(__('No valid cloud subscription found.'));
         }
@@ -152,12 +146,13 @@ class CloudSubscriptionSettings
     public function toJson()
     {
         $json = json_encode([
-            'isTrial' => $this->isTrial,
+            'isTrial' => $this->isTrial(),
             'expiryDate' => $this->expiryDate->toUnixString()
         ]);
         if ($json === false) {
             throw new InternalErrorException(__('Could not serialize cloud subscription settings.'));
         }
+        return $json;
     }
 
     /**

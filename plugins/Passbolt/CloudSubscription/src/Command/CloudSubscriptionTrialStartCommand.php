@@ -18,29 +18,44 @@ use Cake\Console\Arguments;
 use Cake\Console\Command;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
-use Passbolt\CloudSubscription\Command\Subcommands\TrialStartCommand;
+use Cake\Chronos\Date;
+use Cake\Http\Exception\InternalErrorException;
+use Passbolt\CloudSubscription\Utility\CloudSubscriptionSettings;
 
-class CloudSubscriptionCommand extends Command
+class CloudSubscriptionTrialStartCommand extends Command
 {
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
-        $parser->addArgument('action', [
-            'help' => 'The action you want to perform'
+        $parser->addOption('org', [
+            'help' => 'The organization you are working with.'
         ]);
-        $parser->addArgument('org', [
-            'help' => 'The organization you are working with'
+        $parser->addOption('expiryDate', [
+            'help' => 'When the trial expires.'
         ]);
         return $parser;
     }
 
     public function execute(Arguments $args, ConsoleIo $io)
     {
-        $action = $args->getArgument('action');
-        $org = $args->getArgument('org');
-        if ($action) {
-            $this->executeCommand(TrialStartCommand::class, [$org]);
-        } else {
-            $io->out("An action is required.");
+        $org = $args->getOption('org');
+        if (!isset($org)) {
+            throw new InternalErrorException(__('Can not start trial. Organization is missing.'));
         }
+
+        $expiryDate = $args->getOption('expiryDate');
+        if (!isset($expiryDate)) {
+            $expiryDate = Date::today();
+            $expiryDate = $expiryDate->modify('+14 days');
+        } else {
+            $expiryDate = new Date($expiryDate);
+        }
+
+        $subscription = new CloudSubscriptionSettings([
+            'isTrial' => true,
+            'expiryDate' => $expiryDate->toUnixString()
+        ]);
+        $subscription->save();
+
+        $io->out(__("Trial started for {$org}. Expires: {0}", $expiryDate->toIso8601String()));
     }
 }

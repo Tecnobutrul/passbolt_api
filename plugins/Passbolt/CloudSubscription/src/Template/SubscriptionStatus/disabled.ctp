@@ -30,14 +30,11 @@ $this->Html->css('themes/default/api_cloud.min.css?v=' . Configure::read('passbo
             </h2>
             <p>
                 <?= __('This workspace is disabled because your subscription or free trial has expired.'); ?>
-                <?= __('Please proceed to check to continue using passbolt.'); ?>
+                <?= __('Please check your mailbox to proceed to checkout in order to continue using passbolt.'); ?>
                 <?= __('Your workspace data will be deleted if inactive for more than 30 days.'); ?>
             </p>
-            <a href="#" class="button primary">
-                <?= __('Purchase subscription'); ?>
-            </a>
-            <a href="#" class="secondary-cta">
-                <?= __('or contact the sales team'); ?>
+            <a class="button primary" href="https://www.passbolt.com/contact/passbolt-cloud-enterprise" class="secondary-cta">
+                <?= __('contact the sales team'); ?>
             </a>
         </div>
     </div>
