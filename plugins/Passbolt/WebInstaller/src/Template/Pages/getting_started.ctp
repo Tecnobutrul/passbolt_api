@@ -18,7 +18,7 @@ use Cake\Core\Configure;
 $this->assign('title',	__('Passbolt is not configured.'));
 $this->Html->css('themes/default/api_setup.min.css?v=' . Configure::read('passbolt.version'), ['block' => 'css', 'fullBase' => true]);
 
-$this->assign('page_classes', 'setup start');
+$this->assign('pageClass', 'setup start');
 ?>
 <?php echo $this->element('Navigation/empty'); ?>
 <div class="page-row">

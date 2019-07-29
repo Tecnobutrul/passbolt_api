@@ -28,6 +28,7 @@ use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
 use NewRelic\Middleware\NameTransactionMiddleware;
 use Passbolt\MultiTenant\Middleware\MultitenantRoutingMiddleware;
+use Passbolt\CloudSubscription\Middleware\CloudSubscriptionStatusMiddleware;
 
 class Application extends BaseApplication
 {
@@ -41,6 +42,9 @@ class Application extends BaseApplication
     {
         // Multitenant route middleware.
         $middleware->prepend(MultitenantRoutingMiddleware::class);
+
+        $middleware
+            ->add(CloudSubscriptionStatusMiddleware::class);
 
         /*
          * Default Middlewares
@@ -164,6 +168,7 @@ class Application extends BaseApplication
         if (env('PASSBOLT_PLUGINS_MULTITENANTADMIN_ENABLED', false)) {
             $this->addPlugin('Passbolt/MultiTenantAnalytics', ['bootstrap' => true, 'routes' => false]);
             $this->addPlugin('Passbolt/MultiTenantAdmin', ['bootstrap' => true, 'routes' => true]);
+            $this->addPlugin('Passbolt/CloudSubscription', ['bootstrap' => true, 'routes' => true]);
         }
 
         if (Configure::read('debug') && Configure::read('passbolt.selenium.active')) {

@@ -16,6 +16,7 @@ namespace Passbolt\MultiFactorAuthentication\Utility;
 
 use App\Error\Exception\ValidationException;
 use App\Model\Entity\AuthenticationToken;
+use App\Model\Table\AuthenticationTokensTable;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
@@ -70,6 +71,7 @@ class MfaVerifiedToken
     public static function check(UserAccessControl $uac, string $token)
     {
         // Baseline validity check
+        /** @var AuthenticationTokensTable $auth */
         $auth = TableRegistry::getTableLocator()->get('AuthenticationTokens');
         if (!$auth->isValid($token, $uac->getId(), AuthenticationToken::TYPE_MFA)) {
             return false;

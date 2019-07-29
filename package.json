@@ -19,6 +19,6 @@
     "jquery": "^3.4.1",
     "openpgp": "^4.5.5",
     "passbolt-appjs": "^2.10.4",
-    "passbolt-styleguide": "^2.10.6"
+    "passbolt-styleguide": "^2.10.7"
   }
 }

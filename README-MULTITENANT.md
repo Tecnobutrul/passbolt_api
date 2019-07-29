@@ -47,7 +47,7 @@ The main idea is to remove the site from the path so that cakephp understands wh
 By default the container create an organization database while starting. An administrator is also created
 and a link to complete the administrator setup can be found in the output of the container.
 
-The link looks like: https://cloud.passbolt.com/acme/setup/install/5820c265-629b-4b99-bd2f-e238a34616d7/d30573c5-3829-4c92-b6e7-288fdf0d0b7a
+The link looks like: https://cloud.passbolt.local/acme/setup/install/5820c265-629b-4b99-bd2f-e238a34616d7/d30573c5-3829-4c92-b6e7-288fdf0d0b7a
 
 # Production
 

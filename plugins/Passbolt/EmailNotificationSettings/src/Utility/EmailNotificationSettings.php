@@ -44,7 +44,7 @@ class EmailNotificationSettings
         'show' => [
             'comment' => true,
             'description' => true,
-            'secret' => true,
+            'secret' => false,
             'uri' => true,
             'username' => true,
         ],
@@ -53,7 +53,7 @@ class EmailNotificationSettings
                 'add' => true,
             ],
             'password' => [
-                'create' => true,
+                'create' => false,
                 'share' => true,
                 'update' => true,
                 'delete' => true,

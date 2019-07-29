@@ -18,17 +18,21 @@ namespace App\Test\TestCase\Controller\Notifications;
 use App\Model\Entity\Permission;
 use App\Test\TestCase\Controller\Share\ShareControllerTest;
 use App\Utility\UuidFactory;
+use Cake\Core\Configure;
 
 class ShareNotificationTest extends ShareControllerTest
 {
     public $fixtures = [
         'app.Base/Users', 'app.Base/Gpgkeys', 'app.Base/Profiles', 'app.Base/Roles',
         'app.Base/Groups', 'app.Base/GroupsUsers', 'app.Base/Resources', 'app.Base/Permissions', 'app.Base/Secrets',
-        'app.Base/EmailQueue', 'app.Base/Avatars', 'app.Base/Favorites'
+        'app.Base/EmailQueue', 'app.Base/Avatars', 'app.Base/Favorites', 'app.Base/OrganizationSettings'
     ];
 
     public function testShareNotificationSuccess()
     {
+        // Redefine some default notifications settings
+        Configure::write('passbolt.email.show.secret', true);
+
         // Define actors of this tests
         $resourceId = UuidFactory::uuid('resource.id.cakephp');
         // Users
