@@ -1,4 +1,4 @@
-FROM php:7.2-fpm-stretch
+FROM php:7.3-fpm
 
 LABEL maintainer="diego@passbolt.com"
 
@@ -39,7 +39,7 @@ RUN apt-get update \
          gnupg \
          libgpgme11 \
          libmcrypt4 \
-         mysql-client \
+         mariadb-client \
          supervisor \
     && curl -L $NR_URL | tar -C /tmp -zx \
     && NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 /tmp/newrelic-php5-*/newrelic-install install \
