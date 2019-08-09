@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -10,23 +11,22 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.5.0
+ * @since         2.11.0
  */
-namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Controllers;
 
-use Passbolt\MultiFactorAuthentication\Test\Lib\MfaIntegrationTestCase;
-use Passbolt\MultiFactorAuthentication\Utility\MfaSettings;
+namespace App\Controller\Auth;
 
-class MfaSetupDeleteControllerTest extends MfaIntegrationTestCase
+use App\Controller\AppController;
+
+class AuthIsAuthenticatedController extends AppController
 {
     /**
-     * @group mfa
-     * @group mfaVerify
+     * Check a user is authenticated
+     *
+     * @return void
      */
-    public function testMfaSetupDelete()
+    public function isAuthenticated()
     {
-        $this->authenticateAs('ada');
-        $providers = MfaSettings::getProviders();
-        $this->markTestIncomplete();
+        $this->success();
     }
 }
