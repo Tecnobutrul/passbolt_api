@@ -1,20 +1,21 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.4.0
  */
 
-use Migrations\AbstractMigration;
+use Cake\Datasource\ConnectionManager;
 use Cake\ORM\TableRegistry;
+use Migrations\AbstractMigration;
 
 class V250ChangeMfaAccountSettingsDataFormat extends AbstractMigration
 {
@@ -25,7 +26,14 @@ class V250ChangeMfaAccountSettingsDataFormat extends AbstractMigration
      */
     public function up()
     {
-        $accountSettings = TableRegistry::get('AccountSettings');
+        $connectionName = 'default';
+        if ($this->input->getOption('connection')) {
+            $connectionName = $this->input->getOption('connection');
+        }
+        $connection = ConnectionManager::get($connectionName);
+        $accountSettings = TableRegistry::getTableLocator()->get('AccountSettings', [
+            'connection' => $connection
+        ]);
         $settings = $accountSettings->find()
             ->select()
             ->where(['property' => 'mfa'])

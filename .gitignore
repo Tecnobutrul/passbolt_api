@@ -7,6 +7,13 @@
 /config/gpg/serverkey_private.asc
 /config/license
 /config/ldap.php
+/config/DirectorySync/schema/*
+
+# Cloud specific
+config/service-account.json
+config/gpg/serverkey.key
+config/gpg/serverkey_private.key
+docker/conf/service-account.json
 
 # Dependencies #
 ################

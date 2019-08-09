@@ -14,14 +14,12 @@
  */
 namespace Passbolt\DirectorySync\Utility;
 
-use App\Model\Entity\OrganizationSetting;
+use App\Utility\OpenPGP\OpenPGPBackendFactory;
 use App\Utility\UserAccessControl;
 use Cake\Core\Configure;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Network\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
-use function Gaufrette\Adapter\file_exists;
 
 class DirectoryOrgSettings
 {
@@ -43,7 +41,15 @@ class DirectoryOrgSettings
      */
     public function __construct(array $settings = [])
     {
-        $this->OrganizationSetting = TableRegistry::get('OrganizationSettings');
+        $this->OrganizationSetting = TableRegistry::getTableLocator()->get('OrganizationSettings');
+
+        // If settings is not empty, we merge with the plugin default settings.
+        // It is important to leave settings empty if no settings are set. This permits
+        // to check when no settings have been set at all.
+        if (!empty($settings)) {
+            $pluginDefaultSettings = self::getDefaultSettings();
+            $settings = Hash::merge($pluginDefaultSettings, $settings);
+        }
         $this->settings = $settings;
     }
 
@@ -54,16 +60,10 @@ class DirectoryOrgSettings
      */
     public static function get()
     {
-        $pluginDefaultSettings = self::getDefaultSettings();
-
         try {
             $settings = self::loadSettingsFromDatabase();
         } catch (RecordNotFoundException $e) {
             $settings = self::loadSettingsFromFile();
-        }
-
-        if (!empty($settings)) {
-            $settings = Hash::merge($pluginDefaultSettings, $settings);
         }
 
         return new DirectoryOrgSettings($settings);
@@ -76,7 +76,7 @@ class DirectoryOrgSettings
      */
     private static function loadSettingsFromDatabase()
     {
-        $OrganizationSettings = TableRegistry::get('OrganizationSettings');
+        $OrganizationSettings = TableRegistry::getTableLocator()->get('OrganizationSettings');
         $data = $OrganizationSettings->getFirstSettingOrFail(self::ORG_SETTINGS_PROPERTY);
         $settings = json_decode($data->value, true);
         $password = Hash::get($settings, 'ldap.domains.org_domain.password', '');
@@ -127,7 +127,7 @@ class DirectoryOrgSettings
      */
     public static function disable($uac)
     {
-        $OrganizationSettings = TableRegistry::get('OrganizationSettings');
+        $OrganizationSettings = TableRegistry::getTableLocator()->get('OrganizationSettings');
         $OrganizationSettings->deleteSetting(self::ORG_SETTINGS_PROPERTY, $uac);
     }
 
@@ -251,6 +251,36 @@ class DirectoryOrgSettings
     }
 
     /**
+     * Get useEmailPrefixSuffix.
+     *
+     * @return mixed
+     */
+    public function getUseEmailPrefixSuffix()
+    {
+        return Hash::get($this->settings, "useEmailPrefixSuffix");
+    }
+
+    /**
+     * Get EmailPrefix.
+     *
+     * @return mixed
+     */
+    public function getEmailPrefix()
+    {
+        return Hash::get($this->settings, "emailPrefix");
+    }
+
+    /**
+     * Get EmailSuffix.
+     *
+     * @return mixed
+     */
+    public function getEmailSuffix()
+    {
+        return Hash::get($this->settings, "emailSuffix");
+    }
+
+    /**
      * Get the settings.
      *
      * @return array
@@ -300,15 +330,15 @@ class DirectoryOrgSettings
         $gpgConfig = Configure::read('passbolt.gpg');
         $keyid = $gpgConfig['serverKey']['fingerprint'];
         $passphrase = $gpgConfig['serverKey']['passphrase'];
-        $gpg = new \gnupg();
-        $gpg->addencryptkey($keyid);
-        $gpg->addsignkey($keyid, $passphrase);
+        $gpg = OpenPGPBackendFactory::get();
+        $gpg->setSignKeyFromFingerprint($keyid, $passphrase);
+        $gpg->setEncryptKeyFromFingerprint($keyid);
 
-        return $gpg->encryptsign($data);
+        return $gpg->encrypt($data, true);
     }
 
     /**
-     * Undocumented function
+     * Decrypt the organization settings
      *
      * @param string $data The message to decrypt
      * @return string
@@ -318,8 +348,8 @@ class DirectoryOrgSettings
         $gpgConfig = Configure::read('passbolt.gpg');
         $keyid = $gpgConfig['serverKey']['fingerprint'];
         $passphrase = $gpgConfig['serverKey']['passphrase'];
-        $gpg = new \gnupg();
-        $gpg->adddecryptkey($keyid, $passphrase);
+        $gpg = OpenPGPBackendFactory::get();
+        $gpg->setDecryptKeyFromFingerprint($keyid, $passphrase);
 
         return $gpg->decrypt($data);
     }

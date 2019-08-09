@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -82,9 +82,8 @@ return [
                         'update' => filter_var(env('PASSBOLT_EMAIL_SEND_GROUP_USER_UPDATE', true), FILTER_VALIDATE_BOOLEAN),
                     ],
                     'manager' => [
-                        // Notify manager when a group user is updated / deleted.
+                        // Notify managers when group membership changes.
                         'update' => filter_var(env('PASSBOLT_EMAIL_SEND_GROUP_MANAGER_UPDATE', true), FILTER_VALIDATE_BOOLEAN),
-                        'delete' => filter_var(env('PASSBOLT_EMAIL_SEND_GROUP_MANAGER_DELETE', true), FILTER_VALIDATE_BOOLEAN),
                     ]
                 ]
             ]
@@ -108,7 +107,11 @@ return [
 
         // GPG Configuration.
         'gpg' => [
-            // Tell GPG where to find the keyring.
+            // Tell passbolt which OpenPGP backend to use
+            // Default is PHP-GNUPG with some help from OpenPGP-PHP
+            'backend' => env('PASSBOLT_GPG_BACKEND', 'gnupg'),
+
+            // Tell passbolt where to find the GnuPG keyring.
             // If putenv is set to false, gnupg will use the default path ~/.gnupg.
             // For example :
             // - Apache on Centos it would be in '/usr/share/httpd/.gnupg'
@@ -128,8 +131,26 @@ return [
                 'private' => env('PASSBOLT_GPG_SERVER_KEY_PRIVATE', CONFIG . 'gpg' . DS . 'serverkey_private.asc'),
 
                 // PHP Gnupg module currently does not support passphrase, please leave blank.
-                'passphrase' => ''
+                'passphrase' => env('PASSBOLT_GPG_SERVER_KEY_PASSPHRASE', '')
             ],
+
+            // Http backend configuration
+            'http' => [
+                'domain' => env('PASSBOLT_GPG_HTTP_DOMAIN', 'cloudfunctions.net'),
+                'project' => env('PASSBOLT_GPG_HTTP_PROJECT', null),
+                'region' => env('PASSBOLT_GPG_HTTP_REGION', null),
+                'auth' => [
+                    'username' => env('PASSBOLT_GPG_HTTP_USERNAME', null),
+                    'password' => env('PASSBOLT_GPG_HTTP_AUTH_PASSWORD', null)
+                ],
+                'functions' => [
+                    'encrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_ENCRYPT', 'onOpenpgpEncrypt'),
+                    'decrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_DECRYPT', 'onOpenpgpDecrypt'),
+                    'keyinfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_KEYINFO', 'onOpenpgpGetKeyInfo'),
+                    'msginfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_MSGINFO', 'onOpenpgpGetMessageInfo'),
+                    'verify' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_VERIFY', 'onOpenpgpVerifyCleartext')
+                ]
+            ]
         ],
 
         // Legal
@@ -141,7 +162,12 @@ return [
 
         // Wich plugins are enabled
         'plugins' => [
-
+            'import' => [
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_IMPORT_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
+            ],
+            'export' => [
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_EXPORT_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
+            ],
         ],
 
         // Is public registration allowed.
@@ -172,7 +198,7 @@ return [
         // false will render your installation insecure.
         'ssl' => [
             'force' => filter_var(env('PASSBOLT_SSL_FORCE', true), FILTER_VALIDATE_BOOLEAN)
-        ]
+        ],
     ],
     // Override the Cake ExceptionRenderer.
     'Error' => [

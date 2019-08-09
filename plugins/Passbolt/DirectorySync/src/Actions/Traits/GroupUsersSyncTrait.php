@@ -71,7 +71,7 @@ trait GroupUsersSyncTrait
         $toRemove = $this->retrieveUsersToRemove($data);
         $toSync = $this->retrieveUsersToSync($data, $group);
 
-        $Resources = TableRegistry::get('Resources');
+        $Resources = TableRegistry::getTableLocator()->get('Resources');
 
         if (!empty($toAdd)) {
             // Check if group has access to passwords already.
@@ -218,7 +218,6 @@ trait GroupUsersSyncTrait
         // We add users that are in group data and not in directoryRelations.
         foreach ($data['group']['users'] as $userDn) {
             // If the group member is a group, we do not process.
-            // TODO: manage nested groups.
             if ($this->groupExistsInDirectory($userDn)) {
                 continue;
             }

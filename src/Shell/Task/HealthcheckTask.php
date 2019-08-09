@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -409,7 +409,7 @@ class HealthcheckTask extends AppShell
             __('The database schema is not up to date.'),
             [
                 __('Run the migration scripts:'),
-                'sudo su -s /bin/bash -c "' . ROOT . DS . 'bin/cake migrations migrate" ' . PROCESS_USER,
+                'sudo su -s /bin/bash -c "' . ROOT . DS . 'bin/cake migrations migrate --no-lock" ' . PROCESS_USER,
                 __('See. https://www.passbolt.com/help/tech/update')
             ]
         );
@@ -604,8 +604,8 @@ class HealthcheckTask extends AppShell
         );
         $this->assert(
             $checks['gpg']['gpgKeyPublicInKeyring'],
-            __('The server public key defined in the config/passbolt.php is in the keyring.'),
-            __('The server public key defined in the config/passbolt.php is not in the keyring'),
+            __('The server public key defined in the config/passbolt.php (or environment variables) is in the keyring.'),
+            __('The server public key defined in the config/passbolt.php (or environment variables) is not in the keyring'),
             [
                 __('Import the private server key in the keyring of the webserver user.'),
                 __('you can try:'),

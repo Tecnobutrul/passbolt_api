@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -30,12 +30,25 @@ class PassboltShell extends AppShell
         'Migrate',
         'MysqlExport',
         'MysqlImport',
-        'Passbolt/License.LicenseCheck',
-        'PassboltTestData.Data',
-        'PassboltTestData.fixturize',
         'RegisterUser',
-        'SendTestEmail',
+        'SendTestEmail'
     ];
+
+    /**
+     * Initializes the Shell
+     * acts as constructor for subclasses
+     * allows configuration of tasks prior to shell execution
+     *
+     * @return void
+     * @link https://book.cakephp.org/3.0/en/console-and-shells.html#Cake\Console\ConsoleOptionParser::initialize
+     */
+    public function initialize()
+    {
+        if (Configure::read('passbolt.plugins.license')) {
+            $this->tasks[] = 'Passbolt/License.LicenseCheck';
+        }
+        parent::initialize();
+    }
 
     /**
      * Display the passbolt ascii banner
@@ -72,13 +85,6 @@ class PassboltShell extends AppShell
             'help' => __d('cake_console', 'Identify and fix database relational integrity issues.'),
             'parser' => $this->Cleanup->getOptionParser(),
         ]);
-
-        if (Configure::read('passbolt.plugins.passbolt_test_data')) {
-            $parser->addSubcommand('data', [
-                'help' => __d('cake_console', 'Populate database with predefined data set (development mode).'),
-                'parser' => $this->Data->getOptionParser(),
-            ]);
-        }
 
         $parser->addSubcommand('drop_tables', [
             'help' => __d('cake_console', 'Drop all the tables. Dangerous but useful for a full reinstall.'),

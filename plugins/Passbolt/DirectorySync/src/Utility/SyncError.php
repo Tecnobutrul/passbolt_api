@@ -14,7 +14,7 @@
  */
 namespace Passbolt\DirectorySync\Utility;
 
-use Cake\Network\Exception\InternalErrorException;
+use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\Entity;
 
 /**
@@ -77,7 +77,6 @@ class SyncError implements \Serializable
     {
         return serialize([
             'entity' => serialize($this->entity),
-            // TODO add exception serialization
             'version' => '2'
         ]);
     }

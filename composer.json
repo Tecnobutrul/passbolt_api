@@ -6,6 +6,9 @@
         "password",
         "passbolt"
     ],
+    "config": {
+      "optimize-autoloader": true
+    },
     "homepage": "https://www.passbolt.com",
     "license": "AGPL-3.0-or-later",
     "authors": [
@@ -22,12 +25,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/passbolt/cakephp-email-queue.git",
-            "no-api": true
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/passbolt/migrations.git",
+            "url": "https://github.com/passbolt/cakephp.git",
             "no-api": true
         },
         {
@@ -42,24 +40,28 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
-        "cakephp/cakephp": "3.5.*",
+        "php": ">=7.2",
+        "ext-json" : "*",
+        "ext-posix" : "*",
+        "cakephp/cakephp": "^3.7.10",
+        "cakephp/migrations": "^2.1",
+        "cakephp/plugin-installer": "^1.1",
         "mobiledetect/mobiledetectlib": "2.*",
-        "cakephp/migrations": "1.7.1001",
-        "cakephp/plugin-installer": "~1.0",
         "ramsey/uuid": "^3.7",
         "singpolyma/openpgp-php": "^0.3.0",
         "thadafinser/user-agent-parser": "^2.0",
-        "donatj/phpuseragentparser": "^0.10.0",
-        "lorenzo/cakephp-email-queue": "^3.1.4001",
-        "burzum/file-storage": "1.2.1",
-        "burzum/cakephp-imagine-plugin": "2.1.1",
-        "aws/aws-sdk-php":"3.55.0",
-        "ldaptools/ldaptools": "^0.25.2",
+        "donatj/phpuseragentparser": "^0.7.0",
+        "lorenzo/cakephp-email-queue": "^3.2.0",
+        "burzum/cakephp-file-storage": "^2.1.0",
+        "burzum/cakephp-imagine-plugin": "3.x-dev",
         "spomky-labs/otphp": "^8.3",
         "bacon/bacon-qr-code": "^1.0",
         "enygma/yubikey": "^3.3",
-        "duosecurity/duo_php": "^1.0"
+        "duosecurity/duo_php": "^1.0",
+        "ldaptools/ldaptools": "^0.25.2",
+        "google/apiclient": "^2.0",
+        "brunitto/cakephp-new-relic": "^1.3.1"
+
     },
     "require-dev": {
         "psy/psysh": "@stable",
@@ -67,35 +69,36 @@
         "cakephp/bake": "~1.1",
         "phpunit/phpunit": "^5.7|^6.0",
         "cakephp/cakephp-codesniffer": "^3.0",
-        "satooshi/php-coveralls": "~1.0",
-        "passbolt/passbolt_selenium_api": "dev-master",
-        "passbolt/passbolt_test_data": "dev-master"
+        "passbolt/passbolt_selenium_api": "^2.10.0",
+        "passbolt/passbolt_test_data": "^2.10.2"
     },
     "autoload": {
         "psr-4": {
             "App\\": "src",
-            "PassboltTestData\\": "./plugins/PassboltTestData/src",
-            "PassboltSeleniumApi\\": "./plugins/PassboltSeleniumApi/src",
             "Passbolt\\MultiTenant\\": "./plugins/Passbolt/MultiTenant/src",
+            "Passbolt\\MultiTenantAnalytics\\": "./plugins/Passbolt/MultiTenantAnalytics/src",
             "Passbolt\\MultiTenantAdmin\\": "./plugins/Passbolt/MultiTenantAdmin/src",
-            "Passbolt\\RememberMe\\": "./plugins/Passbolt/RememberMe/src",
-            "Passbolt\\Tags\\": "./plugins/Passbolt/Tags/src",
             "Passbolt\\AccountSettings\\": "./plugins/Passbolt/AccountSettings/src",
-            "Passbolt\\DirectorySync\\": "./plugins/Passbolt/DirectorySync/src",
+            "Passbolt\\RememberMe\\": "./plugins/Passbolt/RememberMe/src",
             "Passbolt\\MultiFactorAuthentication\\": "./plugins/Passbolt/MultiFactorAuthentication/src",
-            "Passbolt\\WebInstaller\\": "./plugins/Passbolt/WebInstaller/src"
+            "Passbolt\\Tags\\": "./plugins/Passbolt/Tags/src",
+            "Passbolt\\Log\\": "./plugins/Passbolt/Log/src",
+            "Passbolt\\AuditLog\\": "./plugins/Passbolt/AuditLog/src",
+            "Passbolt\\EmailNotificationSettings\\": "./plugins/Passbolt/EmailNotificationSettings/src"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "App\\Test\\": "tests",
             "Cake\\Test\\": "./vendor/cakephp/cakephp/tests",
-            "PassboltSeleniumApi\\Test\\": "./plugins/PassboltSeleniumApi/tests",
-            "Passbolt\\Tags\\Test\\": "./plugins/Passbolt/Tags/tests",
-            "Passbolt\\WebInstaller\\Test\\": "./plugins/Passbolt/WebInstaller/tests",
+            "Passbolt\\MultiTenant\\Test\\": "./plugins/Passbolt/MultiTenant/tests",
+            "Passbolt\\MultiTenantAdmin\\Test\\": "./plugins/Passbolt/MultiTenantAdmin/tests",
             "Passbolt\\AccountSettings\\Test\\": "./plugins/Passbolt/AccountSettings/tests",
-            "Passbolt\\DirectorySync\\Test\\": "./plugins/Passbolt/DirectorySync/tests",
-            "Passbolt\\MultiFactorAuthentication\\Test\\": "./plugins/Passbolt/MultiFactorAuthentication/tests"
+            "Passbolt\\MultiFactorAuthentication\\Test\\": "./plugins/Passbolt/MultiFactorAuthentication/tests",
+            "Passbolt\\Tags\\Test\\": "./plugins/Passbolt/Tags/tests",
+            "Passbolt\\Log\\Test\\": "./plugins/Passbolt/Log/tests",
+            "Passbolt\\AuditLog\\Test\\": "./plugins/Passbolt/AuditLog/tests",
+            "Passbolt\\EmailNotificationSettings\\Test\\": "./plugins/Passbolt/EmailNotificationSettings/tests"
         }
     },
     "scripts": {

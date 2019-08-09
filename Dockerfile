@@ -1,4 +1,4 @@
-FROM php:7.2-fpm
+FROM php:7.2-fpm-stretch
 
 LABEL maintainer="diego@passbolt.com"
 
@@ -12,6 +12,7 @@ ARG PHP_EXTENSIONS="gd \
 
 ARG PECL_PASSBOLT_EXTENSIONS="gnupg \
       redis \
+      apcu \
       mcrypt"
 
 ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
@@ -26,7 +27,7 @@ ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
 
 ENV PECL_BASE_URL="https://pecl.php.net/get"
 ENV PHP_EXT_DIR="/usr/src/php/ext"
-ENV NR_VERSION="8.5.0.235"
+ENV NR_VERSION="8.7.0.242"
 ENV NR_URL="https://download.newrelic.com/php_agent/release/newrelic-php5-${NR_VERSION}-linux.tar.gz"
 
 COPY --chown=www-data:www-data . /var/www/passbolt
@@ -40,10 +41,14 @@ RUN apt-get update \
          libmcrypt4 \
          mysql-client \
          supervisor \
-         cron \
     && curl -L $NR_URL | tar -C /tmp -zx \
     && NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 /tmp/newrelic-php5-*/newrelic-install install \
     && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall* \
+    && sed -i \
+        -e "s/;\?newrelic.enabled =.*/newrelic.enabled = \${NEW_RELIC_ENABLED}/" \
+        -e "s/newrelic.license =.*/newrelic.license = \${NEW_RELIC_LICENSE_KEY}/" \
+        -e "s/newrelic.appname =.*/newrelic.appname = \${NEW_RELIC_APP_NAME}/" \
+        /usr/local/etc/php/conf.d/newrelic.ini \
     && mkdir /home/www-data \
     && chown -R www-data:www-data /home/www-data \
     && usermod -d /home/www-data www-data \
@@ -65,13 +70,11 @@ RUN apt-get update \
          exit 1; \
        fi \
     && php composer-setup.php \
+    && rm composer-setup.php \
     && mv composer.phar /usr/local/bin/composer \
     && composer install -n --no-dev --optimize-autoloader \
+    && chmod -R 755 /var/www/passbolt/tmp \
     && chown -R www-data:www-data . \
-    && chmod 775 $(find /var/www/passbolt/tmp -type d) \
-    && chmod 664 $(find /var/www/passbolt/tmp -type f) \
-    && chmod 775 $(find /var/www/passbolt/webroot/img/public -type d) \
-    && chmod 664 $(find /var/www/passbolt/webroot/img/public -type f) \
     && rm /etc/nginx/sites-enabled/default \
     && apt-get purge -y --auto-remove $PASSBOLT_DEV_PACKAGES \
     && echo 'php_flag[expose_php] = off' > /usr/local/etc/php-fpm.d/expose.conf \
@@ -79,10 +82,15 @@ RUN apt-get update \
     && rm /usr/local/bin/composer \
     && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
+COPY docker/conf/passbolt.php config/passbolt.php
+COPY docker/conf/app.php config/app.php
 COPY docker/conf/passbolt.conf /etc/nginx/conf.d/default.conf
 COPY docker/conf/nginx.conf /etc/nginx/nginx.conf
 COPY docker/conf/supervisor/*.conf /etc/supervisor/conf.d/
 COPY docker/bin/docker-entrypoint.sh /docker-entrypoint.sh
+# Cleaning docker directory
+RUN rm -rf docker \
+    && rm Dockerfile
 
 EXPOSE 80 443
 

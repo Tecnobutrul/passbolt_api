@@ -1,23 +1,25 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
 namespace App\Controller;
 
+use App\Utility\UserAction;
+use App\Utility\UuidFactory;
+use Cake\Core\Exception\Exception;
 use Cake\Event\Event;
 use Cake\Routing\Router;
 use Cake\Utility\Hash;
-use Cake\Utility\Text;
 
 /**
  * Error Handling Controller
@@ -29,11 +31,15 @@ class ErrorController extends AppController
     /**
      * Initialization hook method.
      *
+     * @throws \Exception If a component class cannot be found.
      * @return void
      */
     public function initialize()
     {
-        $this->loadComponent('RequestHandler');
+        parent::initialize();
+        $this->loadComponent('RequestHandler', [
+            'enableBeforeRedirect' => false,
+        ]);
     }
 
     /**
@@ -47,21 +53,32 @@ class ErrorController extends AppController
         if ($this->request->is('json')) {
             // If the body is a that exposes the getErrors functionality
             // for example ValidationRulesException
-            $error = Hash::get($this->viewVars, 'body', null);
+            $error = $this->viewVars['error'];
             if (method_exists($error, 'getErrors')) {
                 $body = $error->getErrors();
             } else {
-                $body = $error;
+                $body = '';
             }
 
+            try {
+                $userActionId = UserAction::getInstance()->getUserActionId();
+            } catch (Exception $e) {
+                $userActionId = UuidFactory::uuid();
+            }
+            try {
+                $actionId = UserAction::getInstance()->getActionId();
+            } catch (Exception $e) {
+                $actionId = 'undefined';
+            }
             $prefix = strtolower($this->request->getParam('prefix'));
             $action = $this->request->getParam('action');
             $this->set([
                 'header' => [
-                    'id' => Text::uuid(),
+                    'id' => $userActionId,
                     'status' => 'error',
                     'servertime' => time(),
                     'title' => 'app_' . $prefix . '_' . $action . '_error',
+                    'action' => $actionId,
                     'message' => $this->viewVars['message'],
                     'url' => Router::url(),
                     'code' => $this->viewVars['code'],
@@ -74,9 +91,6 @@ class ErrorController extends AppController
             $apiVersion = $this->request->getQuery('api-version');
             if (!isset($apiVersion) || $apiVersion === 'v1') {
                 $this->viewBuilder()->setClassName('LegacyJson');
-                // pass additional error info like table
-                // useful to format error associations names
-                $this->set('error', $error);
             }
         }
         $this->viewBuilder()->setTemplatePath('Error');

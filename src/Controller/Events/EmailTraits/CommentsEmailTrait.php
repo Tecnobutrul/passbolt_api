@@ -1,13 +1,13 @@
 <?php
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
@@ -16,9 +16,9 @@ namespace App\Controller\Events\EmailTraits;
 
 use App\Model\Entity\Comment;
 use App\Model\Entity\Role;
-use Cake\Core\Configure;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
+use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettings;
 
 trait CommentsEmailTrait
 {
@@ -42,12 +42,12 @@ trait CommentsEmailTrait
      */
     public function sendCommentAddEmail(Event $event, Comment $comment)
     {
-        if (!Configure::read('passbolt.email.send.comment.add')) {
+        if (!EmailNotificationSettings::get('send.comment.add')) {
             return;
         }
 
         // Find the users that have access to the resource (including via their groups)
-        $Users = TableRegistry::get('Users');
+        $Users = TableRegistry::getTableLocator()->get('Users');
         $options = ['contain' => ['Roles'], 'filter' => ['has-access' => [$comment->foreign_key]]];
         $users = $Users->findIndex(Role::USER, $options)->all();
         if (count($users) < 2) {
@@ -55,9 +55,10 @@ trait CommentsEmailTrait
             return;
         }
 
-        $Resources = TableRegistry::get('Resources');
+        $Resources = TableRegistry::getTableLocator()->get('Resources');
         $creator = $Users->findFirstForEmail($comment->created_by);
         $resource = $Resources->get($comment->foreign_key);
+        $showComment = EmailNotificationSettings::get('show.comment');
 
         foreach ($users as $user) {
             if ($user->id === $comment->created_by) {
@@ -66,7 +67,7 @@ trait CommentsEmailTrait
             }
             $subject = __("{0} commented on {1}", $creator->profile->first_name, $resource->name);
             $template = 'LU/comment_add';
-            $body = ['creator' => $creator, 'comment' => $comment, 'resource' => $resource];
+            $body = ['creator' => $creator, 'comment' => $comment, 'resource' => $resource, 'showComment' => $showComment];
             $data = ['body' => $body, 'title' => $subject];
             $this->_send($user->username, $subject, $data, $template);
         }
