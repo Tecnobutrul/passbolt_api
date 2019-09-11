@@ -7,7 +7,7 @@ services:
     tmpfs:
       - /var/lib/mysql
     ports:
-      - 3306
+      - 3306:3306
   redis-master:
     image: redis
     ports:
