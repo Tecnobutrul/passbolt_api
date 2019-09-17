@@ -1,6 +1,6 @@
 FROM php:7.3-fpm
 
-LABEL maintainer="diego@passbolt.com"
+LABEL maintainer="contact@passbolt.com"
 
 
 ARG PHP_EXTENSIONS="gd \
