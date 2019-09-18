@@ -178,7 +178,7 @@ return [
         // Activate specific entry points for selenium testing.
         // true will render your installation insecure.
         'selenium' => [
-            'active' => filter_var(env('``', false), FILTER_VALIDATE_BOOLEAN)
+            'active' => filter_var(env('PASSBOLT_SELENIUM_ACTIVE', false), FILTER_VALIDATE_BOOLEAN)
         ],
 
         // Security.

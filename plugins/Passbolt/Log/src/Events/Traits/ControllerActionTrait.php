@@ -35,7 +35,7 @@ trait ControllerActionTrait
             $userAction = UserAction::getInstance();
             $ActionLogs = TableRegistry::getTableLocator()->get('Passbolt/Log.ActionLogs');
             $ActionLogs->create($userAction, $status);
-        } catch(PDOException $exception) {
+        } catch (PDOException $exception) {
             // Fail gracefully if database connection is not available.
             // Useful if we are already rendering an error page related to PDOException
             Log::error('Could not connect to Database.');

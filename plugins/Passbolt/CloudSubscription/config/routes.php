@@ -18,9 +18,9 @@ use Cake\Routing\Router;
 Router::plugin('Passbolt/CloudSubscription', ['path' => '/subscription'], function (RouteBuilder $routes) {
     $routes->setExtensions(['json']);
 
-    $routes->connect('/disabled', ['controller' => 'SubscriptionStatus', 'action' => 'getDisabled'])
+    $routes->connect('/disabled', ['controller' => 'CloudSubscriptionParking', 'action' => 'getDisabled'])
         ->setMethods(['GET']);
 
-    $routes->connect('/notfound', ['controller' => 'SubscriptionStatus', 'action' => 'getNotFound'])
+    $routes->connect('/notfound', ['controller' => 'CloudSubscriptionParking', 'action' => 'getNotFound'])
         ->setMethods(['GET']);
 });

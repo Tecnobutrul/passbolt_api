@@ -13,5 +13,15 @@
  * @since         2.0.0
  */
 use Cake\Core\Configure;
+use Cake\Event\EventManager;
+use Passbolt\CloudSubscription\Middleware\CloudSubscriptionStatusMiddleware;
 
 Configure::load('Passbolt/CloudSubscription.config', 'default', true);
+
+// Starts middleware
+EventManager::instance()->on(
+    'Server.buildMiddleware',
+    function ($event, $middlewareQueue) {
+        $middlewareQueue->add(new CloudSubscriptionStatusMiddleware());
+    }
+);

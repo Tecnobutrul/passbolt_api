@@ -28,11 +28,8 @@ class ShareNotificationTest extends ShareControllerTest
         'app.Base/EmailQueue', 'app.Base/Avatars', 'app.Base/Favorites', 'app.Base/OrganizationSettings'
     ];
 
-    public function testShareNotificationSuccess()
+    public function testNotificationShareSuccess()
     {
-        // Redefine some default notifications settings
-        Configure::write('passbolt.email.show.secret', true);
-
         // Define actors of this tests
         $resourceId = UuidFactory::uuid('resource.id.cakephp');
         // Users
@@ -84,7 +81,6 @@ class ShareNotificationTest extends ShareControllerTest
         $this->assertResponseContains('Username: cake');
         $this->assertResponseContains('The rapid and tasty php development framework');
         $this->assertResponseContains('URL: cakephp.org');
-        $this->assertResponseContains('BEGIN PGP MESSAGE');
 
         $this->get('/seleniumtests/showLastEmail/frances@passbolt.com');
         $this->assertResponseCode(200);

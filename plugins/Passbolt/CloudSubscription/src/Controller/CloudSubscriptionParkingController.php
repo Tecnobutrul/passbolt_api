@@ -1,16 +1,7 @@
 <?php
 /**
- * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SA (https://www.passbolt.com)
- *
- * Licensed under GNU Affero General Public License version 3 of the or any later version.
- * For full copyright and license information, please see the LICENSE.txt
- * Redistributions of files must retain the above copyright notice.
- *
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
- * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.11.0
  */
 namespace Passbolt\CloudSubscription\Controller;
 
@@ -19,7 +10,7 @@ use Cake\Event\Event;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
 
-class SubscriptionStatusController extends AppController
+class CloudSubscriptionParkingController extends AppController
 {
     /**
      * Before filter
@@ -32,6 +23,7 @@ class SubscriptionStatusController extends AppController
     {
         $this->Auth->allow('getDisabled');
         $this->Auth->allow('getNotFound');
+
         return parent::beforeFilter($event);
     }
 
@@ -40,7 +32,8 @@ class SubscriptionStatusController extends AppController
      *
      * @return void
      */
-    public function getDisabled() {
+    public function getDisabled()
+    {
         if (!$this->request->is('json')) {
             $this->viewBuilder()
                 ->setLayout('default')
@@ -57,7 +50,8 @@ class SubscriptionStatusController extends AppController
      *
      * @return void
      */
-    public function getNotFound() {
+    public function getNotFound()
+    {
         if (!$this->request->is('json')) {
             $this->viewBuilder()
                 ->setLayout('default')

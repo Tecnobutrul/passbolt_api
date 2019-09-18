@@ -14,42 +14,47 @@ use Cake\Chronos\Date;
 use Cake\Http\Exception\InternalErrorException;
 use Passbolt\CloudSubscription\Service\CloudSubscriptionSettings;
 
-class CloudSubscriptionTrialStartCommand extends CloudSubscriptionCommand
+class CloudSubscriptionSetActiveCommand extends CloudSubscriptionCommand
 {
+    /**
+     * @inheritDoc
+     */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
         $parser = parent::buildOptionParser($parser);
         $parser->addOption('expiryDate', [
-            'help' => 'When the trial expires.'
+            'help' => 'When the subscription expires.'
         ]);
 
         return $parser;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function execute(Arguments $args, ConsoleIo $io)
     {
         parent::execute($args, $io);
+
         $expiryDate = $args->getOption('expiryDate');
         if (!isset($expiryDate)) {
-            $expiryDate = Date::today();
-            $expiryDate = $expiryDate->modify(CloudSubscriptionSettings::TRIAL_DURATION);
-        } else {
-            $expiryDate = new Date($expiryDate);
+            $io->error(__('Fail to set subscription to active, expiry date is missing'));
+            $this->abort();
         }
+
         try {
+            $expiryDate = new Date($expiryDate);
             $subscription = new CloudSubscriptionSettings([
-                'status' => CloudSubscriptionSettings::STATUS_TRIAL,
+                'status' => CloudSubscriptionSettings::STATUS_ACTIVE,
                 'expiryDate' => $expiryDate->toUnixString()
             ]);
         } catch (CustomValidationException $exception) {
             $this->displayErrors($exception, $io);
-            $io->error(__('Fail to start trial. Could not validate data.'));
+            $io->error(__('Fail set subscription to active. Could not validate data.'));
             $this->abort();
-
-            return;
         }
 
         $subscription->save();
-        $io->out(__("Trial started for {0}. Expires: {1}", $this->org, $expiryDate->toIso8601String()));
+        $io->out(__("Subscription is active for {0}. It expires: {1}", $this->org, $expiryDate->toIso8601String()));
     }
 }

@@ -17,9 +17,9 @@ namespace App;
 use App\Middleware\ContentSecurityPolicyMiddleware;
 use App\Middleware\CsrfProtectionMiddleware;
 use App\Middleware\GpgAuthHeadersMiddleware;
+use App\Middleware\SessionPreventExtensionMiddleware;
 use App\Utility\ImageStorage\GoogleCloudStorageListener;
 use Burzum\FileStorage\Storage\Listener\ImageProcessingListener;
-use App\Middleware\SessionPreventExtensionMiddleware;
 use Cake\Core\Configure;
 use Cake\Core\Exception\MissingPluginException;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
@@ -30,7 +30,6 @@ use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
 use NewRelic\Middleware\NameTransactionMiddleware;
 use Passbolt\MultiTenant\Middleware\MultitenantRoutingMiddleware;
-use Passbolt\CloudSubscription\Middleware\CloudSubscriptionStatusMiddleware;
 
 class Application extends BaseApplication
 {
@@ -148,7 +147,9 @@ class Application extends BaseApplication
     }
 
     /**
+     * Bootstrap file storage
      *
+     * @return void
      */
     protected function bootstrapFileStorage()
     {
@@ -171,10 +172,10 @@ class Application extends BaseApplication
             $this->addPlugin('Passbolt/MultiTenantAnalytics', ['bootstrap' => true, 'routes' => false]);
             $this->addPlugin('Passbolt/MultiTenantAdmin', ['bootstrap' => true, 'routes' => true]);
 
-//            $subscriptionEnabled = Configure::read('passbolt.plugins.cloudSubscription.enabled');
-//            if (!isset($subscriptionEnabled) || $subscriptionEnabled) {
-//                $this->addPlugin('Passbolt/CloudSubscription', ['bootstrap' => true, 'routes' => true]);
-//            }
+            $subscriptionEnabled = Configure::read('passbolt.plugins.cloudSubscription.enabled');
+            if (!isset($subscriptionEnabled) || $subscriptionEnabled) {
+                $this->addPlugin('Passbolt/CloudSubscription', ['bootstrap' => true, 'routes' => true]);
+            }
         }
 
         if (Configure::read('debug') && Configure::read('passbolt.selenium.active')) {

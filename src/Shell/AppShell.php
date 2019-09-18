@@ -59,7 +59,6 @@ class AppShell extends Shell
      * @return \Cake\Console\ConsoleOptionParser
      * @link https://book.cakephp.org/3.0/en/console-and-shells.html#configuring-options-and-generating-help
      */
-
     public function getOptionParser()
     {
         $parser = parent::getOptionParser();
@@ -68,6 +67,7 @@ class AppShell extends Shell
             'help' => 'Organization for which this operation is for.',
             'default' => null,
         ]);
+
         return $parser;
     }
 
