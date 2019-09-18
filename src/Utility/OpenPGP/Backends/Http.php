@@ -91,7 +91,8 @@ class Http extends OpenPGPBackend
      * @throws InternalErrorException if operation is not supported
      * @return string url of the service to call
      */
-    private function _getUrl(string $endpoint) {
+    private function _getUrl(string $endpoint)
+    {
         switch ($endpoint) {
             case self::ENCRYPT_ENDPOINT:
                 return $this->_encrypt_url;
@@ -112,10 +113,12 @@ class Http extends OpenPGPBackend
      * Assert that a key is not expired
      *
      * @param array $info see getKeyInfo
+     * @return void
      */
-    private function _assertKeyNotExpired(array $info) {
+    private function _assertKeyNotExpired(array $info)
+    {
         if (!empty($info) && !empty($info['expires'])) {
-            if($info['expires'] < time()) {
+            if ($info['expires'] < time()) {
                 throw new Exception('The key expired.');
             }
         }
@@ -125,8 +128,10 @@ class Http extends OpenPGPBackend
      * Assert that a key is not expired
      *
      * @param array $info see getKeyInfo
+     * @return void
      */
-    private function _assertKeyIsPublic(array $info) {
+    private function _assertKeyIsPublic(array $info)
+    {
         if (!$info['public']) {
             throw new Exception('The key is not a public key.');
         }
@@ -136,8 +141,10 @@ class Http extends OpenPGPBackend
      * Assert that a key is not expired
      *
      * @param array $info see getKeyInfo
+     * @return void
      */
-    private function _assertKeyIsPrivate(array $info) {
+    private function _assertKeyIsPrivate(array $info)
+    {
         if (!$info['private']) {
             throw new Exception('The key is not a private key.');
         }
@@ -159,18 +166,17 @@ class Http extends OpenPGPBackend
             'type' => 'json',
             'auth' => $this->_auth
         ]);
-        switch($response->getStatusCode()) {
+        switch ($response->getStatusCode()) {
             case 200:
                 $json = $response->getJson();
+
                 return $json;
             case 400:
                 Log::error('OpenPGP HTTP: ' . $response->getStringBody());
                 $json = $response->getJson();
                 throw new BadRequestException($json['code']);
-                break;
             default:
                 throw new InternalErrorException($response->getStringBody());
-                break;
         }
     }
 
@@ -196,7 +202,7 @@ class Http extends OpenPGPBackend
 
         try {
             $this->_getKeyFromKeyring($fingerprint, self::KEYRING_PUBLIC);
-        } catch(Exception $exception) {
+        } catch (Exception $exception) {
             $this->_importKeyIntoKeyring($info, self::KEYRING_PUBLIC);
         }
 
@@ -404,10 +410,10 @@ class Http extends OpenPGPBackend
     {
         try {
             $this->assertGpgMarker($armored, self::SIGNED_MESSAGE_MARKER);
-            // TODO remote check
         } catch (Exception $e) {
             return false;
         }
+
         return true;
     }
 
@@ -428,6 +434,7 @@ class Http extends OpenPGPBackend
         } catch (Exception $e) {
             return false;
         }
+
         return true;
     }
 
@@ -512,14 +519,17 @@ class Http extends OpenPGPBackend
     {
         try {
             $this->_getKeyFromKeyring($fingerprint, self::KEYRING_PUBLIC);
+
             return true;
         } catch (Exception $e) {
         }
         try {
             $this->_getKeyFromKeyring($fingerprint, self::KEYRING_PRIVATE);
+
             return true;
         } catch (Exception $e) {
         }
+
         return false;
     }
 
@@ -534,7 +544,7 @@ class Http extends OpenPGPBackend
     {
         try {
             $info = $this->getKeyInfo($armoredKey);
-        } catch(Exception $exception) {
+        } catch (Exception $exception) {
             throw new Exception(__('Could not import the key.'));
         }
         $info['armored'] = $armoredKey;
@@ -554,7 +564,7 @@ class Http extends OpenPGPBackend
      * @throws Exception if the key could not be written in cache
      * @return bool
      */
-    public function _importKeyIntoKeyring(array $info, string $keyring)
+    protected function _importKeyIntoKeyring(array $info, string $keyring)
     {
         if ($keyring !== self::KEYRING_PUBLIC && $keyring !== self::KEYRING_PRIVATE) {
             throw new Exception(__('The key could not be added to the keyring. Wrong cache type.'));
@@ -573,7 +583,8 @@ class Http extends OpenPGPBackend
      * @param string $keyring KEYRING_PUBLIC | KEYRING_PRIVATE
      * @return mixed null
      */
-    public function _getKeyFromKeyring(string $fingerprint, string $keyring) {
+    protected function _getKeyFromKeyring(string $fingerprint, string $keyring)
+    {
         $fingerprint = strtoupper($fingerprint);
         $cacheKey = $keyring . $fingerprint;
         $info = Cache::read($cacheKey);
@@ -581,6 +592,7 @@ class Http extends OpenPGPBackend
             $msg = __('The key could not be found in the keyring.');
             throw new Exception($msg);
         }
+
         return $info;
     }
 
@@ -617,7 +629,6 @@ class Http extends OpenPGPBackend
             }
             $this->_passphrase = null;
             $encryptedText = $this->_post(self::ENCRYPT_ENDPOINT, $data);
-
         } catch (Exception $exception) {
             // Catch specialized BadRequestException and cast them
             throw new Exception($exception->getMessage());
@@ -679,6 +690,7 @@ class Http extends OpenPGPBackend
                 throw new Exception($msg);
             }
         }
+
         return $response['clearText'];
     }
 
@@ -710,7 +722,7 @@ class Http extends OpenPGPBackend
     {
         try {
             $pubKey = $this->_getKeyFromKeyring($fingerprint, self::KEYRING_PUBLIC);
-        } catch(Exception $exception) {
+        } catch (Exception $exception) {
             $msg = __('Verification failed. Fingerprint {0} is not in the keyring.', $fingerprint);
             throw new Exception($msg);
         }
@@ -722,7 +734,7 @@ class Http extends OpenPGPBackend
                 ]
             ];
             $response = $this->_post(self::VERIFY_ENDPOINT, $data);
-        } catch(Exception $exception) {
+        } catch (Exception $exception) {
             $msg = __('Verification failed.');
             throw new Exception($msg);
         }
@@ -735,11 +747,10 @@ class Http extends OpenPGPBackend
      * @param string $text plain text to be signed.
      * @throws Exception if no key was set to sign
      * @throws Exception if there is an issue with the key to sign
-     * @return string signed text
+     * @return void
      */
     public function sign(string $text)
     {
         throw new Exception('Sign not implemented');
-        return $signedText;
     }
 }

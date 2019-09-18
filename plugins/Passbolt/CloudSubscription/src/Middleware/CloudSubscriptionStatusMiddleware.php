@@ -121,7 +121,9 @@ class CloudSubscriptionStatusMiddleware
     }
 
     /**
-     * @string string $path path to compare
+     * Return true if request path starts with given string
+     *
+     * @param string $path path to compare
      * @return bool
      */
     protected function isPathStartingWith(string $path)
@@ -130,7 +132,7 @@ class CloudSubscriptionStatusMiddleware
     }
 
     /**
-     * @param string $url
+     * @param string $url url
      * @return string
      */
     protected function getRedirectUrl(string $url)

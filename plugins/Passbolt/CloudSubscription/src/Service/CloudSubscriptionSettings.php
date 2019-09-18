@@ -155,10 +155,11 @@ class CloudSubscriptionSettings
     }
 
     /**
+     * @param string $status status
      * @throws InternalErrorException if save didn't work
      * @return void
      */
-    public function setStatus($status)
+    protected function setStatus(string $status)
     {
         $this->status = $status;
         $this->expiryDate = new Date('now');
@@ -167,6 +168,8 @@ class CloudSubscriptionSettings
     }
 
     /**
+     * Update status if expired
+     *
      * @return void
      */
     public function updateStatusIfExpired()
@@ -196,6 +199,7 @@ class CloudSubscriptionSettings
      *
      * @throws RecordNotFoundException When there is no first record.
      * @throws InternalErrorException if $settings are invalid
+     * @return CloudSubscriptionSettings
      */
     public static function get()
     {
@@ -219,7 +223,7 @@ class CloudSubscriptionSettings
      *
      * @return array list of supported statuses
      */
-    static function getSupportedStatusNames()
+    public static function getSupportedStatusNames()
     {
         return [
             self::STATUS_DISABLED,
@@ -277,8 +281,9 @@ class CloudSubscriptionSettings
     /**
      * Validate subscription status settings
      *
-     * @param array $settings
+     * @param array $settings settings
      * @throws CustomValidationException if $settings do not validate
+     * @return void
      */
     public static function validate(array $settings)
     {
@@ -289,9 +294,10 @@ class CloudSubscriptionSettings
     /**
      * Update or create subscription status settings
      *
-     * @param array $settings
+     * @param array $settings settings
      * @throws CustomValidationException if $settings do not validate
      * @throws InternalErrorException if save operation failed
+     * @return void
      */
     public static function updateOrCreate(array $settings)
     {

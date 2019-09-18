@@ -14,7 +14,11 @@ use Passbolt\CloudSubscription\Service\CloudSubscriptionSettings;
 class CloudSubscriptionDisableCommand extends CloudSubscriptionCommand
 {
     /**
-     * @inheritDoc
+     * Implement this method with your command's logic.
+     *
+     * @param Arguments $args The command arguments.
+     * @param ConsoleIo $io The console io
+     * @return null|int The exit code or null for success
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
@@ -26,13 +30,14 @@ class CloudSubscriptionDisableCommand extends CloudSubscriptionCommand
                 'status' => CloudSubscriptionSettings::STATUS_DISABLED,
                 'expiryDate' => $expiryDate->toUnixString()
             ]);
+            $subscription->save();
+            $io->out(__("Subscription disabled for {0}.", $this->org));
         } catch (CustomValidationException $exception) {
             $this->displayErrors($exception, $io);
             $io->error(__('Fail to disable subscription. Could not validate data.'));
             $this->abort();
         }
 
-        $subscription->save();
-        $io->out(__("Subscription disabled for {0}.", $this->org));
+        return null;
     }
 }

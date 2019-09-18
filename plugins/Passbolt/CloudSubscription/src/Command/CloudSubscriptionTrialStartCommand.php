@@ -6,16 +6,24 @@
 namespace Passbolt\CloudSubscription\Command;
 
 use App\Error\Exception\CustomValidationException;
+use Cake\Chronos\Date;
 use Cake\Console\Arguments;
-use Cake\Console\Command;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
-use Cake\Chronos\Date;
-use Cake\Http\Exception\InternalErrorException;
 use Passbolt\CloudSubscription\Service\CloudSubscriptionSettings;
 
 class CloudSubscriptionTrialStartCommand extends CloudSubscriptionCommand
 {
+
+    /**
+     * Get the option parser.
+     *
+     * You can override buildOptionParser() to define your options & arguments.
+     *
+     * @param ConsoleOptionParser $parser parser
+     * @return ConsoleOptionParser $parser parser
+     * @throws \RuntimeException When the parser is invalid
+     */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
         $parser = parent::buildOptionParser($parser);
@@ -26,6 +34,13 @@ class CloudSubscriptionTrialStartCommand extends CloudSubscriptionCommand
         return $parser;
     }
 
+    /**
+     * Implement this method with your command's logic.
+     *
+     * @param Arguments $args The command arguments.
+     * @param ConsoleIo $io The console io
+     * @return null|int The exit code or null for success
+     */
     public function execute(Arguments $args, ConsoleIo $io)
     {
         parent::execute($args, $io);
@@ -41,15 +56,14 @@ class CloudSubscriptionTrialStartCommand extends CloudSubscriptionCommand
                 'status' => CloudSubscriptionSettings::STATUS_TRIAL,
                 'expiryDate' => $expiryDate->toUnixString()
             ]);
+            $subscription->save();
+            $io->out(__("Trial started for {0}. Expires: {1}", $this->org, $expiryDate->toIso8601String()));
         } catch (CustomValidationException $exception) {
             $this->displayErrors($exception, $io);
             $io->error(__('Fail to start trial. Could not validate data.'));
             $this->abort();
-
-            return;
         }
 
-        $subscription->save();
-        $io->out(__("Trial started for {0}. Expires: {1}", $this->org, $expiryDate->toIso8601String()));
+        return null;
     }
 }

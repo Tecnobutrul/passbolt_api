@@ -22,6 +22,7 @@ use Burzum\FileStorage\Storage\Listener\LocalListener;
 class GoogleCloudStorageListener extends LocalListener
 {
 
+    // @codingStandardsIgnoreStart
     /**
      * List of adapter classes the event listener can work with.
      *
@@ -31,4 +32,5 @@ class GoogleCloudStorageListener extends LocalListener
         '\Gaufrette\Adapter\Local',
         '\Gaufrette\Adapter\GoogleCloudStorage'
     ];
+    // @codingStandardsIgnoreEnd
 }

@@ -6,18 +6,22 @@
 namespace Passbolt\CloudSubscription\Command;
 
 use App\Error\Exception\CustomValidationException;
+use Cake\Chronos\Date;
 use Cake\Console\Arguments;
-use Cake\Console\Command;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
-use Cake\Chronos\Date;
-use Cake\Http\Exception\InternalErrorException;
 use Passbolt\CloudSubscription\Service\CloudSubscriptionSettings;
 
 class CloudSubscriptionSetActiveCommand extends CloudSubscriptionCommand
 {
     /**
-     * @inheritDoc
+     * Get the option parser.
+     *
+     * You can override buildOptionParser() to define your options & arguments.
+     *
+     * @param ConsoleOptionParser $parser parser
+     * @return ConsoleOptionParser $parser parser
+     * @throws \RuntimeException When the parser is invalid
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
@@ -30,7 +34,11 @@ class CloudSubscriptionSetActiveCommand extends CloudSubscriptionCommand
     }
 
     /**
-     * @inheritDoc
+     * Implement this method with your command's logic.
+     *
+     * @param Arguments $args The command arguments.
+     * @param ConsoleIo $io The console io
+     * @return null|int The exit code or null for success
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
@@ -48,13 +56,14 @@ class CloudSubscriptionSetActiveCommand extends CloudSubscriptionCommand
                 'status' => CloudSubscriptionSettings::STATUS_ACTIVE,
                 'expiryDate' => $expiryDate->toUnixString()
             ]);
+            $subscription->save();
+            $io->out(__("Subscription is active for {0}. It expires: {1}", $this->org, $expiryDate->toIso8601String()));
         } catch (CustomValidationException $exception) {
             $this->displayErrors($exception, $io);
             $io->error(__('Fail set subscription to active. Could not validate data.'));
             $this->abort();
         }
 
-        $subscription->save();
-        $io->out(__("Subscription is active for {0}. It expires: {1}", $this->org, $expiryDate->toIso8601String()));
+        return null;
     }
 }

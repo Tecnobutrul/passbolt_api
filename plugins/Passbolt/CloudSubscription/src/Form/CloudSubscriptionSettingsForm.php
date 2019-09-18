@@ -16,7 +16,7 @@ class CloudSubscriptionSettingsForm extends Form
     /**
      * Build the form schema
      *
-     * @param Schema $schema
+     * @param Schema $schema schema
      * @return Schema
      */
     protected function _buildSchema(Schema $schema)
@@ -28,7 +28,7 @@ class CloudSubscriptionSettingsForm extends Form
     /**
      * Build the form validation rules
      *
-     * @param Validator $validator
+     * @param Validator $validator validator
      * @return Validator
      */
     public function validationDefault(Validator $validator)
@@ -53,10 +53,10 @@ class CloudSubscriptionSettingsForm extends Form
     }
 
     /**
-     * @param $timestamp
+     * @param int $timestamp timestamp
      * @return bool
      */
-    function isValidTimeStamp($timestamp)
+    public function isValidTimeStamp($timestamp)
     {
         return ((string)(int)$timestamp === $timestamp)
             && ($timestamp <= PHP_INT_MAX)
@@ -102,7 +102,7 @@ class CloudSubscriptionSettingsForm extends Form
     /**
      * No data treatment, processing is handled in service
      *
-     * @param array $data
+     * @param array $data data
      * @return bool
      */
     protected function _execute(array $data)

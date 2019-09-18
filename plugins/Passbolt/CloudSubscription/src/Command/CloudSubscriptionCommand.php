@@ -10,7 +10,6 @@ use Cake\Console\Arguments;
 use Cake\Console\Command;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
-use Cake\Http\Exception\InternalErrorException;
 
 class CloudSubscriptionCommand extends Command
 {
@@ -18,7 +17,13 @@ class CloudSubscriptionCommand extends Command
     public $org;
 
     /**
-     * @inheritDoc
+     * Get the option parser.
+     *
+     * You can override buildOptionParser() to define your options & arguments.
+     *
+     * @param ConsoleOptionParser $parser parser
+     * @return ConsoleOptionParser $parser parser
+     * @throws \RuntimeException When the parser is invalid
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
@@ -30,7 +35,11 @@ class CloudSubscriptionCommand extends Command
     }
 
     /**
-     * @inheritDoc
+     * Implement this method with your command's logic.
+     *
+     * @param Arguments $args The command arguments.
+     * @param ConsoleIo $io The console io
+     * @return null|int The exit code or null for success
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
@@ -39,11 +48,16 @@ class CloudSubscriptionCommand extends Command
             $io->error(__('Can not run command. Organization is missing.'));
             $this->abort();
         }
+
+        return null;
     }
 
     /**
-     * @param CustomValidationException $exception
-     * @param ConsoleIo $io
+     * Display errors
+     *
+     * @param CustomValidationException $exception exception
+     * @param ConsoleIo $io io
+     * @return void
      */
     protected function displayErrors(CustomValidationException $exception, ConsoleIo $io)
     {
