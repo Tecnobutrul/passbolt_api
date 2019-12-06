@@ -48,7 +48,6 @@ class CloudSubscriptionStatusMiddleware
 
         try {
             $subscription = CloudSubscriptionSettings::get();
-            $subscription->updateStatusIfExpired();
             $pdoError = false;
         } catch (Exception $exception) {
             Log::error($exception->getMessage());

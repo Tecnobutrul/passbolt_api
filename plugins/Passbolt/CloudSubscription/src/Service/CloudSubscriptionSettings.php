@@ -1,16 +1,10 @@
 <?php
 /**
- * Passbolt ~ Open source password manager for teams
+ * Passbolt Cloud
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
- * Licensed under GNU Affero General Public License version 3 of the or any later version.
- * For full copyright and license information, please see the LICENSE.txt
- * Redistributions of files must retain the above copyright notice.
- *
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
- * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.11.0
  */
 namespace Passbolt\CloudSubscription\Service;
 
@@ -48,17 +42,17 @@ class CloudSubscriptionSettings
     private $status;
 
     /**
-     * @var Date $expiryDate
+     * @var Date $expiryDate optional
      */
     private $expiryDate;
 
     /**
-     * @var OrganizationSettingsTable $OrganizationSettings
+     * @var OrganizationSettingsTable $OrganizationSettings org settings table
      */
     private $OrganizationSettings;
 
     /**
-     * @var UserAccessControl $uac
+     * @var UserAccessControl $uac user access control
      */
     private $uac;
 
@@ -152,46 +146,6 @@ class CloudSubscriptionSettings
     public function isDeleted()
     {
         return $this->status === self::STATUS_DELETED;
-    }
-
-    /**
-     * @param string $status status
-     * @throws InternalErrorException if save didn't work
-     * @return void
-     */
-    protected function setStatus(string $status)
-    {
-        $this->status = $status;
-        $this->expiryDate = new Date('now');
-        $this->expiryDate = $this->expiryDate->modify(self::REDEMPTION_DURATION);
-        $this->save();
-    }
-
-    /**
-     * Update status if expired
-     *
-     * @return void
-     */
-    public function updateStatusIfExpired()
-    {
-        if (!$this->isExpired()) {
-            return;
-        }
-
-        if ($this->isTrial()) {
-            return $this->setStatus(self::STATUS_DISABLED);
-        }
-
-        $redemption = new Date($this->expiryDate->toUnixString());
-        $redemption = $redemption->modify(self::REDEMPTION_DURATION);
-        if ($redemption->isPast()) {
-            if ($this->isActive()) {
-                return $this->setStatus(self::STATUS_DISABLED);
-            }
-            if ($this->isDisabled()) {
-                return $this->setStatus(self::STATUS_DELETED);
-            }
-        }
     }
 
     /**
