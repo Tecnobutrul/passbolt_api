@@ -32,7 +32,7 @@
     CACHE_CAKE_DEFAULT_SERVER: 127.0.0.1
     # Image storage settings
     GOOGLE_APPLICATION_CREDENTIALS: /tmp/service-account.json
-    GOOGLE_IMAGE_STORAGE_BUCKET: passbolt-ci-images600aa548
+    GOOGLE_IMAGE_STORAGE_BUCKET: passbolt-ci-imagesa83bd78d
     PASSBOLT_GPG_SERVER_KEY_PUBLIC: config/gpg/unsecure.key
     PASSBOLT_GPG_SERVER_KEY_PRIVATE: config/gpg/unsecure_private.key
     APP_FULL_BASE_URL: http://127.0.0.1
