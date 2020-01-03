@@ -1,5 +1,15 @@
 # Using docker
 ## Run using the docker compose
+Copy the local env variable file:
+```
+cp docker/env/local.env.default docker/env/local.env
+```
+
+Edit it with your docker host IP. This will allow connecting to the cloud admin if needed
+```
+emacs docker/env/local.env
+```
+
 Run the container using:
 ```
 docker-compose -f docker-compose-dev.yml up

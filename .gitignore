@@ -14,6 +14,7 @@ config/service-account.json
 config/gpg/serverkey.key
 config/gpg/serverkey_private.key
 docker/conf/service-account.json
+docker/env/local.env
 
 # Dependencies #
 ################

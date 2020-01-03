@@ -19,6 +19,7 @@ services:
       - db
       - redis-master
     env_file:
+      - docker/env/local.env
       - docker/env/passbolt-cloud.env
     volumes:
       - images_volume:/var/www/passbolt/webroot/img/public/images
@@ -34,6 +35,7 @@ services:
       - |
         ln -s /var/www/passbolt/docker/conf/passbolt.php /var/www/passbolt/config/passbolt.php
         ln -s /var/www/passbolt/docker/conf/app.php /var/www/passbolt/config/app.php
+        echo "$$CLOUD_ADMIN_DEFAULT_HOST $$PASSBOLT_SCRIPT_CATALOG_HOST" >> /etc/hosts
         if [ "$$PHP_COMPOSER" ]; then
           apt-get update
           apt-get install -y git unzip nano
