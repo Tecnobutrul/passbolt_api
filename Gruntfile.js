@@ -143,6 +143,8 @@ module.exports = function(grunt) {
             'controls/overlay-opacity-50.png',
             // Background images for error pages for ex
             'background/rocket.svg',
+            'illustrations/cloud_archived.svg',
+            'illustrations/cloud_disabled.svg',
             'illustrations/birds6_850.png',
             'illustrations/birds3_850.png',
             // Login page 3rd party logo
@@ -169,7 +171,7 @@ module.exports = function(grunt) {
         }, {
           // Default css theme
           cwd: paths.node_modules_styleguide + 'build/css/themes/default',
-          src: ['api_login.min.css', 'api_main.min.css', 'api_setup.min.css'],
+          src: ['api_login.min.css', 'api_main.min.css', 'api_setup.min.css', 'api_cloud.min.css'],
           dest: paths.webroot + 'css/themes/default',
           expand: true
         }, {

@@ -10,7 +10,7 @@ $this->assign('title', $message);
     <div class="row">
         <h2><?= __d('cake', 'An Internal Error Has Occurred') ?></h2>
         <p class="error">
-            <?= h($message) ?>
+<?= h($message) ?>
         </p>
     </div>
 <?php if (Configure::read('debug')): ?>

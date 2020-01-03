@@ -13,13 +13,16 @@
  * @since         2.11.0
  */
 namespace App\Utility\ImageStorage;
+
 use Burzum\FileStorage\Storage\Listener\LocalListener;
 
 /**
  * FileStorage Event Listener for the CakePHP FileStorage plugin
  */
-class GoogleCloudStorageListener extends LocalListener {
+class GoogleCloudStorageListener extends LocalListener
+{
 
+    // @codingStandardsIgnoreStart
     /**
      * List of adapter classes the event listener can work with.
      *
@@ -29,4 +32,5 @@ class GoogleCloudStorageListener extends LocalListener {
         '\Gaufrette\Adapter\Local',
         '\Gaufrette\Adapter\GoogleCloudStorage'
     ];
+    // @codingStandardsIgnoreEnd
 }

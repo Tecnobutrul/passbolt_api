@@ -15,12 +15,16 @@
 use Cake\Core\Configure;
 $version = Configure::read('passbolt.version');
 $privacyPolicyUrl = Configure::read('passbolt.legal.privacy_policy.url');
+$isTrial = $isTrial ?? false;
 ?>
 <footer>
     <div class="footer">
         <ul class="footer-links">
-<?php if (isset($safeMode) && !$safeMode) : ?>
-            <li class="error message"><a href="https://help.passbolt.com/faq/hosting/why-unsafe" title="terms of service">Unsafe mode</a></li>
+<?php if ($isTrial && !$isExpired) : ?>
+            <li class="warning message">Free trial</li>
+<?php endif; ?>
+<?php if ($isTrial && $isExpired) : ?>
+            <li class="error message">Expired trial</li>
 <?php endif; ?>
             <li><a href="https://www.passbolt.com/terms" title="terms of service"><?= __('Terms'); ?></a></li>
 <?php if (!empty($privacyPolicyUrl)) : ?>

@@ -18,7 +18,6 @@ use App\Controller\Events\EmailNotificationsListener;
 use App\Model\Entity\Role;
 use App\Utility\UserAccessControl;
 use App\Utility\UserAction;
-use App\Utility\UuidFactory;
 use Cake\Event\EventManager;
 
 /**

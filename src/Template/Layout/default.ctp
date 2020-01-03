@@ -25,7 +25,7 @@ use Cake\Core\Configure;
 </head>
 <body>
 <!-- main -->
-<div id="container" class="page <?php echo $this->fetch('page_classes') ?>">
+<div id="container" class="page <?php echo $this->fetch('pageClass') ?>">
 <?php echo $this->fetch('content'); ?>
 </div>
 <?= $this->element('Footer/default'); ?>

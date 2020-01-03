@@ -11,9 +11,10 @@ return [
                     'csrfProtection' => [
                         'unlockedActions' => [
                             'MultiTenantAdminRegisterFirstUser' => ['registerFirstUser'],
+                            'MultiTenantAdminSubscriptionUpdate' => ['updateOrCreate']
                         ]
                     ]
-                ],
+                ]
             ]
         ]
     ]

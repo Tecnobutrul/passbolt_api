@@ -18,16 +18,17 @@ namespace App\Test\TestCase\Controller\Notifications;
 use App\Model\Entity\Permission;
 use App\Test\TestCase\Controller\Share\ShareControllerTest;
 use App\Utility\UuidFactory;
+use Cake\Core\Configure;
 
 class ShareNotificationTest extends ShareControllerTest
 {
     public $fixtures = [
         'app.Base/Users', 'app.Base/Gpgkeys', 'app.Base/Profiles', 'app.Base/Roles',
         'app.Base/Groups', 'app.Base/GroupsUsers', 'app.Base/Resources', 'app.Base/Permissions', 'app.Base/Secrets',
-        'app.Base/EmailQueue', 'app.Base/Avatars', 'app.Base/Favorites'
+        'app.Base/EmailQueue', 'app.Base/Avatars', 'app.Base/Favorites', 'app.Base/OrganizationSettings'
     ];
 
-    public function testShareNotificationSuccess()
+    public function testNotificationShareSuccess()
     {
         // Define actors of this tests
         $resourceId = UuidFactory::uuid('resource.id.cakephp');
@@ -80,7 +81,6 @@ class ShareNotificationTest extends ShareControllerTest
         $this->assertResponseContains('Username: cake');
         $this->assertResponseContains('The rapid and tasty php development framework');
         $this->assertResponseContains('URL: cakephp.org');
-        $this->assertResponseContains('BEGIN PGP MESSAGE');
 
         $this->get('/seleniumtests/showLastEmail/frances@passbolt.com');
         $this->assertResponseCode(200);

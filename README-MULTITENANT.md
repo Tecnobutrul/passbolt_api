@@ -1,5 +1,15 @@
 # Using docker
 ## Run using the docker compose
+Copy the local env variable file:
+```
+cp docker/env/local.env.default docker/env/local.env
+```
+
+Edit it with your docker host IP. This will allow connecting to the cloud admin if needed
+```
+emacs docker/env/local.env
+```
+
 Run the container using:
 ```
 docker-compose -f docker-compose-dev.yml up
@@ -47,7 +57,7 @@ The main idea is to remove the site from the path so that cakephp understands wh
 By default the container create an organization database while starting. An administrator is also created
 and a link to complete the administrator setup can be found in the output of the container.
 
-The link looks like: https://cloud.passbolt.com/acme/setup/install/5820c265-629b-4b99-bd2f-e238a34616d7/d30573c5-3829-4c92-b6e7-288fdf0d0b7a
+The link looks like: https://cloud.passbolt.local/acme/setup/install/5820c265-629b-4b99-bd2f-e238a34616d7/d30573c5-3829-4c92-b6e7-288fdf0d0b7a
 
 # Production
 

@@ -13,6 +13,8 @@
  * @since         2.0.0
  */
 use Cake\Core\Configure;
+$isExpired = $isExpired ?? false;
+$isTrial = $isTrial ?? false;
 ?>
 <!DOCTYPE html>
 <html class="passbolt no-js no-passboltplugin version" lang="en">
@@ -25,6 +27,14 @@ use Cake\Core\Configure;
     <?= $this->fetch('css') ?>
 </head>
 <body>
+<?php if ($isTrial && $isExpired) : ?>
+    <div class="message error">
+        <strong><?= __('Warning'); ?>: </strong>
+        <?= __('Your Passbolt Cloud subscription has expired.'); ?>
+        <?= __('Your workspace will be automatically deleted soon.'); ?>
+        <a href="https://www.passbolt.com/contact/passbolt-cloud"><?= __('Contact sales support'); ?></a>.
+    </div>
+<?php endif; ?>
 <div id="container" class="page <?= $this->fetch('pageClass') ?>">
 <?= $this->element('Navigation/default'); ?>
 <div id="content">

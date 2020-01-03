@@ -80,7 +80,7 @@ local-debug:
 
     # Image storage settings
     GOOGLE_APPLICATION_CREDENTIALS: /tmp/service-account.json
-    GOOGLE_IMAGE_STORAGE_BUCKET: passbolt-ci-images600aa548
+    GOOGLE_IMAGE_STORAGE_BUCKET: passbolt-ci-imagesa83bd78d
     PASSBOLT_GPG_SERVER_KEY_PUBLIC: config/gpg/unsecure.key
     PASSBOLT_GPG_SERVER_KEY_PRIVATE: config/gpg/unsecure_private.key
     APP_FULL_BASE_URL: http://127.0.0.1
@@ -92,7 +92,7 @@ local-debug:
 
     # Opengpg backend
     PASSBOLT_GPG_BACKEND: 'http'
-    PASSBOLT_GPG_HTTP_PROJECT: 'passbolt-testing-78757'
+    PASSBOLT_GPG_HTTP_PROJECT: 'cloud-staging-89daeb47'
     PASSBOLT_GPG_HTTP_REGION: 'europe-west1'
     #PASSBOLT_GPG_HTTP_USERNAME: see variables
     #PASSBOLT_GPG_HTTP_AUTH_PASSWORD: see variables
