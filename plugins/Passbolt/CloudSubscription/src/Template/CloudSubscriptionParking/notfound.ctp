@@ -32,7 +32,7 @@ $this->Html->css('themes/default/api_cloud.min.css?v=' . Configure::read('passbo
                 <?= __('This workspace does not exist or has been deleted due to inactivity.'); ?>
                 <?= __('Check the name of the organization in the url or get in touch with support if you think this is a mistake.'); ?>
             </p>
-            <a class="button primary" href="https://www.passbolt.com/contact/passbolt-cloud-enterprise" class="secondary-cta">
+            <a class="button primary" href="https://www.passbolt.com/contact/cloud-help" class="secondary-cta">
                 <?= __('contact support'); ?>
             </a>
         </div>

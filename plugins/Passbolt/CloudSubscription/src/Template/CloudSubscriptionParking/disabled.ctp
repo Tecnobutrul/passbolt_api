@@ -33,7 +33,7 @@ $this->Html->css('themes/default/api_cloud.min.css?v=' . Configure::read('passbo
                 <?= __('Please check your mailbox to proceed to checkout in order to continue using passbolt.'); ?>
                 <?= __('Your workspace data will be deleted if inactive for more than 30 days.'); ?>
             </p>
-            <a class="button primary" href="https://www.passbolt.com/contact/passbolt-cloud-enterprise" class="secondary-cta">
+            <a class="button primary" href="https://www.passbolt.com/contact/cloud-help" class="secondary-cta">
                 <?= __('contact the sales team'); ?>
             </a>
         </div>
