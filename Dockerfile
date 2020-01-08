@@ -1,6 +1,6 @@
-FROM php:7.2-fpm-stretch
+FROM php:7.3.12-fpm
 
-LABEL maintainer="diego@passbolt.com"
+LABEL maintainer="contact@passbolt.com"
 
 
 ARG PHP_EXTENSIONS="gd \
@@ -27,7 +27,7 @@ ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
 
 ENV PECL_BASE_URL="https://pecl.php.net/get"
 ENV PHP_EXT_DIR="/usr/src/php/ext"
-ENV NR_VERSION="8.7.0.242"
+ENV NR_VERSION="9.4.1.250"
 ENV NR_URL="https://download.newrelic.com/php_agent/release/newrelic-php5-${NR_VERSION}-linux.tar.gz"
 
 COPY --chown=www-data:www-data . /var/www/passbolt
@@ -39,7 +39,7 @@ RUN apt-get update \
          gnupg \
          libgpgme11 \
          libmcrypt4 \
-         mysql-client \
+         mariadb-client \
          supervisor \
     && curl -L $NR_URL | tar -C /tmp -zx \
     && NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 /tmp/newrelic-php5-*/newrelic-install install \

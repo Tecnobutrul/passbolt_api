@@ -24,7 +24,7 @@ class EmailQueueInitializeListener implements EventListenerInterface
     /**
      * Undocumented function
      *
-     * @return void
+     * @return array
      */
     public function implementedEvents()
     {

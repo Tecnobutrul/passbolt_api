@@ -253,6 +253,6 @@ class DirectorySettingsControllerTest extends DirectorySyncIntegrationTestCase
         $this->assertTrue(isset($this->_responseJsonBody->groups));
         $this->assertEquals(5, count($this->_responseJsonBody->groups));
         $this->assertTrue(isset($this->_responseJsonBody->tree));
-        $this->assertEquals(4, count((array) $this->_responseJsonBody->tree));
+        $this->assertEquals(4, count((array)$this->_responseJsonBody->tree));
     }
 }

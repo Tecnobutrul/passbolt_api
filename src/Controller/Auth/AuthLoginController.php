@@ -17,6 +17,7 @@ namespace App\Controller\Auth;
 use App\Controller\AppController;
 use App\Model\Entity\Role;
 use Cake\Event\Event;
+use Passbolt\CloudSubscription\Service\CloudSubscriptionSettings;
 
 class AuthLoginController extends AppController
 {
@@ -55,6 +56,16 @@ class AuthLoginController extends AppController
             ->setTemplate('login');
 
         // used to display chrome or firefox image feedback
+        try {
+            $subscription = CloudSubscriptionSettings::get();
+            $this->set('isTrial', $subscription->isTrial());
+            $this->set('isExpired', $subscription->isExpired());
+        } catch (\Exception $exception) {
+            // Pretend everything is fine
+            $this->set('isTrial', false);
+            $this->set('isExpired', false);
+        }
+
         $this->set('userAgent', $this->User->agent());
         $this->success();
     }

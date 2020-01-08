@@ -19,7 +19,7 @@ if (!isset($setupCase)) {
     $setupCase = 'install';
 }
 $this->assign('title',	__('Install'));
-$this->assign('page_classes', 'setup install start');
+$this->assign('pageClass', 'setup install start');
 $this->Html->css('themes/default/api_setup.min.css?v=' . Configure::read('passbolt.version'), ['block' => 'css', 'fullBase' => true]);
 
 // Only Firefox and Chrome are supported right now.

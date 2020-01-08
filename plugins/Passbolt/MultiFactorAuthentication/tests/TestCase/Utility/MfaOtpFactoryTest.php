@@ -61,7 +61,7 @@ class MfaOtpFactoryTest extends MfaIntegrationTestCase
         $this->assertTrue(true);
         $this->assertContains('otpauth://totp/', $otp);
         $issuer = MfaOtpFactory::getIssuer();
-        $this->assertContains('issuer=' . $issuer, $otp);
+        $this->assertContains('issuer=' . urlencode($issuer), $otp);
         $this->assertContains('secret=', $otp);
         $this->assertContains('ada%40passbolt.com', $otp);
     }

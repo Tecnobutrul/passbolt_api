@@ -17,15 +17,14 @@ namespace App\Test\TestCase\Model\Table\Avatars;
 
 use App\Test\Lib\AppTestCase;
 use App\Test\Lib\Model\AvatarsModelTrait;
+use App\Utility\ImageStorage\GoogleCloudStorageListener;
 use App\Utility\UuidFactory;
+use Burzum\FileStorage\Storage\Listener\ImageProcessingListener;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
-use Cake\Http\Client;
-use Cake\Network\Socket;
-use Cake\ORM\TableRegistry;
-use App\Utility\ImageStorage\GoogleCloudStorageListener;
-use Burzum\FileStorage\Storage\Listener\ImageProcessingListener;
 use Cake\Event\EventManager;
+use Cake\Http\Client;
+use Cake\ORM\TableRegistry;
 
 class CreateTest extends AppTestCase
 {

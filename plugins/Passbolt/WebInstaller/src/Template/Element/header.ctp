@@ -1,7 +1,7 @@
 <?php
 use Cake\Core\Configure;
 $this->Html->css('themes/default/api_setup.min.css?v=' . Configure::read('passbolt.version'), ['block' => 'css', 'fullBase' => true]);
-$this->assign('page_classes', 'setup install');
+$this->assign('pageClass', 'setup install');
 ?>
 <!-- first header -->
 <div class="header first">

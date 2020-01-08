@@ -1,23 +1,16 @@
 <?php
-
 /**
- * Passbolt ~ Open source password manager for teams
+ * Passbolt Cloud
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
- * Licensed under GNU Affero General Public License version 3 of the or any later version.
- * For full copyright and license information, please see the LICENSE.txt
- * Redistributions of files must retain the above copyright notice.
- *
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
- * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.11.0
  */
-
 namespace Passbolt\MultiTenantAdmin\Controller;
 
 use App\Model\Entity\Role;
 use App\Utility\UserAccessControl;
+use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Routing\Router;
 use Passbolt\MultiTenantAdmin\Lib\Controller\MultiTenantAdminController;
@@ -29,6 +22,7 @@ class MultiTenantAdminRegisterFirstUserController extends MultiTenantAdminContro
      * acts as constructor for subclasses
      * allows configuration of tasks prior to shell execution
      *
+     * @throws \Exception If a component class cannot be found in parent class
      * @return void
      * @link https://book.cakephp.org/3.0/en/console-and-shells.html#Cake\Console\ConsoleOptionParser::initialize
      */
