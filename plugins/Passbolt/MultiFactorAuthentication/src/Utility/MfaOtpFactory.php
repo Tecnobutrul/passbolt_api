@@ -21,11 +21,31 @@ use BaconQrCode\Renderer\Image\Png;
 use BaconQrCode\Writer;
 use Cake\Core\Configure;
 use Cake\Http\Exception\InternalErrorException;
+use Cake\Routing\Router;
 use OTPHP\TOTP;
 use ParagonIE\ConstantTime\Base32;
 
 class MfaOtpFactory
 {
+    /**
+     * Return Issuer
+     * The domain name without http(s):// and trailing /
+     *
+     * @param string $url Router::url will be used if empty
+     * @return string
+     */
+    public static function getIssuer($url = null)
+    {
+        if (!isset($url) || !is_string($url)) {
+            $url = Router::url('/', true);
+        }
+        $url = parse_url($url, PHP_URL_HOST) . parse_url($url, PHP_URL_PATH);
+        $url = str_replace(':', '', $url);
+        $url = rtrim($url, '/');
+
+        return $url;
+    }
+
     /**
      * Generate a random TOTP
      *
@@ -45,7 +65,7 @@ class MfaOtpFactory
             $uac->getUsername(), //label: string shown bellow the code digits
             $secret
         );
-        $totp->setIssuer(Configure::read('passbolt.meta.title')); //issuer: string shown above the code digits
+        $totp->setIssuer(self::getIssuer()); //issuer: string shown above the code digits
 
         return $totp->getProvisioningUri();
     }

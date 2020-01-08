@@ -10,23 +10,20 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.5.0
+ * @since         2.12.0
  */
-namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Controllers;
 
-use Passbolt\MultiFactorAuthentication\Test\Lib\MfaIntegrationTestCase;
-use Passbolt\MultiFactorAuthentication\Utility\MfaSettings;
+namespace Passbolt\MultiFactorAuthentication\Service;
 
-class MfaSetupDeleteControllerTest extends MfaIntegrationTestCase
+use Passbolt\MultiFactorAuthentication\Utility\MfaOrgSettings;
+
+class GetMfaOrgSettingsService
 {
     /**
-     * @group mfa
-     * @group mfaVerify
+     * @return MfaOrgSettings
      */
-    public function testMfaSetupDelete()
+    public function get()
     {
-        $this->authenticateAs('ada');
-        $providers = MfaSettings::getProviders();
-        $this->markTestIncomplete();
+        return MfaOrgSettings::get();
     }
 }

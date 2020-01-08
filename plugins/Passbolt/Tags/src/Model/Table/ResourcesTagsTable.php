@@ -119,15 +119,36 @@ class ResourcesTagsTable extends Table
      * @param string $userId User whose tags to update
      * @param string $oldTagId Id of the tag that needs update
      * @param string $newTagId New tag id
-     * @return int
+     * @return void
      */
     public function updateUserTag(string $userId, string $oldTagId, string $newTagId)
     {
-        return $this->updateAll([
-            'tag_id' => $newTagId
-        ], [
+        // Find all the user resources already tagged with the new tag.
+        $resourcesIdAssociatedWithNewTag = $this->find()
+            ->select(['resource_id'])
+            ->where([
+                'tag_id' => $newTagId,
+                'user_id' => $userId
+            ])
+            ->extract('resource_id')
+            ->toArray();
+
+        // Tag with the new tag only the user resources that haven't been yet tagged with the new tag.
+        $updateWhere = [
             'tag_id' => $oldTagId,
-            'user_id' => $userId
+            'user_id' => $userId,
+        ];
+        if (!empty($resourcesIdAssociatedWithNewTag)) {
+            $updateWhere['resource_id NOT IN'] = $resourcesIdAssociatedWithNewTag;
+        }
+        $this->updateAll([
+            'tag_id' => $newTagId
+        ], $updateWhere);
+
+        // Remove all associations between the old tag and the user resources.
+        $this->deleteAll([
+            'tag_id' => $oldTagId,
+            'user_id' => $userId,
         ]);
     }
 }

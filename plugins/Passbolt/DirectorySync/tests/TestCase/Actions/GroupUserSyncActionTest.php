@@ -304,6 +304,68 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
     }
 
     /**
+     * Scenario: a group has two groupUsers in ldap which has not been synced yet, one of the corresponding user doesn't exist, has been deleted or is unactive.
+     * Expected result: add first user, send ignore report for second one
+     *
+     * This is
+     *
+     * @group DirectorySync
+     * @group DirectorySyncGroupUser
+     * @group DirectorySyncGroupUserAdd
+     */
+    public function testDirectorySyncGroupUser_Case10_Ok_Ok_Null_Null_NotOk_WithTwoRows()
+    {
+        $userEntryValid = $this->mockDirectoryEntryUser(['fname' => 'frances', 'lname' => 'frances', 'foreign_key' => UuidFactory::uuid('user.id.frances')]);
+        // Ruth is a inactive user.
+        $userEntryInactive = $this->mockDirectoryEntryUser(['fname' => 'ruth', 'lname' => 'ruth', 'foreign_key' => UuidFactory::uuid('user.id.ruth')]);
+        $this->mockDirectoryUserData('ruth', 'ruth', 'ruth@passbolt.com');
+        $this->mockDirectoryUserData('frances', 'frances', 'frances@passbolt.com');
+        $this->mockDirectoryGroupData('newgroup', [
+            'group_users' => [
+                $userEntryValid->directory_name,
+                $userEntryInactive->directory_name
+            ]
+        ]);
+        $reports = $this->action->execute();
+
+        $this->assertReportNotEmpty($reports);
+        $this->assertEquals(count($reports), 3);
+
+        $expectedGroupReport = [
+            'action' => Alias::ACTION_CREATE,
+            'model' => Alias::MODEL_GROUPS,
+            'status' => Alias::STATUS_SUCCESS,
+            'type' => Alias::MODEL_GROUPS,
+        ];
+        $this->assertReport($reports[0], $expectedGroupReport);
+
+        $expectedUserGroupReport = [
+            'action' => Alias::ACTION_CREATE,
+            'model' => Alias::MODEL_GROUPS_USERS,
+            'status' => Alias::STATUS_SUCCESS,
+            'type' => Alias::MODEL_GROUPS
+        ];
+        $this->assertReport($reports[1], $expectedUserGroupReport);
+
+        $expectedUserGroupReport = [
+            'action' => Alias::ACTION_CREATE,
+            'model' => Alias::MODEL_GROUPS_USERS,
+            'status' => Alias::STATUS_IGNORE,
+            'type' => Alias::MODEL_GROUPS
+        ];
+        $this->assertReport($reports[2], $expectedUserGroupReport);
+
+        $groupCreated = $this->assertGroupExist(null, ['name' => 'newgroup', 'deleted' => false]);
+
+        $defaultGroupAdmin = $this->directoryOrgSettings->getDefaultGroupAdminUser();
+        $defaultGroupAdmin = $this->Users->findByUsername($defaultGroupAdmin)->first();
+
+        $groupUserAda = $this->assertGroupUserExist(null, ['group_id' => $groupCreated->id, 'user_id' => $defaultGroupAdmin->id]);
+        $this->assertGroupUserNotExist(null, ['group_id' => $groupCreated->id, 'user_id' => UuidFactory::uuid('user.id.ruth')]);
+        $this->assertDirectoryRelationNotEmpty();
+    }
+
+    /**
      * Scenario: a groupUser has been added to a group without passwords in ldap, not yet added in passbolt
      * Expected result: check if group already has access to passwords. If not, add the groupUser. If yes, send notification to groupAdmins to add user.
      *
@@ -652,5 +714,48 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $this->mockDirectoryRelationGroupUser('freelancer', 'sofia');
         $reports = $this->action->execute();
         $this->assertEmpty($reports);
+    }
+
+    /**
+     * Unit test for PB-767
+     *
+     * When multiple users are added to a group, a failed validation on one groupUser should not make the other associations fail.
+     *
+     * @group DirectorySync
+     * @group DirectorySyncGroupUser
+     * @group DirectorySyncGroupUserAdd
+     */
+    public function testDirectorySyncGroupUser_failedValidationShouldNotContaminateOtherGroupUsers()
+    {
+        $this->mockDirectoryUserData('ruth', 'ruth', 'ruth@passbolt.com');
+        $this->mockDirectoryUserData('betty', 'betty', 'betty@passbolt.com');
+        // Ruth is a inactive user.
+        $ruthEntry = $this->mockDirectoryEntryUser(['fname' => 'ruth', 'lname' => 'ruth', 'foreign_key' => UuidFactory::uuid('user.id.ruth')], Alias::STATUS_SUCCESS);
+        $bettyEntry = $this->mockDirectoryEntryUser(['fname' => 'betty', 'lname' => 'betty', 'foreign_key' => UuidFactory::uuid('user.id.betty')], Alias::STATUS_SUCCESS);
+        $this->mockDirectoryEntryGroup('marketing');
+        //$this->mockDirectoryEntryGroup('marketing');
+        $this->mockDirectoryGroupData('marketing', [
+            'group_users' => [
+                $ruthEntry->directory_name,
+                $bettyEntry->directory_name,
+            ]
+        ]);
+        $reports = $this->action->execute();
+
+        $expectedUserGroupReport = [
+            'action' => Alias::ACTION_CREATE,
+            'model' => Alias::MODEL_GROUPS_USERS,
+            'status' => Alias::STATUS_IGNORE,
+            'type' => Alias::MODEL_GROUPS,
+        ];
+        $this->assertReport($reports[0], $expectedUserGroupReport);
+
+        $expectedUserGroupReport = [
+            'action' => Alias::ACTION_CREATE,
+            'model' => Alias::MODEL_GROUPS_USERS,
+            'status' => Alias::STATUS_SUCCESS,
+            'type' => Alias::MODEL_GROUPS,
+        ];
+        $this->assertReport($reports[1], $expectedUserGroupReport);
     }
 }
