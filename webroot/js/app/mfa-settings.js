@@ -19,7 +19,8 @@ function domReady() {
       },
       redirect: 'follow'
     }).then(() => {
-      window.location.replace('/mfa/setup/select');
+      const url2 = `${appUrl}/mfa/setup/select`;
+      window.location.replace(url2);
     }, () => {
       totpDisableButton.classList.remove('processing');
     })
