@@ -22,6 +22,7 @@ use Cake\Event\Event;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Response;
+use Cake\ORM\TableRegistry;
 use Cake\Validation\Validation;
 use Passbolt\MultiFactorAuthentication\Controller\MfaController;
 use Passbolt\MultiFactorAuthentication\Utility\MfaAccountSettings;
@@ -42,7 +43,7 @@ class MfaUserSettingsDeleteController extends MfaController
     {
         parent::initialize();
 
-        $this->UsersTable = $this->loadModel(UsersTable::class);
+        $this->UsersTable = TableRegistry::getTableLocator()->get('Users');
     }
 
     /**
