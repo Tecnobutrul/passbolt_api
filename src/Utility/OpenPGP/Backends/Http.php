@@ -59,7 +59,7 @@ class Http extends OpenPGPBackend
     public function __construct()
     {
         parent::__construct();
-        $this->_httpClient = new Client;
+        $this->_httpClient = new Client();
         $this->_region = Configure::consume('passbolt.gpg.http.region');
         $this->_project = Configure::consume('passbolt.gpg.http.project');
         $this->_domain = Configure::consume('passbolt.gpg.http.domain');

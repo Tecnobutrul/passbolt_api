@@ -10,6 +10,7 @@ use Cake\Console\Arguments;
 use Cake\Console\Command;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Core\Configure;
 
 class CloudSubscriptionCommand extends Command
 {
@@ -43,6 +44,11 @@ class CloudSubscriptionCommand extends Command
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
+        if (Configure::read('debug') !== true) {
+            $io->error('This tool requires debug mode. Do not use in production. Use cloud admin commands instead.');
+            $this->abort();
+        }
+
         $this->org = $args->getOption('org');
         if (!isset($this->org)) {
             $io->error(__('Can not run command. Organization is missing.'));

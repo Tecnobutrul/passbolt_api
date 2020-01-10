@@ -308,6 +308,9 @@ trait GroupUsersSyncTrait
     {
         foreach ($userIdsToAdd as $userId) {
             $u = $this->Users->get($userId);
+            // For each round, we keep a track of previous groups users so that we can revert in case of error
+            // (and not keep the ones that generated errors in the list. This would create false positives for the next elements).
+            $initialGroupsUsers = $group->groups_users;
             try {
                 $newGroupUsers = $this->GroupsUsers->patchEntitiesWithChanges(
                     $group['groups_users'],
@@ -326,6 +329,9 @@ trait GroupUsersSyncTrait
                     Alias::STATUS_ERROR,
                     $error
                 ));
+
+                $group->groups_users = $initialGroupsUsers;
+                continue;
             } catch (\Exception $exception) {
                 $error = new SyncError($group, $exception);
                 $this->addReportItem(new ActionReport(
@@ -335,14 +341,17 @@ trait GroupUsersSyncTrait
                     Alias::STATUS_ERROR,
                     $error
                 ));
+
+                $group->groups_users = $initialGroupsUsers;
+                continue;
             }
 
             $saveResult = $this->Groups->save($group);
             if (!$saveResult) {
                 $errors = $group->getErrors();
-                $isNotActive = isset($errors['groups_users'][1]['user_id']['user_is_active']);
-                $isDeleted = isset($errors['groups_users'][1]['user_id']['user_is_not_soft_deleted']);
-                if ($isNotActive && $isDeleted || $isDeleted) {
+                $isNotActive = !empty(Hash::extract($errors, 'groups_users.{n}.user_id.user_is_active'));
+                $isDeleted = !empty(Hash::extract($errors, 'groups_users.{n}.user_id.user_is_not_soft_deleted'));
+                if (($isNotActive && $isDeleted) || $isDeleted) {
                     $msg = __('The user {0} could not be added to group {1} because it is deleted.', $u->username, $group->name);
                 } elseif ($isNotActive) {
                     $msg = __('The user {0} could not be added to group {1} because it is not active yet.', $u->username, $group->name);
@@ -356,6 +365,12 @@ trait GroupUsersSyncTrait
                     Alias::STATUS_IGNORE,
                     $group
                 ));
+
+                $group->groups_users = $initialGroupsUsers;
+                continue;
+            }
+
+            if (empty($saveResult->groups_users)) {
                 continue;
             }
 
@@ -392,6 +407,7 @@ trait GroupUsersSyncTrait
                 continue;
             }
 
+            $initialGroupsUsers = $group->groups_users;
             try {
                 $newGroupUsers = $this->GroupsUsers->patchEntitiesWithChanges(
                     $group->groups_users,
@@ -410,6 +426,8 @@ trait GroupUsersSyncTrait
                     Alias::STATUS_IGNORE,
                     $error
                 ));
+
+                $group->groups_users = $initialGroupsUsers;
                 continue;
             }
 
@@ -424,6 +442,8 @@ trait GroupUsersSyncTrait
                 }
                 $error = new SyncError($group, new \Exception($msg));
                 $this->addReportItem(new ActionReport($msg, Alias::MODEL_GROUPS_USERS, Alias::ACTION_DELETE, Alias::STATUS_ERROR, $error));
+
+                $group->groups_users = $initialGroupsUsers;
                 continue;
             }
 

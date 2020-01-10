@@ -5,88 +5,88 @@
 	   / ____/ /_/ (__  |__  ) /_/ / /_/ / / /_
 	  /_/    \__,_/____/____/_,___/\____/_/\__/
 
-	The open source password manager for teams
-	Copyright (c) 2018 Passbolt SA
+	Passbolt Cloud API
+	Copyright (c) 2020 Passbolt SA
 	https://www.passbolt.com
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c804760791534e62b90632215952eaf0)](https://www.codacy.com/app/passbolt/passbolt_api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=passbolt/passbolt_api&amp;utm_campaign=Badge_Grade)
-[![Build Status](https://travis-ci.org/passbolt/passbolt_api.svg?branch=master)](https://travis-ci.org/passbolt/passbolt_api)
-[![Coverage Status](https://coveralls.io/repos/github/passbolt/passbolt_api/badge.svg?branch=master)](https://coveralls.io/github/passbolt/passbolt_api?branch=master)
+# Getting started using docker
 
-## License
+Copy the local env variable file:
+```
+cp docker/env/local.env.default docker/env/local.env
+```
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
+Edit it with your docker host IP. This will allow connecting to the cloud admin if needed
+```
+emacs docker/env/local.env
+```
 
-This program is distributed in the hope that it will be useful,
-but without any warranty; without even the implied warranty of
-merchantability or fitness for a particular purpose.  See the
-GNU Affero General Public License for more details.
+## Run using the docker compose
+Run the container using:
+```
+docker-compose -f docker-compose-dev.yml up
+```
 
-[Affero General Public License v3](http://www.gnu.org/licenses/agpl-3.0.html)
+This will use the configuration files in the `docker/conf` directory, by maping `config/passbolt.php` to
+`docker/conf/passbolt.php`.
 
-## About Passbolt
+You can also use the environment variables in `docker/env/passbolt.env` alternatively.
+By default it will fetch the composer dependencies, if you do not want this behavior you can
+set the env `PHP_COMPOSER` to false.
 
-Passbolt is an open source password manager for teams. It allows you to
-securely share and store credentials. For instance, the wifi password of your
-office, the administrator password of a router or your organisation's social
-media account passwords, all of them can be secured using passbolt.
+To connect to the running container:
+`docker-compose -f docker-compose-dev.yml exec passbolt-cloud bash`
 
-Passbolt is different from the other password managers because:
-- It is primarily designed for teams and not individuals
-- It is free & open source
-- It is respectful of privacy
-- It is based on OpenPGP, a proven cryptographic standard
-- It is easy to use for both novices and IT professionals alike
-- It is extensible thanks to its RESTful API
+Similarly to connect to mysql:
+`docker-compose -f docker-compose-dev.yml exec db bash`
 
-Find out more: [https://www.passbolt.com](https://www.passbolt.com "Passbolt Homepage")
+# How to use
 
-### How does it look like?
+By default the container create an organization database while starting. An administrator is also created
+and a link to complete the administrator setup can be found in the output of the container.
 
-[![Login](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-login-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-login.png)
-[![Browse passwords](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot4-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot4.png)
-[![Share passwords](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-share-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-share.png)
+The link looks like: https://cloud.passbolt.local/acme/setup/install/5820c265-629b-4b99-bd2f-e238a34616d7/d30573c5-3829-4c92-b6e7-288fdf0d0b7a
+
+# Manual configuration
+##Configure Nginx
+For multi-tenant to work in Nginx, the following rewrite rules need to be added to the configuration file.
+```
+location ~* \.(jpe?g|woff|woff2|ttf|gif|png|bmp|ico|css|js|ejs|json|pdf|zip|htm|html|docx?|xlsx?|pptx?|txt|wav|swf|svg|avi|woff2|mp\d)$ {
+    access_log off;
+    log_not_found off;
+
+    rewrite ^/([^/]+)/([img|css|js|fonts]+)/(.*)$ /$2/$3 break;
+    rewrite ^/([^/]+)/favicon.ico$ /favicon.ico break;
+
+    try_files $uri /webroot/$uri /index.php?$args;
+  }
+```
+
+## Configure Apache
+For apache, a similar configuration needs to be done. These 2 lines need to be translated in apache language:
+```
+rewrite ^/([^/]+)/([img|css|js|fonts]+)/(.*)$ /$2/$3 break;
+rewrite ^/([^/]+)/favicon.ico$ /favicon.ico break;
+```
+
+The main idea is to remove the site from the path so that cakephp understands where it should be accessed.
 
 
-### Trying out passbolt
+# Production
 
-You can try a demo of passbolt at https://demo.passbolt.com.
+## Emails
 
-You will need to install a browser extension. You can find some help here:
-https://help.passbolt.com/faq/start/browser-extensions
+This container is responsible for sending email. Don't forget to enable the cronjob.
 
-## Installing passbolt
+## Cache configuration
 
-You can install passbolt on your own machine. Follow the instructions on the website here:
-https://help.passbolt.com/hosting/install
+The cache configuration needs to be isolated for each organization. To do so, DO NOT FORGET to set each cache configuration with a path.
+The correct cache option to do so is as below:
+```
+'prefix' => CACHE_PREFIX_ORG
+```
 
-## Updating passbolt
+CACHE_PREFIX_ORG will be set at bootstrap with a unique value for each org.
 
-Every now and then you will need to update passbolt to benefits from important fixes and improvements.
-Follow the instructions on the website here: https://help.passbolt.com/hosting/update
-
-## Contributing to passbolt
-
-Please check out CONTRIBUTING.md for more information on how to get involved!
-
-## Reporting a security issue
-
-If you've found a security-related issue in passbolt, please don't open an issue on GitHub.
-Instead contact us at security@passbolt.com. In the spirit of responsible disclosure we ask
-that the reporter keep the issue confidential until we announce it.
-
-The passbolt team will take the following actions:
-- Try first to reproduce the issue and confirm the vulnerability.
-- Acknowledge to the reporter that we have received the issue and are working on a fix.
-- Get a fix/patch prepared and create associated automated tests.
-- Prepare a post describing the vulnerability and the possible exploits.
-- Release new versions of all affected major versions.
-- Prominently feature the problem in the release announcement.
-- Give credit in the release announcement to the reporter if they so desire.
-
-## Credits
-
-https://www.passbolt.com/credits
+# Troubleshooting
+The clear cache function does not work for now with organization. It has to be fixed
