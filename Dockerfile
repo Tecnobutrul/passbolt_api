@@ -1,4 +1,4 @@
-FROM php:7.3.12-fpm
+FROM php:7.3.16-fpm
 
 LABEL maintainer="contact@passbolt.com"
 
@@ -27,7 +27,7 @@ ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
 
 ENV PECL_BASE_URL="https://pecl.php.net/get"
 ENV PHP_EXT_DIR="/usr/src/php/ext"
-ENV NR_VERSION="9.5.0.252"
+ENV NR_VERSION="9.7.0.258"
 ENV NR_URL="https://download.newrelic.com/php_agent/release/newrelic-php5-${NR_VERSION}-linux.tar.gz"
 
 COPY --chown=www-data:www-data . /var/www/passbolt
