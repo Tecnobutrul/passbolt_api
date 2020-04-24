@@ -2,7 +2,6 @@ FROM php:7.3.17-fpm
 
 LABEL maintainer="contact@passbolt.com"
 
-
 ARG PHP_EXTENSIONS="gd \
       intl \
       ldap \
