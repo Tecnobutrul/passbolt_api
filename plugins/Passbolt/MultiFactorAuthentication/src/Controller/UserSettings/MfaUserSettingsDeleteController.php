@@ -43,7 +43,7 @@ class MfaUserSettingsDeleteController extends MfaController
     {
         parent::initialize();
 
-        $this->UsersTable = TableRegistry::getTableLocator()->get('Users');
+        $this->UsersTable = $this->loadModel('Users');
     }
 
     /**

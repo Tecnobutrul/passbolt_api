@@ -44,7 +44,7 @@
         "ext-json" : "*",
         "ext-posix" : "*",
         "ext-pdo": "*",
-        "cakephp/cakephp": "^3.8.0",
+        "cakephp/cakephp": "3.8.13",
         "cakephp/migrations": "^2.1",
         "cakephp/plugin-installer": "^1.1",
         "mobiledetect/mobiledetectlib": "2.*",
@@ -70,7 +70,7 @@
         "phpunit/phpunit": "^5.7|^6.0",
         "cakephp/cakephp-codesniffer": "3.2.1",
         "passbolt/passbolt_selenium_api": "^2.10.0",
-        "passbolt/passbolt_test_data": "^2.10.2"
+        "passbolt/passbolt_test_data": "^2.13.1"
     },
     "autoload": {
         "psr-4": {
@@ -85,7 +85,10 @@
             "Passbolt\\Tags\\": "./plugins/Passbolt/Tags/src",
             "Passbolt\\Log\\": "./plugins/Passbolt/Log/src",
             "Passbolt\\AuditLog\\": "./plugins/Passbolt/AuditLog/src",
-            "Passbolt\\EmailNotificationSettings\\": "./plugins/Passbolt/EmailNotificationSettings/src"
+            "Passbolt\\EmailNotificationSettings\\": "./plugins/Passbolt/EmailNotificationSettings/src",
+            "Passbolt\\EmailDigest\\": "./plugins/Passbolt/EmailDigest/src",
+            "Passbolt\\Reports\\": "./plugins/Passbolt/Reports/src",
+            "Passbolt\\Folders\\": "./plugins/Passbolt/Folders/src"
         }
     },
     "autoload-dev": {
@@ -100,7 +103,10 @@
             "Passbolt\\Tags\\Test\\": "./plugins/Passbolt/Tags/tests",
             "Passbolt\\Log\\Test\\": "./plugins/Passbolt/Log/tests",
             "Passbolt\\AuditLog\\Test\\": "./plugins/Passbolt/AuditLog/tests",
-            "Passbolt\\EmailNotificationSettings\\Test\\": "./plugins/Passbolt/EmailNotificationSettings/tests"
+            "Passbolt\\EmailNotificationSettings\\Test\\": "./plugins/Passbolt/EmailNotificationSettings/tests",
+            "Passbolt\\EmailDigest\\Test\\": "./plugins/Passbolt/EmailDigest/tests",
+            "Passbolt\\Reports\\Test\\": "./plugins/Passbolt/Reports/tests",
+            "Passbolt\\Folders\\Test\\": "./plugins/Passbolt/Folders/tests"
         }
     },
     "scripts": {

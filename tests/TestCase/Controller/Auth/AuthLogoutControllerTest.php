@@ -22,7 +22,7 @@ use Zend\Diactoros\Response\RedirectResponse;
 class AuthLogoutControllerTest extends AppIntegrationTestCase
 {
     public $fixtures = [
-        'app.Base/Users', 'app.Base/Roles', 'app.Base/Profiles'
+        'app.Base/Users', 'app.Base/Roles', 'app.Base/Profiles',
     ];
 
     /**
@@ -45,8 +45,8 @@ class AuthLogoutControllerTest extends AppIntegrationTestCase
                 'User' => [
                     'id' => UuidFactory::uuid('users.id.ada'),
                     'username' => 'ada@passbolt.com',
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $this->get('/auth/logout');

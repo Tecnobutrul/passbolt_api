@@ -14,8 +14,10 @@
  */
 namespace Passbolt\EmailNotificationSettings\Test\TestCase\Controllers;
 
+use App\Notification\NotificationSettings\CoreNotificationSettingsDefinition;
 use App\Test\Lib\AppIntegrationTestCase;
 use Cake\Core\Configure;
+use Cake\Event\EventManager;
 use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettings;
 
@@ -29,13 +31,19 @@ class NotificationOrgSettingsGetControllerTest extends AppIntegrationTestCase
     public $fixtures = [
         'app.Base/OrganizationSettings',
         'app.Base/AuthenticationTokens', 'app.Base/Users',
-        'app.Base/Roles'
+        'app.Base/Roles',
     ];
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->loadNotificationSettings();
+    }
 
     public function tearDown()
     {
-        EmailNotificationSettings::flushCache();
         parent::tearDown();
+        $this->unloadNotificationSettings();
     }
 
     /**
@@ -98,7 +106,7 @@ class NotificationOrgSettingsGetControllerTest extends AppIntegrationTestCase
         $cases = [
             'send_comment_add' => false,
             'send_password_create' => true,
-            'send_password_share' => false
+            'send_password_share' => false,
         ];
 
         // Mock DB settings
@@ -124,12 +132,13 @@ class NotificationOrgSettingsGetControllerTest extends AppIntegrationTestCase
         $cases = [
             'send_comment_add' => false,
             'send_password_create' => true,
-            'send_password_share' => false
+            'send_password_share' => false,
         ];
 
         // Mock File settings
         foreach ($cases as $case => $value) {
-            Configure::write('passbolt.email.' . $case, $value);
+            $configKey = EmailNotificationSettings::underscoreToDottedFormat($case);
+            Configure::write('passbolt.email.' . $configKey, $value);
         }
 
         $this->authenticateAs('admin');
@@ -152,12 +161,13 @@ class NotificationOrgSettingsGetControllerTest extends AppIntegrationTestCase
         $cases = [
             'send_comment_add' => false,
             'send_password_create' => true,
-            'send_password_share' => false
+            'send_password_share' => false,
         ];
 
         // Mock DB settings
         foreach ($cases as $case => $value) {
-            Configure::write('passbolt.email.' . $case, $value);
+            $configKey = EmailNotificationSettings::underscoreToDottedFormat($case);
+            Configure::write('passbolt.email.' . $configKey, $value);
         }
 
         // Override with DB settings

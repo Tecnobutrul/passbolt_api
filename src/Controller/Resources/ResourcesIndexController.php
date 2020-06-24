@@ -34,12 +34,15 @@ class ResourcesIndexController extends AppController
         $whitelist = [
             'contain' => ['creator', 'favorite', 'modifier', 'permission', 'permissions.user.profile', 'permissions.group', 'secret'],
             'filter' => ['is-favorite', 'is-shared-with-group', 'is-owned-by-me', 'is-shared-with-me', 'has-id'],
-            'order' => ['Resource.modified']
+            'order' => ['Resource.modified'],
         ];
 
         if (Configure::read('passbolt.plugins.tags.enabled')) {
             $whitelist['contain'][] = 'tag';
             $whitelist['filter'][] = 'has-tag';
+        }
+        if (Configure::read('passbolt.plugins.folders')) {
+            $whitelist['filter'][] = 'has-parent';
         }
         $options = $this->QueryString->get($whitelist);
 
