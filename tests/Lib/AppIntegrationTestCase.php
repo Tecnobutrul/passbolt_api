@@ -82,6 +82,16 @@ abstract class AppIntegrationTestCase extends TestCase
         Configure::write('passbolt.plugins.multiFactorAuthentication.enabled', false);
         Configure::write('passbolt.plugins.log.enabled', false);
         Configure::write('passbolt.plugins.cloudSubscription.enabled', false);
+        Configure::write('passbolt.plugins.folders.enabled', false);
+    }
+
+    /**
+     * Tear down
+     */
+    public function tearDown()
+    {
+        $this->clearPlugins();
+        parent::tearDown();
     }
 
     /**
@@ -100,8 +110,8 @@ abstract class AppIntegrationTestCase extends TestCase
                 'last_name' => 'testing',
             ],
             'role' => [
-                'name' => Role::USER
-            ]
+                'name' => Role::USER,
+            ],
         ];
         if ($userFirstName === 'admin') {
             $data['role']['name'] = Role::ADMIN;

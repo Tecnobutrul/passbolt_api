@@ -14,17 +14,14 @@
  */
 namespace Passbolt\DirectorySync\Test\Utility;
 
-use App\Model\Entity\Role;
 use App\Test\Lib\AppIntegrationTestCase;
 use App\Test\Lib\Utility\UserAccessControlTrait;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
-use Cake\Utility\Hash;
 use Passbolt\DirectorySync\Test\Utility\Traits\AssertDirectoryTrait;
 use Passbolt\DirectorySync\Test\Utility\Traits\AssertReportTrait;
 use Passbolt\DirectorySync\Test\Utility\Traits\DirectoryOrgSettingsTrait;
 use Passbolt\DirectorySync\Test\Utility\Traits\MockDirectoryTrait;
-use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 abstract class DirectorySyncIntegrationTestCase extends AppIntegrationTestCase
 {
@@ -48,6 +45,7 @@ abstract class DirectorySyncIntegrationTestCase extends AppIntegrationTestCase
         'app.Base/Favorites',
         'app.Base/EmailQueue',
         'app.Base/OrganizationSettings',
+        'app.Base/Gpgkeys',
         'plugin.Passbolt/DirectorySync.Base/DirectoryEntries',
         'plugin.Passbolt/DirectorySync.Base/DirectoryIgnore',
         'plugin.Passbolt/DirectorySync.Base/DirectoryRelations',
@@ -68,7 +66,6 @@ abstract class DirectorySyncIntegrationTestCase extends AppIntegrationTestCase
     public function setUp()
     {
         parent::setUp();
-//        Configure::load('Passbolt/DirectorySync.config', 'default', true);
         $this->Groups = TableRegistry::getTableLocator()->get('Groups');
         $this->Users = TableRegistry::getTableLocator()->get('Users');
         $this->DirectoryEntries = TableRegistry::getTableLocator()->get('DirectoryEntries');

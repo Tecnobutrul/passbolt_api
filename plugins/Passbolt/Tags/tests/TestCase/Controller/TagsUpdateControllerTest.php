@@ -15,6 +15,7 @@
 namespace Passbolt\Tags\Test\TestCase\Controller;
 
 use App\Test\Lib\Model\ResourcesModelTrait;
+use App\Test\Lib\Model\SecretsModelTrait;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
@@ -28,7 +29,7 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
         'app.Base/Users', 'app.Base/Roles', 'app.Base/Resources', 'app.Base/Secrets', 'app.Base/Favorites',
         'app.Base/Profiles', 'app.Base/Groups', 'app.Alt0/GroupsUsers', 'app.Alt0/Permissions',
         'plugin.Passbolt/Tags.Base/Tags', 'plugin.Passbolt/Tags.Alt0/ResourcesTags',
-        'app.Base/Groups', 'app.Base/Avatars', 'app.Base/Favorites', 'app.Base/EmailQueue'
+        'app.Base/Groups', 'app.Base/Avatars', 'app.Base/Favorites', 'app.Base/EmailQueue',
     ];
 
     public function setUp()
@@ -108,7 +109,7 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
         $this->authenticateAs('ada');
         $tagId = UuidFactory::uuid('tag.id.firefox');
         $this->putJson("/tags/$tagId.json?api-version=v2", [
-            'slug' => str_repeat('a', 129)
+            'slug' => str_repeat('a', 129),
         ]);
         $this->assertBadRequestError('Could not validate tag data.');
         $response = json_decode(json_encode($this->_responseJsonBody), true);
@@ -130,7 +131,7 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
         $this->authenticateAs('ada');
         $tagId = UuidFactory::uuid('tag.id.firefox');
         $this->put("/tags/$tagId.json?api-version=v2", [
-            'slug' => 'brave'
+            'slug' => 'brave',
         ]);
         $this->assertResponseCode(403);
         $result = ($this->_getBodyAsString());
@@ -151,30 +152,30 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
                 'user' => 'ada',
                 'tag' => 'tag.id.alpha',
                 'data' => [
-                    'slug' => '新的專用資源名稱'
-                ]
+                    'slug' => '新的專用資源名稱',
+                ],
             ],
             'slavic' => [
                 'user' => 'ada',
                 'tag' => 'tag.id.firefox',
                 'data' => [
-                    'slug' => 'Новое имя частного ресурса'
-                ]
+                    'slug' => 'Новое имя частного ресурса',
+                ],
             ],
             'french' => [
                 'user' => 'betty',
                 'tag' => 'tag.id.alpha',
                 'data' => [
-                    'slug' => 'Nouveau nom de resource privée'
-                ]
+                    'slug' => 'Nouveau nom de resource privée',
+                ],
             ],
             'emoticon' => [
                 'user' => 'ada',
                 'tag' => 'tag.id.hindi',
                 'data' => [
-                    'slug' => "\u{1F61C}\u{1F61C}\u{1F61C}\u{1F61C}\u{1F61C}\u{1F61C}\u{1F61C}"
-                ]
-            ]
+                    'slug' => "\u{1F61C}\u{1F61C}\u{1F61C}\u{1F61C}\u{1F61C}\u{1F61C}\u{1F61C}",
+                ],
+            ],
         ];
 
         foreach ($success as $test => $case) {
@@ -197,7 +198,7 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
         $this->authenticateAs('ada');
         $tagId = UuidFactory::uuid('tag.id.alpha');
         $this->putJson("/tags/$tagId.json?api-version=v2", [
-            'slug' => 'test slug'
+            'slug' => 'test slug',
         ]);
         $this->assertSuccess();
         $response = $this->_responseJsonBody;
@@ -217,7 +218,7 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
         $this->authenticateAs('ada');
         $tagId = UuidFactory::uuid('tag.id.firefox');
         $this->putJson("/tags/$tagId.json?api-version=v2", [
-            'slug' => 'brave'
+            'slug' => 'brave',
         ]);
         $this->assertSuccess();
 
@@ -241,24 +242,26 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
     public function testTagUpdateUserWithExistingTagHandleTagsAssociationDuplicate()
     {
         $this->authenticateAs('ada');
-        $resource = $this->_addTestResource(ResourcesModelTrait::getDummyResource());
+        $resourceData = ResourcesModelTrait::getDummyResourceData();
+        $resourceData['secrets'][0] = SecretsModelTrait::getDummySecretData();
+        $resource = $this->_addTestResource($resourceData);
         $tags = $this->_addTestTag($resource->id, ['test-tag-1', 'test-tag-2']);
         $this->assertCount(2, $tags);
 
         $resourcesTagsCount = $this->ResourcesTags->find()->where([
             'user_id' => UuidFactory::uuid('user.id.ada'),
-            'resource_id' => $resource->id
+            'resource_id' => $resource->id,
         ])->count();
         $this->assertEquals(2, $resourcesTagsCount);
 
         $this->putJson("/tags/{$tags[0]->id}.json?api-version=v2", [
-            'slug' => $tags[1]->slug
+            'slug' => $tags[1]->slug,
         ]);
         $this->assertSuccess();
 
         $resourcesTags = $this->ResourcesTags->find()->where([
             'user_id' => UuidFactory::uuid('user.id.ada'),
-            'resource_id' => $resource->id
+            'resource_id' => $resource->id,
         ])->all()->toArray();
         $this->assertCount(1, $resourcesTags);
         $this->assertEquals($tags[1]->id, $resourcesTags[0]->tag_id);
@@ -276,7 +279,7 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
         $this->authenticateAs('ada');
         $tagId = UuidFactory::uuid('tag.id.firefox');
         $this->putJson("/tags/$tagId.json?api-version=v2", [
-            'slug' => '#brave'
+            'slug' => '#brave',
         ]);
         $this->assertBadRequestError('You do not have the permission to change a personal tag into shared tag.');
     }
@@ -293,7 +296,7 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
         $this->authenticateAs('ada');
         $tagId = UuidFactory::uuid('tag.id.alpha');
         $this->putJson("/tags/$tagId.json?api-version=v2", [
-            'slug' => 'updated-slug'
+            'slug' => 'updated-slug',
         ]);
 
         // Make sure this doesn't affect other users
@@ -318,7 +321,7 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
         $this->authenticateAs('admin');
         $tagId = UuidFactory::uuid('tag.id.alpha');
         $this->putJson("/tags/$tagId.json?api-version=v2", [
-            'slug' => 'updated-slug'
+            'slug' => 'updated-slug',
         ]);
 
         // Make sure this doesn't affect other users
@@ -341,13 +344,15 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
     public function testTagAdminPersonalUpdateResponseContainsTag()
     {
         $this->authenticateAs('admin');
-        $resource = $this->_addTestResource(ResourcesModelTrait::getDummyResource());
+        $resourceData = ResourcesModelTrait::getDummyResourceData();
+        $resourceData['secrets'][0] = SecretsModelTrait::getDummySecretData();
+        $resource = $this->_addTestResource($resourceData);
         $tags = $this->_addTestTag($resource->id, ['admin-personal']);
         $tag = $tags[0];
 
         // Update Tag
         $this->putJson("/tags/{$tag->id}.json?api-version=v2", [
-            'slug' => 'updated-admin-personal'
+            'slug' => 'updated-admin-personal',
         ]);
         $this->assertSuccess();
         $response = $this->_responseJsonBody;

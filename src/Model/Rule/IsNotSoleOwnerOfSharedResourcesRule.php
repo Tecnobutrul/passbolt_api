@@ -15,6 +15,8 @@
 
 namespace App\Model\Rule;
 
+use App\Model\Table\PermissionsTable;
+use Cake\Core\Configure;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\TableRegistry;
 
@@ -30,11 +32,17 @@ class IsNotSoleOwnerOfSharedResourcesRule
     public function __invoke(EntityInterface $entity, array $options)
     {
         $Permissions = TableRegistry::getTableLocator()->get('Permissions');
+        $checkGroupsUsers = false;
 
+        // Check also the groups the aro is member of, if the aro is a User.
         if (is_a($entity, 'App\Model\Entity\User')) {
-            $check = $Permissions->findSharedResourcesUserIsSoleOwner($entity->id, true)->count();
-        } else {
-            $check = $Permissions->findSharedResourcesGroupIsSoleOwner($entity->id)->count();
+            $checkGroupsUsers = true;
+        }
+
+        $check = $Permissions->findSharedAcosByAroIsSoleOwner(PermissionsTable::RESOURCE_ACO, $entity->id, ['checkGroupsUsers' => $checkGroupsUsers])->count();
+
+        if (Configure::read('passbolt.plugins.folders.enabled')) {
+            $check += $Permissions->findSharedAcosByAroIsSoleOwner(PermissionsTable::FOLDER_ACO, $entity->id, ['checkGroupsUsers' => $checkGroupsUsers])->count();
         }
 
         return $check == 0;

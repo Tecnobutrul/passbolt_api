@@ -14,7 +14,6 @@
  */
 namespace App\Shell;
 
-use App\Shell\AppShellBootstrap;
 use Cake\Console\Shell;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;

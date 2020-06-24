@@ -15,6 +15,7 @@
 
 namespace App\Model\Entity;
 
+use Cake\I18n\FrozenTime;
 use Cake\ORM\Entity;
 
 /**
@@ -26,12 +27,11 @@ use Cake\ORM\Entity;
  * @property string $aro
  * @property string $aro_foreign_key
  * @property int $type
- * @property \Cake\I18n\FrozenTime $created
- * @property \Cake\I18n\FrozenTime $modified
+ * @property FrozenTime $created
+ * @property FrozenTime $modified
  */
 class Permission extends Entity
 {
-
     /**
      * The types of permissions.
      */
@@ -59,6 +59,58 @@ class Permission extends Entity
 
         // Associated entities
         'group' => false,
-        'user' => false
+        'user' => false,
     ];
+
+    /**
+     * @param string|null $acoForeignKey ACO foreign key
+     * @return string
+     */
+    protected function _getAcoForeignKey(string $acoForeignKey = null)
+    {
+        if ($this->acoObject) {
+            return $this->acoObject->getAcoForeignKey();
+        }
+
+        return $acoForeignKey;
+    }
+
+    /**
+     * @param string|null $aco Access Control Object
+     * @return string
+     */
+    protected function _getAco(string $aco = null)
+    {
+        if ($this->acoObject) {
+            return $this->acoObject->getAcoType();
+        }
+
+        return $aco;
+    }
+
+    /**
+     * @param string|null $aroForeignKey ARO foreign key
+     * @return string
+     */
+    protected function _getAroForeignKey(string $aroForeignKey = null)
+    {
+        if ($this->aroObject) {
+            return $this->aroObject->getAroForeignKey();
+        }
+
+        return $aroForeignKey;
+    }
+
+    /**
+     * @param string|null $aro Access Request Object
+     * @return string
+     */
+    protected function _getAro(string $aro = null)
+    {
+        if ($this->aroObject) {
+            return $this->aroObject->getAroType();
+        }
+
+        return $aro;
+    }
 }

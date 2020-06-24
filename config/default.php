@@ -93,6 +93,13 @@ return [
                     'create' => filter_var(env('PASSBOLT_EMAIL_SEND_USER_CREATE', true), FILTER_VALIDATE_BOOLEAN),
                     'recover' => filter_var(env('PASSBOLT_EMAIL_SEND_USER_RECOVER', true), FILTER_VALIDATE_BOOLEAN),
                 ],
+                'admin' => [
+                    'user' => [
+                        'setup' => [
+                            'completed' => filter_var(env('PASSBOLT_EMAIL_SEND_ADMIN_USER_SETUP_COMPLETED', true), FILTER_VALIDATE_BOOLEAN),
+                        ]
+                    ]
+                ],
                 'group' => [
                     // Notify all members that a group was deleted.
                     'delete' => filter_var(env('PASSBOLT_EMAIL_SEND_GROUP_DELETE', true), FILTER_VALIDATE_BOOLEAN),
@@ -105,7 +112,13 @@ return [
                         // Notify managers when group membership changes.
                         'update' => filter_var(env('PASSBOLT_EMAIL_SEND_GROUP_MANAGER_UPDATE', true), FILTER_VALIDATE_BOOLEAN),
                     ]
-                ]
+                ],
+                'folder' => [
+                    'create' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_CREATE', true), FILTER_VALIDATE_BOOLEAN),
+                    'update' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_UPDATE', true), FILTER_VALIDATE_BOOLEAN),
+                    'delete' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_DELETE', true), FILTER_VALIDATE_BOOLEAN),
+                    'share' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_SHARE', true), FILTER_VALIDATE_BOOLEAN),
+                ],
             ]
         ],
 
