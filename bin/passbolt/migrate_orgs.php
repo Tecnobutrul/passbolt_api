@@ -56,4 +56,5 @@ foreach ($organizations as $organization) {
     $command = __DIR__ . "/../cake passbolt migrate --org={$slugParam}";
     echo "Migrated: {$organization->slug}.\n";
     $output = shell_exec($command);
+    print_r($output);
 }
