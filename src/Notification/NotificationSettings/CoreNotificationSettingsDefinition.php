@@ -35,7 +35,7 @@ class CoreNotificationSettingsDefinition implements EmailNotificationSettingsDef
             // show controls
             ->addField('show_comment', ['type' => 'boolean', 'default' => true])
             ->addField('show_description', ['type' => 'boolean', 'default' => true])
-            ->addField('show_secret', ['type' => 'boolean', 'default' => true])
+            ->addField('show_secret', ['type' => 'boolean', 'default' => false])
             ->addField('show_uri', ['type' => 'boolean', 'default' => true])
             ->addField('show_username', ['type' => 'boolean', 'default' => true])
             // send controls
@@ -46,7 +46,7 @@ class CoreNotificationSettingsDefinition implements EmailNotificationSettingsDef
             ->addField('send_group_user_delete', ['type' => 'boolean', 'default' => true])
             ->addField('send_group_user_update', ['type' => 'boolean', 'default' => true])
             ->addField('send_group_manager_update', ['type' => 'boolean', 'default' => true])
-            ->addField('send_password_create', ['type' => 'boolean', 'default' => true])
+            ->addField('send_password_create', ['type' => 'boolean', 'default' => false])
             ->addField('send_password_share', ['type' => 'boolean', 'default' => true])
             ->addField('send_password_update', ['type' => 'boolean', 'default' => true])
             ->addField('send_password_delete', ['type' => 'boolean', 'default' => true])
