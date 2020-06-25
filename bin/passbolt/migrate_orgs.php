@@ -53,7 +53,7 @@ foreach ($organizations as $organization) {
     }
 
     $slugParam = escapeshellarg($organization->slug);
-    $command = __DIR__ . "/../cake passbolt migrate --org={$slugParam}";
+    $command = __DIR__ . "/../cake passbolt migrate --org={$slugParam} --no-clear-cache";
     echo "Migrated: {$organization->slug}.\n";
     $output = shell_exec($command);
     print_r($output);
