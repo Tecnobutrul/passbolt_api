@@ -26,7 +26,7 @@ ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
 
 ENV PECL_BASE_URL="https://pecl.php.net/get"
 ENV PHP_EXT_DIR="/usr/src/php/ext"
-ENV NR_VERSION="9.12.0.268"
+ENV NR_VERSION="9.13.0.270"
 ENV NR_URL="https://download.newrelic.com/php_agent/release/newrelic-php5-${NR_VERSION}-linux.tar.gz"
 
 COPY --chown=www-data:www-data . /var/www/passbolt
@@ -79,7 +79,8 @@ RUN apt-get update \
     && echo 'php_flag[expose_php] = off' > /usr/local/etc/php-fpm.d/expose.conf \
     && rm -rf /var/lib/apt/lists/* \
     && rm /usr/local/bin/composer \
-    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && sed -i 's:max_execution_time = 30:max_execution_time = 200:g' "$PHP_INI_DIR/php.ini"
 
 COPY docker/conf/passbolt.php config/passbolt.php
 COPY docker/conf/app.php config/app.php
