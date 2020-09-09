@@ -126,11 +126,9 @@ class Application extends BaseApplication
     public function initEmails()
     {
         // Gather
-        if (WebInstallerMiddleware::isConfigured()) {
-            $this->getEventManager()
-                ->on(new CoreEmailRedactorPool())
-                ->on(new CoreNotificationSettingsDefinition());
-        }
+        $this->getEventManager()
+            ->on(new CoreEmailRedactorPool())
+            ->on(new CoreNotificationSettingsDefinition());
 
         if (PHP_SAPI === 'cli' || (Configure::read('debug') && Configure::read('passbolt.selenium.active'))) {
             // Core email digests
