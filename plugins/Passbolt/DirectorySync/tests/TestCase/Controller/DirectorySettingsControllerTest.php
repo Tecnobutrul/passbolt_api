@@ -78,6 +78,7 @@ class DirectorySettingsControllerTest extends DirectorySyncIntegrationTestCase
         $this->assertSuccess();
         $settings = $this->_responseJsonBody;
         $this->assertNotEmpty($settings);
+        $this->assertEquals($settings->source, 'db');
     }
 
     /**
