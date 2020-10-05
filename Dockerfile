@@ -1,4 +1,4 @@
-FROM php:7.3.20-fpm
+FROM php:7.3.23-fpm
 
 LABEL maintainer="contact@passbolt.com"
 
