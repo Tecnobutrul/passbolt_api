@@ -1,7 +1,7 @@
 <?php
 return [
     'passbolt' => [
-        'version' => '2.13.1',
-        'name' => 'Stomp'
+        'version' => '2.14.0',
+        'name' => 'Sunshine'
     ]
 ];

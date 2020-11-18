@@ -1,4 +1,4 @@
-FROM php:7.3.19-fpm
+FROM php:7.3.23-fpm
 
 LABEL maintainer="contact@passbolt.com"
 
@@ -79,7 +79,8 @@ RUN apt-get update \
     && echo 'php_flag[expose_php] = off' > /usr/local/etc/php-fpm.d/expose.conf \
     && rm -rf /var/lib/apt/lists/* \
     && rm /usr/local/bin/composer \
-    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && sed -i 's:max_execution_time = 30:max_execution_time = 200:g' "$PHP_INI_DIR/php.ini"
 
 COPY docker/conf/passbolt.php config/passbolt.php
 COPY docker/conf/app.php config/app.php
