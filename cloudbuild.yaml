@@ -95,9 +95,9 @@ steps:
         with open(file_path, 'r') as f:
             values = yaml.safe_load(f)
         if 'SHORT_SHA' in os.environ:
-            values['app']['image']['tag'] = os.environ.get('SHORT_SHA')
+            values['cloudApi']['image']['tag'] = os.environ.get('SHORT_SHA')
         else:
-            values['app']['image']['tag'] = os.environ.get('BUILD_ID')
+            values['cloudApi']['image']['tag'] = os.environ.get('BUILD_ID')
         with open(file_path, 'w') as f:
             yaml.dump(values, f, default_flow_style=False)
         END
