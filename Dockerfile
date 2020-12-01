@@ -24,6 +24,7 @@ ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
       unzip \
       git"
 
+ENV PHP_MEMORY_LIMIT="256M"
 ENV PECL_BASE_URL="https://pecl.php.net/get"
 ENV PHP_EXT_DIR="/usr/src/php/ext"
 ENV NR_VERSION="9.14.0.290"
@@ -80,6 +81,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && rm /usr/local/bin/composer \
     && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && sed -i "s:memory_limit = 128M:memory_limit = $PHP_MEMORY_LIMIT:g" $PHP_INI_DIR/php.ini \
     && sed -i 's:max_execution_time = 30:max_execution_time = 200:g' "$PHP_INI_DIR/php.ini"
 
 COPY docker/conf/passbolt.php config/passbolt.php
