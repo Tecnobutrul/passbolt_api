@@ -28,7 +28,7 @@ trait PermissionsCleanupTrait
     public function cleanupHardDeletedPermissions($dryRun = false)
     {
         $secretsToDelete = [];
-        $secrets = $this->find('all');
+        $secrets = $this->find('all')->select(['id', 'resource_id', 'user_id']);
 
         foreach ($secrets as $secret) {
             if (!$this->Resources->Permissions->hasAccess(PermissionsTable::RESOURCE_ACO, $secret->resource_id, $secret->user_id)) {
