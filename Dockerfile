@@ -27,7 +27,7 @@ ARG PASSBOLT_DEV_PACKAGES="libgpgme11-dev \
 ENV PHP_MEMORY_LIMIT="256M"
 ENV PECL_BASE_URL="https://pecl.php.net/get"
 ENV PHP_EXT_DIR="/usr/src/php/ext"
-ENV NR_VERSION="9.14.0.290"
+ENV NR_VERSION="9.15.0.293"
 ENV NR_URL="https://download.newrelic.com/php_agent/release/newrelic-php5-${NR_VERSION}-linux.tar.gz"
 
 COPY --chown=www-data:www-data . /var/www/passbolt
