@@ -66,12 +66,13 @@ class Http extends OpenPGPBackend
         if (empty($this->_region) || empty($this->_project) || empty($this->_domain)) {
             throw new InternalErrorException('Configuration is missing for OpenPGP backend');
         }
-        $this->_decrypt_url = Configure::read('passbolt.gpg.http.functions.decrypt');
-        $this->_encrypt_url = Configure::read('passbolt.gpg.http.functions.encrypt');
-        $this->_keyinfo_url = Configure::read('passbolt.gpg.http.functions.keyinfo');
-        $this->_msginfo_url = Configure::read('passbolt.gpg.http.functions.msginfo');
-        $this->_verify_url = Configure::read('passbolt.gpg.http.functions.verify');
+        $this->_url = 'https://' . $this->_region . '-' . $this->_project . '.' . $this->_domain . '/';
 
+        $this->_decrypt_url = $this->_url . Configure::read('passbolt.gpg.http.functions.decrypt');
+        $this->_encrypt_url = $this->_url . Configure::read('passbolt.gpg.http.functions.encrypt');
+        $this->_keyinfo_url = $this->_url . Configure::read('passbolt.gpg.http.functions.keyinfo');
+        $this->_msginfo_url = $this->_url . Configure::read('passbolt.gpg.http.functions.msginfo');
+        $this->_verify_url = $this->_url . Configure::read('passbolt.gpg.http.functions.verify');
         $this->_auth = [
             'username' => Configure::consume('passbolt.gpg.http.auth.username'),
             'password' => Configure::consume('passbolt.gpg.http.auth.password')

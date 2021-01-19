@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -17,7 +19,6 @@ namespace App\Error;
 
 use App\Error\Exception\ExceptionWithErrorsDetailInterface;
 use Cake\Error\ExceptionRenderer;
-use Cake\Http\Response;
 
 class AppExceptionRenderer extends ExceptionRenderer
 {
@@ -26,10 +27,18 @@ class AppExceptionRenderer extends ExceptionRenderer
      * If the exception contains an error attribute, set it as controller view variable.
      *
      * @see \App\Controller\ErrorController
-     * @return Response The response to be sent.
+     * @return \Cake\Http\Response The response to be sent.
      */
     public function render()
     {
+        $class = get_class($this->error);
+
+        // Redirect the user if the organization database does not exist.
+        if ($class == "PDOException" && $this->error->getCode() == 1049) {
+            header('Location: ' . PASSBOLT_PLUGINS_MULTITENANT_NOORGREDIRECT, true, 302);
+            exit;
+        }
+
         if ($this->error instanceof ExceptionWithErrorsDetailInterface) {
             $this->controller->set(['body' => $this->error]);
         }

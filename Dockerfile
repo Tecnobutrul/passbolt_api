@@ -69,7 +69,7 @@ RUN apt-get update \
          rm composer-setup.php; \
          exit 1; \
        fi \
-    && php composer-setup.php --1 \
+    && php composer-setup.php \
     && rm composer-setup.php \
     && mv composer.phar /usr/local/bin/composer \
     && composer install -n --no-dev --optimize-autoloader \
