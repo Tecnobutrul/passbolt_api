@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -25,6 +27,7 @@ class SendTask extends AppShell
 
     /**
      * Initialize.
+     *
      * @return void
      */
     public function initialize()
@@ -45,7 +48,8 @@ class SendTask extends AppShell
     public function getOptionParser()
     {
         $parser = parent::getOptionParser();
-        $parser->setDescription(__('Get analytics from the database and send them to a configurable external entry point.'));
+        $msg = __('Get analytics from the database and send them to a configurable external entry point.');
+        $parser->setDescription($msg);
 
         return $parser;
     }
@@ -66,15 +70,16 @@ class SendTask extends AppShell
 
     /**
      * get data that will be sent to the entry point.
+     *
      * @return array
      */
     public function getData()
     {
         $data = [
-            "org" => [
-                "slug" => PASSBOLT_ORG
+            'org' => [
+                'slug' => PASSBOLT_ORG,
             ],
-            "analytics" => $this->getAnalytics(),
+            'analytics' => $this->getAnalytics(),
         ];
 
         return $data;
@@ -82,17 +87,19 @@ class SendTask extends AppShell
 
     /**
      * Get analytics in the expected format.
+     *
      * @return array
      */
     public function getAnalytics()
     {
         return [
-            'active_users_count' => $this->getActiveUsersCount()
+            'active_users_count' => $this->getActiveUsersCount(),
         ];
     }
 
     /**
      * Get active users count for the current organization.
+     *
      * @return mixed
      */
     public function getActiveUsersCount()
@@ -101,7 +108,7 @@ class SendTask extends AppShell
                 'conditions' => [
                     'Users.deleted' => false,
                     'Users.active' => true,
-                ]
+                ],
             ])->count();
 
         return $activeUsersCount;
@@ -109,8 +116,9 @@ class SendTask extends AppShell
 
     /**
      * Publish analytics.
+     *
      * @param array $data data
-     * @return Client\Response
+     * @return \Cake\Http\Client\Response
      */
     public function publish(array $data)
     {
@@ -122,8 +130,8 @@ class SendTask extends AppShell
         $response = $http->post($url, $data, [
             'auth' => [
                 'username' => $username,
-                'password' => $password
-            ]
+                'password' => $password,
+            ],
         ]);
 
         return $response;

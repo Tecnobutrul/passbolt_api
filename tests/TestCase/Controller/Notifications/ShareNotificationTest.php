@@ -20,7 +20,6 @@ namespace App\Test\TestCase\Controller\Notifications;
 use App\Model\Entity\Permission;
 use App\Test\TestCase\Controller\Share\ShareControllerTest;
 use App\Utility\UuidFactory;
-use Cake\Core\Configure;
 
 class ShareNotificationTest extends ShareControllerTest
 {

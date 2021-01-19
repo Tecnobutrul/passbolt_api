@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt Cloud
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,7 +17,6 @@ use Passbolt\MultiTenantAdmin\Lib\Controller\MultiTenantAdminController;
 
 class MultiTenantAdminMigrateController extends MultiTenantAdminController
 {
-
     /**
      * The migration status
      *

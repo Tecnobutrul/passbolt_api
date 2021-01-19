@@ -17,8 +17,6 @@ declare(strict_types=1);
 namespace App\Shell;
 
 use Cake\Console\Shell;
-use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 
 /**
  * Application Shell

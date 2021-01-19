@@ -5,11 +5,9 @@ use Cake\TestSuite\Fixture\TestFixture;
 
 /**
  * AvatarsFixture
- *
  */
 class AvatarsFixture extends TestFixture
 {
-
     /**
      * Table name
      *

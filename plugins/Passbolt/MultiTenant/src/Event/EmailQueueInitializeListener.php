@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -36,7 +38,7 @@ class EmailQueueInitializeListener implements EventListenerInterface
     /**
      * Undocumented function
      *
-     * @param Event $event Initialization event
+     * @param \Passbolt\MultiTenant\Event\Event $event Initialization event
      * @return void
      */
     public function initializeEvent($event)

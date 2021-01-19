@@ -17,7 +17,6 @@ declare(strict_types=1);
 
 namespace App\Test\TestCase\Controller\Resources;
 
-use App\Error\Exception\ValidationException;
 use App\Model\Entity\Permission;
 use App\Test\Lib\AppIntegrationTestCase;
 use App\Utility\UuidFactory;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Passbolt Cloud
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,9 +16,13 @@ Router::plugin('Passbolt/MultiTenantAdmin', ['path' => '/multitenant/admin'], fu
     $routes->connect('/migrate', ['controller' => 'MultiTenantAdminMigrate', 'action' => 'migrate'])
         ->setMethods(['GET']);
 
-    $routes->connect('/register-first-user', ['controller' => 'MultiTenantAdminRegisterFirstUser', 'action' => 'registerFirstUser'])
+    $routes->connect('/register-first-user', [
+            'controller' => 'MultiTenantAdminRegisterFirstUser', 'action' => 'registerFirstUser',
+        ])
         ->setMethods(['POST']);
 
-    $routes->connect('/subscriptions', ['controller' => 'MultiTenantAdminSubscriptionUpdate', 'action' => 'updateOrCreate'])
+    $routes->connect('/subscriptions', [
+            'controller' => 'MultiTenantAdminSubscriptionUpdate', 'action' => 'updateOrCreate',
+        ])
         ->setMethods(['POST']);
 });

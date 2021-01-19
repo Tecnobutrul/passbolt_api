@@ -34,7 +34,7 @@ class AppExceptionRenderer extends ExceptionRenderer
         $class = get_class($this->error);
 
         // Redirect the user if the organization database does not exist.
-        if ($class == "PDOException" && $this->error->getCode() == 1049) {
+        if ($class == 'PDOException' && $this->error->getCode() == 1049) {
             header('Location: ' . PASSBOLT_PLUGINS_MULTITENANT_NOORGREDIRECT, true, 302);
             exit;
         }

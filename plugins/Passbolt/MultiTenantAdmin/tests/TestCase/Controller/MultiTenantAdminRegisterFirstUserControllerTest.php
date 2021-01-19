@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * Passbolt ~ Open source password manager for teams
@@ -25,7 +26,7 @@ class MultiTenantAdminRegisterFirstUserControllerTest extends MultitenantAdminIn
     public $fixtures = [
         'plugin.Passbolt/MultiTenantAdmin.Base/Users', 'app.Base/Roles',
         'plugin.Passbolt/MultiTenantAdmin.Base/Profiles', 'plugin.Passbolt/MultiTenantAdmin.Base/Avatars',
-        'plugin.Passbolt/MultiTenantAdmin.Base/AuthenticationTokens'
+        'plugin.Passbolt/MultiTenantAdmin.Base/AuthenticationTokens',
     ];
 
     public function tearDown()
@@ -39,12 +40,12 @@ class MultiTenantAdminRegisterFirstUserControllerTest extends MultitenantAdminIn
             'username' => 'org-admin@passbolt.com',
             'profile' => [
                 'first_name' => 'Organization',
-                'last_name' => 'Administrator'
-            ]
+                'last_name' => 'Administrator',
+            ],
         ];
 
         $this->setBasicAuth();
-        $this->postJson("/multitenant/admin/register-first-user.json?api-version=v2", $postData);
+        $this->postJson('/multitenant/admin/register-first-user.json?api-version=v2', $postData);
         $this->assertSuccess();
 
         $Users = TableRegistry::getTableLocator()->get('Users');
@@ -59,14 +60,14 @@ class MultiTenantAdminRegisterFirstUserControllerTest extends MultitenantAdminIn
     {
         $postData = [];
         $this->setBasicAuth();
-        $this->postJson("/multitenant/admin/register-first-user.json?api-version=v2", $postData);
+        $this->postJson('/multitenant/admin/register-first-user.json?api-version=v2', $postData);
         $this->assertBadRequestError('Could not validate user data');
         $this->assertNotEmpty($this->_responseJsonBody->username->_required);
     }
 
     public function testError_NotAuthorized()
     {
-        $this->postJson("/multitenant/admin/register-first-user.json?api-version=v2");
+        $this->postJson('/multitenant/admin/register-first-user.json?api-version=v2');
         $this->assertForbiddenError('You are not authorized to access this location');
     }
 }

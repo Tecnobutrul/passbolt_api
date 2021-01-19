@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @link          https://www.passbolt.com Passbolt(tm)
@@ -16,8 +18,8 @@ class CloudSubscriptionDisableCommand extends CloudSubscriptionCommand
     /**
      * Implement this method with your command's logic.
      *
-     * @param Arguments $args The command arguments.
-     * @param ConsoleIo $io The console io
+     * @param \Cake\Console\Arguments $args The command arguments.
+     * @param \Cake\Console\ConsoleIo $io The console io
      * @return null|int The exit code or null for success
      */
     public function execute(Arguments $args, ConsoleIo $io)
@@ -28,10 +30,10 @@ class CloudSubscriptionDisableCommand extends CloudSubscriptionCommand
             $expiryDate = Date::today();
             $subscription = new CloudSubscriptionSettings([
                 'status' => CloudSubscriptionSettings::STATUS_DISABLED,
-                'expiryDate' => $expiryDate->toUnixString()
+                'expiryDate' => $expiryDate->toUnixString(),
             ]);
             $subscription->save();
-            $io->out(__("Subscription disabled for {0}.", $this->org));
+            $io->out(__('Subscription disabled for {0}.', $this->org));
         } catch (CustomValidationException $exception) {
             $this->displayErrors($exception, $io);
             $io->error(__('Fail to disable subscription. Could not validate data.'));

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * Passbolt ~ Open source password manager for teams
@@ -28,6 +29,7 @@ class MultiTenantAnalyticsShell extends AppShell
 
     /**
      * Initialize.
+     *
      * @return void
      */
     public function initialize()
@@ -49,7 +51,8 @@ class MultiTenantAnalyticsShell extends AppShell
     public function getOptionParser()
     {
         $parser = parent::getOptionParser();
-        $parser->setDescription(__('The multitenant analytics shell provides maintenance tasks for orgs managed by the multitenant plugin.'));
+        $msg = __('The multitenant analytics shell provides maintenance tasks for orgs managed by the plugin.');
+        $parser->setDescription($msg);
 
         $parser->addSubcommand('send', [
             'help' => __d('cake_console', 'Collect analytics and send them to the configured external entry point.'),

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt Cloud
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -63,7 +65,7 @@ abstract class MultiTenantAdminController extends Controller
                 'code' => 200,
             ],
             'body' => $body,
-            '_serialize' => ['header', 'body']
+            '_serialize' => ['header', 'body'],
         ]);
     }
 
@@ -90,7 +92,7 @@ abstract class MultiTenantAdminController extends Controller
                 'code' => 200,
             ],
             'body' => $body,
-            '_serialize' => ['header', 'body']
+            '_serialize' => ['header', 'body'],
         ]);
     }
 }

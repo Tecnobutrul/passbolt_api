@@ -42,7 +42,7 @@ class CreateTest extends AppTestCase
 
         $this->loadPlugins([
             'Burzum/FileStorage' => ['bootstrap' => false, 'routes' => true],
-            'Burzum/Imagine' => ['bootstrap' => true, 'routes' => true]
+            'Burzum/Imagine' => ['bootstrap' => true, 'routes' => true],
         ]);
         $listener = new GoogleCloudStorageListener();
         EventManager::instance()->on($listener);

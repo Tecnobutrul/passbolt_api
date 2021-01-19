@@ -73,7 +73,6 @@ class AuthLoginController extends AppController
             $this->set('isTrial', false);
             $this->set('isExpired', false);
         }
-
     }
 
     /**

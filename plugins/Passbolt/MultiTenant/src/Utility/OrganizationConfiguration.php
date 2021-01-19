@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -23,7 +25,7 @@ class OrganizationConfiguration
      *
      * @var string
      */
-    const ORG_DB_PREFIX = 'pb_org_';
+    public const ORG_DB_PREFIX = 'pb_org_';
 
     /**
      * Get a an organization database name.

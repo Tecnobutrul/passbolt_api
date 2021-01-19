@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Passbolt Cloud
  * Copyright (c) Passbolt SA (https://www.passbolt.com)

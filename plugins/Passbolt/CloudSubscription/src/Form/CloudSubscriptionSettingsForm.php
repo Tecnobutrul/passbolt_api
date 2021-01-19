@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @link          https://www.passbolt.com Passbolt(tm)
@@ -16,8 +18,8 @@ class CloudSubscriptionSettingsForm extends Form
     /**
      * Build the form schema
      *
-     * @param Schema $schema schema
-     * @return Schema
+     * @param \Cake\Form\Schema $schema schema
+     * @return \Cake\Form\Schema
      */
     protected function _buildSchema(Schema $schema)
     {
@@ -28,8 +30,8 @@ class CloudSubscriptionSettingsForm extends Form
     /**
      * Build the form validation rules
      *
-     * @param Validator $validator validator
-     * @return Validator
+     * @param \Cake\Validation\Validator $validator validator
+     * @return \Cake\Validation\Validator
      */
     public function validationDefault(Validator $validator)
     {
@@ -37,7 +39,7 @@ class CloudSubscriptionSettingsForm extends Form
             ->allowEmptyDateTime('expiryDate')
             ->add('expiryDate', ['isValidTimeStamp' => [
                 'rule' => [$this, 'isValidTimeStamp'],
-                'message' => __('The date should be a valid unix timestamp.')
+                'message' => __('The date should be a valid unix timestamp.'),
             ]]);
 
         $validator
@@ -46,7 +48,7 @@ class CloudSubscriptionSettingsForm extends Form
             ->requirePresence('status')
             ->add('status', ['isValidStatusName' => [
                 'rule' => [$this, 'isValidStatusName'],
-                'message' => __('This status is not supported.')
+                'message' => __('This status is not supported.'),
             ]]);
 
         return $validator;
@@ -70,7 +72,7 @@ class CloudSubscriptionSettingsForm extends Form
      * @param array $context not in use
      * @return bool
      */
-    public function isValidStatusName(string $value, array $context = null)
+    public function isValidStatusName(string $value, ?array $context = null)
     {
         return in_array($value, CloudSubscriptionSettings::getSupportedStatusNames());
     }

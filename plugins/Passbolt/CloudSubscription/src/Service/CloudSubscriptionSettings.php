@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt Cloud
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -8,10 +10,7 @@
  */
 namespace Passbolt\CloudSubscription\Service;
 
-use App\Error\Exception\CustomValidationException;
 use App\Model\Entity\Role;
-use App\Model\Table\OrganizationSettingsTable;
-use App\Model\Table\UsersTable;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
 use Cake\Chronos\Date;
@@ -23,18 +22,18 @@ use Passbolt\CloudSubscription\Form\CloudSubscriptionSettingsForm;
 
 class CloudSubscriptionSettings
 {
-    const NAMESPACE = 'cloudSubscription';
+    public const NAMESPACE = 'cloudSubscription';
 
     /**
      * Supported statuses
      */
-    const STATUS_DISABLED = 'disabled';
-    const STATUS_DELETED = 'deleted';
-    const STATUS_ACTIVE = 'active';
-    const STATUS_TRIAL = 'trial';
+    public const STATUS_DISABLED = 'disabled';
+    public const STATUS_DELETED = 'deleted';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_TRIAL = 'trial';
 
-    const TRIAL_DURATION = '+14 days';
-    const REDEMPTION_DURATION = '+14 days';
+    public const TRIAL_DURATION = '+14 days';
+    public const REDEMPTION_DURATION = '+14 days';
 
     /**
      * @var string $status, any STATUS_*
@@ -42,17 +41,17 @@ class CloudSubscriptionSettings
     private $status;
 
     /**
-     * @var Date $expiryDate optional
+     * @var \Cake\Chronos\Date $expiryDate optional
      */
     private $expiryDate;
 
     /**
-     * @var OrganizationSettingsTable $OrganizationSettings org settings table
+     * @var \App\Model\Table\OrganizationSettingsTable $OrganizationSettings org settings table
      */
     private $OrganizationSettings;
 
     /**
-     * @var UserAccessControl $uac user access control
+     * @var \App\Utility\UserAccessControl $uac user access control
      */
     private $uac;
 
@@ -61,7 +60,7 @@ class CloudSubscriptionSettings
      *
      * @param array $settings settings
      * @param bool $validate or not
-     * @throws InternalErrorException if $settings are invalid
+     * @throws \Cake\Http\Exception\InternalErrorException if $settings are invalid
      */
     public function __construct(array $settings, bool $validate = true)
     {
@@ -73,7 +72,7 @@ class CloudSubscriptionSettings
         // Define user access control object
         // We impersonate the first "most likely active" admin
         // otherwise we go with a random user id that does not exist
-        /** @var UsersTable $Users */
+        /** @var \App\Model\Table\UsersTable $Users */
         $Users = TableRegistry::getTableLocator()->get('Users');
         $admin = $Users->find()
             ->where(['Roles.name' => Role::ADMIN])
@@ -92,7 +91,7 @@ class CloudSubscriptionSettings
      *
      * @param array $settings settings
      * @param bool $validate or not
-     * @throws CustomValidationException if does not validate
+     * @throws \App\Error\Exception\CustomValidationException if does not validate
      * @return void
      */
     public function set(array $settings, bool $validate = true)
@@ -151,14 +150,14 @@ class CloudSubscriptionSettings
     /**
      * Get cloud subscription configuration information
      *
-     * @throws RecordNotFoundException When there is no first record.
-     * @throws InternalErrorException if $settings are invalid
-     * @return CloudSubscriptionSettings
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When there is no first record.
+     * @throws \Cake\Http\Exception\InternalErrorException if $settings are invalid
+     * @return \Passbolt\CloudSubscription\Service\CloudSubscriptionSettings
      */
     public static function get()
     {
         try {
-            /** @var OrganizationSettingsTable $OrganizationSettings */
+            /** @var \App\Model\Table\OrganizationSettingsTable $OrganizationSettings */
             $OrganizationSettings = TableRegistry::getTableLocator()->get('OrganizationSettings');
             $setting = $OrganizationSettings->getFirstSettingOrFail(static::NAMESPACE);
         } catch (RecordNotFoundException $exception) {
@@ -183,14 +182,14 @@ class CloudSubscriptionSettings
             self::STATUS_DISABLED,
             self::STATUS_DELETED,
             self::STATUS_ACTIVE,
-            self::STATUS_TRIAL
+            self::STATUS_TRIAL,
         ];
     }
 
     /**
      * Serialize settings to Json
      *
-     * @throws InternalErrorException if settings cannot be serialized
+     * @throws \Cake\Http\Exception\InternalErrorException if settings cannot be serialized
      * @return string
      */
     public function toJson()
@@ -212,14 +211,14 @@ class CloudSubscriptionSettings
     {
         return [
             'status' => $this->status,
-            'expiryDate' => $this->expiryDate->toUnixString()
+            'expiryDate' => $this->expiryDate->toUnixString(),
         ];
     }
 
     /**
      * Save the cloud subscription information
      *
-     * @throws InternalErrorException if save operation failed
+     * @throws \Cake\Http\Exception\InternalErrorException if save operation failed
      * @return void
      */
     public function save()
@@ -236,7 +235,7 @@ class CloudSubscriptionSettings
      * Validate subscription status settings
      *
      * @param array $settings settings
-     * @throws CustomValidationException if $settings do not validate
+     * @throws \App\Error\Exception\CustomValidationException if $settings do not validate
      * @return void
      */
     public static function validate(array $settings)
@@ -249,8 +248,8 @@ class CloudSubscriptionSettings
      * Update or create subscription status settings
      *
      * @param array $settings settings
-     * @throws CustomValidationException if $settings do not validate
-     * @throws InternalErrorException if save operation failed
+     * @throws \App\Error\Exception\CustomValidationException if $settings do not validate
+     * @throws \Cake\Http\Exception\InternalErrorException if save operation failed
      * @return void
      */
     public static function updateOrCreate(array $settings)
