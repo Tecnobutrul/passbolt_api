@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -55,13 +57,11 @@ class SaveTest extends AppTestCase
                 'group_id' => true,
                 'user_id' => true,
                 'is_admin' => true,
-            ]
+            ],
         ];
     }
 
-    /* ************************************************************** */
     /* FORMAT VALIDATION TESTS */
-    /* ************************************************************** */
 
     public function testValidationGroupId()
     {
@@ -70,7 +70,7 @@ class SaveTest extends AppTestCase
             'requirePresence' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
         ];
-        $this->assertFieldFormatValidation($this->GroupsUsers, 'group_id', self::getDummyGroupUser(), self::getEntityDefaultOptions(), $testCases);
+        $this->assertFieldFormatValidation($this->GroupsUsers, 'group_id', self::getDummyGroupUserData(), self::getEntityDefaultOptions(), $testCases);
     }
 
     public function testValidationUserId()
@@ -80,7 +80,7 @@ class SaveTest extends AppTestCase
             'requirePresence' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
         ];
-        $this->assertFieldFormatValidation($this->GroupsUsers, 'user_id', self::getDummyGroupUser(), self::getEntityDefaultOptions(), $testCases);
+        $this->assertFieldFormatValidation($this->GroupsUsers, 'user_id', self::getDummyGroupUserData(), self::getEntityDefaultOptions(), $testCases);
     }
 
     public function testValidationIsAdmin()
@@ -89,16 +89,14 @@ class SaveTest extends AppTestCase
             'boolean' => self::getBooleanTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
         ];
-        $this->assertFieldFormatValidation($this->GroupsUsers, 'is_admin', self::getDummyGroupUser(), self::getEntityDefaultOptions(), $testCases);
+        $this->assertFieldFormatValidation($this->GroupsUsers, 'is_admin', self::getDummyGroupUserData(), self::getEntityDefaultOptions(), $testCases);
     }
 
-    /* ************************************************************** */
     /* LOGIC VALIDATION TESTS */
-    /* ************************************************************** */
 
     public function testSuccess()
     {
-        $data = self::getDummyGroupUser();
+        $data = self::getDummyGroupUserData();
         $options = self::getEntityDefaultOptions();
         $entity = $this->GroupsUsers->newEntity($data, $options);
         $save = $this->GroupsUsers->save($entity);
@@ -116,7 +114,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleGroupUserUnique()
     {
-        $data = self::getDummyGroupUser();
+        $data = self::getDummyGroupUserData();
         $data['group_id'] = UuidFactory::uuid('group.id.freelancer');
         $data['user_id'] = UuidFactory::uuid('user.id.jean');
         $options = self::getEntityDefaultOptions();
@@ -130,7 +128,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleGroupExists()
     {
-        $data = self::getDummyGroupUser();
+        $data = self::getDummyGroupUserData();
         $data['group_id'] = UuidFactory::uuid();
         $options = self::getEntityDefaultOptions();
         $entity = $this->GroupsUsers->newEntity($data, $options);
@@ -143,7 +141,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleGroupIsNotSoftDeleted()
     {
-        $data = self::getDummyGroupUser();
+        $data = self::getDummyGroupUserData();
         $data['group_id'] = UuidFactory::uuid('group.id.deleted');
         $options = self::getEntityDefaultOptions();
         $entity = $this->GroupsUsers->newEntity($data, $options);
@@ -156,7 +154,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleUserExists()
     {
-        $data = self::getDummyGroupUser();
+        $data = self::getDummyGroupUserData();
         $data['user_id'] = UuidFactory::uuid();
         $options = self::getEntityDefaultOptions();
         $entity = $this->GroupsUsers->newEntity($data, $options);
@@ -169,7 +167,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleUserIsNotSoftDeleted()
     {
-        $data = self::getDummyGroupUser();
+        $data = self::getDummyGroupUserData();
         $data['user_id'] = UuidFactory::uuid('user.id.sofia');
         $options = self::getEntityDefaultOptions();
         $entity = $this->GroupsUsers->newEntity($data, $options);
@@ -182,7 +180,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleUserIsActive()
     {
-        $data = self::getDummyGroupUser();
+        $data = self::getDummyGroupUserData();
         $data['user_id'] = UuidFactory::uuid('user.id.ruth');
         $options = self::getEntityDefaultOptions();
         $entity = $this->GroupsUsers->newEntity($data, $options);

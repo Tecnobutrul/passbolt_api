@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -33,13 +35,13 @@ trait DirectoryOrgSettingsTrait
             'jobs' => [
                 'users' => [
                     'create' => true,
-                    'delete' => true
+                    'delete' => true,
                 ],
                 'groups' => [
                     'create' => true,
                     'delete' => true,
-                    'update' => true
-                ]
+                    'update' => true,
+                ],
             ],
         ];
         $uac = $this->mockUserAccessControl('admin', Role::ADMIN);

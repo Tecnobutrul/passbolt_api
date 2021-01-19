@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,12 +17,27 @@
 namespace Passbolt\EmailNotificationSettings\Test\Lib;
 
 use App\Model\Entity\Role;
+use App\Notification\NotificationSettings\CoreNotificationSettingsDefinition;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
+use Cake\Event\EventManager;
 use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettings;
 
 trait EmailNotificationSettingsTestTrait
 {
+    protected function loadNotificationSettings()
+    {
+        $this->loadPlugins(['Passbolt/EmailNotificationSettings']);
+
+        EventManager::instance()
+            ->on(new CoreNotificationSettingsDefinition());
+    }
+
+    protected function unloadNotificationSettings()
+    {
+        EmailNotificationSettings::flushCache();
+    }
+
     /**
      * Set email notification setting
      *
@@ -37,11 +54,16 @@ trait EmailNotificationSettingsTestTrait
     /**
      * Set email notification settings
      *
-     * @param array $settings Array of settings
+     * @param array|null $settings Array of settings
      */
-    protected function setEmailNotificationSettings(array $settings = [])
+    protected function setEmailNotificationSettings(?array $settings = [])
     {
+        $settingsToSave = [];
+        foreach ($settings as $key => $setting) {
+            $key = EmailNotificationSettings::underscoreToDottedFormat($key);
+            $settingsToSave[$key] = $setting;
+        }
         $uac = new UserAccessControl(Role::ADMIN, UuidFactory::uuid('user.id.admin'));
-        EmailNotificationSettings::save($settings, $uac);
+        EmailNotificationSettings::save($settingsToSave, $uac);
     }
 }

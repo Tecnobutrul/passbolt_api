@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,14 +17,10 @@
 
 namespace App\Test\TestCase\Model\Table\Resources;
 
-use App\Model\Table\GpgkeysTable;
-use App\Model\Table\ResourcesTable;
 use App\Test\Lib\AppTestCase;
 use App\Test\Lib\Model\FormatValidationTrait;
-use App\Utility\OpenPGP\OpenPGPBackend;
 use App\Utility\OpenPGP\OpenPGPBackendFactory;
 use App\Utility\UuidFactory;
-use Cake\Core\Exception\Exception;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 
@@ -30,18 +28,24 @@ class UpdateTest extends AppTestCase
 {
     use FormatValidationTrait;
 
-    /** @var ResourcesTable */
+    /**
+     * @var ResourcesTable
+     */
     public $Resources;
 
-    /** @var GpgkeysTable */
+    /**
+     * @var GpgkeysTable
+     */
     public $Gpgkeys;
 
-    /** @var OpenPGPBackend gpg */
+    /**
+     * @var OpenPGPBackend gpg
+     */
     public $gpg;
 
     public $fixtures = [
         'app.Base/Groups', 'app.Base/GroupsUsers', 'app.Base/Users', 'app.Base/Roles', 'app.Base/Gpgkeys',
-        'app.Base/Profiles', 'app.Base/Avatars', 'app.Base/Permissions', 'app.Base/Resources', 'app.Base/Secrets'
+        'app.Base/Profiles', 'app.Base/Avatars', 'app.Base/Permissions', 'app.Base/Resources', 'app.Base/Secrets',
     ];
 
     public function setUp()
@@ -68,7 +72,7 @@ class UpdateTest extends AppTestCase
         return $this->gpg->encrypt($text);
     }
 
-    protected function _getUpdatedDummydata($resource, $data = [])
+    protected function _getUpdatedDummydata($resource, ?array $data = [])
     {
         // Build the data to update.
         $defaultData = [
@@ -76,7 +80,7 @@ class UpdateTest extends AppTestCase
             'username' => 'username_updated@by.test',
             'uri' => 'https://uri.updated.by.test',
             'description' => 'Resource description updated',
-            'modified_by' => $resource->modified_by
+            'modified_by' => $resource->modified_by,
         ];
 
         // If secrets provided update them all.
@@ -87,7 +91,7 @@ class UpdateTest extends AppTestCase
                 $defaultData['secrets'][] = [
                     'id' => $secret->id,
                     'user_id' => $secret->user_id,
-                    'data' => $encrypted
+                    'data' => $encrypted,
                 ];
             }
         }
@@ -107,23 +111,21 @@ class UpdateTest extends AppTestCase
                 'uri' => true,
                 'description' => true,
                 'modified_by' => true,
-                'secrets' => true
+                'secrets' => true,
             ],
             'associated' => [
                 'Secrets' => [
                     'validate' => 'saveResource',
                     'accessibleFields' => [
                         'data' => true,
-                        'user_id' => true
-                    ]
-                ]
-            ]
+                        'user_id' => true,
+                    ],
+                ],
+            ],
         ];
     }
 
-    /* ************************************************************** */
     /* LOGIC VALIDATION TESTS */
-    /* ************************************************************** */
 
     public function testResourceUpdate()
     {
@@ -134,7 +136,7 @@ class UpdateTest extends AppTestCase
 
         // Get the dummy resource updated data.
         $data = $this->_getUpdatedDummydata($resource, [
-            'modified_by' => $modifierId
+            'modified_by' => $modifierId,
         ]);
 
         // Save the entity.
@@ -238,7 +240,7 @@ class UpdateTest extends AppTestCase
         $userId = UuidFactory::uuid('user.id.edith');
         $data['secrets'][] = [
             'user_id' => $userId,
-            'data' => $this->_encryptSecret($userId, 'Update secret data')
+            'data' => $this->_encryptSecret($userId, 'Update secret data'),
         ];
 
         // Save the entity.

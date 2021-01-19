@@ -1,9 +1,9 @@
 <?php
+declare(strict_types=1);
+
 namespace Passbolt\DirectorySync\Model\Table;
 
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\I18n\FrozenTime;
-use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
@@ -15,20 +15,17 @@ use Passbolt\DirectorySync\Model\Entity\DirectoryReport;
  * @property \Passbolt\DirectorySync\Model\Table\DirectoryReportsTable|\Cake\ORM\Association\BelongsTo $ParentDirectoryReports
  * @property \Passbolt\DirectorySync\Model\Table\DirectoryReportsTable|\Cake\ORM\Association\HasMany $ChildDirectoryReports
  * @property \Passbolt\DirectorySync\Model\Table\DirectoryReportsTable|\Cake\ORM\Association\HasMany $DirectoryReportsItems
- *
- * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport get($primaryKey, $options = [])
- * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport newEntity($data = null, array $options = [])
- * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport[] newEntities(array $data, array $options = [])
- * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport[] patchEntities($entities, array $data, array $options = [])
- * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport findOrCreate($search, callable $callback = null, $options = [])
- *
+ * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport get($primaryKey, ?array $options = [])
+ * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport newEntity($data = null, ?array $options = [])
+ * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport[] newEntities(array $data, ?array $options = [])
+ * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport|bool save(\Cake\Datasource\EntityInterface $entity, ?array $options = [])
+ * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, ?array $options = [])
+ * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport[] patchEntities($entities, array $data, ?array $options = [])
+ * @method \Passbolt\DirectorySync\Model\Entity\DirectoryReport findOrCreate($search, callable $callback = null, ?array $options = [])
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class DirectoryReportsTable extends Table
 {
-
     /**
      * Initialize method
      *
@@ -47,15 +44,15 @@ class DirectoryReportsTable extends Table
 
         $this->belongsTo('ParentDirectoryReports', [
             'className' => 'Passbolt/DirectorySync.DirectoryReports',
-            'foreignKey' => 'parent_id'
+            'foreignKey' => 'parent_id',
         ]);
         $this->hasMany('ChildDirectoryReports', [
             'className' => 'Passbolt/DirectorySync.DirectoryReports',
-            'foreignKey' => 'parent_id'
+            'foreignKey' => 'parent_id',
         ]);
         $this->hasMany('DirectoryReportsItems', [
             'className' => 'Passbolt/DirectorySync.DirectoryReportsItems',
-            'foreignKey' => 'parent_id'
+            'foreignKey' => 'parent_id',
         ]);
     }
 
@@ -65,7 +62,7 @@ class DirectoryReportsTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator
             ->uuid('id')
@@ -105,7 +102,7 @@ class DirectoryReportsTable extends Table
             'ParentDirectoryReports',
             [
                 'errorField' => 'parent_id',
-                'message' => __('The associated record could not be found')
+                'message' => __('The associated record could not be found'),
             ]
         );
 
@@ -116,16 +113,16 @@ class DirectoryReportsTable extends Table
      * @param string $parentId UUID parent report id
      * @return \Passbolt\DirectorySync\Model\Entity\DirectoryReport
      */
-    public function create(string $parentId = null)
+    public function create(?string $parentId = null)
     {
         $entity = $this->newEntity([
             'parent_id' => $parentId,
-            'status' => DirectoryReport::STATUS_RUNNING
+            'status' => DirectoryReport::STATUS_RUNNING,
         ], [
             'accessibleFields' => [
                 'parent_id' => true,
                 'status' => true,
-            ]
+            ],
         ]);
         $result = $this->save($entity);
 

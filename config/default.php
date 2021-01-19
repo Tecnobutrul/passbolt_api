@@ -12,6 +12,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+
+use App\Model\Entity\AuthenticationToken;
+use App\Utility\AuthToken\AuthTokenExpiryConfigValidator;
+
+$authTokenExpiryConfigValidator = new AuthTokenExpiryConfigValidator();
+
 return [
     /*
      * Passbolt application default configuration.
@@ -36,7 +42,18 @@ return [
 
         // Authentication & Authorisation.
         'auth' => [
-            'tokenExpiry' => env('PASSBOLT_AUTH_TOKEN_EXPIRY', '3 days')
+            'tokenExpiry' => env('PASSBOLT_AUTH_TOKEN_EXPIRY', '3 days'),
+            'token' => [
+                AuthenticationToken::TYPE_REGISTER => [
+                    'expiry' => filter_var(env('PASSBOLT_AUTH_REGISTER_TOKEN_EXPIRY', '10 days'), FILTER_CALLBACK, ['options' => $authTokenExpiryConfigValidator])
+                ],
+                AuthenticationToken::TYPE_RECOVER => [
+                    'expiry' => filter_var(env('PASSBOLT_AUTH_RECOVER_TOKEN_EXPIRY', '1 day'), FILTER_CALLBACK, ['options' => $authTokenExpiryConfigValidator])
+                ],
+                AuthenticationToken::TYPE_LOGIN => [
+                    'expiry' => filter_var(env('PASSBOLT_AUTH_LOGIN_TOKEN_EXPIRY', '5 minutes'), FILTER_CALLBACK, ['options' => $authTokenExpiryConfigValidator])
+                ],
+            ]
         ],
 
         // Email settings
@@ -44,6 +61,9 @@ return [
             // Additional email validation settings
             'validate' => [
                 'mx' => filter_var(env('PASSBOLT_EMAIL_VALIDATE_MX', false), FILTER_VALIDATE_BOOLEAN),
+            ],
+            'purify' => [
+                'subject' => filter_var(env('PASSBOLT_EMAIL_PURIFY_SUBJECT', false), FILTER_VALIDATE_BOOLEAN),
             ],
 
             // Email delivery settings such as credentials are in app.php.
@@ -73,6 +93,13 @@ return [
                     'create' => filter_var(env('PASSBOLT_EMAIL_SEND_USER_CREATE', true), FILTER_VALIDATE_BOOLEAN),
                     'recover' => filter_var(env('PASSBOLT_EMAIL_SEND_USER_RECOVER', true), FILTER_VALIDATE_BOOLEAN),
                 ],
+                'admin' => [
+                    'user' => [
+                        'setup' => [
+                            'completed' => filter_var(env('PASSBOLT_EMAIL_SEND_ADMIN_USER_SETUP_COMPLETED', true), FILTER_VALIDATE_BOOLEAN),
+                        ]
+                    ]
+                ],
                 'group' => [
                     // Notify all members that a group was deleted.
                     'delete' => filter_var(env('PASSBOLT_EMAIL_SEND_GROUP_DELETE', true), FILTER_VALIDATE_BOOLEAN),
@@ -85,7 +112,13 @@ return [
                         // Notify managers when group membership changes.
                         'update' => filter_var(env('PASSBOLT_EMAIL_SEND_GROUP_MANAGER_UPDATE', true), FILTER_VALIDATE_BOOLEAN),
                     ]
-                ]
+                ],
+                'folder' => [
+                    'create' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_CREATE', true), FILTER_VALIDATE_BOOLEAN),
+                    'update' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_UPDATE', true), FILTER_VALIDATE_BOOLEAN),
+                    'delete' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_DELETE', true), FILTER_VALIDATE_BOOLEAN),
+                    'share' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_SHARE', true), FILTER_VALIDATE_BOOLEAN),
+                ],
             ]
         ],
 
@@ -157,11 +190,17 @@ return [
         'legal' => [
             'privacy_policy' => [
                 'url' => env('PASSBOLT_LEGAL_PRIVACYPOLICYURL', '')
+            ],
+            'terms' => [
+                'url' => env('PASSBOLT_LEGAL_TERMSURL', 'https://www.passbolt.com/terms')
             ]
         ],
 
-        // Wich plugins are enabled
+        // Which plugins are enabled
         'plugins' => [
+            'resourceTypes' => [
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_RESOURCE_TYPES_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
+            ],
             'import' => [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_IMPORT_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
             ],
@@ -183,6 +222,10 @@ return [
 
         // Security.
         'security' => [
+            'cookies' => [
+                // force cookie secure flag even if request is not https
+                'secure' => filter_var(env('PASSBOLT_SECURITY_COOKIE_SECURE', true), FILTER_VALIDATE_BOOLEAN)
+            ],
             'setHeaders' => filter_var(env('PASSBOLT_SECURITY_SET_HEADERS', true), FILTER_VALIDATE_BOOLEAN),
             'csrfProtection' => [
                 'active' => true,

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,6 +17,7 @@
 namespace Passbolt\MultiFactorAuthentication\Middleware;
 
 use App\Utility\UserAccessControl;
+use Cake\Core\Configure;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\Routing\Router;
@@ -25,20 +28,21 @@ use Passbolt\MultiFactorAuthentication\Utility\MfaVerifiedToken;
 class MfaMiddleware
 {
     /**
-     * @var MfaSettings
+     * @var \Passbolt\MultiFactorAuthentication\Utility\MfaSettings
      */
     private $mfaSettings;
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function __invoke(ServerRequest $request, Response $response, $next)
     {
         if ($this->requiredMfaCheck($request)) {
             // Clear any dubious cookie if mfa check required
             if ($request->getCookie(MfaVerifiedCookie::MFA_COOKIE_ALIAS)) {
+                $secure = Configure::read('passbolt.security.cookies.secure') || $request->is('ssl');
                 $response = $response
-                    ->withCookie(MfaVerifiedCookie::clearCookie($request->is('ssl')));
+                    ->withCookie(MfaVerifiedCookie::clearCookie($secure));
             }
             // Exception if ajax or redirect
             return $response
@@ -50,7 +54,7 @@ class MfaMiddleware
     }
 
     /**
-     * @param ServerRequest $request request
+     * @param \Cake\Http\ServerRequest $request request
      * @return bool
      */
     protected function requiredMfaCheck(ServerRequest $request)
@@ -66,7 +70,7 @@ class MfaMiddleware
         $whitelistedPaths = [
             '/mfa/verify',
             '/auth/logout',
-            '/logout'
+            '/logout',
         ];
         foreach ($whitelistedPaths as $path) {
             if (substr($request->getUri()->getPath(), 0, strlen($path)) === $path) {
@@ -85,14 +89,16 @@ class MfaMiddleware
         // Mfa cookie is set and a valid token
         $mfa = $request->getCookie(MfaVerifiedCookie::MFA_COOKIE_ALIAS);
         if (isset($mfa)) {
-            return !MfaVerifiedToken::check($uac, $mfa);
+            $sessionId = $request->getSession()->id();
+
+            return !MfaVerifiedToken::check($uac, $mfa, $sessionId);
         }
 
         return true;
     }
 
     /**
-     * @param ServerRequest $request request
+     * @param \Cake\Http\ServerRequest $request request
      * @return string
      */
     protected function getVerifyUrl(ServerRequest $request)

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,6 +16,7 @@
 namespace Passbolt\Log\Events\Traits;
 
 use App\Utility\UserAction;
+use Cake\Core\Configure;
 use Cake\Event\Event;
 use Cake\ORM\Entity;
 use Cake\ORM\Table;
@@ -27,12 +30,61 @@ trait EntitiesHistoryTrait
                 'Permissions' => [
                     EntityHistory::CRUD_CREATE,
                     EntityHistory::CRUD_UPDATE,
-                    EntityHistory::CRUD_DELETE
+                    EntityHistory::CRUD_DELETE,
                 ],
-                'models' => [
-                    'SecretAccesses' => [
-                        EntityHistory::CRUD_CREATE,
-                    ],
+                'Secrets' => [
+                    EntityHistory::CRUD_CREATE,
+                ],
+            ],
+        ],
+        'FoldersShare.share' => [
+            'models' => [
+                'Permissions' => [
+                    EntityHistory::CRUD_CREATE,
+                    EntityHistory::CRUD_UPDATE,
+                    EntityHistory::CRUD_DELETE,
+                ],
+                'FoldersRelations' => [
+                    EntityHistory::CRUD_CREATE,
+                    EntityHistory::CRUD_UPDATE,
+                    EntityHistory::CRUD_DELETE,
+                ],
+            ],
+        ],
+        'FoldersCreate.create' => [
+            'models' => [
+                'Folders' => [
+                    EntityHistory::CRUD_CREATE,
+                ],
+                'FoldersRelations' => [
+                    EntityHistory::CRUD_CREATE,
+                ],
+            ],
+        ],
+        'FoldersRelationsMove.move' => [
+            'models' => [
+                'FoldersRelations' => [
+                    EntityHistory::CRUD_CREATE,
+                    EntityHistory::CRUD_UPDATE,
+                    EntityHistory::CRUD_DELETE,
+                ],
+            ],
+        ],
+        'FoldersUpdate.update' => [
+            'models' => [
+                'Folders' => [
+                    EntityHistory::CRUD_UPDATE,
+                ],
+            ],
+        ],
+        'FoldersDelete.delete' => [
+            'models' => [
+                'Folders' => [
+                    EntityHistory::CRUD_DELETE,
+                ],
+                'FoldersRelations' => [
+                    EntityHistory::CRUD_DELETE,
+                    EntityHistory::CRUD_CREATE,
                 ],
             ],
         ],
@@ -81,18 +133,35 @@ trait EntitiesHistoryTrait
                 ],
             ],
         ],
+        'UsersRegister.registerPost' => [
+            'models' => [
+                'Users' => [
+                    EntityHistory::CRUD_CREATE,
+                ],
+            ],
+        ],
+        'UsersAdd.addPost' => [
+            'models' => [
+                'Users' => [
+                    EntityHistory::CRUD_CREATE,
+                ],
+            ],
+        ],
     ];
 
     /**
      * Log entity history.
-     * @param Event $event the event
+     *
+     * @param \Cake\Event\Event $event the event
      * @return void
      */
     public function logEntityHistory(Event $event)
     {
-        if ($event->getName() == 'Model.afterSave' ||
+        if (
+            $event->getName() == 'Model.afterSave' ||
             $event->getName() == 'Model.afterDelete' ||
-            $event->getName() == 'Model.afterRead') {
+            $event->getName() == 'Model.afterRead'
+        ) {
             $this->_logEntityHistory($event);
         }
     }
@@ -102,7 +171,7 @@ trait EntitiesHistoryTrait
      * Initialize needed associations for the required core models on the fly.
      * Example: we need to associate PermissionsHistory to Permissions in order to track the history.
      *
-     * @param Event $event the event
+     * @param \Cake\Event\Event $event the event
      * @return void
      */
     public function entityAssociationsInitialize(Event $event)
@@ -112,30 +181,45 @@ trait EntitiesHistoryTrait
 
         if ($modelName == 'Permissions') {
             $table->belongsTo('Passbolt/Log.PermissionsHistory', [
-                'foreignKey' => 'foreign_key'
+                'foreignKey' => 'foreign_key',
             ]);
         }
         if ($modelName == 'Resources') {
             $table->belongsTo('Passbolt/Log.EntitiesHistory', [
-                'foreignKey' => 'foreign_key'
+                'foreignKey' => 'foreign_key',
             ]);
         }
         if ($modelName == 'Secrets') {
             $table->belongsTo('Passbolt/Log.SecretsHistory', [
-                'foreignKey' => 'foreign_key'
+                'foreignKey' => 'foreign_key',
             ]);
             $table->hasMany('Passbolt/Log.SecretAccesses');
         }
         if ($modelName == 'SecretAccesses') {
             $table->belongsTo('Passbolt/Log.EntitiesHistory', [
-                'foreignKey' => 'foreign_key'
+                'foreignKey' => 'foreign_key',
             ]);
+        }
+        if (Configure::read('passbolt.plugins.folders.enabled')) {
+            if ($modelName == 'Folders') {
+                $table->belongsTo('FoldersHistory', [
+                    'className' => 'Passbolt/Folders.FoldersHistory',
+                    'foreignKey' => 'foreign_key',
+                ]);
+            }
+            if ($modelName == 'FoldersRelations') {
+                $table->belongsTo('FoldersRelationsHistory', [
+                    'className' => 'Passbolt/Folders.FoldersRelationsHistory',
+                    'foreignKey' => 'foreign_key',
+                ]);
+            }
         }
     }
 
     /**
      * Log entity history
-     * @param Event $event event
+     *
+     * @param \Cake\Event\Event $event event
      * @return void
      */
     private function _logEntityHistory(Event $event)
@@ -165,9 +249,14 @@ trait EntitiesHistoryTrait
             // If there is a detailed history table, populate it first, then entitiesHistory.
             $modelDetailedHistory = $this->_hasTableDetailedHistory($table);
             if ($modelDetailedHistory) {
+                // We first create the detailed history (PermissionsHistory, FoldersHistory, etc..)
                 $foreignModel = $modelDetailedHistory;
-                $table->getAssociation($foreignModel)
+                $detailedHistory = $table->getAssociation($foreignModel)
                       ->create($entity->toArray());
+
+                // There can be manipulations of id while creating detailed history.
+                // We make sure we have the id of the entity that has been created.
+                $entityHistoryData['foreign_key'] = $detailedHistory->id;
 
                 $entityHistoryData['foreign_model'] = $foreignModel;
                 $table->getAssociation($foreignModel)
@@ -183,8 +272,8 @@ trait EntitiesHistoryTrait
 
     /**
      * Check if a table has a detailed history.
-     * @param Table $table table
      *
+     * @param \Cake\ORM\Table $table table
      * @return bool|string
      */
     private function _hasTableDetailedHistory(Table $table)
@@ -200,8 +289,8 @@ trait EntitiesHistoryTrait
 
     /**
      * Identify crud operation type based on the event.
-     * @param Event $event the event
      *
+     * @param \Cake\Event\Event $event the event
      * @return string CRUD type.
      */
     private function _getCrudType(Event $event)
@@ -226,8 +315,8 @@ trait EntitiesHistoryTrait
 
     /**
      * Check if an entity is soft deleted.
-     * @param Entity $entity entity
      *
+     * @param \Cake\ORM\Entity $entity entity
      * @return bool
      */
     private function _isEntitySoftDeleted(Entity $entity)
@@ -241,9 +330,9 @@ trait EntitiesHistoryTrait
 
     /**
      * Check if a log operation is needed based on the config.
-     * @param Event $event event
-     * @param string $actionName action name
      *
+     * @param \Cake\Event\Event $event event
+     * @param string $actionName action name
      * @return bool
      */
     private function isLogOperationNeeded(Event $event, string $actionName)
@@ -267,8 +356,8 @@ trait EntitiesHistoryTrait
 
     /**
      * Get entities history config
-     * @param string $actionName action name
      *
+     * @param string $actionName action name
      * @return |null
      */
     public function getEntitiesHistoryConfig(string $actionName)

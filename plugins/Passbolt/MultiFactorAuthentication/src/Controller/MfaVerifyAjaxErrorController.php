@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -24,7 +26,7 @@ class MfaVerifyAjaxErrorController extends MfaController
     {
         // Use AppController:error instead of exception to avoid logging the error
         $this->error(__('MFA authentication is required.'), [
-            'providers' => $this->mfaSettings->getProvidersVerifyUrls()
+            'providers' => $this->mfaSettings->getProvidersVerifyUrls(),
         ], 403);
     }
 }

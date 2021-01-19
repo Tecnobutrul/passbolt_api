@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,7 +17,6 @@
 namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Utility;
 
 use App\Error\Exception\CustomValidationException;
-use App\Model\Table\OrganizationSettingsTable;
 use Cake\Core\Configure;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\InternalErrorException;
@@ -30,9 +31,8 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
      * @var array
      */
     public $fixtures = [
-        'app.Base/OrganizationSettings',
-        'app.Base/AuthenticationTokens', 'app.Base/Users',
-        'app.Base/Roles'
+        'app.Base/Users',
+        'app.Base/Roles',
     ];
 
     /**
@@ -44,18 +44,18 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
         'providers' => [
             MfaSettings::PROVIDER_DUO => true,
             MfaSettings::PROVIDER_TOTP => true,
-            MfaSettings::PROVIDER_YUBIKEY => true
+            MfaSettings::PROVIDER_YUBIKEY => true,
         ],
         MfaSettings::PROVIDER_YUBIKEY => [
             'clientId' => '40123',
-            'secretKey' => 'i2/j3jIQBO/axOl3ah4mlgXlXUY='
+            'secretKey' => 'i2/j3jIQBO/axOl3ah4mlgXlXUY=',
         ],
         MfaSettings::PROVIDER_DUO => [
             'salt' => '__CHANGE_ME__THIS_MUST_BE_AT_LEAST_FOURTY_CHARACTERS_____',
             'integrationKey' => 'UICPIC93F14RWR5F55SJ',
             'secretKey' => '8tkYNgi8aGAqa3KW1eqhsJLfjc1nJnHDYC1siNYX',
-            'hostName' => 'api-45e9f2ca.duosecurity.com'
-        ]
+            'hostName' => 'api-45e9f2ca.duosecurity.com',
+        ],
     ];
 
     /**
@@ -147,7 +147,7 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
         $providers = [
             MfaSettings::PROVIDER_TOTP => false,
             MfaSettings::PROVIDER_DUO => false,
-            MfaSettings::PROVIDER_YUBIKEY => false
+            MfaSettings::PROVIDER_YUBIKEY => false,
         ];
         $config = $this->defaultConfig;
         $config[MfaSettings::PROVIDERS] = $providers;
@@ -177,7 +177,7 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
         $this->assertEquals($status, [
             MfaSettings::PROVIDER_TOTP => false,
             MfaSettings::PROVIDER_DUO => true,
-            MfaSettings::PROVIDER_YUBIKEY => false
+            MfaSettings::PROVIDER_YUBIKEY => false,
         ]);
     }
 
@@ -203,6 +203,7 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
     /*
      * TEST ORG SETTING DUO TRAIT
      */
+
     /**
      * @group mfa
      * @group mfaOrgSettings
@@ -281,8 +282,8 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
                     MfaOrgSettings::DUO_SALT => '',
                     MfaOrgSettings::DUO_INTEGRATION_KEY => '',
                     MfaOrgSettings::DUO_HOSTNAME => '',
-                    MfaOrgSettings::DUO_SECRET_KEY => ''
-                ]
+                    MfaOrgSettings::DUO_SECRET_KEY => '',
+                ],
             ]]);
         } catch (CustomValidationException $exception) {
             $errors = $exception->getErrors();
@@ -306,8 +307,8 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
                     MfaOrgSettings::DUO_SALT => '🔥',
                     MfaOrgSettings::DUO_INTEGRATION_KEY => '🔥',
                     MfaOrgSettings::DUO_HOSTNAME => '🔥',
-                    MfaOrgSettings::DUO_SECRET_KEY => '🔥'
-                ]
+                    MfaOrgSettings::DUO_SECRET_KEY => '🔥',
+                ],
             ]);
         } catch (CustomValidationException $exception) {
             $errors = $exception->getErrors();
@@ -330,8 +331,8 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
                 MfaOrgSettings::DUO_SALT => 'qwertyuiopasdfghjklzxcvbnm12345678901234567890',
                 MfaOrgSettings::DUO_INTEGRATION_KEY => 'DICPIC33F13IWF1FR52J',
                 MfaOrgSettings::DUO_HOSTNAME => 'api-42e9f2fe.duosecurity.com',
-                MfaOrgSettings::DUO_SECRET_KEY => '7TkYNgK8AGAuv3KW12qhsJLeIc1mJjHDHC1siNYX'
-            ]
+                MfaOrgSettings::DUO_SECRET_KEY => '7TkYNgK8AGAuv3KW12qhsJLeIc1mJjHDHC1siNYX',
+            ],
         ]);
         $this->assertTrue(true);
     }
@@ -339,6 +340,7 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
     /*
      * TEST ORG SETTING YUBIKEY TRAIT
      */
+
     /**
      * @group mfa
      * @group mfaOrgSettings
@@ -389,7 +391,7 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
                 MfaSettings::PROVIDER_YUBIKEY => [
                     MfaOrgSettings::YUBIKEY_CLIENT_ID => '',
                     MfaOrgSettings::YUBIKEY_SECRET_KEY => '',
-                ]
+                ],
             ]]);
         } catch (CustomValidationException $exception) {
             $errors = $exception->getErrors();
@@ -410,7 +412,7 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
                 MfaSettings::PROVIDER_YUBIKEY => [
                     MfaOrgSettings::YUBIKEY_CLIENT_ID => '🔥',
                     MfaOrgSettings::YUBIKEY_SECRET_KEY => '🔥',
-                ]
+                ],
             ]);
         } catch (CustomValidationException $exception) {
             $errors = $exception->getErrors();
@@ -430,7 +432,7 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
             MfaSettings::PROVIDER_YUBIKEY => [
                 MfaOrgSettings::YUBIKEY_CLIENT_ID => '12345',
                 MfaOrgSettings::YUBIKEY_SECRET_KEY => 'i2/fAjeQBO/Axef16h2xlgRlXxY=',
-            ]
+            ],
         ]);
         $this->assertTrue(true);
     }

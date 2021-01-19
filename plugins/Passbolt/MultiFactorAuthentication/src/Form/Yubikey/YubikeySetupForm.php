@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -25,8 +27,8 @@ class YubikeySetupForm extends YubikeyVerifyForm
     /**
      * Build form validation
      *
-     * @param Validator $validator validation rules
-     * @return Validator
+     * @param \Cake\Validation\Validator $validator validation rules
+     * @return \Cake\Validation\Validator
      */
     protected function _buildValidator(Validator $validator)
     {
@@ -36,11 +38,11 @@ class YubikeySetupForm extends YubikeyVerifyForm
             ->add('hotp', ['isValidModhex' => [
                 'rule' => [$this, 'isValidModhex'],
                 'last' => true,
-                'message' => __('This OTP is not valid.')
+                'message' => __('This OTP is not valid.'),
             ]])
             ->add('hotp', ['isValidHotp' => [
                 'rule' => [$this, 'isValidHotp'],
-                'message' => __('This OTP is not valid.')
+                'message' => __('This OTP is not valid.'),
             ]]);
 
         return $validator;

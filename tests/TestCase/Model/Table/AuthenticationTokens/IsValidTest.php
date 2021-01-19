@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -23,10 +25,10 @@ use Cake\ORM\TableRegistry;
 
 class IsValidTest extends AppTestCase
 {
-    public $AuthenticationTokens;
-
-    public $fixtures = ['app.Base/AuthenticationTokens', 'app.Base/Users'];
     use AuthenticationTokenModelTrait;
+
+    public $AuthenticationTokens;
+    public $fixtures = [ 'app.Base/Users'];
 
     public function setUp()
     {

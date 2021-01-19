@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -19,7 +21,6 @@ use Cake\Datasource\ConnectionManager;
 
 class MysqlExportTask extends AppShell
 {
-
     /**
      * Gets the option parser instance and configures it.
      *
@@ -36,17 +37,17 @@ class MysqlExportTask extends AppShell
             ->addOption('datasource', [
                 'short' => 'd',
                 'default' => 'default',
-                'help' => __('Datasource name')
+                'help' => __('Datasource name'),
             ])
             ->addOption('clear-previous', [
                 'boolean' => true,
                 'default' => false,
-                'help' => __('Clear previous backups.')
+                'help' => __('Clear previous backups.'),
             ])
             ->addOption('force', [
                 'boolean' => true,
                 'default' => false,
-                'help' => __('Override if file already exist.')
+                'help' => __('Override if file already exist.'),
             ])
             ->addOption('file', [
                 'help' => 'The file to export the schema and data to.',
@@ -123,7 +124,7 @@ class MysqlExportTask extends AppShell
         $this->out('Saving backup file: ' . $dir . $file);
         exec($cmd, $output, $status);
 
-        return ($status === self::CODE_SUCCESS);
+        return $status === self::CODE_SUCCESS;
     }
 
     /**
@@ -137,7 +138,7 @@ class MysqlExportTask extends AppShell
     {
         $files = glob($dir . '*');
         foreach ($files as $file) {
-            if (is_file($file) && $file !== ($dir . $newFile)) {
+            if (is_file($file) && $file !== $dir . $newFile) {
                 if (strpos($file, 'empty') !== false) {
                     continue;
                 }
@@ -186,7 +187,7 @@ class MysqlExportTask extends AppShell
             $this->_error(__('Could not access the backup directory: ' . $dir));
 
             return null;
-        };
+        }
 
         return $dir;
     }

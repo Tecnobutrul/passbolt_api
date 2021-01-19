@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -32,7 +34,6 @@ use Cake\ORM\Entity;
  */
 class Group extends Entity
 {
-
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
@@ -52,14 +53,14 @@ class Group extends Entity
         'modified_by' => false,
 
         // Associated entities
-        'groups_users' => false
+        'groups_users' => false,
     ];
 
     /**
      * Check whether a group contains a user based on its groups users.
-     * @param array|User $user the user object or array.
      *
-     * @return GroupsUser|bool groupUser if found, false otherwise
+     * @param array|\App\Model\Entity\User $user the user object or array.
+     * @return \App\Model\Entity\GroupsUser|bool groupUser if found, false otherwise
      */
     public function hasUser($user)
     {

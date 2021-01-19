@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Passbolt\DirectorySync\Model\Entity;
 
 use Cake\ORM\Entity;
@@ -17,9 +19,8 @@ use Cake\ORM\Entity;
  */
 class DirectoryReport extends Entity
 {
-
-    const STATUS_RUNNING = 'running';
-    const STATUS_DONE = 'done';
+    public const STATUS_RUNNING = 'running';
+    public const STATUS_DONE = 'done';
 
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -36,6 +37,6 @@ class DirectoryReport extends Entity
         'created' => false,
         'modified' => false,
         'parent_directory_report' => false,
-        'child_directory_reports' => false
+        'child_directory_reports' => false,
     ];
 }

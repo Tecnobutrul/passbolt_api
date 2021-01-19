@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -33,6 +35,7 @@ class WebInstallerIntegrationTestCase extends AppIntegrationTestCase
     {
         TableRegistry::getTableLocator()->clear();
         parent::setUp();
+        $this->loadPlugins(['Passbolt/WebInstaller', 'Passbolt/License']);
         $this->_recover = false;
     }
 
@@ -45,6 +48,9 @@ class WebInstallerIntegrationTestCase extends AppIntegrationTestCase
             } else {
                 Configure::delete('passbolt.webInstaller.configured');
             }
+        }
+        if ($this->isWebInstallerFriendly()) {
+            $this->restoreTestConnection();
         }
     }
 
@@ -63,6 +69,8 @@ class WebInstallerIntegrationTestCase extends AppIntegrationTestCase
         } catch (\Exception $exception) {
             throw new InternalErrorException('config/app.php is missing an needed for this test.');
         }
+
+        $passboltValues = [];
         try {
             $passboltValues = $engine->read('passbolt');
         } catch (\Exception $exception) {
@@ -84,7 +92,7 @@ class WebInstallerIntegrationTestCase extends AppIntegrationTestCase
         return $config;
     }
 
-    public function initWebInstallerSession(array $options = [])
+    public function initWebInstallerSession(?array $options = [])
     {
         $session = ['initialized' => true] + $options;
         $this->session(['webinstaller' => $session]);

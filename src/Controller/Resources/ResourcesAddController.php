@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -19,40 +21,51 @@ use App\Controller\AppController;
 use App\Error\Exception\ValidationException;
 use App\Model\Entity\Permission;
 use App\Model\Entity\Resource;
+use App\Model\Table\ResourceTypesTable;
 use Cake\Core\Configure;
 use Cake\Event\Event;
 
+/**
+ * @property \App\Model\Table\ResourcesTable $Resources
+ */
 class ResourcesAddController extends AppController
 {
+    public const ADD_SUCCESS_EVENT_NAME = 'ResourcesAddController.addPost.success';
+
     /**
      * Resource Add action
      *
      * @return void
+     * @throws \Exception
      */
     public function add()
     {
         $this->loadModel('Resources');
 
-        // Build and validate the entity
-        $resource = $this->_buildAndValidateEntity();
+        $data = $this->request->getData();
+        $resource = $this->_buildAndValidateEntity($data);
 
-        // Save the entity
-        $result = $this->Resources->save($resource, ['atomic' => false]);
-        $this->_handleValidationError($resource);
+        $result = $this->Resources->getConnection()->transactional(function () use ($resource, $data) {
+            $result = $this->Resources->save($resource, ['atomic' => false]);
+            $this->_handleValidationError($resource);
+            $this->afterCreate($resource, $data);
+            $this->_handleValidationError($resource);
+
+            return $result;
+        });
 
         // Retrieve the saved resource.
         $options = [
             'contain' => [
                 'creator' => true, 'favorite' => true, 'modifier' => true,
-                'secret' => true, 'permission' => true
-            ]
+                'secret' => true, 'permission' => true,
+            ],
         ];
         if (Configure::read('passbolt.plugins.tags.enabled')) {
             $options['contain']['tag'] = true;
         }
-        $resource = $this->Resources->findView($this->User->id(), $result->id, $options)->first();
 
-        $this->_notifyUser($resource);
+        $resource = $this->Resources->findView($this->User->id(), $result->id, $options)->first();
 
         $this->success(__('The resource has been added successfully.'), $resource);
     }
@@ -60,12 +73,11 @@ class ResourcesAddController extends AppController
     /**
      * Build the resource entity from user input
      *
-     * @return \Cake\Datasource\EntityInterface $resource resource entity
+     * @param array $data Array of data
+     * @return Resource
      */
-    protected function _buildAndValidateEntity()
+    protected function _buildAndValidateEntity(array $data)
     {
-        $data = $this->_formatRequestData();
-
         // Enforce data.
         $data['created_by'] = $this->User->id();
         $data['modified_by'] = $this->User->id();
@@ -75,12 +87,18 @@ class ResourcesAddController extends AppController
             'aco' => 'Resource',
             'type' => Permission::OWNER,
         ]];
+
         // If no secrets given, the model will throw a validation error, no need to take care of it here.
         if (isset($data['secrets'])) {
             $data['secrets'][0]['user_id'] = $this->User->id();
         }
 
+        if (!isset($data['resource_type_id']) || !Configure::read('passbolt.plugins.resourceTypes.enabled')) {
+            $data['resource_type_id'] = ResourceTypesTable::getDefaultTypeId();
+        }
+
         // Build entity and perform basic check
+        /** @var Resource $resource */
         $resource = $this->Resources->newEntity($data, [
             'accessibleFields' => [
                 'name' => true,
@@ -90,7 +108,8 @@ class ResourcesAddController extends AppController
                 'created_by' => true,
                 'modified_by' => true,
                 'secrets' => true,
-                'permissions' => true
+                'permissions' => true,
+                'resource_type_id' => true,
             ],
             'associated' => [
                 'Permissions' => [
@@ -99,17 +118,17 @@ class ResourcesAddController extends AppController
                         'aco' => true,
                         'aro' => true,
                         'aro_foreign_key' => true,
-                        'type' => true
-                    ]
+                        'type' => true,
+                    ],
                 ],
                 'Secrets' => [
                     'validate' => 'saveResource',
                     'accessibleFields' => [
                         'user_id' => true,
-                        'data' => true
-                    ]
-                ]
-            ]
+                        'data' => true,
+                    ],
+                ],
+            ],
         ]);
 
         // Handle validation errors if any at this stage.
@@ -119,38 +138,13 @@ class ResourcesAddController extends AppController
     }
 
     /**
-     * Format request data formatted for API v1 to API v2 format
-     *
-     * @return array data
-     */
-    protected function _formatRequestData()
-    {
-        $output = [];
-        $data = $this->request->getData();
-
-        // API v2 additional checks and error (was silent before)
-        if ($this->getApiVersion() == 'v2') {
-            $output = $data;
-        } else {
-            if (isset($data['Resource'])) {
-                $output = $data['Resource'];
-            }
-            if (isset($data['Secret'])) {
-                $output['secrets'] = $data['Secret'];
-            }
-        }
-
-        return $output;
-    }
-
-    /**
      * Manage validation errors.
      *
-     * @param \Cake\Datasource\EntityInterface $resource Resource
-     * @throws ValidationException if the resource validation failed
+     * @param Resource $resource resource
+     * @throws \App\Error\Exception\ValidationException if the resource validation failed
      * @return void
      */
-    protected function _handleValidationError($resource)
+    protected function _handleValidationError(Resource $resource)
     {
         $errors = $resource->getErrors();
         if (!empty($errors)) {
@@ -159,14 +153,17 @@ class ResourcesAddController extends AppController
     }
 
     /**
-     * Send email notification
+     * Trigger the after resource create event.
      *
-     * @param resource $resource Resource
+     * @param Resource $resource The created resource
+     * @param array $data The request data.
      * @return void
      */
-    protected function _notifyUser(Resource $resource)
+    protected function afterCreate(Resource $resource, array $data = [])
     {
-        $event = new Event('ResourcesAddController.addPost.success', $this, ['resource' => $resource, 'accessControl' => $this->User->getAccessControl()]);
+        $uac = $this->User->getAccessControl();
+        $eventData = ['resource' => $resource, 'accessControl' => $uac, 'data' => $data];
+        $event = new Event(static::ADD_SUCCESS_EVENT_NAME, $this, $eventData);
         $this->getEventManager()->dispatch($event);
     }
 }

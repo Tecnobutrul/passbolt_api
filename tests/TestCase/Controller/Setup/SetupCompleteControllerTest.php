@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -22,12 +24,12 @@ use Cake\ORM\TableRegistry;
 
 class SetupCompleteControllerTest extends AppIntegrationTestCase
 {
+    use AuthenticationTokenModelTrait;
+
     public $fixtures = [
         'app.Base/Users', 'app.Base/Profiles', 'app.Base/Gpgkeys', 'app.Base/Roles',
-        'app.Base/AuthenticationTokens'
     ];
     public $AuthenticationTokens;
-    use AuthenticationTokenModelTrait;
 
     public function setUp()
     {
@@ -42,40 +44,6 @@ class SetupCompleteControllerTest extends AppIntegrationTestCase
      * @group setup
      * @group setupComplete
      */
-    public function testSetupCompleteApiV1Success()
-    {
-        $t = $this->AuthenticationTokens->generate(UuidFactory::uuid('user.id.ruth'), AuthenticationToken::TYPE_REGISTER);
-        $url = '/setup/complete/' . UuidFactory::uuid('user.id.ruth') . '.json';
-        $armoredKey = file_get_contents(FIXTURES . DS . 'Gpgkeys' . DS . 'ruth_public.key');
-        $data = [
-            'AuthenticationToken' => [
-                'token' => $t->token
-            ],
-            'Gpgkey' => [
-                'key' => $armoredKey
-            ]
-        ];
-        $this->postJson($url, $data);
-        $this->assertSuccess();
-        // Check that token is now inactive
-        $t2 = $this->AuthenticationTokens->get($t->id);
-        $this->assertFalse($t2->active);
-        // Check that ruth is active
-        $ruth = $this->Users->get(UuidFactory::uuid('user.id.ruth'));
-        $this->assertTrue($ruth->active);
-        // Check that ruth has a gpg key
-        $key = $this->Gpgkeys->find()
-            ->where(['user_id' => UuidFactory::uuid('user.id.ruth')])
-            ->order('created')
-            ->first();
-        $this->assertTrue(!empty($key));
-    }
-
-    /**
-     * @group AN
-     * @group setup
-     * @group setupComplete
-     */
     public function testSetupCompleteSuccess()
     {
         $t = $this->AuthenticationTokens->generate(UuidFactory::uuid('user.id.ruth'), AuthenticationToken::TYPE_REGISTER);
@@ -83,11 +51,11 @@ class SetupCompleteControllerTest extends AppIntegrationTestCase
         $armoredKey = file_get_contents(FIXTURES . DS . 'Gpgkeys' . DS . 'ruth_public.key');
         $data = [
             'authenticationtoken' => [
-                'token' => $t->token
+                'token' => $t->token,
             ],
             'gpgkey' => [
-                'armored_key' => $armoredKey
-            ]
+                'armored_key' => $armoredKey,
+            ],
         ];
         $this->postJson($url, $data);
         $this->assertSuccess();
@@ -106,11 +74,11 @@ class SetupCompleteControllerTest extends AppIntegrationTestCase
         $armoredKey = file_get_contents(FIXTURES . DS . 'Gpgkeys' . DS . 'sofia_public.key');
         $data = [
             'authenticationtoken' => [
-                'token' => $t->token
+                'token' => $t->token,
             ],
             'gpgkey' => [
-                'armored_key' => $armoredKey
-            ]
+                'armored_key' => $armoredKey,
+            ],
         ];
         $this->postJson($url, $data);
         $this->assertError();
@@ -152,42 +120,42 @@ class SetupCompleteControllerTest extends AppIntegrationTestCase
     public function testSetupCompleteInvalidAuthenticationTokenError()
     {
         $userId = UuidFactory::uuid('user.id.ruth');
-        $url = '/setup/complete/' . $userId . '.json';
+        $url = '/setup/complete/' . $userId . '.json?api-version=v2';
         $tokenExpired = $this->quickDummyAuthToken($userId, AuthenticationToken::TYPE_REGISTER, 'expired');
         $tokenInactive = $this->quickDummyAuthToken($userId, AuthenticationToken::TYPE_REGISTER, 'inactive');
         $fails = [
             'empty array' => [
                 'data' => [],
-                'message' => 'An authentication token must be provided.'
+                'message' => 'An authentication token must be provided.',
             ],
             'null' => [
                 'data' => null,
-                'message' => 'An authentication token must be provided.'
+                'message' => 'An authentication token must be provided.',
             ],
             'array with null' => [
                 'data' => ['token' => null],
-                'message' => 'An authentication token must be provided.'
+                'message' => 'An authentication token must be provided.',
             ],
             'int' => [
                 'data' => ['token' => 100],
-                'message' => 'The authentication token should be a valid uuid.'
+                'message' => 'The authentication token should be a valid uuid.',
             ],
             'string' => [
                 'data' => ['token' => 'nope'],
-                'message' => 'The authentication token should be a valid uuid.'
+                'message' => 'The authentication token should be a valid uuid.',
             ],
             'expired token' => [
                 'data' => ['token' => $tokenExpired],
-                'message' => 'The authentication token is not valid or has expired.'
+                'message' => 'The authentication token is not valid or has expired.',
             ],
             'inactive token' => [
                 'data' => ['token' => $tokenInactive],
-                'message' => 'The authentication token is not valid or has expired.'
+                'message' => 'The authentication token is not valid or has expired.',
             ],
         ];
         foreach ($fails as $caseName => $case) {
             $data = [
-                'AuthenticationToken' => $case['data']
+                'authenticationtoken' => $case['data'],
             ];
             $this->postJson($url, $data);
             $this->assertError(400, $case['message'], 'Issue with test case: ' . $caseName);
@@ -202,42 +170,42 @@ class SetupCompleteControllerTest extends AppIntegrationTestCase
     public function testSetupCompleteInvalidGpgkeyError()
     {
         $t = $this->AuthenticationTokens->generate(UuidFactory::uuid('user.id.ruth'), AuthenticationToken::TYPE_REGISTER);
-        $url = '/users/validateAccount/' . UuidFactory::uuid('user.id.ruth') . '.json';
+        $url = '/users/validateAccount/' . UuidFactory::uuid('user.id.ruth') . '.json?api-version=v2';
 
         $armoredKey = file_get_contents(FIXTURES . DS . 'Gpgkeys' . DS . 'ruth_public.key');
         $cutKey = substr($armoredKey, 0, strlen($armoredKey) / 2);
         $fails = [
             'empty array' => [
                 'data' => [],
-                'message' => 'An OpenPGP key must be provided.'
+                'message' => 'An OpenPGP key must be provided.',
             ],
             'null' => [
                 'data' => null,
-                'message' => 'An OpenPGP key must be provided.'
+                'message' => 'An OpenPGP key must be provided.',
             ],
             'array with null' => [
                 'data' => ['armored_key' => null],
-                'message' => 'An OpenPGP key must be provided.'
+                'message' => 'An OpenPGP key must be provided.',
             ],
             'int' => [
                 'data' => ['armored_key' => 100],
-                'message' => 'A valid OpenPGP key must be provided.'
+                'message' => 'A valid OpenPGP key must be provided.',
             ],
             'string' => [
                 'data' => ['armored_key' => 'nope'],
-                'message' => 'A valid OpenPGP key must be provided.'
+                'message' => 'A valid OpenPGP key must be provided.',
             ],
             'partial key' => [
                 'data' => ['armored_key' => $cutKey],
-                'message' => 'A valid OpenPGP key must be provided.'
-            ]
+                'message' => 'A valid OpenPGP key must be provided.',
+            ],
         ];
         foreach ($fails as $caseName => $case) {
             $data = [
-            'AuthenticationToken' => [
-                'token' => $t->token
+            'authenticationtoken' => [
+                'token' => $t->token,
             ],
-            'Gpgkey' => $case['data']
+            'gpgkey' => $case['data'],
             ];
         }
         $this->postJson($url, $data);

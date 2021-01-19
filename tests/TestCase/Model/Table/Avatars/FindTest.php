@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -18,7 +20,6 @@ namespace App\Test\TestCase\Model\Table\Avatars;
 use App\Model\Table\AvatarsTable;
 use App\Test\Lib\AppTestCase;
 use App\Utility\UuidFactory;
-use Cake\Collection\CollectionInterface;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
@@ -48,7 +49,7 @@ class FindTest extends AppTestCase
         $adminUser = $Users->find()
             ->where(['Users.id' => UuidFactory::uuid('user.id.admin')])
             ->contain([
-                'Profiles' => AvatarsTable::addContainAvatar()
+                'Profiles' => AvatarsTable::addContainAvatar(),
             ])
             ->first();
 
@@ -66,7 +67,7 @@ class FindTest extends AppTestCase
         $adaUser = $Users->find()
             ->where(['Users.id' => UuidFactory::uuid('user.id.ada')])
             ->contain([
-                'Profiles' => AvatarsTable::addContainAvatar()
+                'Profiles' => AvatarsTable::addContainAvatar(),
             ])
             ->first();
         $this->assertTrue(!empty(Hash::get($adaUser, 'profile.avatar.url.medium')));

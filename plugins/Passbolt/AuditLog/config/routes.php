@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -22,4 +23,10 @@ Router::plugin('Passbolt/AuditLog', ['path' => '/actionlog'], function (RouteBui
     $routes->connect('/resource/:resourceId', ['controller' => 'UserLogs', 'action' => 'viewByResource'])
            ->setPass(['resourceId'])
            ->setMethods(['GET']);
+
+    if (Configure::read('passbolt.plugins.folders.enabled')) {
+        $routes->connect('/folder/:folderId', ['controller' => 'UserLogs', 'action' => 'viewByFolder'])
+               ->setPass(['folderId'])
+               ->setMethods(['GET']);
+    }
 });

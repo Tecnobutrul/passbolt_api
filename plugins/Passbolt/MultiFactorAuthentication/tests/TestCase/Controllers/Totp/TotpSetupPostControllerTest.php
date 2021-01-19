@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -48,7 +50,7 @@ class TotpSetupPostControllerTest extends MfaIntegrationTestCase
         $uri = MfaOtpFactory::generateTOTP($uac);
         $this->post('/mfa/setup/totp.json?api-version=v2', [
             'otpProvisioningUri' => $uri,
-            'totp' => '12345'
+            'totp' => '12345',
         ]);
         $this->assertResponseError();
         $this->assertResponseContains('not enabled for your organization');
@@ -70,7 +72,7 @@ class TotpSetupPostControllerTest extends MfaIntegrationTestCase
         $uri = MfaOtpFactory::generateTOTP($uac);
         $this->post('/mfa/setup/totp.json?api-version=v2', [
             'otpProvisioningUri' => $uri,
-            'totp' => '12345'
+            'totp' => '12345',
         ]);
         $this->assertResponseError();
         $this->assertResponseContains('already setup');
@@ -91,7 +93,7 @@ class TotpSetupPostControllerTest extends MfaIntegrationTestCase
         $uri = MfaOtpFactory::generateTOTP($uac);
         $this->post('/mfa/setup/totp.json?api-version=v2', [
             'otpProvisioningUri' => $uri,
-            'totp' => '12345'
+            'totp' => '12345',
         ]);
         $this->assertResponseError();
         $this->assertResponseContains('This OTP is not valid.');
@@ -112,7 +114,7 @@ class TotpSetupPostControllerTest extends MfaIntegrationTestCase
         $uri = MfaOtpFactory::generateTOTP($uac);
         $this->post('/mfa/setup/totp.json?api-version=v2', [
             'otpProvisioningUri' => $uri,
-            'totp' => ''
+            'totp' => '',
         ]);
         $this->assertResponseError();
         $this->assertResponseContains('The OTP should not be empty.');
@@ -131,7 +133,7 @@ class TotpSetupPostControllerTest extends MfaIntegrationTestCase
         $this->mockMfaTotpSettings($user, 'orgOnly');
         $this->post('/mfa/setup/totp.json?api-version=v2', [
             'otpProvisioningUri' => 'not a valid uri',
-            'totp' => '12345'
+            'totp' => '12345',
         ]);
         $this->assertResponseError();
         $this->assertResponseContains('This OTP is not valid.');
@@ -150,7 +152,7 @@ class TotpSetupPostControllerTest extends MfaIntegrationTestCase
         $this->mockMfaTotpSettings($user, 'orgOnly');
         $this->post('/mfa/setup/totp.json?api-version=v2', [
             'otpProvisioningUri' => '',
-            'totp' => '12345'
+            'totp' => '12345',
         ]);
         $this->assertResponseError();
         $this->assertResponseContains('This OTP is not valid.');
@@ -172,7 +174,7 @@ class TotpSetupPostControllerTest extends MfaIntegrationTestCase
         $otp = Factory::loadFromProvisioningUri($uri);
         $this->post('/mfa/setup/totp.json?api-version=v2', [
             'otpProvisioningUri' => $uri,
-            'totp' => $otp->now()
+            'totp' => $otp->now(),
         ]);
         $this->assertResponseOk();
     }
@@ -197,7 +199,7 @@ class TotpSetupPostControllerTest extends MfaIntegrationTestCase
 
         $this->post('/mfa/setup/totp.json?api-version=v2', [
             'otpProvisioningUri' => $uri,
-            'totp' => $otp->now()
+            'totp' => $otp->now(),
         ]);
         $this->assertResponseOk();
     }
@@ -218,7 +220,7 @@ class TotpSetupPostControllerTest extends MfaIntegrationTestCase
         $otp = Factory::loadFromProvisioningUri($uri);
         $this->post('/mfa/setup/totp', [
             'otpProvisioningUri' => $uri,
-            'totp' => $otp->now()
+            'totp' => $otp->now(),
         ]);
         $this->assertResponseOk();
         $this->assertResponseContains('successAnimation');

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,12 +16,9 @@
  */
 namespace App\Shell;
 
-use App\Controller\Events\EmailNotificationsListener;
 use App\Model\Entity\Role;
 use App\Utility\UserAccessControl;
 use App\Utility\UserAction;
-use App\Utility\UuidFactory;
-use Cake\Event\EventManager;
 
 /**
  * App Shell Bootstrap
@@ -33,19 +32,20 @@ class AppShellBootstrap
 {
     /**
      * Instance of class used for singleton.
+     *
      * @var
      */
     private static $instance;
 
     /**
      * Init function.
-     * @return AppShellBootstrap
+     *
+     * @return \App\Shell\AppShellBootstrap
      */
     public static function init()
     {
         if (!isset(self::$instance)) {
             self::$instance = new AppShellBootstrap();
-            self::$instance->_bindEvents();
             self::$instance->_initUserAction();
         }
 
@@ -53,18 +53,9 @@ class AppShellBootstrap
     }
 
     /**
-     * Bind events that are needed for AppShell.
-     * @return void
-     */
-    private function _bindEvents()
-    {
-        $emails = new EmailNotificationsListener();
-        EventManager::instance()->on($emails);
-    }
-
-    /**
      * Init the UserAction component if it's not already initialized.
      * This is to avoid errors while executing tasks that don't implement UserAction.
+     *
      * @return void
      */
     private function _initUserAction()

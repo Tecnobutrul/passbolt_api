@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,7 +17,6 @@
 
 namespace App\Test\TestCase\Controller\Favorites;
 
-use App\Model\Entity\Favorite;
 use App\Model\Table\FavoritesTable;
 use App\Test\Lib\AppIntegrationTestCase;
 use App\Test\Lib\Model\FavoritesModelTrait;
@@ -24,14 +25,16 @@ use Cake\ORM\TableRegistry;
 
 class FavoritesAddControllerTest extends AppIntegrationTestCase
 {
-    /** @var FavoritesTable */
-    private $Favorites;
-
     use FavoritesModelTrait;
+
+    /**
+     * @var FavoritesTable
+     */
+    private $Favorites;
 
     public $fixtures = [
         'app.Base/Users', 'app.Base/Groups', 'app.Base/GroupsUsers', 'app.Base/Resources',
-        'app.Base/Favorites', 'app.Base/Permissions'
+        'app.Base/Favorites', 'app.Base/Permissions',
     ];
 
     public function setUp()
@@ -52,18 +55,6 @@ class FavoritesAddControllerTest extends AppIntegrationTestCase
         $this->assertFavoriteAttributes($this->_responseJsonBody);
     }
 
-    public function testFavoritesAddSuccessApiV1()
-    {
-        $this->authenticateAs('dame');
-        $resourceId = UuidFactory::uuid('resource.id.bower');
-        $this->postJson("/favorites/resource/$resourceId.json?api-version=v1");
-        $this->assertSuccess();
-
-        // Expected fields.
-        $this->assertObjectHasAttribute('Favorite', $this->_responseJsonBody);
-        $this->assertFavoriteAttributes($this->_responseJsonBody->Favorite);
-    }
-
     public function testFavoritesAddCannotModifyNotAccessibleFields()
     {
         $this->authenticateAs('dame');
@@ -75,7 +66,7 @@ class FavoritesAddControllerTest extends AppIntegrationTestCase
             'foreign_key' => 'modified_foreign_key',
             'created' => '2019-07-29 10:31:35',
             'modified' => '2019-07-29 10:31:35',
-            'user_id' => 'modified_user_id'
+            'user_id' => 'modified_user_id',
         ];
 
         $this->postJson("/favorites/resource/$resourceId.json", $favoriteData);
@@ -107,7 +98,7 @@ class FavoritesAddControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('dame');
         $resourceId = 'invalid-id';
-        $this->postJson("/favorites/resource/$resourceId.json?api-version=v1");
+        $this->postJson("/favorites/resource/$resourceId.json");
         $this->assertError(400, 'The resource id is not valid.');
     }
 

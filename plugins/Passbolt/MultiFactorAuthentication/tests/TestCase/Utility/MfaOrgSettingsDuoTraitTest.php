@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,7 +16,6 @@
  */
 namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Utility;
 
-use App\Model\Table\OrganizationSettingsTable;
 use Cake\Core\Configure;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\ORM\TableRegistry;
@@ -28,9 +29,8 @@ class MfaOrgSettingsDuoTraitTest extends MfaIntegrationTestCase
      * @var array
      */
     public $fixtures = [
-        'app.Base/OrganizationSettings',
-        'app.Base/AuthenticationTokens', 'app.Base/Users',
-        'app.Base/Roles'
+        'app.Base/Users',
+        'app.Base/Roles',
     ];
 
     /**
@@ -46,8 +46,8 @@ class MfaOrgSettingsDuoTraitTest extends MfaIntegrationTestCase
             'salt' => '__CHANGE_ME__THIS_MUST_BE_AT_LEAST_FOURTY_CHARACTERS_____',
             'integrationKey' => 'UICPIC93F14RWR5F55SJ',
             'secretKey' => '8tkYNgi8aGAqa3KW1eqhsJLfjc1nJnHDYC1siNYX',
-            'hostName' => 'api-45e9f2ca.duosecurity.com'
-        ]
+            'hostName' => 'api-45e9f2ca.duosecurity.com',
+        ],
     ];
 
     /**

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,6 +17,8 @@
 
 namespace App\Model\Rule;
 
+use App\Model\Table\PermissionsTable;
+use Cake\Core\Configure;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\TableRegistry;
 
@@ -27,16 +31,32 @@ class IsNotSoleOwnerOfSharedResourcesRule
      * @param array $options Options passed to the check
      * @return bool
      */
-    public function __invoke(EntityInterface $entity, array $options)
+    public function __invoke(EntityInterface $entity, array $options): bool
     {
+        /** @var \App\Model\Table\PermissionsTable $Permissions */
         $Permissions = TableRegistry::getTableLocator()->get('Permissions');
+        $checkGroupsUsers = false;
 
+        // Check also the groups the aro is member of, if the aro is a User.
         if (is_a($entity, 'App\Model\Entity\User')) {
-            $check = $Permissions->findSharedResourcesUserIsSoleOwner($entity->id, true)->count();
-        } else {
-            $check = $Permissions->findSharedResourcesGroupIsSoleOwner($entity->id)->count();
+            $checkGroupsUsers = true;
         }
 
-        return $check == 0;
+        $check = $Permissions
+            ->findSharedAcosByAroIsSoleOwner(PermissionsTable::RESOURCE_ACO, $entity->id, [
+                'checkGroupsUsers' => $checkGroupsUsers,
+            ])
+            ->count();
+
+        if (Configure::read('passbolt.plugins.folders.enabled')) {
+            $check += $Permissions
+                ->findSharedAcosByAroIsSoleOwner(
+                    PermissionsTable::FOLDER_ACO,
+                    $entity->id,
+                    ['checkGroupsUsers' => $checkGroupsUsers]
+                )->count();
+        }
+
+        return $check === 0;
     }
 }

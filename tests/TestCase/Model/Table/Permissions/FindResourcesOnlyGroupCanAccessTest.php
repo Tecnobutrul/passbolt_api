@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -19,8 +21,6 @@ use App\Model\Table\PermissionsTable;
 use App\Test\Lib\AppTestCase;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
-use Cake\Utility\Hash;
-use PassboltTestData\Lib\PermissionMatrix;
 
 class FindResourcesOnlyGroupCanAccessTest extends AppTestCase
 {
@@ -48,13 +48,13 @@ class FindResourcesOnlyGroupCanAccessTest extends AppTestCase
     {
         // Creative is sole owner of apache
         $groupId = UuidFactory::uuid('group.id.creative');
-        $resources = $this->Permissions->findResourcesOnlyGroupCanAccess($groupId)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $groupId)->extract('aco_foreign_key')->toArray();
         $this->assertEquals(count($resources), 1);
         $this->assertEquals($resources[0], UuidFactory::uuid('resource.id.composer'));
 
         // Developer is sole owner of debian
         $groupId = UuidFactory::uuid('group.id.developer');
-        $resources = $this->Permissions->findResourcesOnlyGroupCanAccess($groupId)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $groupId)->extract('aco_foreign_key')->toArray();
         $this->assertEquals(count($resources), 1);
         $this->assertEquals($resources[0], UuidFactory::uuid('resource.id.debian'));
     }
@@ -63,12 +63,12 @@ class FindResourcesOnlyGroupCanAccessTest extends AppTestCase
     {
         // freelancer not owner of anything
         $groupId = UuidFactory::uuid('group.id.freelancer');
-        $resources = $this->Permissions->findResourcesOnlyGroupCanAccess($groupId)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $groupId)->extract('aco_foreign_key')->toArray();
         $this->assertEmpty($resources);
 
         // ergonom is owner of of some resources but never alone
         $groupId = UuidFactory::uuid('group.id.ergonom');
-        $resources = $this->Permissions->findResourcesOnlyGroupCanAccess($groupId)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $groupId)->extract('aco_foreign_key')->toArray();
         $this->assertEmpty($resources);
     }
 }

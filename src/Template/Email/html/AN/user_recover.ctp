@@ -13,6 +13,7 @@
  * @since         2.0.0
  */
 use App\Utility\Purifier;
+use App\View\Helper\AvatarHelper;
 use Cake\Routing\Router;
 if (PHP_SAPI === 'cli') {
     Router::fullBaseUrl($body['fullBaseUrl']);
@@ -21,7 +22,7 @@ $user = $body['user'];
 $token = $body['token'];
 
 echo $this->element('Email/module/avatar',[
-    'url' => Router::url( DS . $user->profile->avatar->url['small'], true),
+    'url' => AvatarHelper::getAvatarUrl($user->profile->avatar),
     'text' => $this->element('Email/module/avatar_text', [
         'username' => Purifier::clean($user->username),
         'first_name' => Purifier::clean($user->profile->first_name),
@@ -32,7 +33,7 @@ echo $this->element('Email/module/avatar',[
 ]);
 
 $text = '<h3>' . __('Welcome back!') . '</h3><br/>';
-$text .= __('You have just requested to recover your passbolt account on this device.');
+$text .= __('You just requested to recover your passbolt account on this device.');
 $text .= ' ' . __('Make sure you have a backup of your secret key handy.');
 $text .= ' ' . __('Click on the link below to proceed.');
 echo $this->element('Email/module/text', [

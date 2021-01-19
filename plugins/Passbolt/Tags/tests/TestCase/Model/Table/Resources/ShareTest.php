@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -16,6 +18,9 @@
 namespace Passbolt\Tags\Test\TestCase\Model\Table\Resources;
 
 use App\Model\Entity\Permission;
+use App\Model\Entity\Role;
+use App\Service\Resources\ResourcesShareService;
+use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
@@ -31,7 +36,7 @@ class ShareTest extends TagTestCase
         'app.Base/Users', 'app.Base/Groups', 'app.Base/Profiles', 'app.Base/Gpgkeys', 'app.Base/Roles',
         'app.Base/Resources', 'app.Base/Favorites',
         'app.Alt0/GroupsUsers', 'app.Alt0/Permissions', 'app.Alt0/Secrets',
-        'plugin.Passbolt/Tags.Base/Tags', 'plugin.Passbolt/Tags.Alt0/ResourcesTags'
+        'plugin.Passbolt/Tags.Base/Tags', 'plugin.Passbolt/Tags.Alt0/ResourcesTags',
     ];
 
     public function setUp()
@@ -67,12 +72,9 @@ hcciUFw5
 -----END PGP MESSAGE-----';
     }
 
-    public function testLostAccessAssociatedDataDeleted()
+    public function testTagsLostAccessAssociatedDataDeleted()
     {
-        // Define actors of this tests
         $resourceAId = UuidFactory::uuid('resource.id.apache');
-        $resource = $this->Resources->get($resourceAId, ['contain' => ['Permissions', 'Secrets']]);
-        // Users
         $userAId = UuidFactory::uuid('user.id.ada');
         $userEId = UuidFactory::uuid('user.id.edith');
 
@@ -91,8 +93,11 @@ hcciUFw5
         $secrets[] = ['user_id' => $userEId, 'data' => $this->getValidSecret()];
 
         // Share.
-        $result = $this->Resources->share($resource, $changes, $secrets);
-        $this->assertNotFalse($result);
+        $uac = new UserAccessControl(Role::USER, $userAId);
+        $resourceShareService = new ResourcesShareService();
+        $resourceShareService->share($uac, $resourceAId, $changes, $secrets);
+
+        $this->assertUserHasNotAccessResources($userAId, [$resourceAId]);
 
         // Ensure the apache favorite for Dame is deleted
         // But the other favorites for this resource are not touched.

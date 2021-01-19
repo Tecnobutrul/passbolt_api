@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -19,8 +21,6 @@ use App\Model\Table\PermissionsTable;
 use App\Test\Lib\AppTestCase;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
-use Cake\Utility\Hash;
-use PassboltTestData\Lib\PermissionMatrix;
 
 class FindResourcesOnlyUserCanAccessTest extends AppTestCase
 {
@@ -47,7 +47,7 @@ class FindResourcesOnlyUserCanAccessTest extends AppTestCase
     public function testFindOnlyUserCanAccess_SoleOwnerNotShared()
     {
         $userId = UuidFactory::uuid('user.id.ada');
-        $resources = $this->Permissions->findResourcesOnlyUserCanAccess($userId)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $userId)->extract('aco_foreign_key')->toArray();
         $this->assertEquals(count($resources), 1);
         $this->assertEquals($resources[0], UuidFactory::uuid('resource.id.apache'));
     }
@@ -55,35 +55,35 @@ class FindResourcesOnlyUserCanAccessTest extends AppTestCase
     public function testFindOnlyUserCanAccess_OwnerAlongWithAnotherUser()
     {
         $userId = UuidFactory::uuid('user.id.orna');
-        $resources = $this->Permissions->findResourcesOnlyUserCanAccess($userId)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $userId)->extract('aco_foreign_key')->toArray();
         $this->assertEquals(count($resources), 0);
     }
 
     public function testFindOnlyUserCanAccess_SharedWithMe()
     {
         $userId = UuidFactory::uuid('user.id.lynne');
-        $resources = $this->Permissions->findResourcesOnlyUserCanAccess($userId)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $userId)->extract('aco_foreign_key')->toArray();
         $this->assertEquals(count($resources), 0);
     }
 
     public function testFindOnlyUserCanAccess_NoOwnerNoResourcesSharedNoGroupsMember()
     {
         $userId = UuidFactory::uuid('user.id.irene');
-        $resources = $this->Permissions->findResourcesOnlyUserCanAccess($userId)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $userId)->extract('aco_foreign_key')->toArray();
         $this->assertEquals(count($resources), 0);
     }
 
     public function testFindOnlyUserCanAccess_NoOwner()
     {
         $userId = UuidFactory::uuid('user.id.betty');
-        $resources = $this->Permissions->findResourcesOnlyUserCanAccess($userId, true)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $userId, ['checkGroupsUsers' => true])->extract('aco_foreign_key')->toArray();
         $this->assertEquals(count($resources), 0);
     }
 
     public function testFindOnlyUserCanAccess_CheckGroupsUsers_OwnerAlongWithSoleManagerEmptyGroup()
     {
         $userId = UuidFactory::uuid('user.id.ada');
-        $resources = $this->Permissions->findResourcesOnlyUserCanAccess($userId, true)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $userId, ['checkGroupsUsers' => true])->extract('aco_foreign_key')->toArray();
         $this->assertEquals(count($resources), 2);
         $this->assertTrue(in_array(UuidFactory::uuid('resource.id.apache'), $resources));
         $this->assertTrue(in_array(UuidFactory::uuid('resource.id.composer'), $resources));
@@ -92,7 +92,7 @@ class FindResourcesOnlyUserCanAccessTest extends AppTestCase
     public function testFindOnlyUserCanAccess_CheckGroupsUsers_SoleOwnerSharedWithSoleManagerEmptyGroup()
     {
         $userId = UuidFactory::uuid('user.id.nancy');
-        $resources = $this->Permissions->findResourcesOnlyUserCanAccess($userId, true)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $userId, ['checkGroupsUsers' => true])->extract('aco_foreign_key')->toArray();
         $this->assertEquals(count($resources), 1);
         $this->assertTrue(in_array(UuidFactory::uuid('resource.id.openpgpjs'), $resources));
     }
@@ -105,7 +105,7 @@ class FindResourcesOnlyUserCanAccessTest extends AppTestCase
         $this->Permissions->deleteAll(['aro_foreign_key IN' => $userNId, 'aco_foreign_key' => $resourceOId]);
 
         $userId = UuidFactory::uuid('user.id.nancy');
-        $resources = $this->Permissions->findResourcesOnlyUserCanAccess($userId, true)->extract('aco_foreign_key')->toArray();
+        $resources = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $userId, ['checkGroupsUsers' => true])->extract('aco_foreign_key')->toArray();
         $this->assertEquals(count($resources), 1);
         $this->assertTrue(in_array(UuidFactory::uuid('resource.id.openpgpjs'), $resources));
     }

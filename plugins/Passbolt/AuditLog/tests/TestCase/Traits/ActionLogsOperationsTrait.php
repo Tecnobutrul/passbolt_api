@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -23,6 +25,7 @@ trait ActionLogsOperationsTrait
 {
     /**
      * Simulate a share operation from the perspective of action logs and history tables.
+     *
      * @param UserAccessControl $user user access control
      * @param string $aco aco
      * @param string $acoKey aco key
@@ -53,13 +56,14 @@ trait ActionLogsOperationsTrait
         $entityHistory = [
             'foreign_model' => 'PermissionsHistory',
             'foreign_key' => $permissionHistoryCreated->id,
-            'crud' => $crud
+            'crud' => $crud,
         ];
         $EntitiesHistory->create($entityHistory, $userAction);
     }
 
     /**
      * Simulate resources crud operation.
+     *
      * @param UserAccessControl $user user access control
      * @param string $resourceId resource id
      * @param string $crud crud
@@ -81,38 +85,78 @@ trait ActionLogsOperationsTrait
         $entityHistory = [
             'foreign_model' => 'Resources',
             'foreign_key' => $resourceId,
-            'crud' => $crud
+            'crud' => $crud,
         ];
         $EntitiesHistory->create($entityHistory, $userAction);
     }
 
     /**
      * Simulate resource secret update operation.
-     * @param UserAccessControl $user user
+     *
+     * @param UserAccessControl $uac user
      * @param string $resourceId resource id
      * @return void
      */
-    public function simulateResourceSecretUpdate(UserAccessControl $user, string $resourceId)
+    public function simulateResourceSecretUpdate(UserAccessControl $uac, string $resourceId)
     {
         $ActionLogs = TableRegistry::getTableLocator()->get('Passbolt/Log.ActionLogs');
         $EntitiesHistory = TableRegistry::getTableLocator()->get('Passbolt/Log.EntitiesHistory');
         $SecretsHistory = TableRegistry::getTableLocator()->get('Passbolt/Log.SecretsHistory');
-        $userAction = UserAction::getInstance($user, 'Resources.update', 'PUT /resources/' . $resourceId . '.json');
+        $userAction = UserAction::getInstance($uac, 'Resources.update', 'PUT /resources/' . $resourceId . '.json');
 
         $ActionLogs->create($userAction, 1);
 
         $secretsHistory = [
             'id' => UuidFactory::uuid('secret.resource.id.' . $resourceId),
             'resource_id' => $resourceId,
-            'user_id' => $user->userId(),
+            'user_id' => $uac->getId(),
         ];
         $sh = $SecretsHistory->create($secretsHistory);
 
         $entityHistory = [
             'foreign_model' => 'SecretsHistory',
             'foreign_key' => $sh->id,
-            'crud' => EntityHistory::CRUD_UPDATE
+            'crud' => EntityHistory::CRUD_UPDATE,
         ];
         $EntitiesHistory->create($entityHistory, $userAction);
+    }
+
+    /**
+     * Simulate multiple resource get with secrets.
+     *
+     * @param UserAccessControl $user user
+     * @param array $resourceIds resource ids
+     * @return void
+     * @throws \Exception in case the secret cannot be retrieved.
+     */
+    public function simulateMultipleResourceGetWithSecrets(UserAccessControl $user, array $resourceIds)
+    {
+        $ActionLogs = TableRegistry::getTableLocator()->get('Passbolt/Log.ActionLogs');
+        $EntitiesHistory = TableRegistry::getTableLocator()->get('Passbolt/Log.EntitiesHistory');
+        $SecretAccesses = TableRegistry::getTableLocator()->get('Passbolt/Log.SecretAccesses');
+        $Secrets = TableRegistry::getTableLocator()->get('Secrets');
+
+        $userAction = UserAction::getInstance($user, 'ResourcesIndex.index', 'GET /resources/.json');
+        $ActionLogs->create($userAction, 1);
+
+        foreach ($resourceIds as $resourceId) {
+            $secret = $Secrets->find()->where([
+                'resource_id' => $resourceId,
+                'user_id' => $user->getId(),
+            ])->first();
+
+            if (!$secret) {
+                throw new \Exception('Could not retrieve the secret for the given resource and user');
+            }
+
+            $sa = $SecretAccesses->create($secret, $user);
+
+            $entityHistory = [
+                'foreign_model' => 'SecretAccesses',
+                'foreign_key' => $sa->id,
+                'crud' => EntityHistory::CRUD_CREATE,
+            ];
+            $EntitiesHistory->create($entityHistory, $userAction);
+        }
     }
 }

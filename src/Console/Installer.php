@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
@@ -24,7 +26,6 @@ use Exception;
  */
 class Installer
 {
-
     /**
      * Does some routine installation tasks so people don't have to.
      *
@@ -104,7 +105,7 @@ class Installer
             'tmp/cache/persistent',
             'tmp/cache/views',
             'tmp/sessions',
-            'tmp/tests'
+            'tmp/tests',
         ];
 
         foreach ($paths as $path) {

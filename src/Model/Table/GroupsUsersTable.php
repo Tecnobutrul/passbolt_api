@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -12,34 +14,33 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+
 namespace App\Model\Table;
 
-use App\Error\Exception\CustomValidationException;
 use App\Model\Rule\IsActiveRule;
 use App\Model\Rule\IsNotSoftDeletedRule;
 use App\Model\Traits\Cleanup\GroupsCleanupTrait;
 use App\Model\Traits\Cleanup\TableCleanupTrait;
 use App\Model\Traits\Cleanup\UsersCleanupTrait;
+use ArrayObject;
+use Cake\Event\Event;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
-use Cake\Utility\Hash;
 use Cake\Validation\Validation;
 use Cake\Validation\Validator;
 
 /**
  * GroupsUsers Model
  *
- * @property \App\Model\Table\GroupsTable|\Cake\ORM\Association\BelongsTo $Groups
- * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\BelongsTo $Users
- *
- * @method \App\Model\Entity\GroupsUser get($primaryKey, $options = [])
- * @method \App\Model\Entity\GroupsUser newEntity($data = null, array $options = [])
- * @method \App\Model\Entity\GroupsUser[] newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\GroupsUser|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \App\Model\Entity\GroupsUser patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \App\Model\Entity\GroupsUser[] patchEntities($entities, array $data, array $options = [])
- * @method \App\Model\Entity\GroupsUser findOrCreate($search, callable $callback = null, $options = [])
- *
+ * @property \App\Model\Table\GroupsTable|\App\Model\Table\BelongsTo $Groups
+ * @property \App\Model\Table\UsersTable|\App\Model\Table\BelongsTo $Users
+ * @method \App\Model\Table\GroupsUser get($primaryKey, ?array $options = [])
+ * @method \App\Model\Entity\GroupsUser newEntity($data = null, ?array $options = [])
+ * @method \App\Model\Entity\GroupsUser[] newEntities(array $data, ?array $options = [])
+ * @method \App\Model\Entity\GroupsUser|bool save(\Cake\Datasource\EntityInterface $entity, ?array $options = [])
+ * @method \App\Model\Entity\GroupsUser patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, ?array $options = [])
+ * @method \App\Model\Entity\GroupsUser[] patchEntities($entities, array $data, ?array $options = [])
+ * @method \App\Model\Entity\GroupsUser findOrCreate($search, callable $callback = null, ?array $options = [])
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class GroupsUsersTable extends Table
@@ -54,7 +55,7 @@ class GroupsUsersTable extends Table
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 
@@ -74,25 +75,25 @@ class GroupsUsersTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator
             ->uuid('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', null, 'create');
 
         $validator
             ->uuid('group_id')
             ->requirePresence('group_id', 'create')
-            ->notEmpty('group_id');
+            ->notEmptyString('group_id');
 
         $validator
             ->uuid('user_id')
             ->requirePresence('user_id', 'create')
-            ->notEmpty('user_id');
+            ->notEmptyString('user_id');
 
         $validator
             ->boolean('is_admin')
-            ->notEmpty('is_admin');
+            ->requirePresence('is_admin');
 
         return $validator;
     }
@@ -120,34 +121,34 @@ class GroupsUsersTable extends Table
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules)
+    public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->addCreate($rules->isUnique(['group_id', 'user_id']), 'group_user_unique', [
             'errorField' => 'group_id',
-            'message' => __('The user is already member of this group.')
+            'message' => __('The user is already member of this group.'),
         ]);
         $rules->addCreate($rules->existsIn(['group_id'], 'Groups'), 'group_exists', [
             'errorField' => 'group_id',
-            'message' => __('The group does not exist.')
+            'message' => __('The group does not exist.'),
         ]);
         $rules->addCreate(new IsNotSoftDeletedRule(), 'group_is_not_soft_deleted', [
             'table' => 'Groups',
             'errorField' => 'group_id',
-            'message' => __('The group does not exist.')
+            'message' => __('The group does not exist.'),
         ]);
         $rules->addCreate($rules->existsIn(['user_id'], 'Users'), 'user_exists', [
             'errorField' => 'user_id',
-            'message' => __('The user does not exist.')
+            'message' => __('The user does not exist.'),
         ]);
         $rules->addCreate(new IsNotSoftDeletedRule(), 'user_is_not_soft_deleted', [
             'table' => 'Users',
             'errorField' => 'user_id',
-            'message' => __('The user does not exist.')
+            'message' => __('The user does not exist.'),
         ]);
         $rules->addCreate(new IsActiveRule(), 'user_is_active', [
             'table' => 'Users',
             'errorField' => 'user_id',
-            'message' => __('The user does not exist.')
+            'message' => __('The user does not exist.'),
         ]);
 
         return $rules;
@@ -216,7 +217,7 @@ class GroupsUsersTable extends Table
             ->select(['group_id'])->distinct()
             ->where([
                 'user_id <>' => $userId,
-                'is_admin' => true
+                'is_admin' => true,
             ]);
 
         // (R)
@@ -230,7 +231,7 @@ class GroupsUsersTable extends Table
             // R = GROUPS_USER_IS_MANAGER
             ->where([
                 'user_id' => $userId,
-                'is_admin' => true
+                'is_admin' => true,
             ])
             // R = R - GROUPS_OTHER_USER_ARE_MANAGER
             ->where(['group_id NOT IN' => $groupsOtherUsersAreManager]);
@@ -267,7 +268,7 @@ class GroupsUsersTable extends Table
         $groupsOtherUsers = $this->find()
             ->select(['group_id'])->distinct()
             ->where([
-                'user_id <>' => $userId
+                'user_id <>' => $userId,
             ]);
 
         // (R)
@@ -280,7 +281,7 @@ class GroupsUsersTable extends Table
             ->where([
                 'user_id' => $userId,
                 // GROUPS_USER_IS_MEMBER - GROUPS_OTHER_USER_ARE_MEMBER
-                'group_id NOT IN' => $groupsOtherUsers
+                'group_id NOT IN' => $groupsOtherUsers,
             ]);
 
         return $query;
@@ -321,23 +322,10 @@ class GroupsUsersTable extends Table
             ->where([
                 'user_id' => $userId,
                 // GROUPS_USER_IS_MEMBER - GROUPS_USER_ONLY_MEMBER
-                'group_id NOT IN' => $groupsUserOnlyMember
+                'group_id NOT IN' => $groupsUserOnlyMember,
             ]);
 
         return $query;
-    }
-
-    /**
-     * Get the list of groups where the user is member
-     *
-     * @param string $userId user uuid
-     * @return \Cake\ORM\Query
-     */
-    public function findGroupsWhereUserIsMember(string $userId)
-    {
-        return $this->find()
-            ->select('group_id')
-            ->where(['user_id' => $userId]);
     }
 
     /**
@@ -357,119 +345,17 @@ class GroupsUsersTable extends Table
             ->where([
                 'user_id' => $userId,
                 'group_id' => $groupId,
-                'is_admin' => true
+                'is_admin' => true,
             ])->first();
 
-        return (!empty($user));
-    }
-
-    /**
-     * Patch a list of group_user entities with a list of changes.
-     * A change is formatted as following :
-     *
-     * - Add a new group user:
-     * [
-     *   'user_id' => string,
-     *   'is_admin' => bool
-     * ]
-     *
-     * - Update a group user:
-     * [
-     *   'id' => uuid,
-     *   'is_admin' => bool
-     * ]
-     *
-     * - Delete a group user
-     * [
-     *   'id' => uuid,
-     *   'delete' => boolean
-     * ]
-     *
-     * @param array $entities The list of groups users entities to patch
-     * @param array $changes The changes to apply
-     * @param null $groupId The group identifier that the entities belong to
-     * @param array $options A list of options to apply to the operations
-     *
-     *  Allowed operations:
-     *  Define which operations are allowed when patching the entities, by default none of them are allowed.
-     *  [
-     *    'allowedOperations' => [
-     *      'add' => true,
-     *      'update' => true
-     *      'delete' => true,
-     *  ]
-     *
-     * @throw CustomValidationException If a change try to modify a group user that is not in the list of groups users
-     * @throw CustomValidationException If a change does not validate when calling patchEntity
-     * @throw CustomValidationException If a change does not validate when calling newEntity
-     * @return array The list of groups users entities patched with the changes
-     */
-    public function patchEntitiesWithChanges($entities = [], $changes = [], $groupId = null, array $options = [])
-    {
-        // What operations are allowed.
-        $canAdd = Hash::get($options, 'allowedOperations.add', false);
-        $canUpdate = Hash::get($options, 'allowedOperations.update', false);
-        $canDelete = Hash::get($options, 'allowedOperations.delete', false);
-
-        // Apply the changes to the list of entities.
-        foreach ($changes as $changeKey => $change) {
-            // Update or Delete case.
-            if (isset($change['id'])) {
-                // Retrieve the group_user a change is requested for.
-                $groupUserKey = null;
-                foreach ($entities as $groupUserKey => $entity) {
-                    if ($entity['id'] == $change['id']) {
-                        break;
-                    }
-                }
-                // The groupUserKey does not belong to the group.
-                if (is_null($groupUserKey)) {
-                    $errors = ['id' => [
-                        'group_user_exists' => __('The membership does not exist.', $change['id'])
-                    ]];
-                    throw new CustomValidationException(__('Validation error.'), [$changeKey => $errors]);
-                }
-
-                // Delete case.
-                if ($canDelete && isset($change['delete']) && $change['delete']) {
-                    unset($entities[$groupUserKey]);
-                } elseif ($canUpdate) {
-                    // Update case
-                    $options = ['accessibleFields' => ['is_admin' => true]];
-                    $this->patchEntity($entities[$groupUserKey], $change, $options);
-                    $errors = $entities[$groupUserKey]->getErrors();
-                    if (!empty($errors)) {
-                        throw new CustomValidationException(__('Validation error.'), [$changeKey => $errors]);
-                    }
-                }
-            } elseif ($canAdd) {
-                // Add case.
-                // Enforce data.
-                $change['group_id'] = $groupId;
-                // New entity options.
-                $options = ['accessibleFields' => [
-                    'group_id' => true,
-                    'user_id' => true,
-                    'is_admin' => true,
-                ]];
-                // Create and validate the new group_user entity.
-                $groupUser = $this->newEntity($change, $options);
-                $errors = $groupUser->getErrors();
-                if (!empty($errors)) {
-                    throw new CustomValidationException(__('Validation error.'), [$changeKey => $errors]);
-                }
-                $entities[] = $groupUser;
-            }
-        }
-
-        return $entities;
+        return !empty($user);
     }
 
     /**
      * Return a groupUser entity.
-     * @param array $data entity data
      *
-     * @return \App\Model\Entity\GroupsUser
+     * @param array $data entity data
+     * @return \App\Model\Table\GroupsUser
      */
     public function buildEntity(array $data)
     {
@@ -497,7 +383,7 @@ class GroupsUsersTable extends Table
      * @param \ArrayObject $options options
      * @return void
      */
-    public function beforeMarshal(\Cake\Event\Event $event, \ArrayObject $data, \ArrayObject $options)
+    public function beforeMarshal(Event $event, ArrayObject $data, ArrayObject $options)
     {
         if (!isset($data['is_admin'])) {
             $data['is_admin'] = false;
@@ -508,7 +394,7 @@ class GroupsUsersTable extends Table
      * Delete all groups_users records where groups are soft deleted
      *
      * @param bool $dryRun false
-     * @return number of affected records
+     * @return \App\Model\Table\number of affected records
      */
     public function cleanupSoftDeletedGroups($dryRun = false)
     {
@@ -519,7 +405,7 @@ class GroupsUsersTable extends Table
      * Delete all groups_users records where groups are deleted
      *
      * @param bool $dryRun false
-     * @return number of affected records
+     * @return \App\Model\Table\number of affected records
      */
     public function cleanupHardDeletedGroups($dryRun = false)
     {

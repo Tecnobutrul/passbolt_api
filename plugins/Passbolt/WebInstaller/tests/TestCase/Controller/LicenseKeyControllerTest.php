@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,7 +16,6 @@
  */
 namespace Passbolt\WebInstaller\Test\TestCase\Controller;
 
-use App\Utility\Healthchecks;
 use Cake\Core\Configure;
 use Passbolt\WebInstaller\Test\Lib\WebInstallerIntegrationTestCase;
 
@@ -42,7 +43,7 @@ class LicenseKeyControllerTest extends WebInstallerIntegrationTestCase
     public function testWebInstallerLicenseKeyViewSuccess()
     {
         $this->get('/install/license_key');
-        $data = ($this->_getBodyAsString());
+        $data = $this->_getBodyAsString();
         $this->assertResponseOk();
         $this->assertContains('Passbolt Pro activation.', $data);
     }
@@ -52,7 +53,7 @@ class LicenseKeyControllerTest extends WebInstallerIntegrationTestCase
         if ($this->checkPluginLicenseExists()) {
             $this->mockLicenseIssuerKey();
             $postData = [
-                'license_key' => file_get_contents(PLUGINS . DS . 'Passbolt' . DS . 'License' . DS . 'tests' . DS . 'data' . DS . 'license' . DS . 'license_dev')
+                'license_key' => file_get_contents(PLUGINS . DS . 'Passbolt' . DS . 'License' . DS . 'tests' . DS . 'data' . DS . 'license' . DS . 'license_dev'),
             ];
             $this->post('/install/license_key', $postData);
             $this->assertResponseCode(302);
@@ -67,12 +68,11 @@ class LicenseKeyControllerTest extends WebInstallerIntegrationTestCase
         if ($this->checkPluginLicenseExists()) {
             $this->mockLicenseIssuerKey();
             $postData = [
-                'license_key' => 'invalid-format'
+                'license_key' => 'invalid-format',
             ];
             $this->post('/install/license_key', $postData);
-            $data = ($this->_getBodyAsString());
+            $data = $this->_getBodyAsString();
             $this->assertResponseOk();
-            $this->assertContains('The license is not valid', $data);
             $this->assertContains('The license format is not valid', $data);
         }
         $this->assertTrue(true);
@@ -83,10 +83,10 @@ class LicenseKeyControllerTest extends WebInstallerIntegrationTestCase
         if ($this->checkPluginLicenseExists()) {
             $this->mockLicenseIssuerKey();
             $postData = [
-                'license_key' => file_get_contents(PLUGINS . DS . 'Passbolt' . DS . 'License' . DS . 'tests' . DS . 'data' . DS . 'license' . DS . 'license_expired')
+                'license_key' => file_get_contents(PLUGINS . DS . 'Passbolt' . DS . 'License' . DS . 'tests' . DS . 'data' . DS . 'license' . DS . 'license_expired'),
             ];
             $this->post('/install/license_key', $postData);
-            $data = ($this->_getBodyAsString());
+            $data = $this->_getBodyAsString();
             $this->assertResponseOk();
             $this->assertContains('The license is not valid', $data);
             $this->assertContains('The license is expired', $data);

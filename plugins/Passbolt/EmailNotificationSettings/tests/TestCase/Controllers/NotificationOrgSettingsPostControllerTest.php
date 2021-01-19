@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,15 +16,26 @@
  */
 namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Controllers\OrgSettings;
 
+use App\Notification\Email\EmailSubscriptionDispatcher;
 use App\Test\Lib\AppIntegrationTestCase;
-use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettings;
+use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 
 class NotificationOrgSettingsPostControllerTest extends AppIntegrationTestCase
 {
+    use EmailNotificationSettingsTestTrait;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->loadNotificationSettings();
+        (new EmailSubscriptionDispatcher())->collectSubscribedEmailRedactors();
+    }
+
     public function tearDown()
     {
-        EmailNotificationSettings::flushCache();
         parent::tearDown();
+        $this->unloadNotificationSettings();
     }
 
     /**

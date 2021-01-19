@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,15 +17,24 @@
 namespace App\Model\Traits\Users;
 
 use App\Model\Entity\Role;
+use App\Model\Event\TableFindIndexBefore;
 use App\Model\Table\AvatarsTable;
+use App\Model\Table\Dto\FindIndexOptions;
+use App\Utility\UuidFactory;
 use Cake\Core\Configure;
+use Cake\I18n\FrozenTime;
 use Cake\ORM\Query;
 use Cake\Utility\Hash;
 use Cake\Validation\Validation;
+use Exception;
+use InvalidArgumentException;
 
+/**
+ * @method \Composer\EventDispatcher\EventDispatcher getEventManager()
+ * @property \Passbolt\Log\Model\Table\ActionLogsTable $ActionLogs
+ */
 trait UsersFindersTrait
 {
-
     /**
      * Filter a Groups query by groups users.
      *
@@ -49,7 +60,7 @@ trait UsersFindersTrait
         $subQuery = $this->GroupsUsers->find()
             ->select([
                 'GroupsUsers.user_id',
-                'count' => $query->func()->count('GroupsUsers.user_id')
+                'count' => $query->func()->count('GroupsUsers.user_id'),
             ])
             ->where(['GroupsUsers.group_id IN' => $groupsIds])
             ->group('GroupsUsers.user_id')
@@ -88,7 +99,7 @@ trait UsersFindersTrait
     private function _filterQueryByResourceAccess(\Cake\ORM\Query $query, string $resourceId)
     {
         if (!Validation::uuid($resourceId)) {
-            throw new \InvalidArgumentException(__('The resource id should be a valid uuid.'));
+            throw new InvalidArgumentException(__('The resource id should be a valid uuid.'));
         }
 
         // The query requires a join with Permissions not constraint with the default condition added by the HasMany
@@ -108,7 +119,7 @@ trait UsersFindersTrait
             ->select('Groups.id')
             ->where([
                 'Groups.deleted' => false,
-                'GroupsUsers.user_id = Users.id'
+                'GroupsUsers.user_id = Users.id',
             ]);
 
         // Use distinct to avoid duplicate as it can happen that a user is member of two groups which
@@ -119,7 +130,7 @@ trait UsersFindersTrait
             ->where(
                 ['OR' => [
                     ['PermissionsFilterAccess.aro_foreign_key = Users.id'],
-                    ['PermissionsFilterAccess.aro_foreign_key IN' => $groupsSubquery]
+                    ['PermissionsFilterAccess.aro_foreign_key IN' => $groupsSubquery],
                 ]]
             );
     }
@@ -148,7 +159,7 @@ trait UsersFindersTrait
         return $query->where(['OR' => [
             ['Users.username LIKE' => $search],
             ['Profiles.first_name LIKE' => $search],
-            ['Profiles.last_name LIKE' => $search]
+            ['Profiles.last_name LIKE' => $search],
         ]]);
     }
 
@@ -169,14 +180,14 @@ trait UsersFindersTrait
     private function _filterQueryByHasNotPermission(Query $query, string $resourceId)
     {
         if (!Validation::uuid($resourceId)) {
-            throw new \InvalidArgumentException(__('The resource id should be a valid uuid.'));
+            throw new InvalidArgumentException(__('The resource id should be a valid uuid.'));
         }
 
         $permissionQuery = $this->Permissions->find()
             ->select(['Permissions.aro_foreign_key'])
             ->where([
                 'Permissions.aro' => 'User',
-                'Permissions.aco_foreign_key' => $resourceId
+                'Permissions.aco_foreign_key' => $resourceId,
             ]);
 
         // Filter on the users who do not have yet a permission.
@@ -189,59 +200,61 @@ trait UsersFindersTrait
      * @param string $role name
      * @param array $options filters
      * @throws \InvalidArgumentException if no role is specified
-     * @return Query
+     * @return \Cake\ORM\Query
      */
-    public function findIndex(string $role, array $options = null)
+    public function findIndex(string $role, ?array $options = [])
     {
         $query = $this->find();
+
+        $event = TableFindIndexBefore::create($query, FindIndexOptions::createFromArray($options), $this);
+
+        /** @var \App\Model\Event\TableFindIndexBefore $event */
+        $this->getEventManager()->dispatch($event);
+
+        $query = $event->getQuery();
 
         // Options must contain a role
         if (!isset($role)) {
             $msg = __('User table findIndex should have a role set in options.');
-            throw new \InvalidArgumentException($msg);
+            throw new InvalidArgumentException($msg);
         }
         if (!$this->Roles->isValidRoleName($role)) {
-            throw new \InvalidArgumentException(__('The role name is not valid.'));
+            throw new InvalidArgumentException(__('The role name is not valid.'));
         }
 
         // Default associated data
-        $containDefault = ['Profiles', 'Gpgkeys', 'Roles', 'GroupsUsers'];
-        $containWhiteList = ['LastLoggedIn'];
-        if (!isset($options['contain']) || (!is_array($options['contain']))) {
-            $contain = $containDefault;
-        } else {
-            $containOptions = [];
-            foreach ($options['contain'] as $option => $value) {
-                if ($value == 1) {
-                    $containOptions[] = $option;
-                }
-            }
-            $contain = array_merge($containDefault, array_intersect($containOptions, $containWhiteList));
-        }
+        $containDefault = [
+            'gpgkey' => true, 'profile' => true, 'groups_users' => true, 'role' => true,
+        ];
+        $options['contain'] = $options['contain'] ?? [];
+        $options['contain'] = array_merge($containDefault, $options['contain']);
 
-        // If contains Profiles, then include Avatars too.
-        if (in_array('Profiles', $contain)) {
-            $contain['Profiles'] = AvatarsTable::addContainAvatar();
-            unset($contain[array_search('Profiles', $contain)]);
+        if (isset($options['contain']['role']) && $options['contain']['role']) {
+            $query->contain('Roles');
         }
-
-        if (in_array('LastLoggedIn', $contain)) {
-            $query = $this->_containLastLoggedIn($query);
-            unset($contain[array_search('LastLoggedIn', $contain)]);
+        if (isset($options['contain']['gpgkey']) && $options['contain']['gpgkey']) {
+            $query->contain('Gpgkeys');
         }
-
-        $query->contain($contain);
+        if (isset($options['contain']['profile']) && $options['contain']['profile']) {
+            $query->contain(['Profiles' => AvatarsTable::addContainAvatar()]);
+        }
+        if (isset($options['contain']['groups_users']) && $options['contain']['groups_users']) {
+            $query->contain('GroupsUsers');
+        }
+        if (isset($options['contain']['last_logged_in']) && $options['contain']['last_logged_in']) {
+            $query->find('lastLoggedIn');
+        }
 
         // Filter out guests and deleted users
         $query->where([
             'Users.deleted' => false,
-            'Roles.name <>' => Role::GUEST
+            'Users.role_id <>' => $this->Roles->getIdByName(Role::GUEST),
         ]);
 
         // If searching admins
         if (isset($options['filter']['is-admin'])) {
             $query->where([
-                'Roles.name' => Role::ADMIN
+                'Users.role_id' => $this->Roles->getIdByName(Role::ADMIN),
             ]);
         }
 
@@ -289,16 +302,16 @@ trait UsersFindersTrait
      * @param string $userId uuid
      * @param string $roleName role name
      * @throws \InvalidArgumentException if the role name or user id are not valid
-     * @throws Exception
-     * @return Query
+     * @throws \Exception
+     * @return \Cake\ORM\Query
      */
     public function findView(string $userId, string $roleName)
     {
         if (!Validation::uuid($userId)) {
-            throw new \InvalidArgumentException(__('The user id should be a valid uuid.'));
+            throw new InvalidArgumentException(__('The user id should be a valid uuid.'));
         }
         if (!$this->Roles->isValidRoleName($roleName)) {
-            throw new \InvalidArgumentException(__('The role name is not valid.'));
+            throw new InvalidArgumentException(__('The role name is not valid.'));
         }
 
         // Same rule than index apply with a specific id requested
@@ -311,15 +324,15 @@ trait UsersFindersTrait
      * @param string $userId uuid
      * @param string $roleName role name
      * @throws \InvalidArgumentException if the role name or user id are not valid
-     * @return Query
+     * @return \Cake\ORM\Query
      */
     public function findDelete(string $userId, string $roleName)
     {
         if (!Validation::uuid($userId)) {
-            throw new \InvalidArgumentException(__('The user id should be a valid uuid.'));
+            throw new InvalidArgumentException(__('The user id should be a valid uuid.'));
         }
         if (!$this->Roles->isValidRoleName($roleName)) {
-            throw new \InvalidArgumentException(__('The role name is not valid.'));
+            throw new InvalidArgumentException(__('The role name is not valid.'));
         }
 
         return $this->findIndex($roleName)->where(['Users.id' => $userId]);
@@ -328,7 +341,7 @@ trait UsersFindersTrait
     /**
      * Build the query that fetches the user data during authentication
      *
-     * @param Query $query a query instance
+     * @param \Cake\ORM\Query $query a query instance
      * @param array $options options
      * @throws \Exception if fingerprint id is not set
      * @return \Cake\ORM\Query
@@ -337,7 +350,7 @@ trait UsersFindersTrait
     {
         // Options must contain an id
         if (!isset($options['fingerprint'])) {
-            throw new \Exception(__('User table findAuth should have a fingerprint id set in options.'));
+            throw new Exception(__('User table findAuth should have a fingerprint id set in options.'));
         }
 
         // auth query is always done as guest
@@ -356,21 +369,20 @@ trait UsersFindersTrait
      * @throws \InvalidArgumentException if the username is not an email
      * @return \Cake\ORM\Query
      */
-    public function findRecover(string $username, array $options = [])
+    public function findRecover(string $username, ?array $options = [])
     {
         if (!Validation::email($username, Configure::read('passbolt.email.validate.mx'))) {
-            throw new \InvalidArgumentException(__('The username should be a valid email.'));
+            throw new InvalidArgumentException(__('The username should be a valid email.'));
         }
+
         // show active first and do not count deleted ones
-        $query = $this->find()
+        return $this->find()
             ->where(['Users.username' => $username, 'Users.deleted' => false])
             ->contain([
                 'Roles',
-                'Profiles' => AvatarsTable::addContainAvatar()
+                'Profiles' => AvatarsTable::addContainAvatar(),
             ])
             ->order(['Users.active' => 'DESC']);
-
-        return $query;
     }
 
     /**
@@ -378,21 +390,25 @@ trait UsersFindersTrait
      *
      * @param string $userId uuid
      * @throws \InvalidArgumentException if the user id is not a uuid
-     * @return object $user entity
+     * @return \App\Model\Entity\User $user entity
      */
-    public function findSetup($userId)
+    public function findSetup(string $userId)
     {
         if (!Validation::uuid($userId)) {
-            throw new \InvalidArgumentException(__('The user id should be a valid uuid.'));
+            throw new InvalidArgumentException(__('The user id should be a valid uuid.'));
         }
 
         // show active first and do not count deleted ones
+        /** @var \App\Model\Entity\User $user */
         $user = $this->find()
-            ->contain(['Roles', 'Profiles', 'Roles'])
+            ->contain([
+                'Roles',
+                'Profiles' => AvatarsTable::addContainAvatar(),
+            ])
             ->where([
                 'Users.id' => $userId,
                 'Users.deleted' => false, // forbid deleted users to start setup
-                'Users.active' => false // forbid users that have completed the setup to retry
+                'Users.active' => false, // forbid users that have completed the setup to retry
             ])
             ->first();
 
@@ -404,21 +420,25 @@ trait UsersFindersTrait
      *
      * @param string $userId uuid
      * @throws \InvalidArgumentException if the user id is not a uuid
-     * @return object $user entity
+     * @return \App\Model\Entity\User $user entity
      */
     public function findSetupRecover(string $userId)
     {
         if (!Validation::uuid($userId)) {
-            throw new \InvalidArgumentException(__('The user id should be a valid uuid.'));
+            throw new InvalidArgumentException(__('The user id should be a valid uuid.'));
         }
 
         // show active first and do not count deleted ones
+        /** @var \App\Model\Entity\User $user */
         $user = $this->find()
-            ->contain(['Roles', 'Profiles', 'Roles'])
+            ->contain([
+                'Roles',
+                'Profiles' => AvatarsTable::addContainAvatar(),
+            ])
             ->where([
                 'Users.id' => $userId,
                 'Users.deleted' => false, // forbid deleted users to start setup
-                'Users.active' => true // forbid users that have not completed the setup to recover
+                'Users.active' => true, // forbid users that have not completed the setup to recover
             ])
             ->first();
 
@@ -430,14 +450,15 @@ trait UsersFindersTrait
      *
      * @param string $userId uuid
      * @throws \InvalidArgumentException if the user id is not a valid uuid
-     * @return object User
+     * @return \App\Model\Entity\User
      */
     public function findFirstForEmail(string $userId)
     {
         if (!Validation::uuid($userId)) {
-            throw new \InvalidArgumentException(__('The user id should be a valid uuid.'));
+            throw new InvalidArgumentException(__('The user id should be a valid uuid.'));
         }
 
+        /** @var \App\Model\Entity\User $user */
         $user = $this->find()
             ->where(['Users.id' => $userId])
             ->contain([
@@ -452,20 +473,100 @@ trait UsersFindersTrait
     /**
      * Get a user info for an email notification context
      *
-     * @return object User
+     * @return \App\Model\Entity\User
      */
     public function findFirstAdmin()
     {
+        /** @var \App\Model\Entity\User $user */
         $user = $this->find()
             ->where([
                 'Users.deleted' => false,
                 'Users.active' => true,
-                'Roles.name' => Role::ADMIN
+                'Roles.name' => Role::ADMIN,
             ])
             ->order(['Users.created' => 'ASC'])
             ->contain(['Roles'])
             ->first();
 
         return $user;
+    }
+
+    /**
+     * Return a list of admin users (active, non soft-deleted) with their role attached
+     *
+     * @return \Cake\ORM\Query
+     */
+    public function findAdmins()
+    {
+        return $this->find()
+            ->where(
+                [
+                    'Users.deleted' => false,
+                    'Users.active' => true,
+                    'Roles.name' => Role::ADMIN,
+                ]
+            )
+            ->order(['Users.created' => 'ASC'])
+            ->contain(['Roles']);
+    }
+
+    /**
+     * Get all active users.
+     *
+     * @return \Cake\ORM\Query
+     */
+    public function findActive()
+    {
+        return $this->find()
+             ->where([
+                 'Users.deleted' => false,
+                 'Users.active' => true,
+             ])
+             ->order(['Users.created' => 'ASC'])
+             ->all();
+    }
+
+    /**
+     * Retrieve users' last logged in date.
+     *
+     * @param \Cake\ORM\Query $query query
+     * @return \Cake\ORM\Query
+     */
+    public function findlastLoggedIn(Query $query)
+    {
+        // Retrieve the last logged in date for each user, based on the action_logs table.
+        $loginActionId = UuidFactory::uuid('AuthLogin.loginPost');
+        $subQuery = $this->ActionLogs->find();
+        $subQuery->select([
+                'user_id' => 'user_id',
+                'last_logged_in' => $subQuery->func()->max('ActionLogs.created'),
+            ])
+            ->where([
+                'ActionLogs.action_id' => $loginActionId,
+                'ActionLogs.user_id IS NOT NULL',
+                'ActionLogs.status' => 1,
+            ])
+            ->group('user_id');
+
+        // Left join the last logged in query to the given query.
+        $query = $query->select(['last_logged_in' => 'JoinedUsersLastLoggedIn.last_logged_in'])
+            ->enableAutoFields() // Autofields are disabled when a select is made manually on a query, reestablish it.
+            ->join([
+                'table' => $subQuery,
+                'alias' => 'JoinedUsersLastLoggedIn',
+                'type' => 'LEFT',
+                'conditions' => 'Users.id = JoinedUsersLastLoggedIn.user_id',
+            ]);
+
+        // The last logged in date should be formatted as other dates (FrozenTime).
+        $query->decorateResults(function ($row) {
+            if (!is_null($row['last_logged_in'])) {
+                $row['last_logged_in'] = new FrozenTime($row['last_logged_in']);
+            }
+
+            return $row;
+        });
+
+        return $query;
     }
 }

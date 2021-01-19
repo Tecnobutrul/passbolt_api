@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,6 +17,7 @@
 
 namespace App\Error;
 
+use App\Error\Exception\ExceptionWithErrorsDetailInterface;
 use Cake\Error\ExceptionRenderer;
 
 class AppExceptionRenderer extends ExceptionRenderer
@@ -36,11 +39,7 @@ class AppExceptionRenderer extends ExceptionRenderer
             exit;
         }
 
-        $exceptionWithErrorSet = [
-            'App\Error\Exception\CustomValidationException',
-            'App\Error\Exception\ValidationException'
-        ];
-        if (in_array($class, $exceptionWithErrorSet)) {
+        if ($this->error instanceof ExceptionWithErrorsDetailInterface) {
             $this->controller->set(['body' => $this->error]);
         }
 

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -98,7 +100,7 @@ class TotpSetupGetController extends MfaSetupController
         } else {
             $data = [
                 'otpQrCodeImage' => $qrCode,
-                'otpProvisioningUri' => $uri
+                'otpProvisioningUri' => $uri,
             ];
             $this->success(__('Please setup the TOTP application.'), $data);
         }

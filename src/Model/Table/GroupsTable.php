@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -20,6 +22,7 @@ use App\Model\Rule\IsNotSoftDeletedRule;
 use App\Model\Rule\IsNotSoleOwnerOfSharedResourcesRule;
 use App\Model\Traits\Groups\GroupsFindersTrait;
 use App\Utility\UserAccessControl;
+use Cake\Core\Configure;
 use Cake\Event\Event;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\RulesChecker;
@@ -32,22 +35,22 @@ use Cake\Validation\Validator;
  * Groups Model
  *
  * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\BelongsToMany $Users
- * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\HasMany $GroupsUsers
+ * @property \App\Model\Table\GroupsUsersTable|\Cake\ORM\Association\HasMany $GroupsUsers
  * @property \App\Model\Table\SecretsTable|\Cake\ORM\Association\HasOne $Modifier
- *
- * @method \App\Model\Entity\Group get($primaryKey, $options = [])
- * @method \App\Model\Entity\Group newEntity($data = null, array $options = [])
- * @method \App\Model\Entity\Group[] newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\Group|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \App\Model\Entity\Group patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \App\Model\Entity\Group[] patchEntities($entities, array $data, array $options = [])
- * @method \App\Model\Entity\Group findOrCreate($search, callable $callback = null, $options = [])
- *
+ * @method \App\Model\Entity\Group get($primaryKey, ?array $options = [])
+ * @method \App\Model\Entity\Group newEntity($data = null, ?array $options = [])
+ * @method \App\Model\Entity\Group[] newEntities(array $data, ?array $options = [])
+ * @method \App\Model\Entity\Group|bool save(\Cake\Datasource\EntityInterface $entity, ?array $options = [])
+ * @method \App\Model\Entity\Group patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, ?array $options = [])
+ * @method \App\Model\Entity\Group[] patchEntities($entities, array $data, ?array $options = [])
+ * @method \App\Model\Entity\Group findOrCreate($search, callable $callback = null, ?array $options = [])
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class GroupsTable extends Table
 {
     use GroupsFindersTrait;
+
+    public const GROUP_CREATE_SUCCESS_EVENT_NAME = 'Model.Groups.create.success';
 
     /**
      * Initialize method
@@ -55,7 +58,7 @@ class GroupsTable extends Table
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 
@@ -68,19 +71,19 @@ class GroupsTable extends Table
         $this->hasOne('Modifier', [
             'className' => 'Users',
             'bindingKey' => 'modified_by',
-            'foreignKey' => 'id'
+            'foreignKey' => 'id',
         ]);
         $this->hasMany('GroupsUsers', [
-            'saveStrategy' => 'replace'
+            'saveStrategy' => 'replace',
         ]);
         $this->hasOne('MyGroupUser', [
-            'className' => 'GroupsUsers'
+            'className' => 'GroupsUsers',
         ]);
         $this->hasMany('Permissions', [
-            'foreignKey' => 'aro_foreign_key'
+            'foreignKey' => 'aro_foreign_key',
         ]);
         $this->belongsToMany('Users', [
-            'through' => 'GroupsUsers'
+            'through' => 'GroupsUsers',
         ]);
     }
 
@@ -90,7 +93,7 @@ class GroupsTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator
             ->uuid('id')
@@ -126,7 +129,7 @@ class GroupsTable extends Table
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules)
+    public function buildRules(RulesChecker $rules): RulesChecker
     {
         // Add create rules.
         $rules->addCreate(
@@ -138,7 +141,7 @@ class GroupsTable extends Table
         );
         $rules->addCreate([$this, 'atLeastOneAdminRule'], 'at_least_one_admin', [
             'errorField' => 'groups_users',
-            'message' => __('A group manager must be provided.')
+            'message' => __('A group manager must be provided.'),
         ]);
 
         // Update rules.
@@ -149,20 +152,17 @@ class GroupsTable extends Table
             ),
             'group_unique'
         );
-        $rules->addUpdate([$this, 'atLeastOneAdminRule'], 'at_least_one_admin', [
-            'errorField' => 'groups_users',
-            'message' => __('A group manager must be provided.')
-        ]);
         $rules->addUpdate(new IsNotSoftDeletedRule(), 'group_is_not_soft_deleted', [
             'table' => 'Groups',
             'errorField' => 'id',
-            'message' => __('The group cannot be soft deleted.')
+            'message' => __('The group cannot be soft deleted.'),
         ]);
 
         // Delete rules
-        $rules->addDelete(new IsNotSoleOwnerOfSharedResourcesRule(), 'soleOwnerOfSharedResource', [
+        $msg = __('You need to transfer the ownership for the shared content owned by this user before deleting them.');
+        $rules->addDelete(new IsNotSoleOwnerOfSharedResourcesRule(), 'soleOwnerOfSharedContent', [
             'errorField' => 'id',
-            'message' => __('You need to transfer the ownership for the shared passwords owned by this user before deleting this user.')
+            'message' => $msg,
         ]);
 
         return $rules;
@@ -170,11 +170,11 @@ class GroupsTable extends Table
 
     /**
      * Return a group entity.
-     * @param array $data entity data
      *
+     * @param array $data entity data
      * @return \App\Model\Entity\Group
      */
-    public function buildEntity(array $data)
+    public function buildEntity(array $data): Group
     {
         return $this->newEntity($data, [
             'accessibleFields' => [
@@ -182,17 +182,17 @@ class GroupsTable extends Table
                 'created_by' => true,
                 'modified_by' => true,
                 'groups_users' => true,
-                'deleted' => true
+                'deleted' => true,
             ],
             'associated' => [
                 'GroupsUsers' => [
                     'validate' => 'saveGroup',
                     'accessibleFields' => [
                         'user_id' => true,
-                        'is_admin' => true
-                    ]
+                        'is_admin' => true,
+                    ],
                 ],
-            ]
+            ],
         ]);
     }
 
@@ -200,18 +200,17 @@ class GroupsTable extends Table
      * Create a new group.
      *
      * @param array $data group data
-     * @param UserAccessControl $control access control details
-     *
-     * @return \App\Model\Entity\Group|bool
-     * @throws ValidationException
-     * @throws InternalErrorException
+     * @param \App\Utility\UserAccessControl $control access control details
+     * @return \App\Model\Entity\Group
+     * @throws \App\Error\Exception\ValidationException
+     * @throws \Cake\Http\Exception\InternalErrorException
      */
-    public function create(array $data, UserAccessControl $control)
+    public function create(array $data, UserAccessControl $control): Group
     {
         // Manage defaults.
         $defaults = [
-            'created_by' => $control->userId(),
-            'modified_by' => $control->userId(),
+            'created_by' => $control->getId(),
+            'modified_by' => $control->getId(),
             'deleted' => false,
         ];
         $data = array_merge($defaults, $data);
@@ -236,7 +235,7 @@ class GroupsTable extends Table
 
         // Dispatch event.
         $eventData = ['group' => $groupSaved, 'requester' => $control];
-        $event = new Event('Model.Groups.create.success', $this, $eventData);
+        $event = new Event(static::GROUP_CREATE_SUCCESS_EVENT_NAME, $this, $eventData);
         $this->getEventManager()->dispatch($event);
 
         return $groupSaved;
@@ -246,10 +245,10 @@ class GroupsTable extends Table
      * Validate that the a group can be created only if at least one admin is provided.
      *
      * @param \App\Model\Entity\Group $entity The entity that will be created.
-     * @param array $options options
+     * @param array|null $options options
      * @return bool
      */
-    public function atLeastOneAdminRule(Group $entity, array $options = [])
+    public function atLeastOneAdminRule(Group $entity, ?array $options = []): bool
     {
         $adminUsers = [];
         if (isset($entity->groups_users)) {
@@ -268,10 +267,10 @@ class GroupsTable extends Table
      *
      * @throws \InvalidArgumentException if $group is not a valid group entity
      * @param \App\Model\Entity\Group $group entity
-     * @param array $options additional delete options such as ['checkRules' => true]
+     * @param array|null $options additional delete options such as ['checkRules' => true]
      * @return bool status
      */
-    public function softDelete(Group $group, array $options = null)
+    public function softDelete(Group $group, ?array $options = null): bool
     {
         // Check the delete rules like a normal operation
         if (!isset($options['checkRules'])) {
@@ -286,11 +285,27 @@ class GroupsTable extends Table
         // find all the resources that only belongs to the group and mark them as deleted
         // Note: all resources that cannot be deleted should have been
         // transferred to other people already (ref. delete checkRules)
-        $Permissions = TableRegistry::getTableLocator()->get('Permissions');
-        $resourceIds = $Permissions->findResourcesOnlyGroupCanAccess($group->id)->extract('aco_foreign_key')->toArray();
+        $resourceIds = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::RESOURCE_ACO, $group->id)
+            ->extract('aco_foreign_key')->toArray();
         if (!empty($resourceIds)) {
             $Resources = TableRegistry::getTableLocator()->get('Resources');
             $Resources->softDeleteAll($resourceIds);
+        }
+
+        if (Configure::read('passbolt.plugins.folders.enabled')) {
+            // Find all the folders that only belongs to the deleted group and delete them.
+            // Note: all folders that cannot be deleted should have been transferred to other people already.
+            $foldersIds = $this->Permissions->findAcosOnlyAroCanAccess(PermissionsTable::FOLDER_ACO, $group->id)
+                ->extract('aco_foreign_key')->toArray();
+            if (!empty($foldersIds)) {
+                $foldersTable = TableRegistry::getTableLocator()->get('Passbolt/Folders.Folders');
+                $foldersRelationsTable = TableRegistry::getTableLocator()->get('Passbolt/Folders.FoldersRelations');
+                $foldersTable->deleteAll(['id IN' => $foldersIds]);
+                $foldersRelationsTable
+                    ->deleteAll(['foreign_id IN' => $foldersIds]);
+                $foldersRelationsTable
+                    ->updateAll(['folder_parent_id' => null], ['folder_parent_id IN ' => $foldersIds]);
+            }
         }
 
         // Delete all group memberships
@@ -298,7 +313,9 @@ class GroupsTable extends Table
 
         // Delete all permissions
         // Delete all the secrets that lost permissions in the process
-        $Permissions->deleteAll(['aro_foreign_key' => $group->id]);
+        $this->Permissions->deleteAll(['aro_foreign_key' => $group->id]);
+
+        /** @var \App\Model\Table\SecretsTable $Secrets */
         $Secrets = TableRegistry::getTableLocator()->get('Secrets');
         $Secrets->cleanupHardDeletedPermissions();
 

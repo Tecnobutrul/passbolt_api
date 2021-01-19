@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -33,13 +35,13 @@ class AvatarsTable extends FileStorageTable
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 
         $this->belongsTo('Profiles', [
             'foreignKey' => 'foreign_key',
-            'conditions' => ['model' => 'Avatar']
+            'conditions' => ['model' => 'Avatar'],
         ]);
 
         $this->setTable('file_storage');
@@ -51,7 +53,7 @@ class AvatarsTable extends FileStorageTable
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator
             ->requirePresence('file', __('A file is required'))
@@ -60,11 +62,11 @@ class AvatarsTable extends FileStorageTable
                 'rule' => ['mimeType', ['image/jpeg', 'image/png', 'image/gif']],
             ])
             ->add('file', 'validExtension', [
-                'rule' => ['extension', ['png', 'jpg', 'gif']]
+                'rule' => ['extension', ['png', 'jpg', 'gif']],
             ])
             ->add('file', 'validUploadedFile', [
                 'rule' => ['uploadedFile', ['optional' => false]],
-                'message' => 'File is no valid uploaded file'
+                'message' => 'File is no valid uploaded file',
             ]);
 
         return $validator;
@@ -74,8 +76,8 @@ class AvatarsTable extends FileStorageTable
      * Implements afterSave() callback.
      * Mainly used to delete former versions of avatars
      *
-     * @param Event $event the event
-     * @param EntityInterface $entity entity
+     * @param \Cake\Event\Event $event the event
+     * @param \Cake\Datasource\EntityInterface $entity entity
      * @param \ArrayObject $options options
      * @return void
      */
@@ -86,7 +88,7 @@ class AvatarsTable extends FileStorageTable
             ->where([
                 'foreign_key' => $entity->foreign_key,
                 'id <>' => $entity->id,
-                'model' => 'Avatar'
+                'model' => 'Avatar',
             ])
             ->first();
 
@@ -99,7 +101,7 @@ class AvatarsTable extends FileStorageTable
      * BeforeMarshal callback.
      * It enforces the data related to this model and the adapter to be used.
      *
-     * @param Event $event the event
+     * @param \Cake\Event\Event $event the event
      * @param \ArrayObject $data data
      * @param \ArrayObject $options options
      * @return void
@@ -115,6 +117,7 @@ class AvatarsTable extends FileStorageTable
     /**
      * Formatter for Avatar entities.
      * Used mainly to populate an avatar when no there is no result with the default avatar url.
+     *
      * @param array $avatars list of avatars (\App\Model\Entity\Avatar)
      * @return mixed
      */
@@ -133,6 +136,7 @@ class AvatarsTable extends FileStorageTable
 
     /**
      * Generate an Avatar contain clause to be inserted in a contain table.
+     *
      * @return array
      */
     public static function addContainAvatar()
@@ -143,7 +147,7 @@ class AvatarsTable extends FileStorageTable
                 return $q->formatResults(function (CollectionInterface $avatars) {
                     return AvatarsTable::formatResults($avatars);
                 });
-            }
+            },
         ];
     }
 }

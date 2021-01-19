@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -17,6 +19,7 @@ namespace Passbolt\AuditLog\Utility;
 
 use App\Model\Table\AvatarsTable;
 use App\Utility\UuidFactory;
+use Cake\Core\Configure;
 use Cake\ORM\ResultSet;
 use Cake\ORM\TableRegistry;
 use Passbolt\Log\Model\Entity\ActionLog;
@@ -26,27 +29,35 @@ class ActionLogResultsParser
 {
     protected $actionLogs = [];
     protected $entries = [];
+    protected $filters = [];
 
-    const TYPE_PERMISSIONS_UPDATED = 'Permissions.updated';
-    const TYPE_SECRETS_READ = 'Resource.Secrets.read';
-    const TYPE_SECRETS_UPDATED = 'Resource.Secrets.updated';
-    const TYPE_RESOURCE_CREATED = 'Resources.created';
-    const TYPE_RESOURCE_UPDATED = 'Resources.updated';
-    const TYPE_RESOURCE_DELETED = 'Resources.deleted';
+    public const TYPE_PERMISSIONS_UPDATED = 'Permissions.updated';
+    public const TYPE_SECRETS_READ = 'Resource.Secrets.read';
+    public const TYPE_SECRETS_UPDATED = 'Resource.Secrets.updated';
+    public const TYPE_RESOURCE_CREATED = 'Resources.created';
+    public const TYPE_RESOURCE_UPDATED = 'Resources.updated';
+    public const TYPE_RESOURCE_DELETED = 'Resources.deleted';
+    public const TYPE_FOLDER_CREATED = 'Folders.created';
+    public const TYPE_FOLDER_UPDATED = 'Folders.updated';
+    public const TYPE_FOLDER_DELETED = 'Folders.deleted';
 
     /**
      * ActionLogResultsParser constructor.
      *
-     * @param ResultSet $actionLogs action logs
+     * @param \Cake\ORM\ResultSet $actionLogs action logs
+     * @param array $filters list of filters
+     *   - array resources is the one currently supported. It should contain a list of ids.
      * @return void
      */
-    public function __construct(ResultSet $actionLogs)
+    public function __construct(ResultSet $actionLogs, array $filters = [])
     {
         $this->actionLogs = $actionLogs;
+        $this->filters = $filters;
     }
 
     /**
      * Parse action logs
+     *
      * @return array list of entries
      */
     public function parse()
@@ -60,10 +71,10 @@ class ActionLogResultsParser
 
     /**
      * Add an entry in the entries list
+     *
      * @param string $type type
      * @param array $data data
-     * @param ActionLog $actionLog actionLog object
-     *
+     * @param \Passbolt\Log\Model\Entity\ActionLog $actionLog actionLog object
      * @return array corresponding entry
      */
     protected function _addEntry(string $type, array $data, ActionLog $actionLog)
@@ -87,8 +98,8 @@ class ActionLogResultsParser
      * One action log can produce several entries. It is necessary that we can identify each entry
      * with a unique id.
      * An entry id is a uuid made of action_log_id + its position in the list of entries for the given action log.s
-     * @param array $entry entry
      *
+     * @param array $entry entry
      * @return string entry id
      */
     protected function getEntryId(array $entry)
@@ -97,7 +108,7 @@ class ActionLogResultsParser
 
         foreach ($this->entries as $listEntry) {
             if ($listEntry['action_log_id'] === $entry['action_log_id']) {
-                $nbEntriesForActionLog ++;
+                $nbEntriesForActionLog++;
             }
         }
 
@@ -108,7 +119,8 @@ class ActionLogResultsParser
 
     /**
      * Process resources crud operations.
-     * @param ActionLog $actionLog action log
+     *
+     * @param \Passbolt\Log\Model\Entity\ActionLog $actionLog action log
      * @return void
      */
     protected function _processResourcesCrudOperations(ActionLog $actionLog)
@@ -139,8 +151,42 @@ class ActionLogResultsParser
     }
 
     /**
+     * Process folders crud operations.
+     *
+     * @param \Passbolt\Log\Model\Entity\ActionLog $actionLog action log
+     * @return void
+     */
+    protected function _processFoldersCrudOperations(ActionLog $actionLog)
+    {
+        foreach ($actionLog->entities_history as $entityHistory) {
+            if ($entityHistory->foreign_model == 'FoldersHistory') {
+                $data = [
+                    'folder' => $entityHistory->folders_history->toArray(),
+                ];
+
+                if ($entityHistory->crud == EntityHistory::CRUD_CREATE) {
+                    $type = self::TYPE_FOLDER_CREATED;
+                }
+
+                if ($entityHistory->crud == EntityHistory::CRUD_UPDATE) {
+                    $type = self::TYPE_FOLDER_UPDATED;
+                }
+
+                if ($entityHistory->crud == EntityHistory::CRUD_DELETE) {
+                    $type = self::TYPE_FOLDER_DELETED;
+                }
+
+                if (isset($type)) {
+                    $this->_addEntry($type, $data, $actionLog);
+                }
+            }
+        }
+    }
+
+    /**
      * Process secrets update operations
-     * @param ActionLog $actionLog action log
+     *
+     * @param \Passbolt\Log\Model\Entity\ActionLog $actionLog action log
      * @return void
      */
     protected function _processSecretsUpdateOperations(ActionLog $actionLog)
@@ -168,13 +214,23 @@ class ActionLogResultsParser
 
     /**
      * Process secret accesses operations
-     * @param ActionLog $actionLog action log
+     *
+     * @param \Passbolt\Log\Model\Entity\ActionLog $actionLog action log
      * @return void
      */
     protected function _processSecretAccessesOperations(ActionLog $actionLog)
     {
         foreach ($actionLog->entities_history as $entityHistory) {
             if ($entityHistory->foreign_model == 'SecretAccesses') {
+                // If the resources filter is set, and the current resource is not in the filter, we skip the entry.
+                if (
+                    !empty($this->filters)
+                    && isset($this->filters['resources'])
+                    && !in_array($entityHistory->secret_access->secret_access_resource->id, $this->filters['resources'])
+                ) {
+                    continue;
+                }
+
                 $data = [
                     'resource' => $entityHistory->secret_access->secret_access_resource->toArray(),
                 ];
@@ -188,7 +244,8 @@ class ActionLogResultsParser
 
     /**
      * Process permissions update operations
-     * @param ActionLog $actionLog action log
+     *
+     * @param \Passbolt\Log\Model\Entity\ActionLog $actionLog action log
      * @return void
      */
     protected function _processPermissionsUpdateOperations(ActionLog $actionLog)
@@ -199,7 +256,7 @@ class ActionLogResultsParser
                 'added' => [],
                 'updated' => [],
                 'removed' => [],
-            ]
+            ],
         ];
         foreach ($actionLog->entities_history as $entityHistory) {
             if ($entityHistory->foreign_model === 'PermissionsHistory') {
@@ -215,6 +272,13 @@ class ActionLogResultsParser
                 $permission = $entityHistory->permissions_history;
                 $permission->resource = $permission->permissions_history_resource;
                 unset($permission->permissions_history_resource);
+
+                if (Configure::read('passbolt.plugins.folders.enabled')) {
+                    if (isset($permission->permissions_history_folder)) {
+                        $permission->folder = $permission->permissions_history_folder;
+                        unset($permission->permissions_history_folder);
+                    }
+                }
 
                 $permission->user = $permission->permissions_history_user;
                 unset($permission->permissions_history_user);
@@ -235,6 +299,12 @@ class ActionLogResultsParser
                 if (!isset($data['resource'])) {
                     $data['resource'] = $permission->resource;
                 }
+
+                if (Configure::read('passbolt.plugins.folders.enabled')) {
+                    if (! isset($data['folder'])) {
+                        $data['folder'] = $permission->folder;
+                    }
+                }
             }
         }
         if ($permissionsUpdated == true) {
@@ -244,8 +314,8 @@ class ActionLogResultsParser
 
     /**
      * Get the corresponding user object with its profile and avatar from a user id.
-     * @param string $userId user id.
      *
+     * @param string $userId user id.
      * @return array|\Cake\Datasource\EntityInterface|null user object
      */
     protected function _getUserObject(string $userId)
@@ -265,7 +335,8 @@ class ActionLogResultsParser
 
     /**
      * Add entries corresponding to a given action log.
-     * @param ActionLog $actionLog action log
+     *
+     * @param \Passbolt\Log\Model\Entity\ActionLog $actionLog action log
      * @return void
      */
     public function addEntries(ActionLog $actionLog)
@@ -274,10 +345,14 @@ class ActionLogResultsParser
         $this->_processSecretAccessesOperations($actionLog);
         $this->_processSecretsUpdateOperations($actionLog);
         $this->_processPermissionsUpdateOperations($actionLog);
+        if (Configure::read('passbolt.plugins.folders.enabled')) {
+            $this->_processFoldersCrudOperations($actionLog);
+        }
     }
 
     /**
      * Get entries.
+     *
      * @return array entries
      */
     public function getEntries()

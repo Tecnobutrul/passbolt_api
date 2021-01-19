@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -14,36 +16,35 @@
  */
 namespace Passbolt\DirectorySync\Form;
 
-use App\Error\Exception\CustomValidationException;
 use App\Model\Entity\Role;
 use Cake\Form\Form;
 use Cake\Form\Schema;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 use Cake\Validation\Validator;
-use LdapTools\Configuration;
-use LdapTools\LdapManager;
 use Passbolt\DirectorySync\Utility\DirectoryFactory;
 use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 class LdapConfigurationForm extends Form
 {
-    const CONNECTION_TYPE_PLAIN = 'plain';
-    const CONNECTION_TYPE_SSL = 'ssl';
-    const CONNECTION_TYPE_TLS = 'tls';
+    public const CONNECTION_TYPE_PLAIN = 'plain';
+    public const CONNECTION_TYPE_SSL = 'ssl';
+    public const CONNECTION_TYPE_TLS = 'tls';
 
     public static $connectionTypes = [
         self::CONNECTION_TYPE_PLAIN,
         self::CONNECTION_TYPE_SSL,
-        self::CONNECTION_TYPE_TLS
+        self::CONNECTION_TYPE_TLS,
     ];
 
     /**
      * Mapping of the object properties with the configuration paths.
      * Note that the connection_type property is mapped manually.
+     *
      * @var array
      */
     private static $configurationMapping = [
+        'source' => 'source',
         'directory_type' => 'ldap.domains.org_domain.ldap_type',
         'domain_name' => 'ldap.domains.org_domain.domain_name',
         'username' => 'ldap.domains.org_domain.username',
@@ -67,13 +68,14 @@ class LdapConfigurationForm extends Form
         'sync_users_delete' => 'jobs.users.delete',
         'sync_groups_create' => 'jobs.groups.create',
         'sync_groups_delete' => 'jobs.groups.delete',
-        'sync_groups_update' => 'jobs.groups.update'
+        'sync_groups_update' => 'jobs.groups.update',
     ];
 
     /**
      * Database configuration schema.
-     * @param Schema $schema shchema
-     * @return Schema
+     *
+     * @param \Cake\Form\Schema $schema shchema
+     * @return \Cake\Form\Schema
      */
     protected function _buildSchema(Schema $schema)
     {
@@ -107,15 +109,20 @@ class LdapConfigurationForm extends Form
 
     /**
      * Validation rules.
-     * @param Validator $validator validator
-     * @return Validator
+     *
+     * @param \Cake\Validation\Validator $validator validator
+     * @return \Cake\Validation\Validator
      */
     protected function _buildValidator(Validator $validator)
     {
         $validator
             ->requirePresence('directory_type', 'create', __('A directory type is required.'))
             ->notEmpty('directory_type', __('A directory type is required.'))
-            ->inList('directory_type', ['ad', 'openldap'], __('The directory type is not valid (only ad and openldap are supported).'));
+            ->inList(
+                'directory_type',
+                ['ad', 'openldap'],
+                __('The directory type is not valid (only ad and openldap are supported).')
+            );
 
         $validator
             ->requirePresence('domain_name', 'create', __('A domain name is required.'))
@@ -148,24 +155,28 @@ class LdapConfigurationForm extends Form
         $validator
             ->requirePresence('connection_type', 'create', __('A connection type is required.'))
             ->notEmpty('connection_type', __('A connection type is required.'))
-            ->inList('connection_type', self::$connectionTypes, __('The connection type is not valid (only plain, ssl, tls are supported)'));
+            ->inList(
+                'connection_type',
+                self::$connectionTypes,
+                __('The connection type is not valid (only plain, ssl, tls are supported)')
+            );
 
         $validator
             ->requirePresence('default_user', 'create', __('A default user is required.'))
             ->notEmpty('default_user', __('Default user cannot be empty.'))
-            ->uuid(('default_user'), false, __('Default user should be a valid uuid.'))
+            ->uuid('default_user', false, __('Default user should be a valid uuid.'))
             ->add('default_user', ['isValidAdmin' => [
                 'rule' => [$this, 'isValidAdmin'],
-                'message' => __('The admin user provided does not exist.')
+                'message' => __('The admin user provided does not exist.'),
             ]]);
 
         $validator
             ->requirePresence('default_group_admin_user', 'create', __('A default group admin user is required.'))
             ->notEmpty('default_group_admin_user', __('Default group admin user cannot be empty.'))
-            ->uuid(('default_group_admin_user'), false, __('Default group admin user should be a valid uuid.'))
+            ->uuid('default_group_admin_user', false, __('Default group admin user should be a valid uuid.'))
             ->add('default_group_admin_user', ['isValidUser' => [
                 'rule' => [$this, 'isValidUser'],
-                'message' => __('The group admin user provided does not exist.')
+                'message' => __('The group admin user provided does not exist.'),
             ]]);
 
         $validator
@@ -238,10 +249,14 @@ class LdapConfigurationForm extends Form
      * @param array $context not in use
      * @return bool
      */
-    public function isValidAdmin(string $value, array $context = null)
+    public function isValidAdmin(string $value, ?array $context = null)
     {
         $User = TableRegistry::getTableLocator()->get('Users');
-        $exist = $User->find()->contain(['Roles'])->where(['Users.id' => $value, 'Users.active' => 1, 'Users.deleted' => 0, 'Roles.name' => Role::ADMIN])->count();
+        $exist = $User
+            ->find()
+            ->contain(['Roles'])
+            ->where(['Users.id' => $value, 'Users.active' => 1, 'Users.deleted' => 0, 'Roles.name' => Role::ADMIN])
+            ->count();
         if ($exist) {
             return true;
         }
@@ -256,7 +271,7 @@ class LdapConfigurationForm extends Form
      * @param array $context not in use
      * @return bool
      */
-    public function isValidUser(string $value, array $context = null)
+    public function isValidUser(string $value, ?array $context = null)
     {
         $User = TableRegistry::getTableLocator()->get('Users');
         $exist = $User->find()->where(['Users.id' => $value, 'Users.active' => 1, 'Users.deleted' => 0])->count();
@@ -270,11 +285,10 @@ class LdapConfigurationForm extends Form
     /**
      * Transform form data into the expected org settings format
      *
-     * @param array $data The form data
-     *
+     * @param array|null $data The form data
      * @return array $settings The org settings data
      */
-    public static function formatFormDataToOrgSettings(array $data = [])
+    public static function formatFormDataToOrgSettings(?array $data = [])
     {
         $settings = [];
         if (empty($data)) {
@@ -283,7 +297,10 @@ class LdapConfigurationForm extends Form
 
         $User = TableRegistry::getTableLocator()->get('Users');
         $data['default_user'] = $User->find()->where(['Users.id' => $data['default_user']])->first()->get('username');
-        $data['default_group_admin_user'] = $User->find()->where(['Users.id' => $data['default_group_admin_user']])->first()->get('username');
+        $data['default_group_admin_user'] = $User->find()
+            ->where(['Users.id' => $data['default_group_admin_user']])
+            ->first()
+            ->get('username');
 
         foreach ($data as $prop => $propVal) {
             if ((!empty($propVal) || $propVal === false) && isset(self::$configurationMapping[$prop])) {
@@ -300,11 +317,10 @@ class LdapConfigurationForm extends Form
     /**
      * Transform a configuration array into ldap configuration form data
      *
-     * @param array $settings The organization settings
-     *
+     * @param array|null $settings The organization settings
      * @return array LdapConfigurationForm data
      */
-    public static function formatOrgSettingsToFormData(array $settings = [])
+    public static function formatOrgSettingsToFormData(?array $settings = [])
     {
         $data = [];
         $settings = Hash::flatten($settings);
@@ -322,7 +338,9 @@ class LdapConfigurationForm extends Form
             }
         }
         if (isset($settings['defaultGroupAdminUser'])) {
-            $defaultGroupAdminUser = $User->find()->where(['Users.username' => $settings['defaultGroupAdminUser']])->first();
+            $defaultGroupAdminUser = $User->find()
+                ->where(['Users.username' => $settings['defaultGroupAdminUser']])
+                ->first();
             if (empty($defaultGroupAdminUser)) {
                 $settings['defaultGroupAdminUser'] = '';
             } else {
@@ -365,6 +383,7 @@ class LdapConfigurationForm extends Form
 
     /**
      * Execute implementation.
+     *
      * @param array $data form data
      * @return bool
      */

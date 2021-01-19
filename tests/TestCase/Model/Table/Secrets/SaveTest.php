@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -31,7 +33,7 @@ class SaveTest extends AppTestCase
 
     public $fixtures = [
         'app.Base/Resources', 'app.Base/Secrets', 'app.Base/Permissions',
-        'app.Base/Users', 'app.Base/Groups', 'app.Base/GroupsUsers'
+        'app.Base/Users', 'app.Base/Groups', 'app.Base/GroupsUsers',
     ];
 
     public function setUp()
@@ -57,14 +59,12 @@ class SaveTest extends AppTestCase
                 // See the validationSaveResource.
                 'resource_id' => true,
                 'user_id' => true,
-                'data' => true
+                'data' => true,
             ],
         ];
     }
 
-    /* ************************************************************** */
     /* FORMAT VALIDATION TESTS */
-    /* ************************************************************** */
 
     public function testSecretsSaveValidationUserId()
     {
@@ -73,7 +73,7 @@ class SaveTest extends AppTestCase
             'requirePresence' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
         ];
-        $this->assertFieldFormatValidation($this->Secrets, 'user_id', self::getDummySecret(), self::getEntityDefaultOptions(), $testCases);
+        $this->assertFieldFormatValidation($this->Secrets, 'user_id', self::getDummySecretData(), self::getEntityDefaultOptions(), $testCases);
     }
 
     public function testSecretsSaveValidationResourceId()
@@ -83,7 +83,7 @@ class SaveTest extends AppTestCase
             'requirePresence' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
         ];
-        $this->assertFieldFormatValidation($this->Secrets, 'resource_id', self::getDummySecret(), self::getEntityDefaultOptions(), $testCases);
+        $this->assertFieldFormatValidation($this->Secrets, 'resource_id', self::getDummySecretData(), self::getEntityDefaultOptions(), $testCases);
     }
 
     public function testSecretsSaveValidationData()
@@ -93,16 +93,14 @@ class SaveTest extends AppTestCase
             'requirePresence' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
         ];
-        $this->assertFieldFormatValidation($this->Secrets, 'data', self::getDummySecret(), self::getEntityDefaultOptions(), $testCases);
+        $this->assertFieldFormatValidation($this->Secrets, 'data', self::getDummySecretData(), self::getEntityDefaultOptions(), $testCases);
     }
 
-    /* ************************************************************** */
     /* LOGIC VALIDATION TESTS */
-    /* ************************************************************** */
 
     public function testSecretsSaveSuccess()
     {
-        $data = self::getDummySecret();
+        $data = self::getDummySecretData();
         $options = self::getEntityDefaultOptions();
 
         // Contextual data change: give access to the resource to the user
@@ -127,7 +125,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleSecretUnique()
     {
-        $data = self::getDummySecret();
+        $data = self::getDummySecretData();
         $data['user_id'] = UuidFactory::uuid('user.id.ada');
         $data['resource_id'] = UuidFactory::uuid('resource.id.apache');
         $options = self::getEntityDefaultOptions();
@@ -142,7 +140,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleUserExists()
     {
-        $data = self::getDummySecret();
+        $data = self::getDummySecretData();
         $data['user_id'] = UuidFactory::uuid();
         $options = self::getEntityDefaultOptions();
         $entity = $this->Secrets->newEntity($data, $options);
@@ -156,7 +154,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleUserIsNotSoftDeleted()
     {
-        $data = self::getDummySecret();
+        $data = self::getDummySecretData();
         $data['user_id'] = UuidFactory::uuid('user.id.sofia');
         $options = self::getEntityDefaultOptions();
         $entity = $this->Secrets->newEntity($data, $options);
@@ -170,7 +168,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleResourceExists()
     {
-        $data = self::getDummySecret();
+        $data = self::getDummySecretData();
         $data['resource_id'] = UuidFactory::uuid();
         $options = self::getEntityDefaultOptions();
         $entity = $this->Secrets->newEntity($data, $options);
@@ -184,7 +182,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleResourceIsNotSoftDeleted()
     {
-        $data = self::getDummySecret();
+        $data = self::getDummySecretData();
         $data['resource_id'] = UuidFactory::uuid('resource.id.jquery');
         $options = self::getEntityDefaultOptions();
         $entity = $this->Secrets->newEntity($data, $options);
@@ -198,7 +196,7 @@ class SaveTest extends AppTestCase
 
     public function testErrorRuleHasAccess()
     {
-        $data = self::getDummySecret();
+        $data = self::getDummySecretData();
         $options = self::getEntityDefaultOptions();
         $entity = $this->Secrets->newEntity($data, $options);
 

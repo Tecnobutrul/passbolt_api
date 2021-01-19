@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -20,7 +22,6 @@ use Passbolt\MultiFactorAuthentication\Utility\MfaSettings;
 
 trait MfaYubikeySettingsTestTrait
 {
-
     /**
      * @param string $user
      * @param string $case
@@ -32,15 +33,15 @@ trait MfaYubikeySettingsTestTrait
             MfaSettings::PROVIDERS => [MfaSettings::PROVIDER_YUBIKEY => true],
             MfaSettings::PROVIDER_YUBIKEY => [
                 'clientId' => '12345',
-                'secretKey' => 'f4/ijjIAAO/bxO1k6hXmdgRRXUY='
-            ]
+                'secretKey' => 'f4/ijjIAAO/bxO1k6hXmdgRRXUY=',
+            ],
         ]);
         $this->mockMfaAccountSettings('ada', [
             MfaSettings::PROVIDERS => [MfaSettings::PROVIDER_YUBIKEY],
             MfaSettings::PROVIDER_YUBIKEY => [
                 MfaAccountSettings::VERIFIED => FrozenTime::now(),
-                MfaAccountSettings::YUBIKEY_ID => 'ijfeijfeij'
-            ]
+                MfaAccountSettings::YUBIKEY_ID => 'ijfeijfeij',
+            ],
         ]);
     }
 }

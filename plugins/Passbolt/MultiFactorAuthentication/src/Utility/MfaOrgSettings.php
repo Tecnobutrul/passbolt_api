@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -10,17 +12,15 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.5.0
+ * @since         2.0.0
  */
 namespace Passbolt\MultiFactorAuthentication\Utility;
 
 use App\Error\Exception\CustomValidationException;
-use App\Model\Table\OrganizationSettingsTable;
 use App\Utility\UserAccessControl;
 use Cake\Core\Configure;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\InternalErrorException;
-use Cake\ORM\Locator\TableLocator;
 use Cake\ORM\TableRegistry;
 
 class MfaOrgSettings
@@ -31,19 +31,19 @@ class MfaOrgSettings
     /**
      * Duo constants
      */
-    const DUO_SECRET_KEY = 'secretKey';
-    const DUO_HOSTNAME = 'hostName';
-    const DUO_INTEGRATION_KEY = 'integrationKey';
-    const DUO_SALT = 'salt';
+    public const DUO_SECRET_KEY = 'secretKey';
+    public const DUO_HOSTNAME = 'hostName';
+    public const DUO_INTEGRATION_KEY = 'integrationKey';
+    public const DUO_SALT = 'salt';
 
     /**
      * Yubikey constants
      */
-    const YUBIKEY_CLIENT_ID = 'clientId';
-    const YUBIKEY_SECRET_KEY = 'secretKey';
+    public const YUBIKEY_CLIENT_ID = 'clientId';
+    public const YUBIKEY_SECRET_KEY = 'secretKey';
 
     /**
-     * @var OrganizationSettingsTable
+     * @var \App\Model\Table\OrganizationSettingsTable
      */
     protected $OrganizationSettings;
 
@@ -57,7 +57,7 @@ class MfaOrgSettings
      *
      * @param array|null $settings merged settings from configure and database
      */
-    public function __construct(array $settings = null)
+    public function __construct(?array $settings = null)
     {
         if (!isset($settings) || !isset($settings[MfaSettings::PROVIDERS])) {
             throw new InternalErrorException(__('Invalid MFA org settings.'));
@@ -94,7 +94,7 @@ class MfaOrgSettings
     /**
      * Get Organization MFA Settings
      *
-     * @return MfaOrgSettings
+     * @return \Passbolt\MultiFactorAuthentication\Utility\MfaOrgSettings
      */
     public static function get()
     {
@@ -141,6 +141,14 @@ class MfaOrgSettings
         }
 
         return $result;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return count($this->getEnabledProviders()) > 0;
     }
 
     /**
@@ -217,13 +225,13 @@ class MfaOrgSettings
                         self::DUO_SALT => $this->getDuoSalt(),
                         self::DUO_SECRET_KEY => $this->getDuoSecretKey(),
                         self::DUO_HOSTNAME => $this->getDuoHostname(),
-                        self::DUO_INTEGRATION_KEY => $this->getDuoIntegrationKey()
+                        self::DUO_INTEGRATION_KEY => $this->getDuoIntegrationKey(),
                     ];
                     break;
                 case MfaSettings::PROVIDER_YUBIKEY:
                     $results[MfaSettings::PROVIDER_YUBIKEY] = [
                         self::YUBIKEY_CLIENT_ID => $this->getYubikeyOTPClientId(),
-                        self::YUBIKEY_SECRET_KEY => $this->getYubikeyOTPSecretKey()
+                        self::YUBIKEY_SECRET_KEY => $this->getYubikeyOTPSecretKey(),
                     ];
                     break;
             }
@@ -236,7 +244,7 @@ class MfaOrgSettings
      * Validate
      *
      * @param array $data user provided data
-     * @throws CustomValidationException if the data does not validate
+     * @throws \App\Error\Exception\CustomValidationException if the data does not validate
      * @return bool if data validates
      */
     public function validate(array $data)
@@ -286,10 +294,10 @@ class MfaOrgSettings
     /**
      * Save a user provided org settings in database
      *
-     * @throws CustomValidationException in case of validation error
-     * @throws InternalErrorException
+     * @throws \App\Error\Exception\CustomValidationException in case of validation error
+     * @throws \Cake\Http\Exception\InternalErrorException
      * @param array $data user provided input
-     * @param UserAccessControl $uac user access control
+     * @param \App\Utility\UserAccessControl $uac user access control
      * @return void
      */
     public function save(array $data, UserAccessControl $uac)

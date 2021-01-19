@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -24,7 +26,15 @@ class UsersEditAvatarControllerTest extends AppIntegrationTestCase
     public $localFileStorageListener = null;
     public $imageProcessingListener = null;
 
-    public $fixtures = ['app.Base/Users', 'app.Base/Roles', 'app.Base/Profiles', 'app.Base/Gpgkeys', 'app.Base/GroupsUsers', 'app.Base/Avatars'];
+    /**
+     * @var AvatarsTable $Avatars
+     */
+    public $Avatars;
+
+    public $fixtures = [
+        'app.Base/Users', 'app.Base/Roles', 'app.Base/Profiles', 'app.Base/Gpgkeys',
+        'app.Base/GroupsUsers', 'app.Base/Avatars',
+    ];
 
     public function setUp()
     {
@@ -53,11 +63,11 @@ class UsersEditAvatarControllerTest extends AppIntegrationTestCase
                         'filesize' => 170049, // filesize in bytes
                         'error' => \UPLOAD_ERR_OK, // upload (error) status
                         'filename' => 'ada.png', // upload filename
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.irene') . '.json?api-version=v1', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.irene') . '.json', $data);
         $this->assertSuccess();
 
         $ireneAvatar = $this->Avatars
@@ -97,18 +107,18 @@ class UsersEditAvatarControllerTest extends AppIntegrationTestCase
                     'file' => [
                         'tmp_file' => $pdfFile,
                         'name' => 'minimal.pdf',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.irene') . '.json?api-version=v1', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.irene') . '.json?api-version=v2', $data);
         $this->assertError(400, 'Could not validate user data.');
-        $this->assertNotEmpty($this->_responseJsonBody->User->profile->avatar->file->validExtension);
-        $this->assertNotEmpty($this->_responseJsonBody->User->profile->avatar->file->validMimeType);
-        $this->assertNotEmpty($this->_responseJsonBody->User->profile->avatar->file->validUploadedFile);
+        $this->assertNotEmpty($this->_responseJsonBody->profile->avatar->file->validExtension);
+        $this->assertNotEmpty($this->_responseJsonBody->profile->avatar->file->validMimeType);
+        $this->assertNotEmpty($this->_responseJsonBody->profile->avatar->file->validUploadedFile);
 
         $avatarCountsAfter = $this->Avatars->find()->count();
-        $this->assertEquals($avatarCountsBefore, $avatarCountsAfter, "The number of avatars in db should be same before and after the test");
+        $this->assertEquals($avatarCountsBefore, $avatarCountsAfter, 'The number of avatars in db should be same before and after the test');
     }
 
     public function testUsersEditAvatarNoDataProvided()
@@ -117,12 +127,12 @@ class UsersEditAvatarControllerTest extends AppIntegrationTestCase
         $data = [
             'id' => UuidFactory::uuid('user.id.irene'),
             'profile' => [
-                'avatar' => []
-            ]
+                'avatar' => [],
+            ],
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.irene') . '.json?api-version=v1', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.irene') . '.json', $data);
         $this->assertError(400, 'Could not validate user data.');
-        $this->assertNotEmpty($this->_responseJsonBody->User->profile->avatar->file->_required);
+        $this->assertNotEmpty($this->_responseJsonBody->profile->avatar->file->_required);
     }
 
     public function testUsersEditAvatarCantOverrideData()
@@ -148,11 +158,11 @@ class UsersEditAvatarControllerTest extends AppIntegrationTestCase
                     'extension' => 'jpg',
                     'hash' => '12345',
                     'path' => '/test/test1',
-                    'adapter' => 'TestAdapter'
-                ]
-            ]
+                    'adapter' => 'TestAdapter',
+                ],
+            ],
         ];
-        $this->postJson('/users/' . UuidFactory::uuid('user.id.irene') . '.json?api-version=v1', $data);
+        $this->postJson('/users/' . UuidFactory::uuid('user.id.irene') . '.json', $data);
         $this->assertSuccess();
 
         $ireneAvatar = $this->Avatars

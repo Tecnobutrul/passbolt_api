@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -14,8 +16,11 @@
  */
 namespace Passbolt\DirectorySync\Test\TestCase\Actions;
 
+use App\Notification\Email\EmailSubscriptionDispatcher;
+use App\Notification\Email\Redactor\CoreEmailRedactorPool;
 use App\Shell\AppShellBootstrap;
 use App\Utility\UuidFactory;
+use Cake\Event\EventManager;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\TableRegistry;
 use Passbolt\DirectorySync\Actions\GroupSyncAction;
@@ -24,17 +29,29 @@ use Passbolt\DirectorySync\Test\Utility\Traits\AssertDirectoryRelationsTrait;
 use Passbolt\DirectorySync\Test\Utility\Traits\AssertGroupsTrait;
 use Passbolt\DirectorySync\Test\Utility\Traits\AssertGroupUsersTrait;
 use Passbolt\DirectorySync\Utility\Alias;
+use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 
 class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
 {
     use AssertDirectoryRelationsTrait;
     use AssertGroupsTrait;
     use AssertGroupUsersTrait;
+    use EmailNotificationSettingsTestTrait;
 
     public function setUp()
     {
         parent::setUp();
         $this->initAction();
+        $this->loadNotificationSettings();
+        $this->setEmailNotificationSetting('send.group.user.add', true);
+        EventManager::instance()->on(new CoreEmailRedactorPool());
+        (new EmailSubscriptionDispatcher())->collectSubscribedEmailRedactors();
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+        $this->unloadNotificationSettings();
     }
 
     /**
@@ -103,7 +120,7 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
             'action' => Alias::ACTION_DELETE,
             'model' => Alias::MODEL_GROUPS,
             'status' => Alias::STATUS_SUCCESS,
-            'type' => Alias::MODEL_GROUPS
+            'type' => Alias::MODEL_GROUPS,
         ];
         $this->assertReport($reports[0], $expectedReport);
         $this->assertNoReportsForModel($reports, Alias::MODEL_GROUPS_USERS);
@@ -160,7 +177,7 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
             'action' => Alias::ACTION_CREATE,
             'model' => Alias::MODEL_GROUPS,
             'status' => Alias::STATUS_SUCCESS,
-            'type' => Alias::MODEL_GROUPS
+            'type' => Alias::MODEL_GROUPS,
         ];
         $this->assertReport($reports[0], $expectedReport);
         $groupCreated = $this->assertGroupExist(null, ['name' => 'newgroup', 'deleted' => false]);
@@ -191,7 +208,7 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $expectedReport = [
             'action' => Alias::ACTION_CREATE,
             'model' => Alias::MODEL_GROUPS,
-            'status' => Alias::STATUS_SUCCESS
+            'status' => Alias::STATUS_SUCCESS,
         ];
         $this->assertReport($reports[0], $expectedReport);
         $groupCreated = $this->assertGroupExist(null, ['name' => 'newgroup', 'deleted' => false]);
@@ -247,7 +264,7 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
             'action' => Alias::ACTION_DELETE,
             'model' => Alias::MODEL_GROUPS_USERS,
             'status' => Alias::STATUS_SUCCESS,
-            'type' => Alias::MODEL_GROUPS
+            'type' => Alias::MODEL_GROUPS,
         ];
         $this->assertReport($reports[0], $expectedReport);
         $this->assertGroupExist(UuidFactory::uuid('group.id.accounting'), ['deleted' => false]);
@@ -271,8 +288,8 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $this->mockDirectoryUserData('ruth', 'ruth', 'ruth@passbolt.com');
         $this->mockDirectoryGroupData('newgroup', [
             'group_users' => [
-                $userEntry->directory_name
-            ]
+                $userEntry->directory_name,
+            ],
         ]);
         $reports = $this->action->execute();
         $this->assertReportNotEmpty($reports);
@@ -289,7 +306,8 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
             'action' => Alias::ACTION_CREATE,
             'model' => Alias::MODEL_GROUPS_USERS,
             'status' => Alias::STATUS_IGNORE,
-            'type' => Alias::MODEL_GROUPS
+            'type' => Alias::MODEL_GROUPS,
+            'message' => 'The user ruth@passbolt.com could not be added to the group newgroup because he has not yet activated his account.',
         ];
         $this->assertReport($reports[1], $expectedUserGroupReport);
 
@@ -301,6 +319,71 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $groupUserAda = $this->assertGroupUserExist(null, ['group_id' => $groupCreated->id, 'user_id' => $defaultGroupAdmin->id]);
         $this->assertGroupUserNotExist(null, ['group_id' => $groupCreated->id, 'user_id' => UuidFactory::uuid('user.id.ruth')]);
         $this->assertDirectoryRelationEmpty();
+    }
+
+    /**
+     * Scenario: a group has two groupUsers in ldap which has not been synced yet, one of the corresponding user doesn't exist, has been deleted or is unactive.
+     * Expected result: add first user, send ignore report for second one
+     *
+     * This is
+     *
+     * @group DirectorySync
+     * @group DirectorySyncGroupUser
+     * @group DirectorySyncGroupUserAdd
+     */
+    public function testDirectorySyncGroupUser_Case10_Ok_Ok_Null_Null_NotOk_WithTwoRows()
+    {
+        $userEntryValid = $this->mockDirectoryEntryUser(['fname' => 'frances', 'lname' => 'frances', 'foreign_key' => UuidFactory::uuid('user.id.frances')]);
+        // Ruth is a inactive user.
+        $userEntryInactive = $this->mockDirectoryEntryUser(['fname' => 'ruth', 'lname' => 'ruth', 'foreign_key' => UuidFactory::uuid('user.id.ruth')]);
+        $this->mockDirectoryUserData('ruth', 'ruth', 'ruth@passbolt.com');
+        $this->mockDirectoryUserData('frances', 'frances', 'frances@passbolt.com');
+        $this->mockDirectoryGroupData('newgroup', [
+            'group_users' => [
+                $userEntryValid->directory_name,
+                $userEntryInactive->directory_name,
+            ],
+        ]);
+        $reports = $this->action->execute();
+
+        $this->assertReportNotEmpty($reports);
+        $this->assertEquals(count($reports), 3);
+
+        $expectedGroupReport = [
+            'action' => Alias::ACTION_CREATE,
+            'model' => Alias::MODEL_GROUPS,
+            'status' => Alias::STATUS_SUCCESS,
+            'type' => Alias::MODEL_GROUPS,
+            'message' => 'The group newgroup was successfully added to passbolt.',
+        ];
+        $this->assertReport($reports[0], $expectedGroupReport);
+
+        $expectedUserGroupReport = [
+            'action' => Alias::ACTION_CREATE,
+            'model' => Alias::MODEL_GROUPS_USERS,
+            'status' => Alias::STATUS_SUCCESS,
+            'type' => Alias::MODEL_GROUPS,
+            'message' => 'The user frances@passbolt.com was successfully added to the group newgroup.',
+        ];
+        $this->assertReport($reports[1], $expectedUserGroupReport);
+
+        $expectedUserGroupReport = [
+            'action' => Alias::ACTION_CREATE,
+            'model' => Alias::MODEL_GROUPS_USERS,
+            'status' => Alias::STATUS_IGNORE,
+            'type' => Alias::MODEL_GROUPS,
+            'message' => 'The user ruth@passbolt.com could not be added to the group newgroup because he has not yet activated his account.',
+        ];
+        $this->assertReport($reports[2], $expectedUserGroupReport);
+
+        $groupCreated = $this->assertGroupExist(null, ['name' => 'newgroup', 'deleted' => false]);
+
+        $defaultGroupAdmin = $this->directoryOrgSettings->getDefaultGroupAdminUser();
+        $defaultGroupAdmin = $this->Users->findByUsername($defaultGroupAdmin)->first();
+
+        $this->assertGroupUserExist(null, ['group_id' => $groupCreated->id, 'user_id' => $defaultGroupAdmin->id]);
+        $this->assertGroupUserNotExist(null, ['group_id' => $groupCreated->id, 'user_id' => UuidFactory::uuid('user.id.ruth')]);
+        $this->assertDirectoryRelationNotEmpty();
     }
 
     /**
@@ -317,8 +400,8 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $this->mockDirectoryUserData('frances', 'frances', 'frances@passbolt.com');
         $groupData = $this->mockDirectoryGroupData('newgroup', [
             'group_users' => [
-                $userEntry->directory_name
-            ]
+                $userEntry->directory_name,
+            ],
         ]);
 
         $reports = $this->action->execute();
@@ -370,8 +453,8 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $this->mockDirectoryUserData('frances', 'frances', 'frances@passbolt.com');
         $groupData = $this->mockDirectoryGroupData('marketing', [
             'group_users' => [
-                $userEntry->directory_name
-            ]
+                $userEntry->directory_name,
+            ],
         ]);
 
         $reports = $this->action->execute();
@@ -381,7 +464,7 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
             'action' => Alias::ACTION_CREATE,
             'model' => Alias::MODEL_GROUPS_USERS,
             'status' => Alias::STATUS_SUCCESS,
-            'type' => Alias::MODEL_GROUPS
+            'type' => Alias::MODEL_GROUPS,
         ];
         $this->assertReport($reports[0], $expectedUserGroupReport);
 
@@ -411,8 +494,8 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $this->mockDirectoryEntryGroup('marketing');
         $this->mockDirectoryGroupData('marketing', [
             'group_users' => [
-                $userEntry->directory_name
-            ]
+                $userEntry->directory_name,
+            ],
         ]);
 
         $reports = $this->action->execute();
@@ -444,8 +527,8 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $this->mockDirectoryUserData('frances', 'frances', 'frances@passbolt.com');
         $this->mockDirectoryGroupData('accounting', [
             'group_users' => [
-                $userEntry->directory_name
-            ]
+                $userEntry->directory_name,
+            ],
         ]);
 
         $reports = $this->action->execute();
@@ -455,7 +538,7 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
             'action' => Alias::ACTION_CREATE,
             'model' => Alias::MODEL_GROUPS_USERS,
             'status' => Alias::STATUS_SUCCESS,
-            'type' => Alias::MODEL_USERS
+            'type' => Alias::MODEL_USERS,
         ];
         $this->assertReport($reports[0], $expectedUserGroupReport);
 
@@ -474,6 +557,60 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
     }
 
     /**
+     * PB-1431: Fix: LDAP: a notification should not be sent to a group administrator requesting him to add a non-active user.
+     *
+     * Scenario: a non active groupUser has been added to a ldap group, not yet added in Passbolt.
+     * But the passbolt group has access to shared passwords.
+     * Expected result: No email notification should be sent. An ignore report should be broadcasted.
+     *
+     * @group DirectorySync
+     * @group DirectorySyncGroupUser
+     * @group DirectorySyncGroupUserAdd
+     */
+    public function testDirectorySyncGroupUser_PB1431()
+    {
+        // Init AppShellBootstrap to handle email notifications.
+        AppShellBootstrap::init();
+
+        $defaultGroupAdmin = 'edith@passbolt.com';
+        $this->setDefaultGroupAdminUser($defaultGroupAdmin);
+        $defaultGroupAdmin = $this->Users->findByUsername($defaultGroupAdmin)->first();
+        $this->initAction();
+
+        $userEntry = $this->mockDirectoryEntryUser(['fname' => 'ruth', 'lname' => 'ruth', 'foreign_key' => UuidFactory::uuid('user.id.ruth')]);
+        $this->mockDirectoryEntryGroup('accounting');
+        $this->mockDirectoryUserData('ruth', 'ruth', 'ruth@passbolt.com');
+        $this->mockDirectoryGroupData('accounting', [
+            'group_users' => [
+                $userEntry->directory_name,
+            ],
+        ]);
+
+        $reports = $this->action->execute();
+
+        $this->assertEquals(count($reports), 1);
+        $expectedUserGroupReport = [
+            'action' => Alias::ACTION_CREATE,
+            'model' => Alias::MODEL_GROUPS_USERS,
+            'status' => Alias::STATUS_IGNORE,
+            'type' => Alias::MODEL_GROUPS,
+            'message' => 'The user ruth@passbolt.com could not be added to the group Accounting because he has not yet activated his account.',
+        ];
+        $this->assertReport($reports[0], $expectedUserGroupReport);
+
+        // Group user for default admin should not exist.
+        $this->assertGroupUserNotExist(null, ['group_id' => UuidFactory::uuid('group.id.accounting'), 'user_id' => $defaultGroupAdmin->id]);
+
+        // Frances should not be in group users and directoryRelations.
+        $this->assertGroupUserNotExist(null, ['group_id' => UuidFactory::uuid('group.id.marketing'), 'user_id' => UuidFactory::uuid('user.id.ruth')]);
+        $this->assertDirectoryRelationEmpty();
+
+        // No email notification should have been sent to the group manager.
+        $this->get('/seleniumtests/showLastEmail/ada@passbolt.com');
+        $this->assertResponseCode(500);
+    }
+
+    /**
      * Scenario: A groupUser has been added to a group in ldap and already exist in passbolt
      * Expected result: do nothing. ignore report.
      *
@@ -488,8 +625,8 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $this->mockDirectoryUserData('grace', 'grace', 'grace@passbolt.com');
         $groupData = $this->mockDirectoryGroupData('freelancer', [
             'group_users' => [
-                $userEntry->directory_name
-            ]
+                $userEntry->directory_name,
+            ],
         ]);
 
         // Define creation date.
@@ -501,7 +638,7 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $groupsUsers->getConnection()->execute("UPDATE {$groupsUsers->getTable()} SET created = ? WHERE group_id = ? AND user_id = ?", [
             $dateBeforeGroupModification->format('Y-m-d H:i:s'),
             UuidFactory::uuid('group.id.freelancer'),
-            UuidFactory::uuid('user.id.grace')
+            UuidFactory::uuid('user.id.grace'),
         ]);
         $reports = $this->action->execute();
         $this->assertReportNotEmpty($reports);
@@ -510,7 +647,7 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
             'action' => Alias::ACTION_CREATE,
             'model' => Alias::MODEL_GROUPS_USERS,
             'status' => Alias::STATUS_IGNORE,
-            'type' => 'DirectoryEntry'
+            'type' => 'DirectoryEntry',
         ];
         $this->assertReport($reports[0], $expectedUserGroupReport);
         // groupUser should exist, but not directory relation since the sync shouldn't have happened.
@@ -533,8 +670,8 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $this->mockDirectoryUserData('nancy', 'nancy', 'nancy@passbolt.com');
         $groupData = $this->mockDirectoryGroupData('marketing', [
             'group_users' => [
-                $userEntry->directory_name
-            ]
+                $userEntry->directory_name,
+            ],
         ]);
 
         // Define creation date.
@@ -546,7 +683,7 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $groupsUsers->getConnection()->execute("UPDATE {$groupsUsers->getTable()} SET created = ? WHERE group_id = ? AND user_id = ?", [
             $dateAfterGroupModification->format('Y-m-d H:i:s'),
             UuidFactory::uuid('group.id.marketing'),
-            UuidFactory::uuid('user.id.nancy')
+            UuidFactory::uuid('user.id.nancy'),
         ]);
 
         $reports = $this->action->execute();
@@ -579,8 +716,8 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $this->mockDirectoryUserData('ada', 'ada', 'ada@passbolt.com');
         $this->mockDirectoryGroupData('freelancer', [
             'group_users' => [
-                $userEntry->directory_name
-            ]
+                $userEntry->directory_name,
+            ],
         ]);
         $this->mockDirectoryRelationGroupUser('freelancer', 'ada');
 
@@ -617,8 +754,8 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $this->mockDirectoryUserData('frances', 'frances', 'frances@passbolt.com');
         $this->mockDirectoryGroupData('freelancer', [
             'group_users' => [
-                $userEntry->directory_name
-            ]
+                $userEntry->directory_name,
+            ],
         ]);
         $this->mockDirectoryRelationGroupUser('freelancer', 'frances');
         $reports = $this->action->execute();
@@ -646,11 +783,54 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
         $this->mockDirectoryEntryGroup('freelancer');
         $this->mockDirectoryGroupData('freelancer', [
             'group_users' => [
-                $userEntry->directory_name
-            ]
+                $userEntry->directory_name,
+            ],
         ]);
         $this->mockDirectoryRelationGroupUser('freelancer', 'sofia');
         $reports = $this->action->execute();
         $this->assertEmpty($reports);
+    }
+
+    /**
+     * Unit test for PB-767
+     *
+     * When multiple users are added to a group, a failed validation on one groupUser should not make the other associations fail.
+     *
+     * @group DirectorySync
+     * @group DirectorySyncGroupUser
+     * @group DirectorySyncGroupUserAdd
+     */
+    public function testDirectorySyncGroupUser_failedValidationShouldNotContaminateOtherGroupUsers()
+    {
+        $this->mockDirectoryUserData('ruth', 'ruth', 'ruth@passbolt.com');
+        $this->mockDirectoryUserData('betty', 'betty', 'betty@passbolt.com');
+        // Ruth is a inactive user.
+        $ruthEntry = $this->mockDirectoryEntryUser(['fname' => 'ruth', 'lname' => 'ruth', 'foreign_key' => UuidFactory::uuid('user.id.ruth')], Alias::STATUS_SUCCESS);
+        $bettyEntry = $this->mockDirectoryEntryUser(['fname' => 'betty', 'lname' => 'betty', 'foreign_key' => UuidFactory::uuid('user.id.betty')], Alias::STATUS_SUCCESS);
+        $this->mockDirectoryEntryGroup('marketing');
+        //$this->mockDirectoryEntryGroup('marketing');
+        $this->mockDirectoryGroupData('marketing', [
+            'group_users' => [
+                $ruthEntry->directory_name,
+                $bettyEntry->directory_name,
+            ],
+        ]);
+        $reports = $this->action->execute();
+
+        $expectedUserGroupReport = [
+            'action' => Alias::ACTION_CREATE,
+            'model' => Alias::MODEL_GROUPS_USERS,
+            'status' => Alias::STATUS_IGNORE,
+            'type' => Alias::MODEL_GROUPS,
+        ];
+        $this->assertReport($reports[0], $expectedUserGroupReport);
+
+        $expectedUserGroupReport = [
+            'action' => Alias::ACTION_CREATE,
+            'model' => Alias::MODEL_GROUPS_USERS,
+            'status' => Alias::STATUS_SUCCESS,
+            'type' => Alias::MODEL_GROUPS,
+        ];
+        $this->assertReport($reports[1], $expectedUserGroupReport);
     }
 }

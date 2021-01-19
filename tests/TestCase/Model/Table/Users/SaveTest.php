@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,11 +17,9 @@
 
 namespace App\Test\TestCase\Model\Table\Users;
 
-use App\Model\Table\UsersTable;
 use App\Test\Lib\AppTestCase;
 use App\Test\Lib\Model\FormatValidationTrait;
 use App\Utility\PassboltText;
-use App\Utility\UuidFactory;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 
@@ -27,12 +27,14 @@ class SaveTest extends AppTestCase
 {
     use FormatValidationTrait;
 
-    /** @var UsersTable */
+    /**
+     * @var \App\Model\Table\UsersTable
+     */
     public $Users;
 
     public $fixtures = [
         'app.Base/Users', 'app.Base/Profiles', 'app.Base/Gpgkeys', 'app.Base/Roles', 'app.Base/Groups',
-        'app.Base/GroupsUsers', 'app.Base/Resources', 'app.Base/Permissions'
+        'app.Base/GroupsUsers', 'app.Base/Resources', 'app.Base/Permissions',
     ];
 
     protected function getEntityDefaultOptions()
@@ -44,24 +46,22 @@ class SaveTest extends AppTestCase
                 'role_id' => true,
                 'deleted' => true,
                 'active' => true,
-                'profile' => true
+                'profile' => true,
             ],
             'associated' => [
                 'Profiles' => [
                     'accessibleFields' => [
                         'first_name' => true,
-                        'last_name' => true
-                    ]
-                ]
-            ]
+                        'last_name' => true,
+                    ],
+                ],
+            ],
         ];
     }
 
     public function setUp()
     {
         parent::setUp();
-
-        /** @var UsersTable Users */
         $this->Users = TableRegistry::getTableLocator()->get('Users');
     }
 
@@ -71,7 +71,7 @@ class SaveTest extends AppTestCase
 
         // Fetch the newly created user from DB
         $addedUser = $this->Users->get($testUser->id, [
-            'contain' => ['Profiles']
+            'contain' => ['Profiles'],
         ]);
 
         $this->assertNotEmpty($addedUser);
@@ -100,7 +100,7 @@ class SaveTest extends AppTestCase
 
         // Fetch the updated User from DB.
         $fetchedUser = $this->Users->get($testUser->id, [
-            'contain' => ['Profiles']
+            'contain' => ['Profiles'],
         ]);
 
         $this->assertNotEmpty($fetchedUser);
@@ -118,7 +118,7 @@ class SaveTest extends AppTestCase
         Configure::write('passbolt.email.validate.mx', true);
         $user = self::getDummyUser();
         $testCases = [
-            'email' => self::getEmailTestCases(true)
+            'email' => self::getEmailTestCases(true),
         ];
         $this->assertFieldFormatValidation($this->Users, 'username', $user, self::getEntityDefaultOptions(), $testCases);
     }
@@ -128,14 +128,12 @@ class SaveTest extends AppTestCase
         Configure::write('passbolt.email.validate.mx', false);
         $user = self::getDummyUser();
         $testCases = [
-            'email' => self::getEmailTestCases(false)
+            'email' => self::getEmailTestCases(false),
         ];
         $this->assertFieldFormatValidation($this->Users, 'username', $user, self::getEntityDefaultOptions(), $testCases);
     }
 
-    /* ************************************************************** */
     /* FORMAT VALIDATION TESTS */
-    /* ************************************************************** */
 
     public function testValidationId()
     {
@@ -207,7 +205,7 @@ class SaveTest extends AppTestCase
     {
         $testCases = [
             'uuid' => self::getUuidTestCases(),
-            'requirePresence' => self::getRequirePresenceTestCases()
+            'requirePresence' => self::getRequirePresenceTestCases(),
         ];
 
         $this->assertFieldFormatValidation(
@@ -237,7 +235,7 @@ class SaveTest extends AppTestCase
     public function testValidationProfile()
     {
         $testCases = [
-            'requirePresence' => self::getRequirePresenceTestCases()
+            'requirePresence' => self::getRequirePresenceTestCases(),
         ];
 
         $this->assertFieldFormatValidation(
@@ -249,9 +247,7 @@ class SaveTest extends AppTestCase
         );
     }
 
-    /* ************************************************************** */
     /* LOGIC VALIDATION TESTS */
-    /* ************************************************************** */
 
     public function testRuleUsernameIsUnique()
     {
@@ -281,7 +277,7 @@ class SaveTest extends AppTestCase
     public function testRuleRoleIdExists()
     {
         $data = self::getDummyUser([
-            'role_id' => self::getNonExistingRoleId()
+            'role_id' => self::getNonExistingRoleId(),
         ]);
 
         $options = self::getEntityDefaultOptions();

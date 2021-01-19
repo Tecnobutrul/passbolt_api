@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,6 +16,7 @@
  */
 namespace Passbolt\MultiFactorAuthentication\Controller;
 
+use Cake\Core\Configure;
 use Cake\Http\Exception\BadRequestException;
 use Passbolt\MultiFactorAuthentication\Utility\MfaVerifiedCookie;
 use Passbolt\MultiFactorAuthentication\Utility\MfaVerifiedToken;
@@ -24,7 +27,7 @@ class MfaSetupController extends MfaController
      * Fail is account is already setup for this authentication provider
      *
      * @param string $provider name of the provider
-     * @throws BadRequestException
+     * @throws \Cake\Http\Exception\BadRequestException
      * @return bool
      */
     protected function _notAlreadySetupOrFail(string $provider)
@@ -71,10 +74,11 @@ class MfaSetupController extends MfaController
      */
     protected function _handlePostSuccess(string $provider)
     {
-        $token = MfaVerifiedToken::get($this->User->getAccessControl(), $provider);
-        $remember = false;
-        $cookie = MfaVerifiedCookie::get($token, $remember, $this->request->is('ssl'));
-        $this->response = $this->response->withCookie($cookie);
+        $sessionId = $this->getRequest()->getSession()->id();
+        $token = MfaVerifiedToken::get($this->User->getAccessControl(), $provider, $sessionId);
+        $secure = Configure::read('passbolt.security.cookies.secure') || $this->getRequest()->is('ssl');
+        $cookie = MfaVerifiedCookie::get($token, null, $secure);
+        $this->response = $this->getResponse()->withCookie($cookie);
 
         if (!$this->request->is('json')) {
             $this->set('theme', $this->User->theme());

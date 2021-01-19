@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,7 +16,6 @@
  */
 namespace App\Shell;
 
-use App\Shell\AppShellBootstrap;
 use Cake\Console\Shell;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
@@ -84,7 +85,7 @@ class AppShell extends Shell
             $this->_error('Passbolt commands cannot be executed as root.', false);
             $this->out('');
             $this->out('The command should be executed with the same user as your web server. By instance:');
-            $this->out('su -s /bin/bash -c "' . APP . 'Console/cake COMMAND" HTTP_USER');
+            $this->out('su -s /bin/bash -c "' . ROOT . '/bin/cake COMMAND" HTTP_USER');
             $this->out('where HTTP_USER match your web server user: www-data, nginx, http');
             $this->out('');
 

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -15,7 +17,6 @@
 namespace Passbolt\DirectorySync\Shell;
 
 use App\Shell\AppShell;
-use Cake\Core\Configure;
 use Cake\Routing\Router;
 use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
@@ -32,10 +33,12 @@ class DirectorySyncShell extends AppShell
         'Passbolt/DirectorySync.IgnoreList',
         'Passbolt/DirectorySync.IgnoreCreate',
         'Passbolt/DirectorySync.IgnoreDelete',
+        'Passbolt/DirectorySync.Debug',
     ];
 
     /**
      * Initialize.
+     *
      * @return void
      */
     public function initialize()
@@ -104,6 +107,10 @@ class DirectorySyncShell extends AppShell
         $parser->addSubcommand('ignore-delete', [
             'help' => __d('cake_console', 'Stop ignoring a record during the directory synchronization process.'),
             'parser' => $this->IgnoreDelete->getOptionParser(),
+        ]);
+        $parser->addSubcommand('debug', [
+            'help' => __d('cake_console', 'Debug configuration helper'),
+            'parser' => $this->Debug->getOptionParser(),
         ]);
 
         return $parser;

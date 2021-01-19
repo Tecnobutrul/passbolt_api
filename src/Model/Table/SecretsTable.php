@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,7 +17,6 @@
 
 namespace App\Model\Table;
 
-use App\Error\Exception\CustomValidationException;
 use App\Model\Rule\HasResourceAccessRule;
 use App\Model\Rule\IsNotSoftDeletedRule;
 use App\Model\Traits\Cleanup\PermissionsCleanupTrait;
@@ -32,20 +33,17 @@ use Cake\Validation\Validator;
  *
  * @property \App\Model\Table\GroupsTable|\Cake\ORM\Association\BelongsTo $Resources
  * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\BelongsTo $Users
- *
- * @method \App\Model\Entity\Secret get($primaryKey, $options = [])
- * @method \App\Model\Entity\Secret newEntity($data = null, array $options = [])
- * @method \App\Model\Entity\Secret[] newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\Secret|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \App\Model\Entity\Secret patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \App\Model\Entity\Secret[] patchEntities($entities, array $data, array $options = [])
- * @method \App\Model\Entity\Secret findOrCreate($search, callable $callback = null, $options = [])
- *
+ * @method \App\Model\Entity\Secret get($primaryKey, ?array $options = [])
+ * @method \App\Model\Entity\Secret newEntity($data = null, ?array $options = [])
+ * @method \App\Model\Entity\Secret[] newEntities(array $data, ?array $options = [])
+ * @method \App\Model\Entity\Secret|bool save(\Cake\Datasource\EntityInterface $entity, ?array $options = [])
+ * @method \App\Model\Entity\Secret patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, ?array $options = [])
+ * @method \App\Model\Entity\Secret[] patchEntities($entities, array $data, ?array $options = [])
+ * @method \App\Model\Entity\Secret findOrCreate($search, callable $callback = null, ?array $options = [])
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class SecretsTable extends Table
 {
-
     use PermissionsCleanupTrait;
     use ResourcesCleanupTrait;
     use TableCleanupTrait;
@@ -57,7 +55,7 @@ class SecretsTable extends Table
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 
@@ -77,30 +75,30 @@ class SecretsTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator
             ->uuid('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', null, 'create');
 
         $validator
             ->uuid('resource_id')
             ->requirePresence('resource_id', 'create')
-            ->notEmpty('resource_id');
+            ->notEmptyString('resource_id');
 
         $validator
             ->uuid('user_id')
             ->requirePresence('user_id', 'create')
-            ->notEmpty('user_id');
+            ->notEmptyString('user_id');
 
         $validator
             ->ascii('data', __('The message is not a valid armored gpg message.'))
             ->add('data', 'isValidGpgMessage', [
                 'rule' => [$this, 'isValidGpgMessageRule'],
-                'message' => __('The message is not a valid armored gpg message.')
+                'message' => __('The message is not a valid armored gpg message.'),
             ])
             ->requirePresence('data', 'create', __('A message is required.'))
-            ->notEmpty('data', __('The message cannot be empty.'));
+            ->notEmptyString('data', __('The message cannot be empty.'));
 
         return $validator;
     }
@@ -142,7 +140,7 @@ class SecretsTable extends Table
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules)
+    public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->addCreate(
             $rules->isUnique(
@@ -153,21 +151,21 @@ class SecretsTable extends Table
         );
         $rules->addCreate($rules->existsIn(['user_id'], 'Users'), 'user_exists', [
             'errorField' => 'user_id',
-            'message' => __('The user does not exist.')
+            'message' => __('The user does not exist.'),
         ]);
         $rules->addCreate(new IsNotSoftDeletedRule(), 'user_is_not_soft_deleted', [
             'table' => 'Users',
             'errorField' => 'user_id',
-            'message' => __('The user does not exist.')
+            'message' => __('The user does not exist.'),
         ]);
         $rules->addCreate($rules->existsIn(['resource_id'], 'Resources'), 'resource_exists', [
             'errorField' => 'resource_id',
-            'message' => __('The resource does not exist.')
+            'message' => __('The resource does not exist.'),
         ]);
         $rules->addCreate(new IsNotSoftDeletedRule(), 'resource_is_not_soft_deleted', [
             'table' => 'Resources',
             'errorField' => 'resource_id',
-            'message' => __('The resource does not exist.')
+            'message' => __('The resource does not exist.'),
         ]);
         $rules->addCreate(new HasResourceAccessRule(), 'has_resource_access', [
             'errorField' => 'resource_id',
@@ -177,54 +175,6 @@ class SecretsTable extends Table
         ]);
 
         return $rules;
-    }
-
-    /**
-     * Patch a list of secrets entities with a list of secrets to add and a list of users for whom the secrets
-     * must be deleted.
-     *
-     * @param string $resourceId The resource identifier the secrets belong to
-     * @param array $entities The list of secrets entities to patch
-     * @param array $add The list of secrets to add
-     * @param array $delete The list of user identifies for whom the secrets must be deleted
-     * @throw CustomValidationException If a user identifier for whom a secret has to deleted is not found in the list
-     *   of secrets
-     * @throw CustomValidationException If a secret to add does not validate when calling newEntity
-     * @return array The list of secrets entities patched with the changes
-     */
-    public function patchEntitiesWithChanges(string $resourceId, array $entities, array $add = [], array $delete = [])
-    {
-        // Remove secrets from the list.
-        foreach ($delete as $userId) {
-            $secretKey = array_search($userId, array_column($entities, 'user_id'));
-            // The user_id does not have a secret.
-            if ($secretKey === false) {
-                $errors = ['secret_exists' => __('There is no secret to delete for the user {0}.', $userId)];
-                throw new CustomValidationException(__('Validation error.'), $errors);
-            }
-            array_splice($entities, $secretKey, 1);
-        }
-
-        // Add the new secrets to the list.
-        foreach ($add as $addKey => $secret) {
-            // Enforce data.
-            $secret['resource_id'] = $resourceId;
-            // New entity options.
-            $options = ['accessibleFields' => [
-                'resource_id' => true,
-                'user_id' => true,
-                'data' => true
-            ]];
-            // Create and validate the new secret entity.
-            $secret = $this->newEntity($secret, $options);
-            $errors = $secret->getErrors();
-            if (!empty($errors)) {
-                throw new CustomValidationException(__('Validation error.'), [$addKey => $errors]);
-            }
-            $entities[] = $secret;
-        }
-
-        return $entities;
     }
 
     /**
@@ -239,7 +189,7 @@ class SecretsTable extends Table
         return $this->find()
             ->where([
                 'resource_id' => $resourceId,
-                'user_id' => $userId
+                'user_id' => $userId,
             ]);
     }
 
@@ -255,7 +205,7 @@ class SecretsTable extends Table
         return $this->find()
             ->where([
                 'resource_id IN' => $resourcesIds,
-                'user_id' => $userId
+                'user_id' => $userId,
             ]);
     }
 }

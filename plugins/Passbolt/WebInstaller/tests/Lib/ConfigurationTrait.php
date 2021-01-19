@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -20,12 +22,14 @@ trait ConfigurationTrait
 {
     // Keep a copy of the original passbolt config.
     private $backupConfig = [];
+    private $installerFriendly = null;
 
     /*
      * Skip the test if the environment is production like:
      * - config/passbolt.php not writable
      * - config/license not writable
      */
+
     protected function skipTestIfNotWebInstallerFriendly()
     {
         if (!$this->isWebInstallerFriendly()) {
@@ -38,28 +42,40 @@ trait ConfigurationTrait
      * - config/passbolt.php not writable
      * - or config/license not writable
      */
+
     protected function isWebInstallerFriendly()
     {
+        if (isset($this->installerFriendly)) {
+            return $this->installerFriendly;
+        }
+
         $configFolderWritable = is_writable(CONFIG);
 
         $passboltConfigPath = CONFIG . 'passbolt.php';
         $passboltConfigFileIsWritable = file_exists($passboltConfigPath) ? is_writable($passboltConfigPath) : $configFolderWritable;
         if (!$passboltConfigFileIsWritable) {
-            return false;
+            $this->installerFriendly = false;
+
+            return $this->installerFriendly;
         }
 
         $passboltLicensePath = CONFIG . 'license';
         $passboltLicenseFileIsWritable = file_exists($passboltLicensePath) ? is_writable($passboltLicensePath) : $configFolderWritable;
         if (!$passboltLicenseFileIsWritable) {
-            return false;
+            $this->installerFriendly = false;
+
+            return $this->installerFriendly;
         }
 
-        return true;
+        $this->installerFriendly = true;
+
+        return $this->installerFriendly;
     }
 
     /*
      * Backup the passbolt configuration
      */
+
     protected function backupConfiguration()
     {
         // Backup the config and restore it after each test.

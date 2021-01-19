@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -31,7 +33,7 @@ class GpgKeyGenerateControllerTest extends WebInstallerIntegrationTestCase
     public function testWebInstallerGpgKeyGenerateViewSuccess()
     {
         $this->get('/install/gpg_key');
-        $data = ($this->_getBodyAsString());
+        $data = $this->_getBodyAsString();
         $this->assertResponseOk();
         $this->assertContains('Create a new GPG key for your server', $data);
     }
@@ -48,10 +50,10 @@ class GpgKeyGenerateControllerTest extends WebInstallerIntegrationTestCase
     public function testWebInstallerGpgKeyGeneratePostError_InvalidData()
     {
         $postData = $this->getDummyGpgkey([
-            'fingerprint' => '2FC8945833C51946E937F9FED47B0811573EE67E'
+            'fingerprint' => '2FC8945833C51946E937F9FED47B0811573EE67E',
         ]);
         $this->post('/install/gpg_key', $postData);
-        $data = ($this->_getBodyAsString());
+        $data = $this->_getBodyAsString();
         $this->assertResponseOk();
         $this->assertContains('The data entered are not correct', $data);
     }

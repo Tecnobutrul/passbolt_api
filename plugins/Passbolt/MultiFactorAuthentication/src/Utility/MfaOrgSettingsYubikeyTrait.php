@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -77,7 +79,7 @@ trait MfaOrgSettingsYubikeyTrait
             $errors[MfaSettings::PROVIDER_YUBIKEY][MfaOrgSettings::YUBIKEY_SECRET_KEY]['notEmpty'] = $msg;
         } else {
             $secretKey = $data[MfaSettings::PROVIDER_YUBIKEY][MfaOrgSettings::YUBIKEY_SECRET_KEY];
-            if (!Validation::custom($secretKey, '/^[a-zA-Z0-9\/=]{10,128}$/')) {
+            if (!Validation::custom($secretKey, '/^[a-zA-Z0-9\/=\+]{10,128}$/')) {
                 $msg = __('Yubikey OTP secret key is not valid.');
                 $errors[MfaSettings::PROVIDER_YUBIKEY][MfaOrgSettings::YUBIKEY_SECRET_KEY]['isValidSecretKey'] = $msg;
             }

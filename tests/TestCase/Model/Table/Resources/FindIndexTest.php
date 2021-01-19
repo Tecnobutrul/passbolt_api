@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -16,7 +18,6 @@
 namespace App\Test\TestCase\Model\Table\Resources;
 
 use App\Model\Entity\Permission;
-use App\Model\Table\PermissionsTable;
 use App\Model\Table\ResourcesTable;
 use App\Test\Lib\AppTestCase;
 use App\Test\Lib\Model\FavoritesModelTrait;
@@ -27,9 +28,9 @@ use PassboltTestData\Lib\PermissionMatrix;
 
 class FindIndexTest extends AppTestCase
 {
-    public $Resources;
     use FavoritesModelTrait;
 
+    public $Resources;
     public $fixtures = ['app.Base/Users', 'app.Base/Groups', 'app.Base/GroupsUsers', 'app.Base/Resources', 'app.Base/Secrets', 'app.Base/Favorites', 'app.Base/Permissions'];
 
     public function setUp()

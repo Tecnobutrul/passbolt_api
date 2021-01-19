@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -31,7 +33,7 @@ class GpgKeyImportControllerTest extends WebInstallerIntegrationTestCase
     public function testWebInstallerGpgKeyImportViewSuccess()
     {
         $this->get('/install/gpg_key_import');
-        $data = ($this->_getBodyAsString());
+        $data = $this->_getBodyAsString();
         $this->assertResponseOk();
         $this->assertContains('Copy paste the private key below', $data);
     }
@@ -48,10 +50,10 @@ class GpgKeyImportControllerTest extends WebInstallerIntegrationTestCase
     public function testWebInstallerGpgKeyImportPostError_InvalidData()
     {
         $postData = $this->getDummyGpgkey([
-            'fingerprint' => '2FC8945833C51946E937F9FED47B0811573EE67E'
+            'fingerprint' => '2FC8945833C51946E937F9FED47B0811573EE67E',
         ]);
         $this->post('/install/gpg_key_import', $postData);
-        $data = ($this->_getBodyAsString());
+        $data = $this->_getBodyAsString();
         $this->assertResponseOk();
         $this->assertContains('The data entered are not correct', $data);
     }
@@ -59,10 +61,10 @@ class GpgKeyImportControllerTest extends WebInstallerIntegrationTestCase
     public function testWebInstallerGpgKeyImportPostError_PublicKey()
     {
         $postData = $this->getDummyGpgkey([
-            'public_key_armored' => $this->getDummyGpgkey()['private_key_armored']
+            'public_key_armored' => $this->getDummyGpgkey()['private_key_armored'],
         ]);
         $this->post('/install/gpg_key_import', $postData);
-        $data = ($this->_getBodyAsString());
+        $data = $this->_getBodyAsString();
         $this->assertResponseOk();
         $this->assertContains('The data entered are not correct', $data);
         $this->assertContains('The key is not a valid public key', $data);

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -57,15 +59,13 @@ class CreateTest extends AppTestCase
                 'content' => true,
                 'created_by' => true,
                 'modified_by' => true,
-            ]
+            ],
         ];
 
         return $entityOptions;
     }
 
-    /* ************************************************************** */
     /* FORMAT VALIDATION TESTS */
-    /* ************************************************************** */
 
     public function testValidationUserId()
     {
@@ -128,9 +128,7 @@ class CreateTest extends AppTestCase
         $this->assertFieldFormatValidation($this->Comments, 'created_by', self::getDummyComment(), self::getEntityDefaultOptions(), $testCases);
     }
 
-    /* ************************************************************** */
     /* LOGIC VALIDATION TESTS */
-    /* ************************************************************** */
 
     public function testErrorUserDoesNotExist()
     {
@@ -177,7 +175,7 @@ class CreateTest extends AppTestCase
         $comment = $this->Comments->newEntity(
             self::getDummyComment([
                 'foreign_key' => UuidFactory::uuid('resource.id.apache'),
-                'parent_id' => UuidFactory::uuid('comment.id.doesnotexist')
+                'parent_id' => UuidFactory::uuid('comment.id.doesnotexist'),
             ]),
             self::getEntityDefaultOptions()
         );
@@ -193,7 +191,7 @@ class CreateTest extends AppTestCase
         $comment = $this->Comments->newEntity(
             self::getDummyComment([
                 'foreign_key' => UuidFactory::uuid('resource.id.bower'),
-                'parent_id' => UuidFactory::uuid('comment.id.apache-1')
+                'parent_id' => UuidFactory::uuid('comment.id.apache-1'),
             ]),
             self::getEntityDefaultOptions()
         );

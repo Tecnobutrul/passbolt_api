@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -21,17 +23,17 @@ class UsersRegisterNotificationTest extends AppIntegrationTestCase
 {
     use EmailNotificationSettingsTestTrait;
 
-    public $fixtures = ['app.Base/Users', 'app.Base/Roles', 'app.Base/Profiles', 'app.Base/AuthenticationTokens', 'app.Base/EmailQueue', 'app.Base/Avatars'];
+    public $fixtures = ['app.Base/Users', 'app.Base/Roles', 'app.Base/Profiles', 'app.Base/Avatars', ];
 
     public function testUserRegisterNotificationDisabled()
     {
         $this->setEmailNotificationSetting('send.user.create', false);
 
-        $this->post('/users/register', [
+        $this->postJson('/users/register.json', [
             'username' => 'aurore@passbolt.com',
             'profile' => [
                 'first_name' => 'Aurore',
-                'last_name' => 'Avarguès-Weber'
+                'last_name' => 'Avarguès-Weber',
             ],
         ]);
         $this->assertResponseSuccess();
@@ -46,11 +48,11 @@ class UsersRegisterNotificationTest extends AppIntegrationTestCase
     {
         $this->setEmailNotificationSetting('send.user.create', true);
 
-        $this->post('/users/register', [
+        $this->postJson('/users/register.json', [
             'username' => 'aurore@passbolt.com',
             'profile' => [
                 'first_name' => 'Aurore',
-                'last_name' => 'Avarguès-Weber'
+                'last_name' => 'Avarguès-Weber',
             ],
         ]);
         $this->assertResponseSuccess();

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -34,7 +36,7 @@ class ShareDryRunControllerTest extends AppIntegrationTestCase
         parent::setUp();
     }
 
-    public function testSuccessApiV1()
+    public function testSuccess()
     {
         // Define actors of this tests
         $resourceId = UuidFactory::uuid('resource.id.cakephp');
@@ -81,7 +83,7 @@ class ShareDryRunControllerTest extends AppIntegrationTestCase
         $expectedAddedUsersIds = array_merge($expectedAddedUsersIds, [$userFId]);
 
         $this->authenticateAs('ada');
-        $this->postJson("/share/simulate/resource/$resourceId.json?api-version=v1", $data);
+        $this->postJson("/share/simulate/resource/$resourceId.json?api-version=v2", $data);
         $this->assertNotEmpty($this->_responseJsonBody);
         $this->assertNotEmpty($this->_responseJsonBody->changes);
         $addedUsers = $this->_responseJsonBody->changes->added;
@@ -104,6 +106,7 @@ class ShareDryRunControllerTest extends AppIntegrationTestCase
      * @see App\Test\TestCase\Model\Table\Resources\ShareDryRunTest
      * @see App\Test\TestCase\Model\Table\Permissions\PatchEntitiesWithChangesTest
      */
+
     public function testErrorValidation()
     {
         $resourceId = UuidFactory::uuid('resource.id.apache');
@@ -113,37 +116,37 @@ class ShareDryRunControllerTest extends AppIntegrationTestCase
         $userSId = UuidFactory::uuid('user.id.sofia');
         $testCases = [
             'cannot update a permission that does not exist' => [
-                'errorField' => 'permissions.0.id.permission_exists',
-                'data' => [['id' => UuidFactory::uuid()]]
+                'errorField' => 'permissions.0.id.exists',
+                'data' => [['id' => UuidFactory::uuid()]],
             ],
             'cannot delete a permission of another resource' => [
-                'errorField' => 'permissions.0.id.permission_exists',
+                'errorField' => 'permissions.0.id.exists',
                 'data' => [
-                    ['id' => UuidFactory::uuid("permission.id.$resourceAprilId-$userAId"), 'delete' => true]]
+                    ['id' => UuidFactory::uuid("permission.id.$resourceAprilId-$userAId"), 'delete' => true]],
             ],
             'cannot add a permission with invalid data' => [
-                'errorField' => 'permissions.0.aro_foreign_key._required',
-                'data' => [['aro' => 'User', 'type' => Permission::OWNER]]
+                'errorField' => 'permissions.0.aro_foreign_key._empty',
+                'data' => [['aro' => 'User', 'type' => Permission::OWNER]],
             ],
             'cannot add a permission for a soft deleted user' => [
                 'errorField' => 'permissions.0.aro_foreign_key.aro_exists',
                 'data' => [[
                     'aro' => 'User',
                     'aro_foreign_key' => $userSId,
-                    'type' => Permission::OWNER]]
+                    'type' => Permission::OWNER]],
             ],
             'cannot add a permission for an inactive user' => [
                 'errorField' => 'permissions.0.aro_foreign_key.aro_exists',
                 'data' => [[
                     'aro' => 'User',
                     'aro_foreign_key' => $userRId,
-                    'type' => Permission::OWNER]]
+                    'type' => Permission::OWNER]],
             ],
             'cannot remove the latest owner' => [
                 'errorField' => 'permissions.at_least_one_owner',
                 'data' => [
-                    ['id' => UuidFactory::uuid("permission.id.$resourceId-$userAId"), 'delete' => true]]
-            ]
+                    ['id' => UuidFactory::uuid("permission.id.$resourceId-$userAId"), 'delete' => true]],
+            ],
         ];
 
         $this->authenticateAs('ada');
@@ -161,7 +164,7 @@ class ShareDryRunControllerTest extends AppIntegrationTestCase
     {
         $resourceId = UuidFactory::uuid('resource.id.cakephp');
         $this->authenticateAs('ada');
-        $this->postJson("/share/simulate/resource/$resourceId.json?api-version=v1");
+        $this->postJson("/share/simulate/resource/$resourceId.json");
         $this->assertNotEmpty($this->_responseJsonBody);
         $this->assertNotEmpty($this->_responseJsonBody->changes);
         $this->assertEmpty($this->_responseJsonBody->changes->added);
@@ -172,7 +175,7 @@ class ShareDryRunControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('ada');
         $resourceId = 'invalid-id';
-        $this->postJson("/share/simulate/resource/$resourceId.json?api-version=v1");
+        $this->postJson("/share/simulate/resource/$resourceId.json");
         $this->assertError(400, 'The resource id is not valid.');
     }
 
@@ -180,7 +183,7 @@ class ShareDryRunControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('ada');
         $resourceId = UuidFactory::uuid();
-        $this->postJson("/share/simulate/resource/$resourceId.json?api-version=v1");
+        $this->postJson("/share/simulate/resource/$resourceId.json");
         $this->assertError(404, 'The resource does not exist.');
     }
 
@@ -188,7 +191,7 @@ class ShareDryRunControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('ada');
         $resourceId = UuidFactory::uuid('resource.id.jquery');
-        $this->postJson("/share/simulate/resource/$resourceId.json?api-version=v1");
+        $this->postJson("/share/simulate/resource/$resourceId.json");
         $this->assertError(404, 'The resource does not exist.');
     }
 
@@ -206,15 +209,15 @@ class ShareDryRunControllerTest extends AppIntegrationTestCase
         foreach ($testCases as $testCase) {
             $this->authenticateAs($testCase['userAlias']);
             $resourceId = $testCase['resourceId'];
-            $this->postJson("/share/simulate/resource/$resourceId.json?api-version=v1");
-            $this->assertError(404, 'The resource does not exist.');
+            $this->postJson("/share/simulate/resource/$resourceId.json");
+            $this->assertError(403, 'You are not authorized to share this resource.');
         }
     }
 
     public function testErrorNotAuthenticated()
     {
         $resourceId = UuidFactory::uuid('resource.id.apache');
-        $this->postJson("/share/simulate/resource/$resourceId.json?api-version=v1");
+        $this->postJson("/share/simulate/resource/$resourceId.json");
         $this->assertAuthenticationError();
     }
 }

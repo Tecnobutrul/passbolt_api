@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -57,15 +59,13 @@ class UpdateTest extends AppTestCase
                 'content' => true,
                 'created_by' => false,
                 'modified_by' => true,
-            ]
+            ],
         ];
 
         return $entityOptions;
     }
 
-    /* ************************************************************** */
     /* FORMAT VALIDATION TESTS */
-    /* ************************************************************** */
 
     public function testValidationContent()
     {
@@ -78,7 +78,7 @@ class UpdateTest extends AppTestCase
         ];
         $comment = self::getDummyComment([
             'id' => UuidFactory::uuid('comment.id.apache-1'),
-            'modified_by' => UuidFactory::uuid('user.id.ada')
+            'modified_by' => UuidFactory::uuid('user.id.ada'),
         ]);
         $this->assertFieldFormatValidation($this->Comments, 'content', $comment, self::getEntityDefaultOptions(), $testCases);
     }
@@ -92,14 +92,12 @@ class UpdateTest extends AppTestCase
         ];
         $comment = self::getDummyComment([
             'id' => UuidFactory::uuid('comment.id.apache-1'),
-            'modified_by' => UuidFactory::uuid('user.id.ada')
+            'modified_by' => UuidFactory::uuid('user.id.ada'),
         ]);
         $this->assertFieldFormatValidation($this->Comments, 'modified_by', $comment, self::getEntityDefaultOptions(), $testCases);
     }
 
-    /* ************************************************************** */
     /* LOGIC VALIDATION TESTS */
-    /* ************************************************************** */
 
     public function testErrorModifiedByUserDoesNotExist()
     {

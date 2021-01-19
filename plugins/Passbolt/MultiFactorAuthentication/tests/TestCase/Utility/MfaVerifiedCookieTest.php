@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,6 +16,7 @@
  */
 namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Utility;
 
+use Cake\I18n\Date;
 use Passbolt\MultiFactorAuthentication\Test\Lib\MfaIntegrationTestCase;
 use Passbolt\MultiFactorAuthentication\Utility\MfaVerifiedCookie;
 
@@ -25,12 +28,13 @@ class MfaVerifiedCookieTest extends MfaIntegrationTestCase
      */
     public function testMfaVerifiedCookieGet()
     {
-        $cookie = MfaVerifiedCookie::get('test', true, true);
+        $expiryAt = (new Date())->addDays(MfaVerifiedCookie::MAX_DURATION_IN_DAYS);
+        $cookie = MfaVerifiedCookie::get('test', $expiryAt, true);
         $this->assertTrue($cookie->isSecure());
         $this->assertEquals($cookie->getValue(), 'test');
         $this->assertFalse($cookie->isExpired());
 
-        $cookie = MfaVerifiedCookie::get('test', false, true);
+        $cookie = MfaVerifiedCookie::get('test', null, true);
         $this->assertFalse($cookie->isExpired());
         $this->assertEmpty($cookie->getExpiry());
     }

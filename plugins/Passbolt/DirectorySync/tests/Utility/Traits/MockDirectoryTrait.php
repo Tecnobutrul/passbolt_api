@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -28,7 +30,7 @@ trait MockDirectoryTrait
         $entry = [
             'id' => $id,
             'foreign_model' => $model,
-            'created' => $created
+            'created' => $created,
         ];
         $ignore = $this->action->DirectoryEntries->DirectoryIgnore->newEntity($entry, ['validate' => false]);
         $save = $this->action->DirectoryEntries->DirectoryIgnore->save($ignore, ['checkRules' => false]);
@@ -87,7 +89,7 @@ trait MockDirectoryTrait
             'directory_created' => $data['dirCreated'],
             'directory_modified' => $data['dirModified'],
             'created' => $data['created'],
-            'modified' => $data['modified']
+            'modified' => $data['modified'],
         ];
         $entry = $this->action->DirectoryEntries->newEntity($entry, [
             'validate' => false,
@@ -99,8 +101,8 @@ trait MockDirectoryTrait
                 'directory_created' => true,
                 'directory_modified' => true,
                 'created' => true,
-                'modified' => true
-            ]
+                'modified' => true,
+            ],
         ]);
         $save = $this->action->DirectoryEntries->save($entry, ['checkRules' => false]);
         if (!$save) {
@@ -132,7 +134,7 @@ trait MockDirectoryTrait
             'directory_created' => $dirCreated,
             'directory_modified' => $dirModified,
             'created' => $created,
-            'modified' => $modified
+            'modified' => $modified,
         ];
         $entry = $this->action->DirectoryEntries->newEntity($entry, [
             'validate' => false,
@@ -144,8 +146,8 @@ trait MockDirectoryTrait
                 'directory_created' => true,
                 'directory_modified' => true,
                 'created' => true,
-                'modified' => true
-            ]
+                'modified' => true,
+            ],
         ]);
         $save = $this->action->DirectoryEntries->save($entry, ['checkRules' => false]);
         if (!$save) {
@@ -155,13 +157,16 @@ trait MockDirectoryTrait
         return $entry;
     }
 
-    protected function mockDirectoryGroupData($name = null, $options = [])
+    protected function mockDirectoryGroupData(?string $name = null, ?array $options = [])
     {
-        $created = isset($options['created']) ? $options['created'] : '2018-07-09 03:56:42.000000';
-        $modified = isset($options['modified']) ? $options['modified'] : '2018-07-09 03:56:42.000000';
-        $id = isset($options['id']) ? $options['id'] : ('ldap.group.id.' . strtolower($name));
-        $cn = isset($options['cn']) ? $options['cn'] : $name;
-        $dn = isset($options['dn']) ? $options['dn'] : 'CN=' . ucfirst($cn) . ',OU=PassboltUsers,DC=passbolt,DC=local';
+        if ($name === null) {
+            $name = '';
+        }
+        $created = $options['created'] ?? '2018-07-09 03:56:42.000000';
+        $modified = $options['modified'] ?? '2018-07-09 03:56:42.000000';
+        $id = $options['id'] ?? 'ldap.group.id.' . strtolower($name);
+        $cn = $options['cn'] ?? $name;
+        $dn = $options['dn'] ?? 'CN=' . ucfirst($cn) . ',OU=PassboltUsers,DC=passbolt,DC=local';
         $group = [
             'id' => UuidFactory::uuid($id),
             'directory_name' => $dn,
@@ -170,8 +175,8 @@ trait MockDirectoryTrait
             'group' => [
                 'name' => strtolower($cn),
                 'groups' => [],
-                'users' => isset($options['group_users']) ? $options['group_users'] : [],
-            ]
+                'users' => $options['group_users'] ?? [],
+            ],
         ];
         $this->saveMockDirectoryGroupData($group);
 
@@ -208,7 +213,7 @@ trait MockDirectoryTrait
             'directory_created' => $dirCreated,
             'directory_modified' => $dirModified,
             'created' => $created,
-            'modified' => $modified
+            'modified' => $modified,
         ];
         $this->saveMockDirectoryEntry($entry);
 
@@ -238,8 +243,8 @@ trait MockDirectoryTrait
                 'directory_created' => true,
                 'directory_modified' => true,
                 'created' => true,
-                'modified' => true
-            ]
+                'modified' => true,
+            ],
         ]);
         $this->action->DirectoryEntries->save($entry, ['checkRules' => false]);
     }
@@ -253,6 +258,9 @@ trait MockDirectoryTrait
 
     protected function mockDirectoryUserData($fname = null, $lname = null, $username = null, $created = null, $modified = null)
     {
+        $fname = $fname ?? '';
+        $lname = $lname ?? '';
+        $username = $username ?? '';
         if (!isset($created)) {
             $created = '2018-07-09 03:56:42.000000';
         }
@@ -270,9 +278,9 @@ trait MockDirectoryTrait
                 'username' => strtolower($username),
                 'profile' => [
                     'first_name' => ucfirst($fname),
-                    'last_name' => ucfirst($lname)
-                ]
-            ]
+                    'last_name' => ucfirst($lname),
+                ],
+            ],
         ];
         $users = $this->action->getDirectory()->getUsers();
         $users[] = $user;

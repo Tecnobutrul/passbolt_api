@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -14,71 +16,66 @@
  */
 namespace Passbolt\EmailNotificationSettings\Form;
 
+use Cake\Event\EventManager;
 use Cake\Form\Form;
 use Cake\Form\Schema;
-use Cake\Utility\Hash;
 use Cake\Validation\Validator;
 use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettings;
+use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettingsDefinitionInterface;
+use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettingsDefinitionRegisterEvent;
 
 class EmailNotificationSettingsForm extends Form
 {
     /**
-     * Database configuration schema.
-     *
-     * @param Schema $schema schema
-     * @return Schema
+     * @var \Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettingsDefinitionInterface[]
      */
-    protected function _buildSchema(Schema $schema)
-    {
-        return $schema
-            // Show controls
-            ->addField('show_comment', ['type' => 'boolean'])
-            ->addField('show_description', ['type' => 'boolean'])
-            ->addField('show_secret', ['type' => 'boolean'])
-            ->addField('show_uri', ['type' => 'boolean'])
-            ->addField('show_username', ['type' => 'boolean'])
+    private $notificationSettingsDefinitions = [];
 
-            // Send controls
-            ->addField('send_comment_add', ['type' => 'boolean'])
-            ->addField('send_password_create', ['type' => 'boolean'])
-            ->addField('send_password_share', ['type' => 'boolean'])
-            ->addField('send_password_update', ['type' => 'boolean'])
-            ->addField('send_password_delete', ['type' => 'boolean'])
-            ->addField('send_user_create', ['type' => 'boolean'])
-            ->addField('send_user_recover', ['type' => 'boolean'])
-            ->addField('send_group_delete', ['type' => 'boolean'])
-            ->addField('send_group_user_add', ['type' => 'boolean'])
-            ->addField('send_group_user_delete', ['type' => 'boolean'])
-            ->addField('send_group_user_update', ['type' => 'boolean'])
-            ->addField('send_group_manager_update', ['type' => 'boolean']);
+    /**
+     * @param \Cake\Event\EventManager|null $eventManager An instance of event manager
+     */
+    public function __construct(?EventManager $eventManager = null)
+    {
+        parent::__construct($eventManager);
+
+        $this->getEventManager()->dispatch(EmailNotificationSettingsDefinitionRegisterEvent::create($this));
     }
 
     /**
-     * Validation rules.
-     *
-     * @param Validator $validator validator
-     * @return Validator
+     * @param \Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettingsDefinitionInterface $definition def
+     * @return void
      */
-    protected function _buildValidator(Validator $validator)
+    public function addEmailNotificationSettingsDefinition(EmailNotificationSettingsDefinitionInterface $definition)
     {
-        $validator
-            ->boolean('show_comment', __('Show comment should be a boolean.'))
-            ->boolean('show_description', __('Show description should be a boolean.'))
-            ->boolean('show_secret', __('Show secret should be a boolean.'))
-            ->boolean('show_uri', __('Show uri should be a boolean.'))
-            ->boolean('show_username', __('Show username should be a boolean.'))
-            ->boolean('send_comment_add', __('Send comment add should be a boolean.'))
-            ->boolean('send_password_create', __('Send password create should be a boolean.'))
-            ->boolean('send_password_share', __('Send password share should be a boolean.'))
-            ->boolean('send_password_update', __('Send password update should be a boolean.'))
-            ->boolean('send_password_delete', __('Send password delete should be a boolean.'))
-            ->boolean('send_user_create', __('Send user create should be a boolean.'))
-            ->boolean('send_user_recover', __('Send user recover should be a boolean.'))
-            ->boolean('send_group_delete', __('Send group delete should be a boolean.'))
-            ->boolean('send_group_user_add', __('Send group user add should be a boolean.'))
-            ->boolean('send_group_user_delete', __('Send group user delete should be a boolean.'))
-            ->boolean('send_group_user_update', __('Send group user update should be a boolean.'))
-            ->boolean('send_group_manager_update', __('Send group manager update should be a boolean.'));
+        $this->notificationSettingsDefinitions[] = $definition;
+    }
+
+    /**
+     * Database configuration schema. Build schema from all notification settings definitions schemas.
+     *
+     * @param \Cake\Form\Schema $schema schema
+     * @return \Cake\Form\Schema
+     */
+    protected function _buildSchema(Schema $schema): Schema
+    {
+        foreach ($this->notificationSettingsDefinitions as $notificationSettingsDefinition) {
+            $notificationSettingsDefinition->buildSchema($schema);
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Validation rules. Build validator rules from all notification settings definitions validators.
+     *
+     * @param \Cake\Validation\Validator $validator validator
+     * @return \Cake\Validation\Validator
+     */
+    protected function _buildValidator(Validator $validator): Validator
+    {
+        foreach ($this->notificationSettingsDefinitions as $notificationSettingsDefinition) {
+            $notificationSettingsDefinition->buildValidator($validator);
+        }
 
         return $validator;
     }
@@ -86,10 +83,10 @@ class EmailNotificationSettingsForm extends Form
     /**
      * Transform form data into the expected org settings format
      *
-     * @param array $data The form data
+     * @param array|null $data The form data
      * @return array $settings The org settings data
      */
-    public static function formatFormDataToOrgSettings(array $data = [])
+    public static function formatFormDataToOrgSettings(?array $data = []): array
     {
         if (empty($data)) {
             return $data;
@@ -99,7 +96,7 @@ class EmailNotificationSettingsForm extends Form
         $data = static::stripInvalidKeys($data);
 
         foreach ($data as $prop => $propVal) {
-            $key = str_replace('_', '.', $prop);
+            $key = EmailNotificationSettings::underscoreToDottedFormat($prop);
             $settings[$key] = $propVal;
         }
 
@@ -112,7 +109,7 @@ class EmailNotificationSettingsForm extends Form
      * @param array $data The data array
      * @return array array with the invalid keys removed
      */
-    public static function stripInvalidKeys(array $data = [])
+    public static function stripInvalidKeys(array $data): array
     {
         if (empty($data)) {
             return $data;

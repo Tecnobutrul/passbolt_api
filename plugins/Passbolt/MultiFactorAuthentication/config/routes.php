@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -56,13 +57,17 @@ Router::plugin('Passbolt/MultiFactorAuthentication', ['path' => '/mfa'], functio
     $routes->connect('/setup/yubikey', ['prefix' => 'Yubikey', 'controller' => 'YubikeySetupPost', 'action' => 'post'])
         ->setMethods(['POST']);
 
-    $routes->connect('/setup/yubikey', ['prefix' => 'Yubikey', 'controller' => 'YubikeySetupDelete', 'action' => 'delete'])
+    $routes->connect('/setup/yubikey', [
+            'prefix' => 'Yubikey', 'controller' => 'YubikeySetupDelete', 'action' => 'delete',
+        ])
         ->setMethods(['DELETE']);
 
     $routes->connect('/verify/yubikey', ['prefix' => 'Yubikey', 'controller' => 'YubikeyVerifyGet', 'action' => 'get'])
         ->setMethods(['GET']);
 
-    $routes->connect('/verify/yubikey', ['prefix' => 'Yubikey', 'controller' => 'YubikeyVerifyPost', 'action' => 'post'])
+    $routes->connect('/verify/yubikey', [
+            'prefix' => 'Yubikey', 'controller' => 'YubikeyVerifyPost', 'action' => 'post',
+        ])
         ->setMethods(['POST']);
 
     /**
@@ -94,4 +99,13 @@ Router::plugin('Passbolt/MultiFactorAuthentication', ['path' => '/mfa'], functio
 
     $routes->connect('/settings', ['prefix' => 'OrgSettings', 'controller' => 'MfaOrgSettingsPost', 'action' => 'post'])
         ->setMethods(['PUT', 'POST']);
+
+    /**
+     * User settings
+     */
+    $routes->connect('/setup/:userId', [
+            'prefix' => 'UserSettings', 'controller' => 'MfaUserSettingsDelete', 'action' => 'delete',
+        ])
+        ->setPass(['userId'])
+        ->setMethods(['DELETE']);
 });

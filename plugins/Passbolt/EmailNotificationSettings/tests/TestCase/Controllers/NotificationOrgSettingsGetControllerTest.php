@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -27,15 +29,20 @@ class NotificationOrgSettingsGetControllerTest extends AppIntegrationTestCase
      * @var array
      */
     public $fixtures = [
-        'app.Base/OrganizationSettings',
-        'app.Base/AuthenticationTokens', 'app.Base/Users',
-        'app.Base/Roles'
+        'app.Base/Users',
+        'app.Base/Roles',
     ];
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->loadNotificationSettings();
+    }
 
     public function tearDown()
     {
-        EmailNotificationSettings::flushCache();
         parent::tearDown();
+        $this->unloadNotificationSettings();
     }
 
     /**
@@ -98,7 +105,7 @@ class NotificationOrgSettingsGetControllerTest extends AppIntegrationTestCase
         $cases = [
             'send_comment_add' => false,
             'send_password_create' => true,
-            'send_password_share' => false
+            'send_password_share' => false,
         ];
 
         // Mock DB settings
@@ -124,12 +131,13 @@ class NotificationOrgSettingsGetControllerTest extends AppIntegrationTestCase
         $cases = [
             'send_comment_add' => false,
             'send_password_create' => true,
-            'send_password_share' => false
+            'send_password_share' => false,
         ];
 
         // Mock File settings
         foreach ($cases as $case => $value) {
-            Configure::write('passbolt.email.' . $case, $value);
+            $configKey = EmailNotificationSettings::underscoreToDottedFormat($case);
+            Configure::write('passbolt.email.' . $configKey, $value);
         }
 
         $this->authenticateAs('admin');
@@ -152,12 +160,13 @@ class NotificationOrgSettingsGetControllerTest extends AppIntegrationTestCase
         $cases = [
             'send_comment_add' => false,
             'send_password_create' => true,
-            'send_password_share' => false
+            'send_password_share' => false,
         ];
 
         // Mock DB settings
         foreach ($cases as $case => $value) {
-            Configure::write('passbolt.email.' . $case, $value);
+            $configKey = EmailNotificationSettings::underscoreToDottedFormat($case);
+            Configure::write('passbolt.email.' . $configKey, $value);
         }
 
         // Override with DB settings

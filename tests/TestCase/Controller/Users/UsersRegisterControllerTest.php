@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -23,9 +25,9 @@ use Cake\ORM\TableRegistry;
 class UsersRegisterControllerTest extends AppIntegrationTestCase
 {
     public $fixtures = [
-        'app.Base/Users', 'app.Base/Roles', 'app.Base/Profiles', 'app.Base/Permissions',
+        'app.Base/Users', 'app.Base/Gpgkeys', 'app.Base/Roles', 'app.Base/Profiles', 'app.Base/Permissions',
         'app.Base/GroupsUsers', 'app.Base/Groups', 'app.Base/Favorites', 'app.Base/Secrets',
-        'app.Base/AuthenticationTokens', 'app.Base/Avatars', 'app.Base/EmailQueue'
+         'app.Base/Avatars',
     ];
 
     public function testUsersRegisterGetSuccess()
@@ -41,27 +43,27 @@ class UsersRegisterControllerTest extends AppIntegrationTestCase
                 'username' => 'ping.fu@passbolt.com',
                 'profile' => [
                     'first_name' => '傅',
-                    'last_name' => '苹'
+                    'last_name' => '苹',
                 ],
             ],
             'slavic_name' => [
                 'username' => 'borka@passbolt.com',
                 'profile' => [
                     'first_name' => 'Borka',
-                    'last_name' => 'Jerman Blažič'
+                    'last_name' => 'Jerman Blažič',
                 ],
             ],
             'french_name' => [
                 'username' => 'aurore@passbolt.com',
                 'profile' => [
                     'first_name' => 'Aurore',
-                    'last_name' => 'Avarguès-Weber'
+                    'last_name' => 'Avarguès-Weber',
                 ],
-            ]
+            ],
         ];
 
         foreach ($success as $case => $data) {
-            $this->post('/users/register', $data);
+            $this->postJson('/users/register.json', $data);
             $this->assertResponseSuccess();
 
             // Check user was saved
@@ -84,26 +86,6 @@ class UsersRegisterControllerTest extends AppIntegrationTestCase
         }
     }
 
-    public function testUsersRegisterPostApiV1Success()
-    {
-        $success = [
-            'legacy format' => [
-                'User' => [
-                    'username' => 'anna@passbolt.com'
-                ],
-                'Profile' => [
-                    'first_name' => 'Anna',
-                    'last_name' => 'Fisher'
-                ],
-            ]
-        ];
-
-        foreach ($success as $case => $data) {
-            $this->post('/users/register', $data);
-            $this->assertResponseSuccess();
-        }
-    }
-
     public function testUsersRegisterPostFailValidation()
     {
         $fails = [
@@ -111,15 +93,15 @@ class UsersRegisterControllerTest extends AppIntegrationTestCase
                 'username' => '',
                 'profile' => [
                     'first_name' => 'valid_first_name',
-                    'last_name' => 'valid_last_name'
-                ]
+                    'last_name' => 'valid_last_name',
+                ],
             ],
             'username is not an email' => [
                 'username' => 'invalid@passbolt',
                 'profile' => [
                     'first_name' => 'valid_first_name',
-                    'last_name' => 'valid_last_name'
-                ]
+                    'last_name' => 'valid_last_name',
+                ],
             ],
             'profile is missing' => [
                 'username' => 'valid@passbolt.com',
@@ -127,32 +109,32 @@ class UsersRegisterControllerTest extends AppIntegrationTestCase
             'last name is missing' => [
                 'username' => 'valid@passbolt.com',
                 'profile' => [
-                    'first_name' => 'valid_first_name'
-                ]
+                    'first_name' => 'valid_first_name',
+                ],
             ],
             'first name is missing' => [
                 'username' => 'valid@passbolt.com',
                 'profile' => [
-                    'last_name' => 'valid_last_name'
-                ]
+                    'last_name' => 'valid_last_name',
+                ],
             ],
             'first name is not a utf8 string' => [
                 'username' => 'valid@passbolt.com',
                 'profile' => [
                     'first_name' => '🙈🙉🙊',
-                    'last_name' => 'valid_last_name'
-                ]
+                    'last_name' => 'valid_last_name',
+                ],
             ],
             'email already in use' => [
                 'username' => 'ada@passbolt.com',
                 'profile' => [
                     'first_name' => 'ada',
-                    'last_name' => 'lovelace'
-                ]
+                    'last_name' => 'lovelace',
+                ],
             ],
         ];
         foreach ($fails as $case => $data) {
-            $this->post('/users/register.json?api-version=v1', $data);
+            $this->post('/users/register.json?api-version=v2', $data);
             $result = json_decode($this->_getBodyAsString());
             $this->assertEquals('400', $result->header->code, 'Validation should fail when ' . $case);
             $this->assertResponseError();
@@ -164,7 +146,7 @@ class UsersRegisterControllerTest extends AppIntegrationTestCase
         $this->disableCsrfToken();
         $this->post('/users/register');
         $this->assertResponseCode(403);
-        $result = ($this->_getBodyAsString());
+        $result = $this->_getBodyAsString();
         $this->assertContains('Missing CSRF token cookie', $result);
     }
 
@@ -175,11 +157,11 @@ class UsersRegisterControllerTest extends AppIntegrationTestCase
             'username' => 'ping@passbolt.com',
             'profile' => [
                 'first_name' => 'Ping',
-                'last_name' => 'Duplicate'
+                'last_name' => 'Duplicate',
             ],
         ];
 
-        $this->post('/users/register.json?api-version=v1', $data);
+        $this->post('/users/register.json?api-version=v2', $data);
         $result = json_decode($this->_getBodyAsString());
         $this->assertEquals('400', $result->header->code, 'Validation should fail when the username already exists in db');
         $this->assertResponseError();
@@ -217,11 +199,11 @@ class UsersRegisterControllerTest extends AppIntegrationTestCase
             'role_id' => $adminRoleId,
             'profile' => [
                 'first_name' => 'Aurore',
-                'last_name' => 'Avarguès-Weber'
-            ]
+                'last_name' => 'Avarguès-Weber',
+            ],
         ];
 
-        $this->post('/users/register', $data);
+        $this->postJson('/users/register.json', $data);
         $this->assertResponseSuccess();
 
         $users = TableRegistry::getTableLocator()->get('Users');

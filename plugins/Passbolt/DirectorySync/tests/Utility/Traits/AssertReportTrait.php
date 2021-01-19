@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -59,6 +61,15 @@ trait AssertReportTrait
     }
 
     /**
+     * @param ActionReport $report
+     * @param string $message
+     */
+    public function assertReportMessage(ActionReport $report, string $message)
+    {
+        $this->assertEquals($message, $report->getMessage());
+    }
+
+    /**
      * @param ActionReportCollection $reports
      * @param string $model
      */
@@ -95,6 +106,9 @@ trait AssertReportTrait
         }
         if (isset($data['type'])) {
             $this->assertReportDataType($report, $data['type']);
+        }
+        if (isset($data['message'])) {
+            $this->assertReportMessage($report, $data['message']);
         }
     }
 

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -17,21 +19,23 @@ namespace Passbolt\MultiFactorAuthentication\Utility;
 use App\Utility\UuidFactory;
 use Cake\Http\Cookie\Cookie;
 use DateTime;
+use DateTimeInterface;
 
 class MfaVerifiedCookie
 {
-    const MFA_COOKIE_ALIAS = 'passbolt_mfa';
-    const MAX_DURATION = '30 days';
+    public const MFA_COOKIE_ALIAS = 'passbolt_mfa';
+    public const MAX_DURATION = self::MAX_DURATION_IN_DAYS . ' days';
+    public const MAX_DURATION_IN_DAYS = 30;
 
     /**
      * Get a new mfa verification cookie
      *
      * @param string $token token
-     * @param bool $remember if should last more than browser session
+     * @param \DateTimeInterface|null $expirationDate Expiration date for the token
      * @param bool $ssl if ssl is required
-     * @return Cookie|static
+     * @return \Cake\Http\Cookie\Cookie|static
      */
-    public static function get(string $token, bool $remember = false, bool $ssl = true)
+    public static function get(string $token, ?DateTimeInterface $expirationDate = null, ?bool $ssl = true)
     {
         $mfaCookie = (new Cookie(self::MFA_COOKIE_ALIAS))
             ->withValue($token)
@@ -39,9 +43,9 @@ class MfaVerifiedCookie
             ->withHttpOnly(true)
             ->withSecure($ssl);
 
-        if ($remember) {
+        if ($expirationDate !== null) {
             $mfaCookie = $mfaCookie
-                ->withExpiry(new DateTime(self::MAX_DURATION));
+                ->withExpiry($expirationDate);
         }
 
         return $mfaCookie;
@@ -51,7 +55,7 @@ class MfaVerifiedCookie
      * Return an expired cookie to clear it
      *
      * @param bool $ssl if ssl is required
-     * @return Cookie
+     * @return \Cake\Http\Cookie\Cookie
      */
     public static function clearCookie(bool $ssl = true)
     {

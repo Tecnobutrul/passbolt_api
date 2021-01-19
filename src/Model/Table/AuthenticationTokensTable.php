@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -17,9 +19,9 @@ namespace App\Model\Table;
 use App\Error\Exception\ValidationException;
 use App\Model\Entity\AuthenticationToken;
 use App\Model\Rule\IsNotSoftDeletedRule;
+use App\Model\Traits\AuthenticationTokens\AuthenticationTokensFindersTrait;
+use App\Utility\AuthToken\AuthTokenExpiry;
 use App\Utility\UuidFactory;
-use Cake\Core\Configure;
-use Cake\Datasource\EntityInterface;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validation;
@@ -29,19 +31,23 @@ use Cake\Validation\Validator;
  * AuthenticationTokens Model
  *
  * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\BelongsTo $Users
- *
- * @method \App\Model\Entity\AuthenticationToken get($primaryKey, $options = [])
- * @method \App\Model\Entity\AuthenticationToken newEntity($data = null, array $options = [])
- * @method \App\Model\Entity\AuthenticationToken[] newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\AuthenticationToken|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \App\Model\Entity\AuthenticationToken patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \App\Model\Entity\AuthenticationToken[] patchEntities($entities, array $data, array $options = [])
- * @method \App\Model\Entity\AuthenticationToken findOrCreate($search, callable $callback = null, $options = [])
- *
+ * @method \App\Model\Entity\AuthenticationToken get($primaryKey, ?array $options = [])
+ * @method \App\Model\Entity\AuthenticationToken newEntity($data = null, ?array $options = [])
+ * @method \App\Model\Entity\AuthenticationToken[] newEntities(array $data, ?array $options = [])
+ * @method \App\Model\Entity\AuthenticationToken|bool save(\Cake\Datasource\EntityInterface $entity, ?array $options = [])
+ * @method \App\Model\Entity\AuthenticationToken patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, ?array $options = [])
+ * @method \App\Model\Entity\AuthenticationToken[] patchEntities($entities, array $data, ?array $options = [])
+ * @method \App\Model\Entity\AuthenticationToken findOrCreate($search, callable $callback = null, ?array $options = [])
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class AuthenticationTokensTable extends Table
 {
+    use AuthenticationTokensFindersTrait;
+
+    /**
+     * @var \App\Utility\AuthToken\AuthTokenExpiry
+     */
+    private $authTokenExpiry;
 
     /**
      * Initialize method
@@ -49,9 +55,11 @@ class AuthenticationTokensTable extends Table
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
+
+        $this->authTokenExpiry = new AuthTokenExpiry();
 
         $this->setTable('authentication_tokens');
         $this->setDisplayField('id');
@@ -61,7 +69,7 @@ class AuthenticationTokensTable extends Table
 
         $this->belongsTo('Users', [
             'foreignKey' => 'user_id',
-            'joinType' => 'INNER'
+            'joinType' => 'INNER',
         ]);
     }
 
@@ -71,11 +79,11 @@ class AuthenticationTokensTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator
             ->uuid('id')
-            ->allowEmpty('id', null, 'create');
+            ->allowEmptyString('id', null, 'create');
 
         $validator
             ->uuid('token')
@@ -88,7 +96,7 @@ class AuthenticationTokensTable extends Table
             ->allowEmptyString('token', __('Then authentication type should not be empty.'), false)
             ->add('type', ['type' => [
                 'rule' => [$this, 'isValidAuthenticationTokenType'],
-                'message' => __('This authentication type is not supported.')
+                'message' => __('This authentication type is not supported.'),
             ]]);
 
         $validator
@@ -112,10 +120,10 @@ class AuthenticationTokensTable extends Table
      */
     public function isValidAuthenticationTokenType(string $check, array $context)
     {
-        return(AuthenticationToken::TYPE_REGISTER === $check ||
-            AuthenticationToken::TYPE_RECOVER === $check ||
-            AuthenticationToken::TYPE_LOGIN === $check ||
-            AuthenticationToken::TYPE_MFA === $check);
+        return $check === AuthenticationToken::TYPE_REGISTER ||
+            $check === AuthenticationToken::TYPE_RECOVER ||
+            $check === AuthenticationToken::TYPE_LOGIN ||
+            $check === AuthenticationToken::TYPE_MFA;
     }
 
     /**
@@ -136,14 +144,14 @@ class AuthenticationTokensTable extends Table
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules)
+    public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['user_id'], 'Users'));
 
         $rules->addCreate(new IsNotSoftDeletedRule(), 'user_is_not_soft_deleted', [
             'table' => 'Users',
             'errorField' => 'user_id',
-            'message' => __('The user does not exist.')
+            'message' => __('The user does not exist.'),
         ]);
 
         return $rules;
@@ -154,9 +162,9 @@ class AuthenticationTokensTable extends Table
      *
      * @param string $userId uuid
      * @param string $type AuthenticationToken::TYPE_*
-     * @throws ValidationException is the user is not a valid uuid
-     * @throws ValidationException is the user is not found
-     * @throws ValidationException is the user is deleted
+     * @throws \App\Error\Exception\ValidationException is the user is not a valid uuid
+     * @throws \App\Error\Exception\ValidationException is the user is not found
+     * @throws \App\Error\Exception\ValidationException is the user is deleted
      * @return \App\Model\Entity\AuthenticationToken $token
      */
     public function generate(string $userId, string $type)
@@ -166,7 +174,7 @@ class AuthenticationTokensTable extends Table
                 'user_id' => $userId,
                 'token' => UuidFactory::uuid(),
                 'active' => true,
-                'type' => $type
+                'type' => $type,
             ],
             ['accessibleFields' => [
                 'user_id' => true,
@@ -203,7 +211,7 @@ class AuthenticationTokensTable extends Table
      *    Example of valid types: 6 hours, 2 days, 1 minute.
      * @return bool true if it is valid
      */
-    public function isValid(string $tokenId, string $userId, string $type = null, $expiry = null)
+    public function isValid(string $tokenId, string $userId, ?string $type = null, $expiry = null)
     {
         // Are ids valid uuid?
         if (!Validation::uuid($tokenId) || !Validation::uuid($userId)) {
@@ -224,6 +232,10 @@ class AuthenticationTokensTable extends Table
 
         // Is it expired
         if ($this->isExpired($token, $expiry)) {
+            // update the token to inactive
+            $token->active = false;
+            $this->save($token);
+
             return false;
         }
 
@@ -233,26 +245,19 @@ class AuthenticationTokensTable extends Table
     /**
      * Check if a token is expired
      *
-     * @param EntityInterface $token AuthenticationToken
+     * @param \App\Model\Entity\AuthenticationToken $token uuid
      * @param string|int $expiry the numeric value with space then time type.
      *    Example of valid types: 6 hours, 2 days, 1 minute.
      * @return bool
      */
-    public function isExpired(EntityInterface $token, $expiry = null)
+    public function isExpired(AuthenticationToken $token, $expiry = null)
     {
         if ($expiry === null) {
-            $expiry = Configure::read('passbolt.auth.tokenExpiry');
+            $expiry = $this->authTokenExpiry->getExpirationForTokenType($token->type);
         }
-        $valid = $token->created->wasWithinLast($expiry);
-        if (!$valid) {
-            // update the token to inactive
-            $token->active = false;
-            $this->save($token);
+        $isNotExpired = $token->created->wasWithinLast($expiry);
 
-            return true;
-        }
-
-        return false;
+        return !$isNotExpired;
     }
 
     /**

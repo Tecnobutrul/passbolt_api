@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,8 +16,6 @@
  */
 namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Utility;
 
-use App\Model\Table\OrganizationSettingsTable;
-use App\Utility\UserAccessControl;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
@@ -31,10 +31,9 @@ class MfaSettingsTest extends MfaIntegrationTestCase
      * @var array
      */
     public $fixtures = [
-        'app.Base/OrganizationSettings',
         'plugin.Passbolt/AccountSettings.AccountSettings',
-        'app.Base/AuthenticationTokens', 'app.Base/Users',
-        'app.Base/Roles'
+        'app.Base/Users',
+        'app.Base/Roles',
     ];
 
     /**
@@ -49,18 +48,18 @@ class MfaSettingsTest extends MfaIntegrationTestCase
         MfaSettings::PROVIDERS => [
             MfaSettings::PROVIDER_DUO => true,
             MfaSettings::PROVIDER_TOTP => true,
-            MfaSettings::PROVIDER_YUBIKEY => true
+            MfaSettings::PROVIDER_YUBIKEY => true,
         ],
         MfaSettings::PROVIDER_YUBIKEY => [
             'clientId' => '40123',
-            'secretKey' => 'i2/j3jIQBO/axOl3ah4mlgXlXUY='
+            'secretKey' => 'i2/j3jIQBO/axOl3ah4mlgXlXUY=',
         ],
         MfaSettings::PROVIDER_DUO => [
             'salt' => '__CHANGE_ME__THIS_MUST_BE_AT_LEAST_FOURTY_CHARACTERS_____',
             'integrationKey' => 'UICPIC93F14RWR5F55SJ',
             'secretKey' => '8tkYNgi8aGAqa3KW1eqhsJLfjc1nJnHDYC1siNYX',
-            'hostName' => 'api-45e9f2ca.duosecurity.com'
-        ]
+            'hostName' => 'api-45e9f2ca.duosecurity.com',
+        ],
     ];
 
     /**
@@ -84,12 +83,12 @@ class MfaSettingsTest extends MfaIntegrationTestCase
         $this->uac = $this->mockUserAccessControl('ada');
         $this->defaultAccountConfig = [
             MfaSettings::PROVIDERS => [
-                MfaSettings::PROVIDER_TOTP
+                MfaSettings::PROVIDER_TOTP,
             ],
             MfaSettings::PROVIDER_TOTP => [
                 MfaAccountSettings::VERIFIED => FrozenTime::now(),
-                MfaAccountSettings::OTP_PROVISIONING_URI => MfaOtpFactory::generateTOTP($this->uac)
-            ]
+                MfaAccountSettings::OTP_PROVISIONING_URI => MfaOtpFactory::generateTOTP($this->uac),
+            ],
         ];
     }
 
@@ -203,12 +202,12 @@ class MfaSettingsTest extends MfaIntegrationTestCase
             ],
             MfaSettings::PROVIDER_YUBIKEY => [
                 'clientId' => '123456',
-                'secretKey' => '8aG/Auv3KW1eqhs/JLfIc1mJnHD='
+                'secretKey' => '8aG/Auv3KW1eqhs/JLfIc1mJnHD=',
             ],
             MfaSettings::PROVIDER_DUO => [
                 'salt' => 'Passbolt\MultiFactorAuthentication\Test\TestCase\Utility\MfaSettingsTest',
                 // others are missing
-            ]
+            ],
         ];
         $this->mockMfaOrgSettings($orgSettings, 'configure');
         $accountSettings = [
@@ -218,16 +217,16 @@ class MfaSettingsTest extends MfaIntegrationTestCase
                 MfaSettings::PROVIDER_DUO,
             ],
             MfaSettings::PROVIDER_DUO => [
-                MfaAccountSettings::VERIFIED => FrozenTime::now()
+                MfaAccountSettings::VERIFIED => FrozenTime::now(),
             ],
             MfaSettings::PROVIDER_YUBIKEY => [
                 // missing keyid
-                MfaAccountSettings::VERIFIED => FrozenTime::now()
+                MfaAccountSettings::VERIFIED => FrozenTime::now(),
             ],
             MfaSettings::PROVIDER_TOTP => [
                 MfaAccountSettings::VERIFIED => FrozenTime::now(),
-                MfaAccountSettings::OTP_PROVISIONING_URI => MfaOtpFactory::generateTOTP($this->uac)
-            ]
+                MfaAccountSettings::OTP_PROVISIONING_URI => MfaOtpFactory::generateTOTP($this->uac),
+            ],
         ];
         $this->mockMfaAccountSettings('ada', $accountSettings);
         $settings = MfaSettings::get($this->uac);

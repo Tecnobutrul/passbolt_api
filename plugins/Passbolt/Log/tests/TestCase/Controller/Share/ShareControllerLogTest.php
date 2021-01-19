@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -17,31 +19,34 @@ namespace Passbolt\Log\Test\TestCase\Controller\Share;
 use App\Model\Entity\Permission;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
+use Cake\Utility\Hash;
 use Passbolt\Log\Model\Entity\EntityHistory;
-use Passbolt\Log\Model\Table\PermissionsHistoryTable;
 use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 use Passbolt\Log\Test\Lib\Traits\PermissionsHistoryTrait;
+use Passbolt\Log\Test\Lib\Traits\SecretsHistoryTrait;
 
 class ShareControllerLogTest extends LogIntegrationTestCase
 {
     use PermissionsHistoryTrait;
+    use SecretsHistoryTrait;
 
-    /** @var PermissionsHistoryTable */
+    /**
+     * @var PermissionsHistoryTable
+     */
     protected $PermissionHistory;
 
     public $fixtures = [
         'app.Base/Users', 'app.Base/Gpgkeys', 'app.Base/Profiles', 'app.Base/Avatars', 'app.Base/Roles',
         'app.Base/Groups', 'app.Base/GroupsUsers', 'app.Base/Resources', 'app.Base/Permissions', 'app.Base/Secrets',
-        'plugin.Passbolt/Log.Base/SecretAccesses', 'app.Base/Favorites', 'app.Base/EmailQueue',
-        'plugin.Passbolt/Log.Base/Actions', 'plugin.Passbolt/Log.Base/ActionLogs',
-        'plugin.Passbolt/Log.Base/EntitiesHistory', 'plugin.Passbolt/Log.Base/PermissionsHistory',
-        'plugin.Passbolt/Log.Base/SecretsHistory'
+        'app.Base/Favorites',
     ];
 
     public function setUp()
     {
         parent::setUp();
         $this->PermissionsHistory = TableRegistry::getTableLocator()->get('Passbolt/Log.PermissionsHistory');
+        $this->Secrets = TableRegistry::getTableLocator()->get('Secrets');
+        $this->SecretsHistory = TableRegistry::getTableLocator()->get('Passbolt/Log.SecretsHistory');
     }
 
     public function testLogShareAddSuccess()
@@ -60,36 +65,51 @@ class ShareControllerLogTest extends LogIntegrationTestCase
         // Users permissions changes.
         // Add an owner permission for the user Edith
         $data['permissions'][] = ['aro' => 'User', 'aro_foreign_key' => $userEId, 'type' => Permission::OWNER];
-        $data['secrets'][] = ['user_id' => $userEId, 'data' => self::getDummySecretData($userEId)];
+        $data['secrets'][] = ['user_id' => $userEId, 'data' => Hash::get(self::getDummySecretData(), 'data')];
         $expectedAddedUsersIds[] = $userEId;
 
         $this->authenticateAs('ada');
         $this->putJson("/share/resource/$resourceId.json", $data);
         $this->assertSuccess();
+        $secret = $this->Secrets->findByResourceIdAndUserId($resourceId, $userEId)->first();
 
         // Assert action log is correct.
         $this->assertOneActionLog();
         $actionLog = $this->assertActionLogExists([
             'action_id' => UuidFactory::uuid('Share.share'),
             'user_id' => UuidFactory::uuid('user.id.ada'),
-            'status' => 1
+            'status' => 1,
         ]);
         $this->assertActionLogIdMatchesResponse($actionLog['id'], $this->_responseJsonHeader);
 
         // Assert permissionHistory is correct.
-        $this->assertOnePermissionHistory();
+        $this->assertPermissionsHistoryCount(1);
         $permissionHistory = $this->assertPermissionHistoryExists([
             'aco_foreign_key' => $resourceId,
             'aro_foreign_key' => $userEId,
             'type' => Permission::OWNER,
         ]);
 
+        // Assert secretHistory is correct.
+        $this->assertSecretsHistoryCount(1);
+        $this->assertSecretHistoryExists([
+            'id' => $secret->id,
+            'resource_id' => $resourceId,
+            'user_id' => $userEId,
+        ]);
+
         // Assert entityHistory is correct.
-        $this->assertOneEntityHistory();
+        $this->assertEntitiesHistoryCount(2);
         $this->assertEntityHistoryExists([
             'action_log_id' => $actionLog['id'],
             'foreign_model' => 'PermissionsHistory',
             'foreign_key' => $permissionHistory['id'],
+            'crud' => EntityHistory::CRUD_CREATE,
+        ]);
+        $this->assertEntityHistoryExists([
+            'action_log_id' => $actionLog['id'],
+            'foreign_model' => 'SecretsHistory',
+            'foreign_key' => $secret->id,
             'crud' => EntityHistory::CRUD_CREATE,
         ]);
     }
@@ -105,7 +125,7 @@ class ShareControllerLogTest extends LogIntegrationTestCase
         $data = ['permissions' => []];
         // Delete the permission of the user Betty.
         $data['permissions'][] = [
-            'id' => UuidFactory::uuid("permission.id.$resourceId-$userBId"), 'delete' => true
+            'id' => UuidFactory::uuid("permission.id.$resourceId-$userBId"), 'delete' => true,
         ];
 
         $this->authenticateAs('ada');
@@ -117,7 +137,7 @@ class ShareControllerLogTest extends LogIntegrationTestCase
         $actionLog = $this->assertActionLogExists([
             'action_id' => UuidFactory::uuid('Share.share'),
             'user_id' => UuidFactory::uuid('user.id.ada'),
-            'status' => 1
+            'status' => 1,
         ]);
         $this->assertActionLogIdMatchesResponse($actionLog['id'], $this->_responseJsonHeader);
 
@@ -161,7 +181,7 @@ class ShareControllerLogTest extends LogIntegrationTestCase
         $actionLog = $this->assertActionLogExists([
             'action_id' => UuidFactory::uuid('Share.share'),
             'user_id' => UuidFactory::uuid('user.id.ada'),
-            'status' => 1
+            'status' => 1,
         ]);
         $this->assertActionLogIdMatchesResponse($actionLog['id'], $this->_responseJsonHeader);
 
@@ -211,7 +231,7 @@ class ShareControllerLogTest extends LogIntegrationTestCase
         $actionLog = $this->assertActionLogExists([
             'action_id' => UuidFactory::uuid('Share.dryRun'),
             'user_id' => UuidFactory::uuid('user.id.ada'),
-            'status' => 1
+            'status' => 1,
         ]);
         $this->assertActionLogIdMatchesResponse($actionLog['id'], $this->_responseJsonHeader);
 
@@ -236,7 +256,7 @@ class ShareControllerLogTest extends LogIntegrationTestCase
         // Users permissions changes.
         // Add an owner permission for the user Edith
         $data['permissions'][] = ['aro' => 'User', 'aro_foreign_key' => $userEId, 'type' => Permission::OWNER];
-        $data['secrets'][] = ['user_id' => $userEId, 'data' => self::getDummySecretData($userEId)];
+        $data['secrets'][] = ['user_id' => $userEId, 'data' => Hash::get(self::getDummySecretData(), 'data')];
         $expectedAddedUsersIds[] = $userEId;
 
         $this->authenticateAs('ada');
@@ -247,7 +267,7 @@ class ShareControllerLogTest extends LogIntegrationTestCase
         $actionLog = $this->assertActionLogExists([
             'action_id' => UuidFactory::uuid('Share.share'),
             'user_id' => UuidFactory::uuid('user.id.ada'),
-            'status' => 0
+            'status' => 0,
         ]);
         $this->assertActionLogIdMatchesResponse($actionLog['id'], $this->_responseJsonHeader);
     }

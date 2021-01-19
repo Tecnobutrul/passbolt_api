@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -29,7 +31,6 @@ use Cake\ORM\Entity;
  */
 class Secret extends Entity
 {
-
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
@@ -44,6 +45,6 @@ class Secret extends Entity
         'resource_id' => false,
         'data' => false,
         'created' => false,
-        'modified' => false
+        'modified' => false,
     ];
 }

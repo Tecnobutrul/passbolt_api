@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -31,13 +33,12 @@ use Cake\ORM\Entity;
  */
 class Permission extends Entity
 {
-
     /**
      * The types of permissions.
      */
-    const READ = 1;
-    const UPDATE = 7;
-    const OWNER = 15;
+    public const READ = 1;
+    public const UPDATE = 7;
+    public const OWNER = 15;
 
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -59,6 +60,58 @@ class Permission extends Entity
 
         // Associated entities
         'group' => false,
-        'user' => false
+        'user' => false,
     ];
+
+    /**
+     * @param string|null $acoForeignKey ACO foreign key
+     * @return string
+     */
+    protected function _getAcoForeignKey(?string $acoForeignKey = null)
+    {
+        if ($this->acoObject) {
+            return $this->acoObject->getAcoForeignKey();
+        }
+
+        return $acoForeignKey;
+    }
+
+    /**
+     * @param string|null $aco Access Control Object
+     * @return string
+     */
+    protected function _getAco(?string $aco = null)
+    {
+        if ($this->acoObject) {
+            return $this->acoObject->getAcoType();
+        }
+
+        return $aco;
+    }
+
+    /**
+     * @param string|null $aroForeignKey ARO foreign key
+     * @return string
+     */
+    protected function _getAroForeignKey(?string $aroForeignKey = null)
+    {
+        if ($this->aroObject) {
+            return $this->aroObject->getAroForeignKey();
+        }
+
+        return $aroForeignKey;
+    }
+
+    /**
+     * @param string|null $aro Access Request Object
+     * @return string
+     */
+    protected function _getAro(?string $aro = null)
+    {
+        if ($this->aroObject) {
+            return $this->aroObject->getAroType();
+        }
+
+        return $aro;
+    }
 }

@@ -21,16 +21,20 @@
             <directory>./plugins/Passbolt/Log/tests/TestCase</directory>
             <directory>./plugins/Passbolt/AuditLog/tests/TestCase</directory>
             <directory>./plugins/Passbolt/EmailNotificationSettings/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/Folders/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/EmailDigest/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/Reports/tests/TestCase</directory>
+        </testsuite>
+        <testsuite name="WebInstaller Test Suite">
+            <directory>./plugins/Passbolt/WebInstaller/tests/TestCase</directory>
         </testsuite>
     </testsuites>
 
     <!-- Setup a listener for fixtures -->
     <listeners>
-        <listener
-        class="\Cake\TestSuite\Fixture\FixtureInjector"
-        file="./vendor/cakephp/cakephp/src/TestSuite/Fixture/FixtureInjector.php">
+        <listener class="CakephpTestSuiteLight\FixtureInjector">
             <arguments>
-                <object class="\Cake\TestSuite\Fixture\FixtureManager" />
+                <object class="CakephpTestSuiteLight\FixtureManager" />
             </arguments>
         </listener>
     </listeners>
@@ -44,6 +48,9 @@
             <directory suffix=".php">./plugins/Log/src/</directory>
             <directory suffix=".php">./plugins/AuditLog/src/</directory>
             <directory suffix=".php">./plugins/EmailNotificationSettings/src/</directory>
+            <directory suffix=".php">./plugins/Folders/src/</directory>
+            <directory suffix=".php">./plugins/EmailDigest/src/</directory>
+            <directory suffix=".php">./plugins/Reports/src/</directory>
         </whitelist>
     </filter>
 </phpunit>

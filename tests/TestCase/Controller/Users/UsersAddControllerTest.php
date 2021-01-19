@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -24,7 +26,7 @@ class UsersAddControllerTest extends AppIntegrationTestCase
 {
     public $fixtures = [
         'app.Base/Users', 'app.Base/Gpgkeys', 'app.Base/GroupsUsers', 'app.Base/Roles',
-        'app.Base/Profiles', 'app.Base/AuthenticationTokens', 'app.Base/Avatars', 'app.Base/EmailQueue'
+        'app.Base/Profiles', 'app.Base/Avatars',
     ];
 
     public function testUsersAddNotLoggedInError()
@@ -33,8 +35,8 @@ class UsersAddControllerTest extends AppIntegrationTestCase
             'username' => 'notallowed@passbolt.com',
             'profile' => [
                 'first_name' => 'not',
-                'last_name' => 'allowed'
-            ]
+                'last_name' => 'allowed',
+            ],
         ];
         $this->postJson('/users.json', $data);
         $this->assertAuthenticationError();
@@ -47,8 +49,8 @@ class UsersAddControllerTest extends AppIntegrationTestCase
             'username' => 'notallowed@passbolt.com',
             'profile' => [
                 'first_name' => 'not',
-                'last_name' => 'allowed'
-            ]
+                'last_name' => 'allowed',
+            ],
         ];
         $this->postJson('/users.json', $data);
         $this->assertError(403, 'Only administrators can add new users.');
@@ -66,7 +68,7 @@ class UsersAddControllerTest extends AppIntegrationTestCase
                 'role_id' => $adminRoleId,
                 'profile' => [
                     'first_name' => '傅',
-                    'last_name' => '苹'
+                    'last_name' => '苹',
                 ],
             ],
             'user role' => [
@@ -74,16 +76,16 @@ class UsersAddControllerTest extends AppIntegrationTestCase
                 'role_id' => $userRoleId,
                 'profile' => [
                     'first_name' => 'Borka',
-                    'last_name' => 'Jerman Blažič'
+                    'last_name' => 'Jerman Blažič',
                 ],
             ],
             'no role' => [
                 'username' => 'aurore@passbolt.com',
                 'profile' => [
                     'first_name' => 'Aurore',
-                    'last_name' => 'Avarguès-Weber'
+                    'last_name' => 'Avarguès-Weber',
                 ],
-            ]
+            ],
         ];
 
         foreach ($success as $case => $data) {
@@ -117,7 +119,7 @@ class UsersAddControllerTest extends AppIntegrationTestCase
     {
         $this->disableCsrfToken();
         $this->authenticateAs('admin');
-        $this->post('/users.json?api-version=v1');
+        $this->post('/users.json?api-version=v2');
         $this->assertResponseCode(403);
     }
 
@@ -136,8 +138,8 @@ class UsersAddControllerTest extends AppIntegrationTestCase
             'username' => 'aurore@passbolt.com',
             'profile' => [
                 'first_name' => 'Aurore',
-                'last_name' => 'Avarguès-Weber'
-            ]
+                'last_name' => 'Avarguès-Weber',
+            ],
         ];
 
         $this->postJson('/users.json', $data);
@@ -159,8 +161,8 @@ class UsersAddControllerTest extends AppIntegrationTestCase
             'username' => 'aurore@passbolt.com',
             'profile' => [
                 'first_name' => 'Aurore',
-                'last_name' => 'Avarguès-Weber'
-            ]
+                'last_name' => 'Avarguès-Weber',
+            ],
         ];
         $this->postJson('/users.json', $data);
         $this->assertResponseSuccess();
@@ -170,39 +172,17 @@ class UsersAddControllerTest extends AppIntegrationTestCase
         $this->assertResponseContains('created an account for you');
     }
 
-    public function testUsersAddRequestDataApiV1Success()
+    public function testUsersAddRequestDataApiUserExistError()
     {
         $this->authenticateAs('admin');
         $data = [
-            'User' => [
-                'username' => 'aurore@passbolt.com',
-            ],
-            'Profile' => [
-                'first_name' => 'Aurore',
-                'last_name' => 'Avarguès-Weber'
-            ]
-        ];
-        $this->postJson('/users.json', $data);
-        $this->assertResponseSuccess();
-
-        $this->get('/seleniumtests/showlastemail/aurore@passbolt.com');
-        $this->assertResponseOk();
-        $this->assertResponseContains('created an account for you');
-    }
-
-    public function testUsersAddRequestDataApiV1Error()
-    {
-        $this->authenticateAs('admin');
-        $data = [
-            'User' => [
-                'username' => 'ada@passbolt.com',
-            ],
-            'Profile' => [
+            'username' => 'ada@passbolt.com',
+            'profile' => [
                 'first_name' => 'ada',
-                'last_name' => 'lovelace'
-            ]
+                'last_name' => 'lovelace',
+            ],
         ];
-        $this->postJson('/users.json', $data);
+        $this->postJson('/users.json?api-version=v2', $data);
         $this->assertError(400, 'Could not validate user data.');
     }
 }

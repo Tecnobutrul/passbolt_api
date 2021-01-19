@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -17,17 +19,26 @@ namespace Passbolt\Log\Model\Entity;
 
 use Cake\ORM\Entity;
 
+/**
+ * @property string $id
+ * @property string $action_log_id
+ * @property string $foreign_model
+ * @property string $foreign_key
+ * @property string $crud
+ * @property \Cake\I18n\FrozenTime $created
+ * @property \Passbolt\Log\Model\Entity\ActionLog $action_log
+ */
 class EntityHistory extends Entity
 {
-    const CRUD_CREATE = 'c';
-    const CRUD_READ = 'r';
-    const CRUD_UPDATE = 'u';
-    const CRUD_DELETE = 'd';
+    public const CRUD_CREATE = 'c';
+    public const CRUD_READ = 'r';
+    public const CRUD_UPDATE = 'u';
+    public const CRUD_DELETE = 'd';
 
     /**
      * Allowed CRUD operations.
      */
-    const CRUD = [
+    public const CRUD = [
         self::CRUD_CREATE,
         self::CRUD_READ,
         self::CRUD_UPDATE,

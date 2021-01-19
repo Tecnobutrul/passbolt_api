@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,9 +17,7 @@
 namespace App\Shell\Task;
 
 use App\Shell\AppShell;
-use App\Utility\Healthchecks;
 use Cake\Core\Configure;
-use Cake\Core\Exception\Exception;
 
 class MigrateTask extends AppShell
 {
@@ -37,7 +37,12 @@ class MigrateTask extends AppShell
             ->addOption('backup', [
                 'help' => 'Make a database backup to be used in case something goes wrong.',
                 'boolean' => true,
-                'default' => false
+                'default' => false,
+            ])
+            ->addOption('no-clear-cache', [
+                'help' => 'Don\'t clear the cache once the migration is completed.',
+                'boolean' => true,
+                'default' => false,
             ]);
 
         return $parser;
@@ -59,7 +64,6 @@ class MigrateTask extends AppShell
         // Backup
         if (!$this->_backup()) {
             return false;
-        } else {
         }
 
         // Normal mode
@@ -73,9 +77,11 @@ class MigrateTask extends AppShell
         $cmd = $this->_formatCmd('migrations migrate --no-lock');
         $result = ($this->dispatchShell($cmd) === self::CODE_SUCCESS);
 
-        // Clean cache
-        $cmd = $this->_formatCmd('cache clear_all');
-        $this->dispatchShell($cmd);
+        // Clear cache
+        if ($this->param('no-clear-cache') === false) {
+            $cmd = $this->_formatCmd('cache clear_all');
+            $this->dispatchShell($cmd);
+        }
 
         return $result;
     }

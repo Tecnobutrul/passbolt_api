@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,8 +16,10 @@
  */
 namespace Passbolt\MultiFactorAuthentication\Controller;
 
+use Cake\Core\Configure;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
+use Cake\I18n\Date;
 use Cake\Routing\Router;
 use Passbolt\MultiFactorAuthentication\Utility\MfaVerifiedCookie;
 use Passbolt\MultiFactorAuthentication\Utility\MfaVerifiedToken;
@@ -25,7 +29,7 @@ class MfaVerifyController extends MfaController
     /**
      * Trigger a redirect if MFA verification is not required
      *
-     * @throws BadRequestException if valid Verification token is already present in cookie
+     * @throws \Cake\Http\Exception\BadRequestException if valid Verification token is already present in cookie
      * @return void
      */
     protected function _handleVerifiedNotRequired()
@@ -33,8 +37,9 @@ class MfaVerifyController extends MfaController
         // Mfa cookie is set and a valid token
         $uac = $this->User->getAccessControl();
         $mfaVerifiedToken = $this->request->getCookie(MfaVerifiedCookie::MFA_COOKIE_ALIAS);
+        $sessionId = $this->getRequest()->getSession()->id();
         if (isset($mfaVerifiedToken)) {
-            if (MfaVerifiedToken::check($uac, $mfaVerifiedToken)) {
+            if (MfaVerifiedToken::check($uac, $mfaVerifiedToken, $sessionId)) {
                 throw new BadRequestException(__('MFA is not required.'));
             }
         }
@@ -43,8 +48,8 @@ class MfaVerifyController extends MfaController
     /**
      * Trigger an error if current MFA settings do not allow verify for the given provider
      *
-     * @throws InternalErrorException if there is no MFA settings for the user
-     * @throws BadRequestException if there is no MFA settings for this provider
+     * @throws \Cake\Http\Exception\InternalErrorException if there is no MFA settings for the user
+     * @throws \Cake\Http\Exception\BadRequestException if there is no MFA settings for this provider
      * @param string $provider name of the provider
      * @return void
      */
@@ -68,9 +73,13 @@ class MfaVerifyController extends MfaController
     protected function _generateMFaToken(string $provider)
     {
         $uac = $this->User->getAccessControl();
-        $token = MfaVerifiedToken::get($uac, $provider);
-        $remember = ($this->request->getData('remember') !== null);
-        $cookie = MfaVerifiedCookie::get($token, $remember, $this->request->is('ssl'));
+        $sessionId = $this->getRequest()->getSession()->id();
+        $token = MfaVerifiedToken::get($uac, $provider, $sessionId, (bool)$this->request->getData('remember') ?? false);
+        $expiryAt = $this->request->getData('remember') ?
+            (new Date())->addDays(MfaVerifiedCookie::MAX_DURATION_IN_DAYS) :
+            null;
+        $secure = Configure::read('passbolt.security.cookies.secure') || $this->getRequest()->is('ssl');
+        $cookie = MfaVerifiedCookie::get($token, $expiryAt, $secure);
         $this->response = $this->response->withCookie($cookie);
     }
 

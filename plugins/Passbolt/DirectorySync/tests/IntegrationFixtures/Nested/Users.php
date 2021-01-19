@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -26,8 +28,8 @@ return [
             'username' => 'user1@passbolt.com',
             'profile' => [
                 'first_name' => 'user',
-                'last_name' => 'one'
-            ]
+                'last_name' => 'one',
+            ],
         ],
     ],
     [
@@ -39,8 +41,8 @@ return [
             'username' => 'user2@passbolt.com',
             'profile' => [
                 'first_name' => 'user',
-                'last_name' => 'two'
-            ]
+                'last_name' => 'two',
+            ],
         ],
     ],
     [
@@ -52,8 +54,8 @@ return [
             'username' => 'user3@passbolt.com',
             'profile' => [
                 'first_name' => 'user',
-                'last_name' => 'three'
-            ]
+                'last_name' => 'three',
+            ],
         ],
     ],
     [
@@ -65,8 +67,8 @@ return [
             'username' => 'user4@passbolt.com',
             'profile' => [
                 'first_name' => 'user',
-                'last_name' => 'four'
-            ]
+                'last_name' => 'four',
+            ],
         ],
     ],
     // These 2 last users are invalid due to a wrong email.
@@ -78,8 +80,8 @@ return [
         'user' => [
             'profile' => [
                 'first_name' => 'user',
-                'last_name' => 'five'
-            ]
+                'last_name' => 'five',
+            ],
         ],
     ],
     [
@@ -90,8 +92,8 @@ return [
         'user' => [
             'profile' => [
                 'first_name' => 'user',
-                'last_name' => 'six'
-            ]
+                'last_name' => 'six',
+            ],
         ],
     ],
 ];

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -28,7 +30,7 @@ class AccountCreationControllerTest extends WebInstallerIntegrationTestCase
     public function testWebInstallerAccountCreationViewSuccess()
     {
         $this->get('/install/account_creation');
-        $data = ($this->_getBodyAsString());
+        $data = $this->_getBodyAsString();
         $this->assertResponseOk();
         $this->assertContains('Admin user details', $data);
     }
@@ -38,7 +40,7 @@ class AccountCreationControllerTest extends WebInstallerIntegrationTestCase
         $postData = [
             'username' => 'aurore@passbolt.com',
             'first_name' => 'Aurore',
-            'last_name' => 'Avarguès-Weber'
+            'last_name' => 'Avarguès-Weber',
         ];
         $this->post('/install/account_creation', $postData);
         $this->assertResponseCode(302);
@@ -48,8 +50,8 @@ class AccountCreationControllerTest extends WebInstallerIntegrationTestCase
             'username' => 'aurore@passbolt.com',
             'profile' => [
                 'first_name' => 'Aurore',
-                'last_name' => 'Avarguès-Weber'
-            ]
+                'last_name' => 'Avarguès-Weber',
+            ],
         ];
         $this->assertSession($expectedData, 'webinstaller.first_user');
     }
@@ -59,10 +61,10 @@ class AccountCreationControllerTest extends WebInstallerIntegrationTestCase
         $postData = [
             'username' => 'invalid-email',
             'first_name' => 'Aurore',
-            'last_name' => 'Avarguès-Weber'
+            'last_name' => 'Avarguès-Weber',
         ];
         $this->post('/install/account_creation', $postData);
-        $data = ($this->_getBodyAsString());
+        $data = $this->_getBodyAsString();
         $this->assertResponseOk();
         $this->assertContains('The data entered are not correct', $data);
     }

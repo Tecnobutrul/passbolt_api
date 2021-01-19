@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -25,8 +27,7 @@ class ThemesSelectControllerTest extends AppIntegrationTestCase
 
     public $fixtures = [
         'app.Base/Users', 'app.Base/Roles', 'app.Base/Profiles',
-        'app.Base/OrganizationSettings',
-        'plugin.Passbolt/AccountSettings.AccountSettings'
+        'plugin.Passbolt/AccountSettings.AccountSettings',
     ];
 
     public function setUp()
@@ -41,7 +42,7 @@ class ThemesSelectControllerTest extends AppIntegrationTestCase
         $setting = $this->AccountSettings->find()
             ->where([
                 'user_id' => UuidFactory::uuid('user.id.ada'),
-                'property_id' => UuidFactory::uuid('account.settings.property.id.theme')
+                'property_id' => UuidFactory::uuid('account.settings.property.id.theme'),
             ])
             ->first();
         $this->assertNotEmpty($setting);
@@ -55,7 +56,7 @@ class ThemesSelectControllerTest extends AppIntegrationTestCase
         // Check that the setting is set
         $themeSettingFindConditions = [
             'user_id' => UuidFactory::uuid('user.id.ada'),
-            'property_id' => UuidFactory::uuid('account.settings.property.id.theme')
+            'property_id' => UuidFactory::uuid('account.settings.property.id.theme'),
         ];
         $setting = $this->AccountSettings->find()->where($themeSettingFindConditions)->first();
         $this->assertNotEmpty($setting);

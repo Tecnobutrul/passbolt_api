@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -12,7 +14,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.2.0
  */
-namespace Passbolt\DirectorySync\Test\TestCase\Actions;
+namespace Passbolt\DirectorySync\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
 use LdapTools\Object\LdapObjectType;
@@ -23,7 +25,6 @@ use Passbolt\DirectorySync\Utility\DirectoryEntry\DirectoryResults;
 
 class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
 {
-
     public function setUp()
     {
         parent::setUp();
@@ -48,7 +49,7 @@ class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
         $expectedGroupsUsers = [
             'CN=Administration,OU=PassboltUsers,DC=passbolt,DC=local' => [
                 'groups' => [
-                    'CN=Managers,OU=PassboltUsers,DC=passbolt,DC=local'
+                    'CN=Managers,OU=PassboltUsers,DC=passbolt,DC=local',
                 ],
                 'users' => [],
             ],
@@ -66,16 +67,16 @@ class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
                 'groups' => [],
                 'users' => [
                     'CN=User1,OU=PassboltUsers,DC=passbolt,DC=local',
-                ]
+                ],
             ],
             'CN=Developers,OU=PassboltUsers,DC=passbolt,DC=local' => [
                 'groups' => [
-                    'CN=InvalidGroup1,OU=PassboltUsers,DC=passbolt,DC=local'
+                    'CN=InvalidGroup1,OU=PassboltUsers,DC=passbolt,DC=local',
                 ],
                 'users' => [
-                    'CN=User3,OU=PassboltUsers,DC=passbolt,DC=local'
-                ]
-            ]
+                    'CN=User3,OU=PassboltUsers,DC=passbolt,DC=local',
+                ],
+            ],
         ];
 
         foreach ($expectedGroupsUsers as $groupDn => $groupsUsers) {
@@ -110,7 +111,7 @@ class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
                 'groups' => [],
                 'users' => [
                     'CN=User1,OU=PassboltUsers,DC=passbolt,DC=local',
-                ]
+                ],
             ],
         ];
 

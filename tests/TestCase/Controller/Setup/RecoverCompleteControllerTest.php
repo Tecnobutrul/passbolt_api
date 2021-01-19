@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -22,9 +24,10 @@ use Cake\ORM\TableRegistry;
 
 class RecoverCompleteControllerTest extends AppIntegrationTestCase
 {
-    public $fixtures = ['app.Base/Users', 'app.Base/Profiles', 'app.Base/Gpgkeys', 'app.Base/Roles', 'app.Base/AuthenticationTokens'];
-    public $AuthenticationTokens;
     use AuthenticationTokenModelTrait;
+
+    public $fixtures = ['app.Base/Users', 'app.Base/Profiles', 'app.Base/Gpgkeys', 'app.Base/Roles',];
+    public $AuthenticationTokens;
 
     public function setUp()
     {
@@ -46,11 +49,11 @@ class RecoverCompleteControllerTest extends AppIntegrationTestCase
         $armoredKey = file_get_contents(FIXTURES . DS . 'Gpgkeys' . DS . 'ada_public.key');
         $data = [
             'authenticationtoken' => [
-                'token' => $t->token
+                'token' => $t->token,
             ],
             'gpgkey' => [
-                'armored_key' => $armoredKey
-            ]
+                'armored_key' => $armoredKey,
+            ],
         ];
         $this->postJson($url, $data);
         $this->assertSuccess();
@@ -58,28 +61,6 @@ class RecoverCompleteControllerTest extends AppIntegrationTestCase
         // Check that token is now inactive
         $t2 = $this->AuthenticationTokens->get($t->id);
         $this->assertFalse($t2->active);
-    }
-
-    /**
-     * @group AN
-     * @group recover
-     * @group recoverComplete
-     */
-    public function testRecoverCompleteApiV1Success()
-    {
-        $t = $this->AuthenticationTokens->generate(UuidFactory::uuid('user.id.ada'), AuthenticationToken::TYPE_RECOVER);
-        $url = '/setup/completeRecovery/' . UuidFactory::uuid('user.id.ada') . '.json';
-        $armoredKey = file_get_contents(FIXTURES . DS . 'Gpgkeys' . DS . 'ada_public.key');
-        $data = [
-            'AuthenticationToken' => [
-                'token' => $t->token
-            ],
-            'Gpgkey' => [
-                'key' => $armoredKey
-            ]
-        ];
-        $this->postJson($url, $data);
-        $this->assertSuccess();
     }
 
     /**
@@ -123,36 +104,36 @@ class RecoverCompleteControllerTest extends AppIntegrationTestCase
         $fails = [
             'empty array' => [
                 'data' => [],
-                'message' => 'An authentication token must be provided.'
+                'message' => 'An authentication token must be provided.',
             ],
             'null' => [
                 'data' => null,
-                'message' => 'An authentication token must be provided.'
+                'message' => 'An authentication token must be provided.',
             ],
             'array with null' => [
                 'data' => ['token' => null],
-                'message' => 'An authentication token must be provided.'
+                'message' => 'An authentication token must be provided.',
             ],
             'int' => [
                 'data' => ['token' => 100],
-                'message' => 'The authentication token should be a valid uuid.'
+                'message' => 'The authentication token should be a valid uuid.',
             ],
             'string' => [
                 'data' => ['token' => 'nope'],
-                'message' => 'The authentication token should be a valid uuid.'
+                'message' => 'The authentication token should be a valid uuid.',
             ],
             'expired token' => [
                 'data' => ['token' => $tokenExpired],
-                'message' => 'The authentication token is not valid or has expired.'
+                'message' => 'The authentication token is not valid or has expired.',
             ],
             'inactive token' => [
                 'data' => ['token' => $tokenInactive],
-                'message' => 'The authentication token is not valid or has expired.'
-            ]
+                'message' => 'The authentication token is not valid or has expired.',
+            ],
         ];
         foreach ($fails as $caseName => $case) {
             $data = [
-                'AuthenticationToken' => $case['data']
+                'authenticationtoken' => $case['data'],
             ];
             $this->postJson($url, $data);
             $this->assertError(400, $case['message'], 'Issue with test case: ' . $caseName);
@@ -173,12 +154,12 @@ class RecoverCompleteControllerTest extends AppIntegrationTestCase
         $fails = [
             'wrong type token' => [
                 'data' => ['token' => $tokenWrongType],
-                'message' => 'The authentication token is not valid or has expired.'
+                'message' => 'The authentication token is not valid or has expired.',
             ],
         ];
         foreach ($fails as $caseName => $case) {
             $data = [
-                'AuthenticationToken' => $case['data']
+                'authenticationtoken' => $case['data'],
             ];
             $this->postJson($url, $data);
             $this->assertError(400, $case['message'], 'Issue with test case: ' . $caseName);
@@ -200,35 +181,35 @@ class RecoverCompleteControllerTest extends AppIntegrationTestCase
         $fails = [
             'empty array' => [
                 'data' => [],
-                'message' => 'An OpenPGP key must be provided.'
+                'message' => 'An OpenPGP key must be provided.',
             ],
             'null' => [
                 'data' => null,
-                'message' => 'An OpenPGP key must be provided.'
+                'message' => 'An OpenPGP key must be provided.',
             ],
             'array with null' => [
                 'data' => ['armored_key' => null],
-                'message' => 'An OpenPGP key must be provided.'
+                'message' => 'An OpenPGP key must be provided.',
             ],
             'int' => [
                 'data' => ['armored_key' => 100],
-                'message' => 'A valid OpenPGP key must be provided.'
+                'message' => 'A valid OpenPGP key must be provided.',
             ],
             'string' => [
                 'data' => ['armored_key' => 'nope'],
-                'message' => 'A valid OpenPGP key must be provided.'
+                'message' => 'A valid OpenPGP key must be provided.',
             ],
             'partial key' => [
                 'data' => ['armored_key' => $cutKey],
-                'message' => 'A valid OpenPGP key must be provided.'
-            ]
+                'message' => 'A valid OpenPGP key must be provided.',
+            ],
         ];
         foreach ($fails as $caseName => $case) {
             $data = [
-            'AuthenticationToken' => [
-                'token' => $t->token
+            'authenticationtoken' => [
+                'token' => $t->token,
             ],
-            'Gpgkey' => $case['data']
+            'gpgkey' => $case['data'],
             ];
         }
         $this->postJson($url, $data);

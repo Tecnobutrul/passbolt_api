@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -29,20 +31,17 @@ use Cake\Validation\Validator;
  *
  * @property \App\Model\Table\ResourcesTable|\Cake\ORM\Association\BelongsTo $Resources
  * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\BelongsTo $Users
- *
- * @method \App\Model\Entity\Favorite get($primaryKey, $options = [])
- * @method \App\Model\Entity\Favorite newEntity($data = null, array $options = [])
- * @method \App\Model\Entity\Favorite[] newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\Favorite|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \App\Model\Entity\Favorite patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \App\Model\Entity\Favorite[] patchEntities($entities, array $data, array $options = [])
- * @method \App\Model\Entity\Favorite findOrCreate($search, callable $callback = null, $options = [])
- *
+ * @method \App\Model\Entity\Favorite get($primaryKey, ?array $options = [])
+ * @method \App\Model\Entity\Favorite newEntity($data = null, ?array $options = [])
+ * @method \App\Model\Entity\Favorite[] newEntities(array $data, ?array $options = [])
+ * @method \App\Model\Entity\Favorite|bool save(\Cake\Datasource\EntityInterface $entity, ?array $options = [])
+ * @method \App\Model\Entity\Favorite patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, ?array $options = [])
+ * @method \App\Model\Entity\Favorite[] patchEntities($entities, array $data, ?array $options = [])
+ * @method \App\Model\Entity\Favorite findOrCreate($search, callable $callback = null, ?array $options = [])
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class FavoritesTable extends Table
 {
-
     use ResourcesCleanupTrait;
     use TableCleanupTrait;
     use UsersCleanupTrait;
@@ -50,7 +49,7 @@ class FavoritesTable extends Table
     /**
      * List of allowed foreign models on which Favorites can be plugged.
      */
-    const ALLOWED_FOREIGN_MODELS = [
+    public const ALLOWED_FOREIGN_MODELS = [
         'Resource',
     ];
 
@@ -60,7 +59,7 @@ class FavoritesTable extends Table
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 
@@ -71,10 +70,10 @@ class FavoritesTable extends Table
         $this->addBehavior('Timestamp');
 
         $this->belongsTo('Resources', [
-            'foreignKey' => 'foreign_key'
+            'foreignKey' => 'foreign_key',
         ]);
         $this->belongsTo('Users', [
-            'foreignKey' => 'user_id'
+            'foreignKey' => 'user_id',
         ]);
     }
 
@@ -84,26 +83,26 @@ class FavoritesTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator
             ->uuid('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', null, 'create');
 
         $validator
             ->uuid('user_id')
             ->requirePresence('user_id', 'create')
-            ->notEmpty('user_id');
+            ->notEmptyString('user_id');
 
         $validator
             ->inList('foreign_model', self::ALLOWED_FOREIGN_MODELS)
             ->requirePresence('foreign_model', 'create')
-            ->notEmpty('foreign_model');
+            ->notEmptyString('foreign_model');
 
         $validator
             ->uuid('foreign_key')
             ->requirePresence('foreign_key', 'create')
-            ->notEmpty('foreign_key');
+            ->notEmptyString('foreign_key');
 
         return $validator;
     }
@@ -115,20 +114,20 @@ class FavoritesTable extends Table
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules)
+    public function buildRules(RulesChecker $rules): RulesChecker
     {
         // Add create rules.
         $rules->addCreate($rules->existsIn('user_id', 'Users'), 'user_exists');
         $rules->addCreate(new IsNotSoftDeletedRule(), 'user_is_not_soft_deleted', [
             'table' => 'Users',
             'errorField' => 'user_id',
-            'message' => __('The user is soft deleted.')
+            'message' => __('The user is soft deleted.'),
         ]);
         $rules->addCreate($rules->existsIn('foreign_key', 'Resources'), 'resource_exists');
         $rules->addCreate(new IsNotSoftDeletedRule(), 'resource_is_not_soft_deleted', [
             'table' => 'Resources',
             'errorField' => 'foreign_key',
-            'message' => __('The resource is soft deleted.')
+            'message' => __('The resource is soft deleted.'),
         ]);
         $rules->addCreate(new HasResourceAccessRule(), 'has_resource_access', [
             'errorField' => 'foreign_key',
@@ -147,7 +146,7 @@ class FavoritesTable extends Table
         // Add delete rules.
         $rules->addDelete([$this, 'isOwnerRule'], 'is_owner', [
             'errorField' => 'user_id',
-            'message' => __('The user cannot delete this favorite.')
+            'message' => __('The user cannot delete this favorite.'),
         ]);
 
         return $rules;
@@ -157,10 +156,10 @@ class FavoritesTable extends Table
      * Validate that the favorite can be deleted by the user who requests the deletion.
      *
      * @param \App\Model\Entity\Favorite $entity The entity that will be deleted.
-     * @param array $options options
+     * @param array|null $options options
      * @return bool
      */
-    public function isOwnerRule(\App\Model\Entity\Favorite $entity, array $options = [])
+    public function isOwnerRule(\App\Model\Entity\Favorite $entity, ?array $options = [])
     {
         if ($options['Favorites.user_id'] != $entity->user_id) {
             return false;

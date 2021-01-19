@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,10 +16,65 @@
  */
 namespace App\Test\Lib\Model;
 
+use App\Model\Entity\Group;
 use App\Utility\UuidFactory;
+use Cake\ORM\TableRegistry;
 
 trait GroupsModelTrait
 {
+    /**
+     * Add a dummy group.
+     *
+     * @param array|null $data The group data
+     * @param array|null $options The entity options
+     * @return Group
+     */
+    public function addGroup(?array $data = [], ?array $options = [])
+    {
+        $groupsTable = TableRegistry::getTableLocator()->get('Groups');
+        $group = self::getDummyGroupEntity($data, $options);
+
+        $groupsTable->save($group, ['checkRules' => true]);
+
+        return $group;
+    }
+
+    /**
+     * Get a new group entity
+     *
+     * @param array|null $data The group data.
+     * @param array|null $options The new entity options.
+     * @return Group
+     */
+    public function getDummyGroupEntity(?array $data = [], ?array $options = []): Group
+    {
+        $groupsTable = TableRegistry::getTableLocator()->get('Groups');
+        $defaultOptions = [
+            'validate' => false,
+            'accessibleFields' => [
+                'name' => true,
+                'created_by' => true,
+                'modified_by' => true,
+                'groups_users' => true,
+                'deleted' => true,
+            ],
+            'associated' => [
+                'GroupsUsers' => [
+                    'validate' => false,
+                    'accessibleFields' => [
+                        'user_id' => true,
+                        'is_admin' => true,
+                    ],
+                ],
+            ],
+        ];
+
+        $data = self::getDummyGroupData($data);
+        $options = array_merge($defaultOptions, $options);
+
+        return $groupsTable->newEntity($data, $options);
+    }
+
     /**
      * Get a dummy group with test data.
      * The comment returned passes a default validation.
@@ -25,14 +82,10 @@ trait GroupsModelTrait
      * @param array $data Custom data that will be merged with the default content.
      * @return array Comment data
      */
-    public static function getDummyGroup($data = [])
+    public static function getDummyGroupData($data = [])
     {
         $entityContent = [
             'name' => 'New group name',
-            'groups_users' => [
-                ['user_id' => UuidFactory::uuid('user.id.ada'), 'is_admin' => true],
-                ['user_id' => UuidFactory::uuid('user.id.betty')]
-            ],
             'created_by' => UuidFactory::uuid('user.id.admin'),
             'modified_by' => UuidFactory::uuid('user.id.admin'),
             'deleted' => false,
@@ -60,13 +113,17 @@ trait GroupsModelTrait
      */
     protected function assertGroupIsSoftDeleted($id)
     {
-        $group = $this->Groups->get($id);
+        $groupsTable = TableRegistry::getTableLocator()->get('Groups');
+        $groupsUsersTable = TableRegistry::getTableLocator()->get('GroupsUsers');
+        $permissionsTable = TableRegistry::getTableLocator()->get('Permissions');
+
+        $group = $groupsTable->get($id);
         $this->assertTrue($group->deleted);
         // Groups users have been deleted
-        $groupsUsers = $this->Groups->GroupsUsers->find()->where(['group_id' => $id])->all();
+        $groupsUsers = $groupsUsersTable->find()->where(['group_id' => $id])->all();
         $this->assertEmpty($groupsUsers);
         // Permissions have been deleted
-        $permissions = $this->Permissions->find()->where(['aro_foreign_key' => '$id'])->all();
+        $permissions = $permissionsTable->find()->where(['aro_foreign_key' => '$id'])->all();
         $this->assertEmpty($permissions);
     }
 

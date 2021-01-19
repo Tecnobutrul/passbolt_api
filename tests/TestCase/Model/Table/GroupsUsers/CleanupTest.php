@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -19,17 +21,15 @@ use App\Test\Lib\AppTestCase;
 use App\Test\Lib\Utility\CleanupTrait;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
-use Cake\Utility\Hash;
 
 class CleanupTest extends AppTestCase
 {
+    use CleanupTrait;
 
     public $GroupsUsers;
     public $Groups;
     public $fixtures = ['app.Base/Groups', 'app.Base/Users', 'app.Base/GroupsUsers'];
     public $options;
-
-    use CleanupTrait;
 
     public function setUp()
     {
@@ -41,7 +41,7 @@ class CleanupTest extends AppTestCase
             'group_id' => true,
             'user_id' => true,
             'is_admin' => true,
-            'created_by' => true
+            'created_by' => true,
         ]];
     }
 

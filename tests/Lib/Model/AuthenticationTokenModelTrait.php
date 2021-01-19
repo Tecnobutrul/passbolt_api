@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -46,7 +48,7 @@ trait AuthenticationTokenModelTrait
                 'type' => true,
                 'data' => true,
                 'created' => true,
-                'deleted' => true
+                'deleted' => true,
             ]]
         );
         $authToken->save($token, ['checkRules' => false]);
@@ -66,7 +68,7 @@ trait AuthenticationTokenModelTrait
             'user_id' => $userId,
             'type' => $type,
             'token' => UuidFactory::uuid(),
-            'active' => true
+            'active' => true,
         ];
         switch ($case) {
             case 'inactive':
@@ -78,8 +80,8 @@ trait AuthenticationTokenModelTrait
                 $data['modified'] = date('Y-m-d H:i:s', strtotime('-10 days'));
                 break;
             case 'expired':
-                $data['created'] = date('Y-m-d H:i:s', strtotime('-10 days'));
-                $data['modified'] = date('Y-m-d H:i:s', strtotime('-10 days'));
+                $data['created'] = date('Y-m-d H:i:s', strtotime('-11 days'));
+                $data['modified'] = date('Y-m-d H:i:s', strtotime('-11 days'));
                 break;
         }
 

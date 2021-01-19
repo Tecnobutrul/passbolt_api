@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -15,7 +17,6 @@
 namespace Passbolt\DirectorySync\Test\TestCase\Actions;
 
 use App\Utility\UuidFactory;
-use Cake\Core\Configure;
 use Passbolt\DirectorySync\Actions\GroupSyncAction;
 use Passbolt\DirectorySync\Test\Utility\DirectorySyncIntegrationTestCase;
 use Passbolt\DirectorySync\Test\Utility\Traits\AssertGroupsTrait;
@@ -576,7 +577,7 @@ class GroupSyncActionDeleteTest extends DirectorySyncIntegrationTestCase
             'action' => Alias::ACTION_DELETE,
             'model' => Alias::MODEL_GROUPS,
             'status' => Alias::STATUS_ERROR,
-            'type' => 'SyncError'
+            'type' => 'SyncError',
         ];
         $this->assertReport($reports[0], $expectedReport);
         $this->assertGroupExist(UuidFactory::uuid('group.id.accounting'), ['deleted' => false]);
@@ -603,7 +604,7 @@ class GroupSyncActionDeleteTest extends DirectorySyncIntegrationTestCase
             'action' => Alias::ACTION_DELETE,
             'model' => Alias::MODEL_GROUPS,
             'status' => Alias::STATUS_IGNORE,
-            'type' => 'DirectoryIgnore'
+            'type' => 'DirectoryIgnore',
         ];
         $this->assertReport($reports[0], $expectedReport);
         $this->assertDirectoryEntryEmpty();

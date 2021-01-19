@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -25,9 +27,10 @@ class DirectoryOrgSettings
 {
     /**
      * The organisation settings property name.
+     *
      * @var string
      */
-    const ORG_SETTINGS_PROPERTY = 'directorySync';
+    public const ORG_SETTINGS_PROPERTY = 'directorySync';
 
     /**
      * @var array
@@ -37,9 +40,9 @@ class DirectoryOrgSettings
     /**
      * DirectoryOrgSettings constructor.
      *
-     * @param array $settings settings
+     * @param array|null $settings settings
      */
-    public function __construct(array $settings = [])
+    public function __construct(?array $settings = [])
     {
         $this->OrganizationSetting = TableRegistry::getTableLocator()->get('OrganizationSettings');
 
@@ -56,7 +59,7 @@ class DirectoryOrgSettings
     /**
      * Get Directory Organization Settings
      *
-     * @return DirectoryOrgSettings
+     * @return \Passbolt\DirectorySync\Utility\DirectoryOrgSettings
      */
     public static function get()
     {
@@ -83,6 +86,9 @@ class DirectoryOrgSettings
         if (!empty($password)) {
             $settings = Hash::insert($settings, 'ldap.domains.org_domain.password', self::decrypt($password));
         }
+        if (!empty($settings)) {
+            $settings['source'] = 'db';
+        }
 
         return $settings;
     }
@@ -98,9 +104,12 @@ class DirectoryOrgSettings
         if (!\file_exists($path)) {
             return [];
         }
-        $data = require($path);
+        $data = require $path;
 
-        return Hash::get($data, 'passbolt.plugins.directorySync', []);
+        $settings = Hash::get($data, 'passbolt.plugins.directorySync', []);
+        $settings['source'] = 'file';
+
+        return $settings;
     }
 
     /**
@@ -114,7 +123,7 @@ class DirectoryOrgSettings
         if (!\file_exists($path)) {
             return [];
         }
-        $data = require($path);
+        $data = require $path;
 
         return Hash::get($data, 'passbolt.plugins.directorySync', []);
     }
@@ -122,7 +131,7 @@ class DirectoryOrgSettings
     /**
      * Disable the ldap integration.
      *
-     * @param UserAccessControl $uac user access control
+     * @param \App\Utility\UserAccessControl $uac user access control
      * @return void
      */
     public static function disable($uac)
@@ -170,7 +179,7 @@ class DirectoryOrgSettings
      */
     public function getDefaultUser()
     {
-        return Hash::get($this->settings, "defaultUser");
+        return Hash::get($this->settings, 'defaultUser');
     }
 
     /**
@@ -180,7 +189,7 @@ class DirectoryOrgSettings
      */
     public function getDefaultGroupAdminUser()
     {
-        return Hash::get($this->settings, "defaultGroupAdminUser");
+        return Hash::get($this->settings, 'defaultGroupAdminUser');
     }
 
     /**
@@ -190,7 +199,7 @@ class DirectoryOrgSettings
      */
     public function getUsersParentGroup()
     {
-        return Hash::get($this->settings, "usersParentGroup");
+        return Hash::get($this->settings, 'usersParentGroup');
     }
 
     /**
@@ -200,7 +209,7 @@ class DirectoryOrgSettings
      */
     public function getGroupsParentGroup()
     {
-        return Hash::get($this->settings, "groupsParentGroup");
+        return Hash::get($this->settings, 'groupsParentGroup');
     }
 
     /**
@@ -210,19 +219,19 @@ class DirectoryOrgSettings
      */
     public function getEnabledUsersOnly()
     {
-        return Hash::get($this->settings, "enabledUsersOnly");
+        return Hash::get($this->settings, 'enabledUsersOnly');
     }
 
     /**
      * Get fields mapping.
-     * @param string $type directory type
      *
+     * @param string $type directory type
      * @return bool|string
      */
-    public function getFieldsMapping(string $type = null)
+    public function getFieldsMapping(?string $type = null)
     {
         if ($type === null) {
-            return Hash::get($this->settings, "fieldsMapping");
+            return Hash::get($this->settings, 'fieldsMapping');
         }
 
         return Hash::get($this->settings, "fieldsMapping.$type");
@@ -235,7 +244,7 @@ class DirectoryOrgSettings
      */
     public function getLdapSettings()
     {
-        return Hash::get($this->settings, "ldap");
+        return Hash::get($this->settings, 'ldap');
     }
 
     /**
@@ -257,7 +266,7 @@ class DirectoryOrgSettings
      */
     public function getUseEmailPrefixSuffix()
     {
-        return Hash::get($this->settings, "useEmailPrefixSuffix");
+        return Hash::get($this->settings, 'useEmailPrefixSuffix');
     }
 
     /**
@@ -267,7 +276,7 @@ class DirectoryOrgSettings
      */
     public function getEmailPrefix()
     {
-        return Hash::get($this->settings, "emailPrefix");
+        return Hash::get($this->settings, 'emailPrefix');
     }
 
     /**
@@ -277,7 +286,37 @@ class DirectoryOrgSettings
      */
     public function getEmailSuffix()
     {
-        return Hash::get($this->settings, "emailSuffix");
+        return Hash::get($this->settings, 'emailSuffix');
+    }
+
+    /**
+     * Get UserCustomFilters
+     *
+     * @return mixed (should be callable)
+     */
+    public function getUserCustomFilters()
+    {
+        return Hash::get($this->settings, 'userCustomFilters');
+    }
+
+    /**
+     * Get GroupCustomFilters
+     *
+     * @return mixed (should be callable)
+     */
+    public function getGroupCustomFilters()
+    {
+        return Hash::get($this->settings, 'groupCustomFilters');
+    }
+
+    /**
+     * Get Source. (file or db).
+     *
+     * @return mixed
+     */
+    public function getSource()
+    {
+        return Hash::get($this->settings, 'source');
     }
 
     /**
@@ -304,7 +343,7 @@ class DirectoryOrgSettings
     /**
      * Persist the settings in database.
      *
-     * @param UserAccessControl $uac user access control
+     * @param \App\Utility\UserAccessControl $uac user access control
      * @return void
      */
     public function save(UserAccessControl $uac)

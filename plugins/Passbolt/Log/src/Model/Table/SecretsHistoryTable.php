@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -16,11 +18,9 @@
 namespace Passbolt\Log\Model\Table;
 
 use App\Error\Exception\ValidationException;
-use App\Utility\UserAction;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
-use Passbolt\Log\Model\Entity\EntityHistory;
 
 class SecretsHistoryTable extends Table
 {
@@ -30,7 +30,7 @@ class SecretsHistoryTable extends Table
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         parent::initialize($config);
 
@@ -41,13 +41,13 @@ class SecretsHistoryTable extends Table
 
         $this->hasOne('EntitiesHistory', [
             'foreignKey' => 'foreign_key',
-            'className' => 'Passbolt/Log.EntitiesHistory'
+            'className' => 'Passbolt/Log.EntitiesHistory',
         ]);
         $this->belongsTo('Resources', [
-            'foreignKey' => 'resource_id'
+            'foreignKey' => 'resource_id',
         ]);
         $this->belongsTo('Users', [
-            'foreignKey' => 'user_id'
+            'foreignKey' => 'user_id',
         ]);
 
         // The contains below are a duplicate of above.
@@ -56,12 +56,12 @@ class SecretsHistoryTable extends Table
         $this->belongsTo('SecretsHistoryUsers', [
             'foreignKey' => 'user_id',
             'className' => 'Users',
-            'joinType' => 'LEFT'
+            'joinType' => 'LEFT',
         ]);
         $this->belongsTo('SecretsHistoryResources', [
             'foreignKey' => 'resource_id',
             'className' => 'Resources',
-            'joinType' => 'LEFT'
+            'joinType' => 'LEFT',
         ]);
     }
 
@@ -71,30 +71,30 @@ class SecretsHistoryTable extends Table
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator)
+    public function validationDefault(Validator $validator): Validator
     {
         $validator
             ->uuid('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', null, 'create');
 
         $validator
             ->uuid('resource_id')
             ->requirePresence('resource_id', 'create')
-            ->notEmpty('resource_id');
+            ->notEmptyString('resource_id');
 
         $validator
             ->uuid('user_id')
             ->requirePresence('user_id', 'create')
-            ->notEmpty('user_id');
+            ->notEmptyString('user_id');
 
         return $validator;
     }
 
     /**
      * Return a SecretsHistory entity.
-     * @param array $data entity data
      *
-     * @return EntityHistory
+     * @param array $data entity data
+     * @return \Passbolt\Log\Model\Table\EntityHistory
      */
     public function buildEntity(array $data)
     {
@@ -111,10 +111,9 @@ class SecretsHistoryTable extends Table
      * Create a new SecretHistory.
      *
      * @param array $data the data
-     *
-     * @return UserAction|bool
-     * @throws ValidationException
-     * @throws InternalErrorException
+     * @return \Passbolt\Log\Model\Table\UserAction|bool
+     * @throws \App\Error\Exception\ValidationException
+     * @throws \Cake\Http\Exception\InternalErrorException
      */
     public function create(array $data)
     {

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -12,6 +14,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.5.0
  */
+namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Controllers;
+
 use Passbolt\MultiFactorAuthentication\Test\Lib\MfaIntegrationTestCase;
 use Passbolt\MultiFactorAuthentication\Utility\MfaVerifiedCookie;
 
@@ -45,7 +49,6 @@ class MfaMiddlewareTest extends MfaIntegrationTestCase
      */
     public function testMfaMiddlewareErrorNoVerifyCookie()
     {
-        $this->markTestSkipped();
         $this->mockMfaDuoSettings('ada', 'valid');
         $this->authenticateAs('ada');
         $this->get('/app/users');
@@ -58,7 +61,6 @@ class MfaMiddlewareTest extends MfaIntegrationTestCase
      */
     public function testMfaMiddlewareErrorInvalidVerifyCookie()
     {
-        $this->markTestSkipped();
         $this->cookieEncrypted(MfaVerifiedCookie::MFA_COOKIE_ALIAS, 'Invalid secret');
         $this->mockMfaDuoSettings('ada', 'valid');
         $this->authenticateAs('ada');

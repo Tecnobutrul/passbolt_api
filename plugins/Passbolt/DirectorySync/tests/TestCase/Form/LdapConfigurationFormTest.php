@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -14,25 +16,23 @@
  */
 namespace Passbolt\DirectorySync\Test\TestCase\Form;
 
-use App\Model\Entity\Role;
-use App\Model\Table\OrganizationSettingsTable;
 use App\Test\Lib\AppTestCase;
 use App\Test\Lib\Model\FormatValidationTrait;
-use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
+use Cake\Event\EventDispatcherTrait;
 use Cake\Utility\Hash;
 use Passbolt\DirectorySync\Form\LdapConfigurationForm;
 use Passbolt\DirectorySync\Test\TestCase\Utility\DirectoryOrgSettingsTest;
-use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 class LdapConfigurationFormTest extends AppTestCase
 {
+    use EventDispatcherTrait;
     use FormatValidationTrait;
 
     public $fixtures = [
         'app.Base/Users', 'app.Base/Groups', 'app.Base/Secrets', 'app.Base/Roles',
         'app.Base/GroupsUsers', 'app.Base/Permissions', 'app.Base/Avatars',
-        'app.Base/Favorites', 'app.Base/OrganizationSettings'
+        'app.Base/Favorites',
     ];
 
     public static function getDummyFormData()
@@ -59,7 +59,7 @@ class LdapConfigurationFormTest extends AppTestCase
             'sync_users_delete' => false,
             'sync_groups_create' => true,
             'sync_groups_delete' => false,
-            'sync_groups_update' => true
+            'sync_groups_update' => true,
         ];
     }
 
@@ -69,7 +69,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $testCases = [
             'required' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
-            'inList' => self::getInListTestCases(['ad', 'openldap'])
+            'inList' => self::getInListTestCases(['ad', 'openldap']),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'directory_type', $ldapSettings, $testCases);
     }
@@ -80,7 +80,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $testCases = [
             'required' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases()
+            'utf8' => self::getUtf8TestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'domain_name', $ldapSettings, $testCases);
     }
@@ -90,7 +90,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowEmpty' => self::getAllowEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases()
+            'utf8' => self::getUtf8TestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'username', $ldapSettings, $testCases);
     }
@@ -100,7 +100,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowEmpty' => self::getAllowEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases()
+            'utf8' => self::getUtf8TestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'password', $ldapSettings, $testCases);
     }
@@ -110,7 +110,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowEmpty' => self::getAllowEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases()
+            'utf8' => self::getUtf8TestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'base_dn', $ldapSettings, $testCases);
     }
@@ -121,7 +121,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $testCases = [
             'required' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases()
+            'utf8' => self::getUtf8TestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'server', $ldapSettings, $testCases);
     }
@@ -132,7 +132,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $testCases = [
             'required' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
-            'range' => self::getRangeTestCases(0, 65535)
+            'range' => self::getRangeTestCases(0, 65535),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'port', $ldapSettings, $testCases);
     }
@@ -143,7 +143,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $testCases = [
             'required' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
-            'inList' => self::getInListTestCases(LdapConfigurationForm::$connectionTypes)
+            'inList' => self::getInListTestCases(LdapConfigurationForm::$connectionTypes),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'connection_type', $ldapSettings, $testCases);
     }
@@ -167,7 +167,7 @@ class LdapConfigurationFormTest extends AppTestCase
                     UuidFactory::uuid('user.id.ada') => false,
                     UuidFactory::uuid('user.id.admin') => true,
                 ],
-            ]
+            ],
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'default_user', $ldapSettings, $testCases);
     }
@@ -191,9 +191,9 @@ class LdapConfigurationFormTest extends AppTestCase
                 'test_cases' => [
                     UuidFactory::uuid('user.id.ada') => true,
                     UuidFactory::uuid('user.id.admin') => true,
-                    UuidFactory::uuid('user.id.ruth') => false
+                    UuidFactory::uuid('user.id.ruth') => false,
                 ],
-            ]
+            ],
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'default_group_admin_user', $ldapSettings, $testCases);
     }
@@ -203,7 +203,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases()
+            'utf8' => self::getUtf8TestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'group_object_class', $ldapSettings, $testCases);
     }
@@ -213,7 +213,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases()
+            'utf8' => self::getUtf8TestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'user_object_class', $ldapSettings, $testCases);
     }
@@ -223,7 +223,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases()
+            'utf8' => self::getUtf8TestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'group_path', $ldapSettings, $testCases);
     }
@@ -233,7 +233,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases()
+            'utf8' => self::getUtf8TestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'user_path', $ldapSettings, $testCases);
     }
@@ -243,7 +243,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'utf8' => self::getBooleanTestCases()
+            'utf8' => self::getBooleanTestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'use_email_prefix_suffix', $ldapSettings, $testCases);
     }
@@ -253,7 +253,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases()
+            'utf8' => self::getUtf8TestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'email_prefix', $ldapSettings, $testCases);
     }
@@ -263,7 +263,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases()
+            'utf8' => self::getUtf8TestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'email_suffix', $ldapSettings, $testCases);
     }
@@ -273,7 +273,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'boolean' => self::getBooleanTestCases()
+            'boolean' => self::getBooleanTestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_users_create', $ldapSettings, $testCases);
     }
@@ -283,7 +283,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'boolean' => self::getBooleanTestCases()
+            'boolean' => self::getBooleanTestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_users_delete', $ldapSettings, $testCases);
     }
@@ -293,7 +293,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'boolean' => self::getBooleanTestCases()
+            'boolean' => self::getBooleanTestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_groups_create', $ldapSettings, $testCases);
     }
@@ -303,7 +303,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'boolean' => self::getBooleanTestCases()
+            'boolean' => self::getBooleanTestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_groups_delete', $ldapSettings, $testCases);
     }
@@ -313,7 +313,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'allowempty' => self::getAllowEmptyTestCases(),
-            'boolean' => self::getBooleanTestCases()
+            'boolean' => self::getBooleanTestCases(),
         ];
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_groups_update', $ldapSettings, $testCases);
     }

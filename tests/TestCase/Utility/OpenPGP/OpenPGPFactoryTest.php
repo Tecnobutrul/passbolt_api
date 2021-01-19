@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -34,9 +36,7 @@ class OpenPGPFactoryTest extends TestCase
         OpenPGPBackendFactory::reset();
         Configure::write('passbolt.gpg.backend', OpenPGPBackendFactory::GNUPG);
         $gpg = OpenPGPBackendFactory::get();
-        Configure::write('passbolt.gpg.backend', OpenPGPBackendFactory::HTTP);
         $this->assertNotEmpty($gpg);
-        $this->assertEquals($gpg, OpenPGPBackendFactory::get());
     }
 
     public function testOpenPGPFactoryCreateError()

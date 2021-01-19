@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,10 +16,53 @@
  */
 namespace App\Test\Lib\Model;
 
+use App\Model\Entity\GroupsUser;
 use App\Utility\UuidFactory;
+use Cake\ORM\TableRegistry;
 
 trait GroupsUsersModelTrait
 {
+    /**
+     * Add a dummy group user.
+     *
+     * @param array|null $data The group user data
+     * @param array|null $options The entity options
+     * @return GroupsUser
+     */
+    public function addGroupUser(?array $data = [], ?array $options = []): GroupsUser
+    {
+        $groupsUsersTable = TableRegistry::getTableLocator()->get('GroupsUsers');
+        $groupUser = self::getDummyGroupUserEntity($data, $options);
+
+        $groupsUsersTable->save($groupUser, ['checkRules' => true]);
+
+        return $groupUser;
+    }
+
+    /**
+     * Get a new group user entity
+     *
+     * @param array|null $data The group user data.
+     * @param array|null $options The new entity options.
+     * @return GroupsUser
+     */
+    public function getDummyGroupUserEntity(?array $data = [], ?array $options = []): GroupsUser
+    {
+        $groupsUsersTable = TableRegistry::getTableLocator()->get('GroupsUsers');
+        $defaultOptions = [
+            'validate' => false,
+            'accessibleFields' => [
+                'group_id' => true,
+                'user_id' => true,
+                'is_admin' => true,
+            ],
+        ];
+
+        $data = self::getDummyGroupUserData($data);
+        $options = array_merge($defaultOptions, $options);
+
+        return $groupsUsersTable->newEntity($data, $options);
+    }
 
     /**
      * Get a dummy group user with test data.
@@ -26,7 +71,7 @@ trait GroupsUsersModelTrait
      * @param array $data Custom data that will be merged with the default content.
      * @return array Comment data
      */
-    public static function getDummyGroupUser($data = [])
+    public static function getDummyGroupUserData($data = [])
     {
         $entityContent = [
             'group_id' => UuidFactory::uuid('group.id.board'),
@@ -51,7 +96,44 @@ trait GroupsUsersModelTrait
     }
 
     /**
-     * Assert a user is admin of group a group.
+     * Assert a user is member of a group.
+     *
+     * @param string $groupId The target group
+     * @param string $userId The target user
+     * @param bool $isAdmin Is the member also admin of the group
+     * @return bool
+     */
+    protected function assertUserIsMemberOf(string $groupId, string $userId, bool $isAdmin = false)
+    {
+        $groupsUsersTable = TableRegistry::getTableLocator()->get('GroupsUsers');
+        $count = $groupsUsersTable->find()->where([
+            'user_id' => $userId,
+            'group_id' => $groupId,
+            'is_admin' => $isAdmin,
+        ])->count();
+        $this->assertEquals(1, $count);
+    }
+
+    /**
+     * Assert a user is not member of a group.
+     *
+     * @param string $groupId The target group
+     * @param string $userId The target user
+     * @return bool
+     */
+    protected function assertUserIsNotMemberOf(string $groupId, string $userId)
+    {
+        $groupsUsersTable = TableRegistry::getTableLocator()->get('GroupsUsers');
+        $count = $groupsUsersTable->find()->where([
+            'user_id' => $userId,
+            'group_id' => $groupId,
+        ])->count();
+        $this->assertEquals(0, $count);
+    }
+
+    /**
+     * Assert a user is admin of a group.
+     *
      * @param string $groupId
      * @param string $userId
      */
@@ -63,6 +145,7 @@ trait GroupsUsersModelTrait
 
     /**
      * Assert a user is not admin of group a group.
+     *
      * @param string $groupId
      * @param string $userId
      */

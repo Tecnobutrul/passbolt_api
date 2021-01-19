@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -19,7 +21,6 @@ use Cake\Datasource\ConnectionManager;
 
 class MysqlImportTask extends AppShell
 {
-
     /**
      * Gets the option parser instance and configures it.
      *
@@ -36,7 +37,7 @@ class MysqlImportTask extends AppShell
             ->addOption('datasource', [
                 'short' => 'd',
                 'default' => 'default',
-                'help' => __('Datasource name')
+                'help' => __('Datasource name'),
             ])
             ->addOption('file', [
                 'help' => 'The file to import the schema and data from',

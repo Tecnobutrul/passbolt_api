@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -31,8 +33,6 @@ use Cake\TestSuite\TestCase;
 
 abstract class AppTestCase extends TestCase
 {
-    // Do not load all the traits here
-    // load them were needed instead
     use ArrayTrait;
     use CommentsModelTrait;
     use EntityTrait;
@@ -55,6 +55,18 @@ abstract class AppTestCase extends TestCase
     {
         parent::setUp();
         Configure::write('passbolt.plugins.tags.enabled', false);
+        Configure::write('passbolt.plugins.multiFactorAuthentication.enabled', false);
+        Configure::write('passbolt.plugins.log.enabled', false);
+        Configure::write('passbolt.plugins.folders.enabled', false);
+    }
+
+    /**
+     * Tear dow
+     */
+    public function tearDown()
+    {
+        $this->clearPlugins();
+        parent::tearDown();
     }
 
     /**
@@ -73,7 +85,7 @@ abstract class AppTestCase extends TestCase
             'alphaRussian' => 'Идеальное решение для управления пароль для небольших компаний и предприятий бизнесмена', // The perfect password management solution for businesses and small companies
             'alphaEmojis' => '', // List of smileys.
             'special' => '!@#$%^&*()_-+={}[]:";<>?,./\\|~ ',
-            'html' => '<h1>La solution gestion de mot de passe</h1> parfaite pour les <b>business</b> et les <span style="font-size:10px">petites</span> entreprises sans oublier les accents <span style="background: url()">indispensables</span> dans l\'alphabet latin ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÚÚÚÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ'
+            'html' => '<h1>La solution gestion de mot de passe</h1> parfaite pour les <b>business</b> et les <span style="font-size:10px">petites</span> entreprises sans oublier les accents <span style="background: url()">indispensables</span> dans l\'alphabet latin ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÚÚÚÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ',
         ];
 
         // Init emojis. (Covers all common smileys: 1F601 - 1F64F)
@@ -100,10 +112,10 @@ abstract class AppTestCase extends TestCase
      * Get a string mask.
      *
      * @param string $maskName name of the mask to use.
-     * @param null $length length of the string to return.
+     * @param int $length length of the string to return.
      * @return string an utf8mb4 string of the size mentioned in length parameter.
      */
-    public static function getStringMask($maskName, $length = null)
+    public static function getStringMask(string $maskName, int $length): string
     {
         if (empty(self::$stringMasks)) {
             self::initStringMasks();
@@ -123,27 +135,27 @@ abstract class AppTestCase extends TestCase
     /**
      * Custom implementation of mb_str_pad, with full unicode support.
      * Initially php doesn't support extended UTF-8 in str_pad. (see: http://php.net/manual/en/ref.mbstring.php#90611)
-     * Working implementation was found here: https://stackoverflow.com/questions/14773072/php-str-pad-unicode-issue
-     * @param $str
-     * @param $pad_len
+     * Working implementation was found here: https://www.php.net/manual/en/function.str-pad.php#116244
+     *
+     * @param string $str
+     * @param int $pad_len
      * @param string $pad_str
      * @param int $dir
-     * @param null $encoding
-     *
+     * @param mixed $encoding
      * @return string
      */
-    public static function mbStrPad($str, $pad_len, $pad_str = ' ', $dir = STR_PAD_RIGHT, $encoding = null)
+    public static function mbStrPad(string $str, int $pad_len, string $pad_str = ' ', int $dir = STR_PAD_RIGHT, $encoding = null): string
     {
-        $encoding = $encoding === null ? mb_internal_encoding() : $encoding;
+        $encoding = $encoding ?? mb_internal_encoding();
         $padBefore = $dir === STR_PAD_BOTH || $dir === STR_PAD_LEFT;
         $padAfter = $dir === STR_PAD_BOTH || $dir === STR_PAD_RIGHT;
         $pad_len -= mb_strlen($str, $encoding);
         $targetLen = $padBefore && $padAfter ? $pad_len / 2 : $pad_len;
         $strToRepeatLen = mb_strlen($pad_str, $encoding);
         $repeatTimes = ceil($targetLen / $strToRepeatLen);
-        $repeatedString = str_repeat($pad_str, max(0, $repeatTimes)); // safe if used with valid unicode sequences (any charset)
-        $before = $padBefore ? mb_substr($repeatedString, 0, floor($targetLen), $encoding) : '';
-        $after = $padAfter ? mb_substr($repeatedString, 0, ceil($targetLen), $encoding) : '';
+        $repeatedString = str_repeat($pad_str, (int)max(0, $repeatTimes)); // safe if used with valid utf-8 strings
+        $before = $padBefore ? mb_substr($repeatedString, 0, (int)floor($targetLen), $encoding) : '';
+        $after = $padAfter ? mb_substr($repeatedString, 0, (int)ceil($targetLen), $encoding) : '';
 
         return $before . $str . $after;
     }

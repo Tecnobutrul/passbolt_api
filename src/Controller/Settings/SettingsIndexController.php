@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -22,26 +24,31 @@ use Cake\Event\Event;
 use Cake\Routing\Router;
 use Cake\Utility\Hash;
 
+/**
+ * @property \App\Model\Table\UsersTable $Users
+ */
 class SettingsIndexController extends AppController
 {
     /**
      * Settings visibility key.
+     *
      * @var array
      */
-    const SETTINGS_VISIBILITY_KEY = 'settingsVisibility';
+    public const SETTINGS_VISIBILITY_KEY = 'settingsVisibility';
 
     /**
      * Keys that will be always whitelisted, in addition to the ones defined in config. (once logged in).
+     *
      * @var array
      */
     protected $alwaysWhiteListed = [
-        'version'
+        'version',
     ];
 
     /**
      * Before filter
      *
-     * @param Event $event An Event instance
+     * @param \Cake\Event\Event $event An Event instance
      * @return \Cake\Http\Response|null
      */
     public function beforeFilter(Event $event)
@@ -62,7 +69,7 @@ class SettingsIndexController extends AppController
         $role = $this->User->role();
         // Retrieve and sanity the query options.
         $whitelist = [
-            'contain' => ['header']
+            'contain' => ['header'],
         ];
         $options = $this->QueryString->get($whitelist);
         $withHeader = isset($options['contain']['header']) && $options['contain']['header'] === false ? false : true;
@@ -82,7 +89,6 @@ class SettingsIndexController extends AppController
      * Get the list of settings that should be displayed publicly.
      *
      * @param string $role role of the user accessing the settings.
-     *
      * @return array
      */
     protected function _getSettings(string $role)
@@ -93,19 +99,24 @@ class SettingsIndexController extends AppController
                 'app' => [
                     'version' => [
                         'number' => Configure::read('passbolt.version'),
-                        'name' => Configure::read('passbolt.name')
+                        'name' => Configure::read('passbolt.name'),
                     ],
                     'url' => Router::url('/', true),
                     'debug' => Configure::read('debug') ? 1 : 0,
                     'server_timezone' => date_default_timezone_get(),
-                    'session_timeout' => Configure::read('Session.timeout', ini_get('session.gc_maxlifetime')),
+                    // session timeout info in minutes
+                    'session_timeout' => Configure::read('Session.timeout', ini_get('session.gc_maxlifetime') / 60),
                     'image_storage' => [
-                        'public_path' => Configure::read('ImageStorage.publicPath')
+                        'public_path' => Configure::read('ImageStorage.publicPath'),
                     ],
                 ],
                 'passbolt' => [
+                    'legal' => Configure::read('passbolt.legal'),
                     'edition' => Configure::read('passbolt.edition'),
                     'plugins' => $this->_getWhiteListedPluginConfig($this->_getPluginWhiteList(false)),
+                    'registration' => [
+                        'public' => Configure::read('passbolt.registration.public'),
+                    ],
                 ],
             ];
         } else {
@@ -115,8 +126,12 @@ class SettingsIndexController extends AppController
                     'url' => Router::url('/', true),
                 ],
                 'passbolt' => [
+                    'legal' => Configure::read('passbolt.legal'),
                     'edition' => Configure::read('passbolt.edition'),
                     'plugins' => $this->_getWhiteListedPluginConfig($this->_getPluginWhiteList(true)),
+                    'registration' => [
+                        'public' => Configure::read('passbolt.registration.public'),
+                    ],
                 ],
             ];
         }
@@ -128,7 +143,6 @@ class SettingsIndexController extends AppController
      * Get plugin options that are white listed.
      *
      * @param bool $public for public visibility or not (require log in).
-     *
      * @return array list of
      */
     protected function _getPluginWhiteList($public = false)
@@ -159,7 +173,6 @@ class SettingsIndexController extends AppController
      * Get white listed config.
      *
      * @param array $whiteList white list options array
-     *
      * @return array white listed plugins configurations
      */
     protected function _getWhiteListedPluginConfig(array $whiteList)

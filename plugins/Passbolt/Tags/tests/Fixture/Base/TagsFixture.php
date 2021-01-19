@@ -19,34 +19,9 @@ use Cake\TestSuite\Fixture\TestFixture;
 
 /**
  * TagsFixture
- *
  */
 class TagsFixture extends TestFixture
 {
-
-    /**
-     * Fields
-     *
-     * @var array
-     */
-    // @codingStandardsIgnoreStart
-    public $fields = [
-        'id' => ['type' => 'uuid', 'length' => null, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null],
-        'slug' => ['type' => 'string', 'length' => 128, 'null' => false, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
-        'is_shared' => ['type' => 'boolean', 'length' => null, 'null' => false, 'default' => '0', 'comment' => '', 'precision' => null],
-        '_indexes' => [
-            'id' => ['type' => 'index', 'columns' => ['id', 'slug'], 'length' => []],
-        ],
-        '_constraints' => [
-            'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
-        ],
-        '_options' => [
-            'engine' => 'InnoDB',
-            'collation' => 'utf8mb4_unicode_ci'
-        ],
-    ];
-    // @codingStandardsIgnoreEnd
-
     /**
      * Init the records dynamically
      *
@@ -58,58 +33,58 @@ class TagsFixture extends TestFixture
             [
                 'id' => UuidFactory::uuid('tag.id.alpha'),
                 'slug' => 'alpha',
-                'is_shared' => 0
+                'is_shared' => 0,
             ],
             [
                 'id' => UuidFactory::uuid('tag.id.#bravo'),
                 'slug' => '#bravo',
-                'is_shared' => 1
+                'is_shared' => 1,
             ],
             [
                 'id' => UuidFactory::uuid('tag.id.#charlie'),
                 'slug' => '#charlie',
-                'is_shared' => 1
+                'is_shared' => 1,
             ],
             [
                 'id' => UuidFactory::uuid('tag.id.#echo'),
                 'slug' => '#echo',
-                'is_shared' => 1
+                'is_shared' => 1,
             ],
             [
                 'id' => UuidFactory::uuid('tag.id.fox-trot'),
                 'slug' => 'fox-trot',
-                'is_shared' => 0
+                'is_shared' => 0,
             ],
             [
                 'id' => UuidFactory::uuid('tag.id.firefox'),
                 'slug' => 'firefox',
-                'is_shared' => 0
+                'is_shared' => 0,
             ],
             [
                 'id' => UuidFactory::uuid('tag.id.#golf'),
                 'slug' => '#golf',
-                'is_shared' => 1
+                'is_shared' => 1,
             ],
             [
                 'id' => UuidFactory::uuid('tag.id.hotel'),
                 'slug' => 'hotel',
-                'is_shared' => 0
+                'is_shared' => 0,
             ],
             [
                 'id' => UuidFactory::uuid('tag.id.hindi'),
                 'slug' => 'परदेशी-परदेशी',
-                'is_shared' => 0
+                'is_shared' => 0,
             ],
             [
                 'id' => UuidFactory::uuid('tag.id.unused'),
                 'slug' => 'unused',
-                'is_shared' => 0
+                'is_shared' => 0,
             ],
             [
                 'id' => UuidFactory::uuid('tag.id.#unused'),
                 'slug' => '#unused',
-                'is_shared' => 1
-            ]
+                'is_shared' => 1,
+            ],
         ];
         parent::init();
     }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Passbolt\DirectorySync\Model\Entity;
 
 use Cake\ORM\Entity;
@@ -34,6 +36,6 @@ class DirectoryReportsItem extends Entity
         'action' => false,
         'data' => false,
         'created' => false,
-        'report' => false
+        'report' => false,
     ];
 }

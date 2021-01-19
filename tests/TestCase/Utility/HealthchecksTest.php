@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -16,17 +18,15 @@ namespace App\Test\TestCase\Utility;
 
 use App\Test\Lib\AppIntegrationTestCase;
 use App\Utility\Healthchecks;
-use Cake\Core\Configure;
 
 class HealthchecksTest extends AppIntegrationTestCase
 {
-
     public function testHealthcheckApplication()
     {
         $check = Healthchecks::application();
         $attributes = [
             'schema', 'robotsIndexDisabled', 'sslForce', 'sslFullBaseUrl', 'seleniumDisabled',
-            'registrationClosed', 'jsProd', 'emailNotificationEnabled', 'latestVersion'
+            'registrationClosed', 'jsProd', 'emailNotificationEnabled', 'latestVersion',
         ];
         $this->assertArrayHasAttributes($attributes, $check['application']);
     }
@@ -72,7 +72,7 @@ class HealthchecksTest extends AppIntegrationTestCase
         $attributes = [
             'lib', 'gpgKey', 'gpgKeyNotDefault', 'gpgHome', 'gpgHomeWritable', 'gpgKeyPublic', 'gpgKeyPublicReadable',
             'gpgKeyPrivate', 'gpgKeyPrivateReadable', 'gpgKeyPrivateFingerprint', 'gpgKeyPublicFingerprint',
-            'gpgKeyPublicEmail', 'gpgKeyPublicInKeyring', 'canEncrypt', 'canDecrypt'
+            'gpgKeyPublicEmail', 'gpgKeyPublicInKeyring', 'canEncrypt', 'canDecrypt',
         ];
         $this->assertArrayHasAttributes($attributes, $check['gpg']);
     }

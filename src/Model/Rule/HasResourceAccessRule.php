@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -16,6 +18,7 @@
 namespace App\Model\Rule;
 
 use App\Model\Entity\Permission;
+use App\Model\Table\PermissionsTable;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
@@ -36,9 +39,9 @@ class HasResourceAccessRule
         }
         $resourceId = $entity->get($options['resourceField']);
         $userId = $entity->get($options['userField']);
-        $Resources = TableRegistry::getTableLocator()->get('Resources');
+        $Permissions = TableRegistry::getTableLocator()->get('Permissions');
         $permissionType = Hash::get($options, 'permissionType', Permission::READ);
 
-        return $Resources->hasAccess($userId, $resourceId, $permissionType);
+        return $Permissions->hasAccess(PermissionsTable::RESOURCE_ACO, $resourceId, $userId, $permissionType);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -12,7 +13,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-use \Cake\Core\Configure;
+use Cake\Core\Configure;
 
 $license = env(
     'PASSBOLT_PLUGINS_LICENSE_LICENSE',
@@ -37,9 +38,9 @@ return [
                 'version' => '2.0.0',
                 'license' => $license,
                 'licenseKey' => [
-                    'public' => $licensePublicKey
-                ]
-            ]
-        ]
-    ]
+                    'public' => $licensePublicKey,
+                ],
+            ],
+        ],
+    ],
 ];

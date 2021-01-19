@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,12 +16,13 @@
  */
 namespace App\Controller;
 
+use App\Error\Exception\ExceptionWithErrorsDetailInterface;
 use App\Utility\UserAction;
 use App\Utility\UuidFactory;
 use Cake\Core\Exception\Exception;
 use Cake\Event\Event;
+use Cake\Http\Exception\InternalErrorException;
 use Cake\Routing\Router;
-use Cake\Utility\Hash;
 
 /**
  * Error Handling Controller
@@ -34,7 +37,7 @@ class ErrorController extends AppController
      * @throws \Exception If a component class cannot be found.
      * @return void
      */
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
         $this->loadComponent('RequestHandler', [
@@ -54,10 +57,9 @@ class ErrorController extends AppController
             // If the body is a that exposes the getErrors functionality
             // for example ValidationRulesException
             $error = $this->viewVars['error'];
-            if (method_exists($error, 'getErrors')) {
+
+            if ($error instanceof ExceptionWithErrorsDetailInterface) {
                 $body = $error->getErrors();
-            } else {
-                $body = '';
             }
 
             try {
@@ -70,27 +72,24 @@ class ErrorController extends AppController
             } catch (Exception $e) {
                 $actionId = 'undefined';
             }
-            $prefix = strtolower($this->request->getParam('prefix'));
-            $action = $this->request->getParam('action');
             $this->set([
                 'header' => [
                     'id' => $userActionId,
                     'status' => 'error',
                     'servertime' => time(),
-                    'title' => 'app_' . $prefix . '_' . $action . '_error',
                     'action' => $actionId,
                     'message' => $this->viewVars['message'],
                     'url' => Router::url(),
                     'code' => $this->viewVars['code'],
                 ],
-                'body' => $body,
+                'body' => $body ?? '',
                 '_serialize' => ['header', 'body']
             ]);
 
             // render a legacy JSON view by default
             $apiVersion = $this->request->getQuery('api-version');
-            if (!isset($apiVersion) || $apiVersion === 'v1') {
-                $this->viewBuilder()->setClassName('LegacyJson');
+            if ($apiVersion === 'v1') {
+                throw new InternalErrorException(__('API v1 support is deprecated in this version.'));
             }
         }
         $this->viewBuilder()->setTemplatePath('Error');

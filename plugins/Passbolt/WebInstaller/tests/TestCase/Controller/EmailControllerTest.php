@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,8 +16,6 @@
  */
 namespace Passbolt\WebInstaller\Test\TestCase\Controller;
 
-use App\Utility\Healthchecks;
-use Cake\Core\Configure;
 use Passbolt\WebInstaller\Test\Lib\WebInstallerIntegrationTestCase;
 
 class EmailControllerTest extends WebInstallerIntegrationTestCase
@@ -30,7 +30,7 @@ class EmailControllerTest extends WebInstallerIntegrationTestCase
     public function testWebInstallerEmailViewSuccess()
     {
         $this->get('/install/email');
-        $data = ($this->_getBodyAsString());
+        $data = $this->_getBodyAsString();
         $this->assertResponseOk();
         $this->assertContains('Email configuration', $data);
     }
@@ -51,10 +51,10 @@ class EmailControllerTest extends WebInstallerIntegrationTestCase
             'tls' => true,
             'port' => 'invalid-port',
             'username' => 'test@passbolt.com',
-            'password' => 'password'
+            'password' => 'password',
         ];
         $this->post('/install/email', $postData);
-        $data = ($this->_getBodyAsString());
+        $data = $this->_getBodyAsString();
         $this->assertResponseOk();
         $this->assertContains('The data entered are not correct', $data);
     }
@@ -73,7 +73,7 @@ class EmailControllerTest extends WebInstallerIntegrationTestCase
             'email_test_to' => 'test@passbolt.com',
         ];
         $this->post('/install/email', $postData);
-        $data = ($this->_getBodyAsString());
+        $data = $this->_getBodyAsString();
         $this->assertResponseOk();
         $this->assertContains('Email could not be sent', $data);
     }

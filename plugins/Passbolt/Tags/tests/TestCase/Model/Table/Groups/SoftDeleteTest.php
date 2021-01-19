@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -32,7 +34,7 @@ class SoftDeleteTest extends TagTestCase
         'app.Base/Users', 'app.Base/Groups', 'app.Base/Favorites',
         'app.Base/Profiles', 'app.Base/Gpgkeys', 'app.Base/Resources',
         'app.Alt0/GroupsUsers', 'app.Alt0/Permissions',
-        'plugin.Passbolt/Tags.Base/Tags', 'plugin.Passbolt/Tags.Alt0/ResourcesTags'
+        'plugin.Passbolt/Tags.Base/Tags', 'plugin.Passbolt/Tags.Alt0/ResourcesTags',
     ];
 
     public function setUp()
@@ -42,7 +44,7 @@ class SoftDeleteTest extends TagTestCase
         $this->Tags = TableRegistry::getTableLocator()->get('Passbolt/Tags.Tags');
     }
 
-    public function testGroupsSoftDeleteAlsoDeleteTagsSuccess()
+    public function testTagsGroupsSoftDeleteAlsoDeleteTagsSuccess()
     {
         $g = $this->Groups->get(UuidFactory::uuid('group.id.accounting'));
         $this->Groups->softDelete($g, ['checkRules' => false]);
