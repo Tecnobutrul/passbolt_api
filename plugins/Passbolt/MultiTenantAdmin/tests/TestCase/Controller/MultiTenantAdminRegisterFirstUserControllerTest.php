@@ -34,7 +34,7 @@ class MultiTenantAdminRegisterFirstUserControllerTest extends MultitenantAdminIn
         TableRegistry::clear();
     }
 
-    public function testSuccess()
+    public function testMultiTenantAdminRegisterFirstUserControllerSuccess()
     {
         $postData = [
             'username' => 'org-admin@passbolt.com',
@@ -56,7 +56,7 @@ class MultiTenantAdminRegisterFirstUserControllerTest extends MultitenantAdminIn
         $this->assertEquals($url, $this->_responseJsonBody);
     }
 
-    public function testError_InvalidUser()
+    public function testMultiTenantAdminRegisterFirstUserControllerError_InvalidUser()
     {
         $postData = [];
         $this->setBasicAuth();
@@ -65,7 +65,7 @@ class MultiTenantAdminRegisterFirstUserControllerTest extends MultitenantAdminIn
         $this->assertNotEmpty($this->_responseJsonBody->username->_required);
     }
 
-    public function testError_NotAuthorized()
+    public function testMultiTenantAdminRegisterFirstUserControllerError_NotAuthorized()
     {
         $this->postJson('/multitenant/admin/register-first-user.json?api-version=v2');
         $this->assertForbiddenError('You are not authorized to access this location');

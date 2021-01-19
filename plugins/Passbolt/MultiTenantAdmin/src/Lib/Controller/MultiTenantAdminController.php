@@ -46,20 +46,17 @@ abstract class MultiTenantAdminController extends Controller
      * Success renders set the variables used to render the json view
      * All passbolt response contains an header (metadata like status) an a body (data)
      *
-     * @param string $message message in the header section
+     * @param string|null $message message in the header section
      * @param array $body data for the body section
      * @return void
      */
-    protected function success($message = null, $body = null)
+    protected function success(?string $message = null, $body = null)
     {
-        $prefix = strtolower($this->request->getParam('prefix'));
-        $action = $this->request->getParam('action');
         $this->set([
             'header' => [
                 'id' => Text::uuid(),
                 'status' => 'success',
                 'servertime' => time(),
-                'title' => 'app_' . $prefix . '_' . $action . '_success',
                 'message' => $message,
                 'url' => Router::url(),
                 'code' => 200,
@@ -73,25 +70,22 @@ abstract class MultiTenantAdminController extends Controller
      * Error renders set the variables used to render the json view
      * All passbolt response contains an header (metadata like status) an a body (data)
      *
-     * @param string $message message in the header section
-     * @param array $body data for the body section
+     * @param string|null $message message in the header section
+     * @param mixed $body data for the body section
      * @return void
      */
-    protected function error($message = null, $body = null)
+    protected function error(?string $message = null, $body = null)
     {
-        $prefix = strtolower($this->request->getParam('prefix'));
-        $action = $this->request->getParam('action');
         $this->set([
             'header' => [
                 'id' => Text::uuid(),
                 'status' => 'error',
                 'servertime' => time(),
-                'title' => 'app_' . $prefix . '_' . $action . '_error',
-                'message' => $message,
+                'message' => $message ?? '',
                 'url' => Router::url(),
                 'code' => 200,
             ],
-            'body' => $body,
+            'body' => $body ?? '',
             '_serialize' => ['header', 'body'],
         ]);
     }

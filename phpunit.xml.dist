@@ -16,14 +16,16 @@
         <testsuite name="App Test Suite">
             <directory>./tests/TestCase</directory>
             <directory>./plugins/Passbolt/AccountSettings/tests/TestCase</directory>
-            <directory>./plugins/Passbolt/MultiFactorAuthentication/tests/TestCase</directory>
-            <directory>./plugins/Passbolt/Tags/tests/TestCase</directory>
-            <directory>./plugins/Passbolt/Log/tests/TestCase</directory>
             <directory>./plugins/Passbolt/AuditLog/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/CloudSubscription/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/EmailDigest/tests/TestCase</directory>
             <directory>./plugins/Passbolt/EmailNotificationSettings/tests/TestCase</directory>
             <directory>./plugins/Passbolt/Folders/tests/TestCase</directory>
-            <directory>./plugins/Passbolt/EmailDigest/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/Log/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/MultiFactorAuthentication/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/MultitenantAdmin/tests/TestCase</directory>
             <directory>./plugins/Passbolt/Reports/tests/TestCase</directory>
+            <directory>./plugins/Passbolt/Tags/tests/TestCase</directory>
         </testsuite>
     </testsuites>
 
@@ -39,15 +41,17 @@
     <filter>
         <whitelist>
             <directory suffix=".php">./src/</directory>
-            <directory suffix=".php">./plugins/AccountSettings/src/</directory>
-            <directory suffix=".php">./plugins/MultiFactorAuthentication/src/</directory>
-            <directory suffix=".php">./plugins/Tags/src/</directory>
-            <directory suffix=".php">./plugins/Log/src/</directory>
-            <directory suffix=".php">./plugins/AuditLog/src/</directory>
-            <directory suffix=".php">./plugins/EmailNotificationSettings/src/</directory>
-            <directory suffix=".php">./plugins/Folders/src/</directory>
-            <directory suffix=".php">./plugins/EmailDigest/src/</directory>
-            <directory suffix=".php">./plugins/Reports/src/</directory>
+            <directory suffix=".php">./plugins/Passbolt/AccountSettings/src/</directory>
+            <directory suffix=".php">./plugins/Passbolt/AuditLog/src/</directory>
+            <directory suffix=".php">./plugins/Passbolt/CloudSubscription/src/</directory>
+            <directory suffix=".php">./plugins/Passbolt/EmailDigest/src/</directory>
+            <directory suffix=".php">./plugins/Passbolt/EmailNotificationSettings/src/</directory>
+            <directory suffix=".php">./plugins/Passbolt/Folders/src/</directory>
+            <directory suffix=".php">./plugins/Passbolt/Log/src/</directory>
+            <directory suffix=".php">./plugins/Passbolt/MultiFactorAuthentication/src/</directory>
+            <directory suffix=".php">./plugins/Passbolt/MultitenantAdmin/src/</directory>
+            <directory suffix=".php">./plugins/Passbolt/Reports/src/</directory>
+            <directory suffix=".php">./plugins/Passbolt/Tags/src/</directory>
         </whitelist>
     </filter>
 </phpunit>

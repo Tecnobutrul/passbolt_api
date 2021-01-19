@@ -33,7 +33,7 @@ class MultiTenantAdminMigrateControllerTest extends MultitenantAdminIntegrationT
         TableRegistry::clear();
     }
 
-    public function testError_NotAuthorized()
+    public function testMultiTenantAdminMigrateControllerError_NotAuthorized()
     {
         $this->getJson('/multitenant/admin/migrate.json?api-version=v2');
         $this->assertForbiddenError('You are not authorized to access this location');
