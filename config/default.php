@@ -169,9 +169,6 @@ return [
 
             // Http backend configuration
             'http' => [
-                'domain' => env('PASSBOLT_GPG_HTTP_DOMAIN', 'cloudfunctions.net'),
-                'project' => env('PASSBOLT_GPG_HTTP_PROJECT', null),
-                'region' => env('PASSBOLT_GPG_HTTP_REGION', null),
                 'auth' => [
                     'username' => env('PASSBOLT_GPG_HTTP_USERNAME', null),
                     'password' => env('PASSBOLT_GPG_HTTP_AUTH_PASSWORD', null)

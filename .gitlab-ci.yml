@@ -93,10 +93,14 @@ local-debug:
 
     # Opengpg backend
     PASSBOLT_GPG_BACKEND: 'http'
-    PASSBOLT_GPG_HTTP_PROJECT: 'cloud-staging-89daeb47'
-    PASSBOLT_GPG_HTTP_REGION: 'europe-west1'
+    PASSBOLT_GPG_HTTP_FUNCTIONS_DECRYPT: https://europe-west1-cloud-staging-89daeb47.cloudfunctions.net/onOpenpgpDecrypt
+    PASSBOLT_GPG_HTTP_FUNCTIONS_ENCRYPT: https://europe-west1-cloud-staging-89daeb47.cloudfunctions.net/onOpenpgpEncrypt
+    PASSBOLT_GPG_HTTP_FUNCTIONS_KEYINFO: https://europe-west1-cloud-staging-89daeb47.cloudfunctions.net/onOpenpgpGetKeyInfo
+    PASSBOLT_GPG_HTTP_FUNCTIONS_MSGINFO: https://europe-west1-cloud-staging-89daeb47.cloudfunctions.net/onOpenpgpGetMessageInfo
+    PASSBOLT_GPG_HTTP_FUNCTIONS_VERIFY: https://europe-west1-cloud-staging-89daeb47.cloudfunctions.net/onOpenpgpVerifyClearText
     #PASSBOLT_GPG_HTTP_USERNAME: see variables
     #PASSBOLT_GPG_HTTP_AUTH_PASSWORD: see variables
+
   services:
   - name: $DATABASE_ENGINE_VERSION
     command:
