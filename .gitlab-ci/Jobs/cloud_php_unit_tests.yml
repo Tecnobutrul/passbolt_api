@@ -73,12 +73,6 @@ php7.3-mysql5.7:
     DATABASE_ENGINE_VERSION: "mysql:5.7"
   extends: .test-template
 
-php7.2-mysql5.7:
-  variables:
-    PHP_VERSION: "7.2"
-    DATABASE_ENGINE_VERSION: "mysql:5.7"
-  extends: .test-template
-
 .custom_functions: &custom_functions |
 
   function setup_svc_account() {
