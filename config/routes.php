@@ -173,6 +173,10 @@ Router::scope('/healthcheck', function ($routes) {
 
     $routes->connect('/', ['prefix' => 'Healthcheck', 'controller' => 'HealthcheckIndex', 'action' => 'index'])
         ->setMethods(['GET']);
+
+    // TODO REMOVE
+    $routes->connect('/debug', ['prefix' => 'Healthcheck', 'controller' => 'HealthcheckDebug', 'action' => 'debug'])
+        ->setMethods(['GET']);
 });
 
 /**
