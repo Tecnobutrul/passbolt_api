@@ -34,10 +34,6 @@ class Http extends OpenPGPBackend
      */
     protected $_httpClient = null;
 
-    private $_region;
-    private $_project;
-    private $_domain;
-    private $_url;
     private $_auth;
 
     private $_decrypt_url;
