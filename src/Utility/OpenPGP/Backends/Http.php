@@ -69,8 +69,10 @@ class Http extends OpenPGPBackend
             'username' => Configure::consume('passbolt.gpg.http.auth.username'),
             'password' => Configure::consume('passbolt.gpg.http.auth.password'),
         ];
-
-        if (empty($this->_auth) || empty($this->_auth['username']) || empty($this->_auth['password'])) {
+        $configMissing = empty($this->_auth) || empty($this->_auth['username']) || empty($this->_auth['password']) ||
+            empty($this->_decrypt_url) || empty($this->_encrypt_url) || empty($this->_keyinfo_url) ||
+            empty($this->_msginfo_url) || empty($this->_verify_url);
+        if ($configMissing) {
             throw new InternalErrorException('Configuration is missing for OpenPGP backend');
         }
     }

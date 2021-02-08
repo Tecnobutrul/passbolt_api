@@ -174,11 +174,11 @@ return [
                     'password' => env('PASSBOLT_GPG_HTTP_AUTH_PASSWORD', null)
                 ],
                 'functions' => [
-                    'encrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_ENCRYPT', 'onOpenpgpEncrypt'),
-                    'decrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_DECRYPT', 'onOpenpgpDecrypt'),
-                    'keyinfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_KEYINFO', 'onOpenpgpGetKeyInfo'),
-                    'msginfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_MSGINFO', 'onOpenpgpGetMessageInfo'),
-                    'verify' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_VERIFY', 'onOpenpgpVerifyCleartext')
+                    'encrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_ENCRYPT', null),
+                    'decrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_DECRYPT', null),
+                    'keyinfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_KEYINFO', null),
+                    'msginfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_MSGINFO', null),
+                    'verify' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_VERIFY', null)
                 ]
             ]
         ],

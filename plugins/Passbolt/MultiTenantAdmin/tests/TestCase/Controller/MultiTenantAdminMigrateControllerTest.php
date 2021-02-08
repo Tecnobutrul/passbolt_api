@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since         2.11.0
  */
 
-namespace Passbolt\MultiTenantAdmin\Test\TestCase\Controller\Admin;
+namespace Passbolt\MultiTenantAdmin\Test\TestCase\Controller;
 
 use Cake\ORM\TableRegistry;
 use Passbolt\MultiTenantAdmin\Test\Lib\MultitenantAdminIntegrationTestCase;
