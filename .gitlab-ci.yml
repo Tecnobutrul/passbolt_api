@@ -10,6 +10,7 @@ stages:
   - release
 
 include:
+  - template: Code-Quality.gitlab-ci.yml
   - local: '/.gitlab-ci/Jobs/cloud_php_unit_tests.yml'
   - local: '/.gitlab-ci/Jobs/style_check.yml'
 
@@ -49,6 +50,7 @@ include:
   }
 
 local-debug:
+  stage: unit-test
   variables:
     # MySQL services variables
     MYSQL_USER: user
