@@ -1,5 +1,5 @@
 .test-template:
-  stage: test
+  stage: unit-test
   variables:
     # MySQL services variables
     MYSQL_USER: user
