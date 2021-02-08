@@ -50,7 +50,6 @@ include:
   }
 
 local-debug:
-  stage: unit-test
   variables:
     # MySQL services variables
     MYSQL_USER: user
