@@ -1,14 +1,14 @@
 .test-template:
   stage: unit-test
   variables:
+    # Organization settings
+    ORG_NAME: acme
     # MySQL services variables
     MYSQL_USER: user
     MYSQL_PASSWORD: testing-password
     MYSQL_ROOT_PASSWORD: testing-password2
-    #ORG_NAME: acme
-    MYSQL_DATABASE: pb_org_acme
+    MYSQL_DATABASE: pb_org_${ORG_NAME}
     MYSQL_DATABASE_EMAILQUEUE: email_queue_test
-    # Organization settings
 
     # Passbolt unit test job common variables
     DEBUG: "true"
