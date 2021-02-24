@@ -1,13 +1,11 @@
 .test-template:
   stage: unit-test
   variables:
-    # Organization settings
-    ORG_NAME: acme
     # MySQL services variables
     MYSQL_USER: user
     MYSQL_PASSWORD: testing-password
     MYSQL_ROOT_PASSWORD: testing-password2
-    MYSQL_DATABASE: pb_org_${ORG_NAME}
+    MYSQL_DATABASE: pb_org_acme
     MYSQL_DATABASE_EMAILQUEUE: email_queue_test
 
     # Passbolt unit test job common variables
@@ -81,11 +79,8 @@ php7.3-mysql5.7:
 
   function init_test_db() {
     mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $DATASOURCES_EMAILQUEUE_DATABASE;" mysql
-    # mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $DATASOURCES_TEST_DATABASE;" mysql
-    #mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS pb_org_$ORG_NAME;" mysql
     mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL ON $MYSQL_DATABASE.* to $DATASOURCES_TEST_USERNAME@'%' identified by '$DATASOURCES_TEST_PASSWORD';" mysql
     mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL ON $DATASOURCES_EMAILQUEUE_DATABASE.* to $DATASOURCES_EMAILQUEUE_USERNAME@'%' identified by '$DATASOURCES_EMAILQUEUE_PASSWORD';" mysql
-    #mysql -h $DATASOURCES_DEFAULT_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL ON pb_org_$ORG_NAME.* to $DATASOURCES_TEST_USERNAME@'%' identified by '$DATASOURCES_TEST_PASSWORD';" mysql
   }
 
   function run_migrations() {
