@@ -5,8 +5,8 @@
     MYSQL_USER: user
     MYSQL_PASSWORD: testing-password
     MYSQL_ROOT_PASSWORD: testing-password2
-    ORG_NAME: acme
-    MYSQL_DATABASE: pb_org_$ORG_NAME
+    #ORG_NAME: acme
+    MYSQL_DATABASE: pb_org_acme
     MYSQL_DATABASE_EMAILQUEUE: email_queue_test
     # Organization settings
 
