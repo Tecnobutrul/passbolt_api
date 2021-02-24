@@ -5,10 +5,10 @@
     MYSQL_USER: user
     MYSQL_PASSWORD: testing-password
     MYSQL_ROOT_PASSWORD: testing-password2
-    MYSQL_DATABASE: test
+    ORG_NAME: acme
+    MYSQL_DATABASE: pb_org_$ORG_NAME
     MYSQL_DATABASE_EMAILQUEUE: email_queue_test
     # Organization settings
-    ORG_NAME: acme
 
     # Passbolt unit test job common variables
     DEBUG: "true"
