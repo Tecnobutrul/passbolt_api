@@ -60,12 +60,6 @@ class Http extends OpenPGPBackend
     {
         parent::__construct();
         $this->_httpClient = new Client();
-        $this->_region = Configure::consume('passbolt.gpg.http.region');
-        $this->_project = Configure::consume('passbolt.gpg.http.project');
-        $this->_domain = Configure::consume('passbolt.gpg.http.domain');
-        if (empty($this->_region) || empty($this->_project) || empty($this->_domain)) {
-            throw new InternalErrorException('Configuration is missing for OpenPGP backend');
-        }
         $this->_decrypt_url = Configure::read('passbolt.gpg.http.functions.decrypt');
         $this->_encrypt_url = Configure::read('passbolt.gpg.http.functions.encrypt');
         $this->_keyinfo_url = Configure::read('passbolt.gpg.http.functions.keyinfo');
