@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt Cloud
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -18,7 +20,7 @@ use Cake\Http\Exception\ForbiddenException;
 class AuthTokenComponent extends Component
 {
     /**
-     * @var Request
+     * @var \Passbolt\MultiTenantAdmin\Controller\Component\Request
      */
     protected $_request;
 
@@ -36,8 +38,9 @@ class AuthTokenComponent extends Component
 
     /**
      * Authenticate the user.
+     *
      * @return bool
-     * @throws ForbiddenException If the authentication token is not valid.
+     * @throws \Cake\Http\Exception\ForbiddenException If the authentication token is not valid.
      */
     public function identify()
     {

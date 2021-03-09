@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -22,11 +24,11 @@ use Cake\Http\Exception\InternalErrorException;
 
 class OpenPGPBackendFactory
 {
-    const GNUPG = 'gnupg';
-    const HTTP = 'http';
+    public const HTTP = 'http';
+    public const GNUPG = 'gnupg';
 
     /**
-     * @var OpenPGPBackend
+     * @var \App\Utility\OpenPGP\OpenPGPBackend
      */
     private static $instance = null;
 
@@ -34,8 +36,8 @@ class OpenPGPBackendFactory
      * Instantiate an OpenPGP Backend
      *
      * @param string $backend one of the supported backend
-     * @throws InternalErrorException if backend if not supported
-     * @return OpenPGPBackend
+     * @throws \Cake\Http\Exception\InternalErrorException if backend if not supported
+     * @return \App\Utility\OpenPGP\OpenPGPBackend
      */
     public static function create(string $backend = self::GNUPG)
     {
@@ -62,8 +64,8 @@ class OpenPGPBackendFactory
     /**
      * Get a OpenPGP backend (Singleton pattern)
      *
-     * @return OpenPGPBackend
-     * @throws InternalErrorException if backend if not supported
+     * @return \App\Utility\OpenPGP\OpenPGPBackend
+     * @throws \Cake\Http\Exception\InternalErrorException if backend if not supported
      */
     public static function get()
     {

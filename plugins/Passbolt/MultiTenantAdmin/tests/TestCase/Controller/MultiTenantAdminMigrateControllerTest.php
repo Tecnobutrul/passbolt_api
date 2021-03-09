@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -13,7 +15,7 @@
  * @since         2.11.0
  */
 
-namespace Passbolt\MultiTenantAdmin\Test\TestCase\Controller\Admin;
+namespace Passbolt\MultiTenantAdmin\Test\TestCase\Controller;
 
 use Cake\ORM\TableRegistry;
 use Passbolt\MultiTenantAdmin\Test\Lib\MultitenantAdminIntegrationTestCase;
@@ -23,7 +25,7 @@ class MultiTenantAdminMigrateControllerTest extends MultitenantAdminIntegrationT
     public $fixtures = [
         'plugin.Passbolt/MultiTenantAdmin.Base/Users', 'app.Base/Roles',
         'plugin.Passbolt/MultiTenantAdmin.Base/Profiles', 'plugin.Passbolt/MultiTenantAdmin.Base/Avatars',
-        'plugin.Passbolt/MultiTenantAdmin.Base/AuthenticationTokens'
+        'plugin.Passbolt/MultiTenantAdmin.Base/AuthenticationTokens',
     ];
 
     public function tearDown()
@@ -31,9 +33,9 @@ class MultiTenantAdminMigrateControllerTest extends MultitenantAdminIntegrationT
         TableRegistry::clear();
     }
 
-    public function testError_NotAuthorized()
+    public function testMultiTenantAdminMigrateControllerError_NotAuthorized()
     {
-        $this->getJson("/multitenant/admin/migrate.json?api-version=v2");
+        $this->getJson('/multitenant/admin/migrate.json?api-version=v2');
         $this->assertForbiddenError('You are not authorized to access this location');
     }
 }

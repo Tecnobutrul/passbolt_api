@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @link          https://www.passbolt.com Passbolt(tm)
@@ -8,15 +10,14 @@ namespace Passbolt\CloudSubscription\Controller;
 use App\Controller\AppController;
 use Cake\Event\Event;
 use Cake\Http\Exception\ForbiddenException;
-use Cake\Http\Exception\NotFoundException;
 
 class CloudSubscriptionParkingController extends AppController
 {
     /**
      * Before filter
      *
-     * @param Event $event An Event instance
-     * @throws NotFoundException if registration is not set to public
+     * @param \Cake\Event\Event $event An Event instance
+     * @throws \Cake\Http\Exception\NotFoundException if registration is not set to public
      * @return \Cake\Http\Response|null
      */
     public function beforeFilter(Event $event)
@@ -42,7 +43,9 @@ class CloudSubscriptionParkingController extends AppController
             $msg = __('This Passbolt Cloud instance is disabled. Please purchase a subscription.');
             throw new ForbiddenException($msg);
         }
-        $this->success(__('The Passbolt Cloud subscription is not valid for this workspace. This workspace is disabled.'));
+        $msg = __('The Passbolt Cloud subscription is not valid for this workspace.') . ' ';
+        $msg .= __('This workspace is disabled.');
+        $this->success($msg);
     }
 
     /**

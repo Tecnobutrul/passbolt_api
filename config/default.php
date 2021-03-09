@@ -169,19 +169,16 @@ return [
 
             // Http backend configuration
             'http' => [
-                'domain' => env('PASSBOLT_GPG_HTTP_DOMAIN', 'cloudfunctions.net'),
-                'project' => env('PASSBOLT_GPG_HTTP_PROJECT', null),
-                'region' => env('PASSBOLT_GPG_HTTP_REGION', null),
                 'auth' => [
                     'username' => env('PASSBOLT_GPG_HTTP_USERNAME', null),
                     'password' => env('PASSBOLT_GPG_HTTP_AUTH_PASSWORD', null)
                 ],
                 'functions' => [
-                    'encrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_ENCRYPT', 'onOpenpgpEncrypt'),
-                    'decrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_DECRYPT', 'onOpenpgpDecrypt'),
-                    'keyinfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_KEYINFO', 'onOpenpgpGetKeyInfo'),
-                    'msginfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_MSGINFO', 'onOpenpgpGetMessageInfo'),
-                    'verify' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_VERIFY', 'onOpenpgpVerifyCleartext')
+                    'encrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_ENCRYPT', null),
+                    'decrypt' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_DECRYPT', null),
+                    'keyinfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_KEYINFO', null),
+                    'msginfo' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_MSGINFO', null),
+                    'verify' => env('PASSBOLT_GPG_HTTP_FUNCTIONS_VERIFY', null)
                 ]
             ]
         ],
@@ -190,11 +187,17 @@ return [
         'legal' => [
             'privacy_policy' => [
                 'url' => env('PASSBOLT_LEGAL_PRIVACYPOLICYURL', '')
+            ],
+            'terms' => [
+                'url' => env('PASSBOLT_LEGAL_TERMSURL', 'https://www.passbolt.com/terms')
             ]
         ],
 
-        // Wich plugins are enabled
+        // Which plugins are enabled
         'plugins' => [
+            'resourceTypes' => [
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_RESOURCE_TYPES_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
+            ],
             'import' => [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_IMPORT_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
             ],

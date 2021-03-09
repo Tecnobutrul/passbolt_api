@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -21,7 +23,6 @@ use Burzum\FileStorage\Storage\Listener\LocalListener;
  */
 class GoogleCloudStorageListener extends LocalListener
 {
-
     // @codingStandardsIgnoreStart
     /**
      * List of adapter classes the event listener can work with.

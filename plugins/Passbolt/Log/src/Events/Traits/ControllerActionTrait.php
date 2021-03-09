@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -21,10 +23,10 @@ use PDOException;
 
 trait ControllerActionTrait
 {
-
     /**
      * Log controller action.
-     * @param Event $event the event
+     *
+     * @param \Cake\Event\Event $event the event
      * @return void
      */
     public function logControllerAction(Event $event)

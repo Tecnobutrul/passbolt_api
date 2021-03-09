@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @link          https://www.passbolt.com Passbolt(tm)
@@ -19,15 +21,15 @@ class CloudSubscriptionSetActiveCommand extends CloudSubscriptionCommand
      *
      * You can override buildOptionParser() to define your options & arguments.
      *
-     * @param ConsoleOptionParser $parser parser
-     * @return ConsoleOptionParser $parser parser
+     * @param \Cake\Console\ConsoleOptionParser $parser parser
+     * @return \Cake\Console\ConsoleOptionParser $parser parser
      * @throws \RuntimeException When the parser is invalid
      */
     protected function buildOptionParser(ConsoleOptionParser $parser)
     {
         $parser = parent::buildOptionParser($parser);
         $parser->addOption('expiryDate', [
-            'help' => 'When the subscription expires.'
+            'help' => 'When the subscription expires.',
         ]);
 
         return $parser;
@@ -36,8 +38,8 @@ class CloudSubscriptionSetActiveCommand extends CloudSubscriptionCommand
     /**
      * Implement this method with your command's logic.
      *
-     * @param Arguments $args The command arguments.
-     * @param ConsoleIo $io The console io
+     * @param \Cake\Console\Arguments $args The command arguments.
+     * @param \Cake\Console\ConsoleIo $io The console io
      * @return null|int The exit code or null for success
      */
     public function execute(Arguments $args, ConsoleIo $io)
@@ -54,10 +56,10 @@ class CloudSubscriptionSetActiveCommand extends CloudSubscriptionCommand
             $expiryDate = new Date($expiryDate);
             $subscription = new CloudSubscriptionSettings([
                 'status' => CloudSubscriptionSettings::STATUS_ACTIVE,
-                'expiryDate' => $expiryDate->toUnixString()
+                'expiryDate' => $expiryDate->toUnixString(),
             ]);
             $subscription->save();
-            $io->out(__("Subscription is active for {0}. It expires: {1}", $this->org, $expiryDate->toIso8601String()));
+            $io->out(__('Subscription is active for {0}. It expires: {1}', $this->org, $expiryDate->toIso8601String()));
         } catch (CustomValidationException $exception) {
             $this->displayErrors($exception, $io);
             $io->error(__('Fail set subscription to active. Could not validate data.'));

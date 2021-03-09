@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @link          https://www.passbolt.com Passbolt(tm)
@@ -18,11 +20,13 @@ class CloudSubscriptionStatusMiddleware
 {
     private $redirectUrl;
 
-    /** @var ServerRequest $request */
+    /**
+     * @var \Cake\Http\ServerRequest $request
+     */
     private $request;
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function __invoke(ServerRequest $request, Response $response, $next)
     {
@@ -127,7 +131,7 @@ class CloudSubscriptionStatusMiddleware
      */
     protected function isPathStartingWith(string $path)
     {
-        return (substr($this->request->getUri()->getPath(), 0, strlen($path)) === $path);
+        return substr($this->request->getUri()->getPath(), 0, strlen($path)) === $path;
     }
 
     /**

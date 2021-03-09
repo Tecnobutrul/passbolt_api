@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -15,8 +17,6 @@
 namespace App\Shell;
 
 use Cake\Console\Shell;
-use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
 
 /**
  * Application Shell

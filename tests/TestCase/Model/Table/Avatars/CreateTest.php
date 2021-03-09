@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -40,7 +42,7 @@ class CreateTest extends AppTestCase
 
         $this->loadPlugins([
             'Burzum/FileStorage' => ['bootstrap' => false, 'routes' => true],
-            'Burzum/Imagine' => ['bootstrap' => true, 'routes' => true]
+            'Burzum/Imagine' => ['bootstrap' => true, 'routes' => true],
         ]);
         $listener = new GoogleCloudStorageListener();
         EventManager::instance()->on($listener);

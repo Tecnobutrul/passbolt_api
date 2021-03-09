@@ -14,8 +14,10 @@
  */
 use Cake\Core\Configure;
 $version = Configure::read('passbolt.version');
-$privacyPolicyUrl = Configure::read('passbolt.legal.privacy_policy.url');
+$privacyUrl = Configure::read('passbolt.legal.privacy_policy.url');
+$termsUrl = Configure::read('passbolt.legal.terms.url');
 $isTrial = $isTrial ?? false;
+$isExpired = $isExpired ?? false;
 ?>
 <footer>
     <div class="footer">
@@ -26,9 +28,11 @@ $isTrial = $isTrial ?? false;
 <?php if ($isTrial && $isExpired) : ?>
             <li class="error message">Expired trial</li>
 <?php endif; ?>
-            <li><a href="https://www.passbolt.com/terms" title="terms of service"><?= __('Terms'); ?></a></li>
-<?php if (!empty($privacyPolicyUrl)) : ?>
-            <li><a href="<?php echo $privacyPolicyUrl ?>"><?= __('Privacy'); ?></a></li>
+<?php if (!empty($termsUrl)) : ?>
+            <li><a href="<?php echo $termsUrl ?>"><?= __('Terms'); ?></a></li>
+<?php endif; ?>
+<?php if (!empty($privacyUrl)) : ?>
+            <li><a href="<?php echo $privacyUrl ?>"><?= __('Privacy'); ?></a></li>
 <?php endif; ?>
             <li><a href="https://www.passbolt.com/credits"><?= __('Credits'); ?></a></li>
             <li id="version">

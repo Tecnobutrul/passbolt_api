@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -27,13 +29,11 @@ class Http extends OpenPGPBackend
 {
     private $_passphrase = null;
 
-    /** @var Client */
+    /**
+     * @var \Cake\Http\Client
+     */
     protected $_httpClient = null;
 
-    private $_region;
-    private $_project;
-    private $_domain;
-    private $_url;
     private $_auth;
 
     private $_decrypt_url;
@@ -42,19 +42,19 @@ class Http extends OpenPGPBackend
     private $_msginfo_url;
     private $_verify_url;
 
-    const KEYRING_PUBLIC = 'keyring-public-';
-    const KEYRING_PRIVATE = 'keyring-private-';
+    public const KEYRING_PUBLIC = 'keyring-public-';
+    public const KEYRING_PRIVATE = 'keyring-private-';
 
-    const DECRYPT_ENDPOINT = 'decrypt';
-    const ENCRYPT_ENDPOINT = 'encrypt';
-    const KEYINFO_ENDPOINT = 'keyinfo';
-    const MSGINFO_ENDPOINT = 'msginfo';
-    const VERIFY_ENDPOINT = 'verify';
+    public const DECRYPT_ENDPOINT = 'decrypt';
+    public const ENCRYPT_ENDPOINT = 'encrypt';
+    public const KEYINFO_ENDPOINT = 'keyinfo';
+    public const MSGINFO_ENDPOINT = 'msginfo';
+    public const VERIFY_ENDPOINT = 'verify';
 
     /**
      * Constructor.
      *
-     * @throws Exception
+     * @throws \Cake\Core\Exception\Exception
      */
     public function __construct()
     {
@@ -65,13 +65,14 @@ class Http extends OpenPGPBackend
         $this->_keyinfo_url = Configure::read('passbolt.gpg.http.functions.keyinfo');
         $this->_msginfo_url = Configure::read('passbolt.gpg.http.functions.msginfo');
         $this->_verify_url = Configure::read('passbolt.gpg.http.functions.verify');
-
         $this->_auth = [
             'username' => Configure::consume('passbolt.gpg.http.auth.username'),
-            'password' => Configure::consume('passbolt.gpg.http.auth.password')
+            'password' => Configure::consume('passbolt.gpg.http.auth.password'),
         ];
-
-        if (empty($this->_auth) || empty($this->_auth['username']) || empty($this->_auth['password'])) {
+        $configMissing = empty($this->_auth) || empty($this->_auth['username']) || empty($this->_auth['password']) ||
+            empty($this->_decrypt_url) || empty($this->_encrypt_url) || empty($this->_keyinfo_url) ||
+            empty($this->_msginfo_url) || empty($this->_verify_url);
+        if ($configMissing) {
             throw new InternalErrorException('Configuration is missing for OpenPGP backend');
         }
     }
@@ -80,7 +81,7 @@ class Http extends OpenPGPBackend
      * Return a url for a target endpoint
      *
      * @param string $endpoint such as encrypt, decrypt, etc.
-     * @throws InternalErrorException if operation is not supported
+     * @throws \Cake\Http\Exception\InternalErrorException if operation is not supported
      * @return string url of the service to call
      */
     private function _getUrl(string $endpoint)
@@ -147,8 +148,8 @@ class Http extends OpenPGPBackend
      *
      * @param string $endpoint such as decrypt, encrypt, etc.
      * @param array $data mixed example ['armored' => 'etc.']
-     * @throws BadRequestException if the operation didn't succeed because of user data
-     * @throws InternalErrorException if the operation didn't succeed because of config or network issues
+     * @throws \Cake\Http\Exception\BadRequestException if the operation didn't succeed because of user data
+     * @throws \Cake\Http\Exception\InternalErrorException if the operation didn't succeed because of config or network issues
      * @return mixed string|array|null json data
      */
     private function _post(string $endpoint, array $data)
@@ -156,7 +157,7 @@ class Http extends OpenPGPBackend
         $url = $this->_getUrl($endpoint);
         $response = $this->_httpClient->post($url, json_encode($data), [
             'type' => 'json',
-            'auth' => $this->_auth
+            'auth' => $this->_auth,
         ]);
         switch ($response->getStatusCode()) {
             case 200:
@@ -176,7 +177,7 @@ class Http extends OpenPGPBackend
      * Set a key for encryption.
      *
      * @param string $armoredKey ASCII armored key data
-     * @throws Exception if the key cannot be used to encrypt
+     * @throws \Cake\Core\Exception\Exception if the key cannot be used to encrypt
      * @return bool true if success
      */
     public function setEncryptKey(string $armoredKey)
@@ -207,8 +208,8 @@ class Http extends OpenPGPBackend
      * Set a key for encryption.
      *
      * @param string $fingerprint fingerprint
-     * @throws Exception if key is not present in keyring
-     * @throws Exception if there was an issue to use the key to encrypt
+     * @throws \Cake\Core\Exception\Exception if key is not present in keyring
+     * @throws \Cake\Core\Exception\Exception if there was an issue to use the key to encrypt
      * @return bool true if success
      */
     public function setEncryptKeyFromFingerprint(string $fingerprint)
@@ -232,8 +233,8 @@ class Http extends OpenPGPBackend
      *
      * @param string $armoredKey ASCII armored key data
      * @param string $passphrase to decrypt secret key
-     * @throws Exception if the key cannot be found in the keyring
-     * @throws Exception if the key cannot be used to decrypt
+     * @throws \Cake\Core\Exception\Exception if the key cannot be found in the keyring
+     * @throws \Cake\Core\Exception\Exception if the key cannot be used to decrypt
      * @return bool true if success
      */
     public function setDecryptKey(string $armoredKey, string $passphrase)
@@ -265,8 +266,8 @@ class Http extends OpenPGPBackend
      *
      * @param string $fingerprint fingerprint of a key in the keyring
      * @param string $passphrase to decrypt secret key
-     * @throws Exception if the key cannot be found in the keyring
-     * @throws Exception if the key cannot be used to decrypt
+     * @throws \Cake\Core\Exception\Exception if the key cannot be found in the keyring
+     * @throws \Cake\Core\Exception\Exception if the key cannot be used to decrypt
      * @return bool true if success
      */
     public function setDecryptKeyFromFingerprint(string $fingerprint, string $passphrase)
@@ -291,11 +292,11 @@ class Http extends OpenPGPBackend
      *
      * @param string $armoredKey ASCII armored key data
      * @param string $passphrase passphrase
-     * @throws Exception if the key is not already in the keyring
-     * @throws Exception if the passphrase is not empty
-     * @throws Exception if the key cannot be used for signing
+     * @throws \Cake\Core\Exception\Exception if the key is not already in the keyring
+     * @throws \Cake\Core\Exception\Exception if the passphrase is not empty
+     * @throws \Cake\Core\Exception\Exception if the key cannot be used for signing
      * @return bool
-     * @throws Exception
+     * @throws \Cake\Core\Exception\Exception
      */
     public function setSignKey(string $armoredKey, string $passphrase)
     {
@@ -325,9 +326,9 @@ class Http extends OpenPGPBackend
     /**
      * Set key to be used for signing
      *
-     * @throws Exception if the key is not already in the keyring
-     * @throws Exception if the passphrase is not empty
-     * @throws Exception if the key cannot be used for signing
+     * @throws \Cake\Core\Exception\Exception if the key is not already in the keyring
+     * @throws \Cake\Core\Exception\Exception if the passphrase is not empty
+     * @throws \Cake\Core\Exception\Exception if the key cannot be used for signing
      * @param string $fingerprint fingerprint
      * @param string $passphrase passphrase
      * @return true if success
@@ -434,7 +435,7 @@ class Http extends OpenPGPBackend
      * Get public key information.
      *
      * @param string $armoredKey the ASCII armored key block
-     * @throws Exception if the armored key cannot be parsed
+     * @throws \Cake\Core\Exception\Exception if the armored key cannot be parsed
      * @return array key information (see getKeyInfo)
      */
     public function getPublicKeyInfo(string $armoredKey)
@@ -474,7 +475,7 @@ class Http extends OpenPGPBackend
             'key_id' => strtoupper($info['keyId']),
             'fingerprint' => strtoupper($info['fingerprint']),
             'uid' => $info['userId'],
-            'key_created' => strtotime($info['creationTime'])
+            'key_created' => strtotime($info['creationTime']),
         ];
 
         if (!empty($info['expirationTime'])) {
@@ -529,7 +530,7 @@ class Http extends OpenPGPBackend
      * Import a key into the local keyring.
      *
      * @param string $armoredKey the ASCII armored key block
-     * @throws Exception if the key could not be imported
+     * @throws \Cake\Core\Exception\Exception if the key could not be imported
      * @return string key fingerprint
      */
     public function importKeyIntoKeyring(string $armoredKey)
@@ -553,7 +554,7 @@ class Http extends OpenPGPBackend
      *
      * @param array $info see getKeyInfo
      * @param string $keyring public or private key cache
-     * @throws Exception if the key could not be written in cache
+     * @throws \Cake\Core\Exception\Exception if the key could not be written in cache
      * @return bool
      */
     protected function _importKeyIntoKeyring(array $info, string $keyring)
@@ -594,8 +595,8 @@ class Http extends OpenPGPBackend
      *
      * @param string $text plain text to be encrypted.
      * @param bool $sign whether the encrypted message should be signed.
-     * @throws Exception if no key was set to encrypt and optionally to sign
-     * @throws Exception if there is an issue with the key to encrypt and optionally to sign
+     * @throws \Cake\Core\Exception\Exception if no key was set to encrypt and optionally to sign
+     * @throws \Cake\Core\Exception\Exception if there is an issue with the key to encrypt and optionally to sign
      * @return string encrypted text
      */
     public function encrypt(string $text, bool $sign = false)
@@ -610,8 +611,8 @@ class Http extends OpenPGPBackend
             $data = [
                 'clearText' => $text,
                 'publicKey' => [
-                    'armored' => $pubKey['armored']
-                ]
+                    'armored' => $pubKey['armored'],
+                ],
             ];
             if ($sign) {
                 $fingerprint = $this->_signKeyFingerprint;
@@ -634,7 +635,7 @@ class Http extends OpenPGPBackend
      *
      * @param string $text ASCII armored encrypted text to be decrypted.
      * @param bool $verifySignature should signature be verified
-     * @throws Exception
+     * @throws \Cake\Core\Exception\Exception
      * @return string decrypted text
      */
     public function decrypt(string $text, bool $verifySignature = false)
@@ -649,8 +650,8 @@ class Http extends OpenPGPBackend
                 'armoredText' => $text,
                 'privateKey' => [
                     'armored' => $info['armored'],
-                    'passphrase' => $this->_passphrase
-                ]
+                    'passphrase' => $this->_passphrase,
+                ],
             ];
             if ($verifySignature) {
                 $pubKey = $this->_getKeyFromKeyring($this->_verifyKeyFingerprint, self::KEYRING_PUBLIC);
@@ -707,7 +708,7 @@ class Http extends OpenPGPBackend
      * @param string $armored The armored signed message to verify.
      * @param string $fingerprint The fingerprint of the key to verify for.
      * @param mixed $plainText (optional) if this parameter is passed, it will be filled with the plain text.
-     * @throws Exception If the armored signed message cannot be verified.
+     * @throws \Cake\Core\Exception\Exception If the armored signed message cannot be verified.
      * @return void
      */
     public function verify($armored, $fingerprint, &$plainText = null)
@@ -722,8 +723,8 @@ class Http extends OpenPGPBackend
             $data = [
                 'clearText' => $armored,
                 'publicKey' => [
-                    'armored' => $pubKey['armored']
-                ]
+                    'armored' => $pubKey['armored'],
+                ],
             ];
             $response = $this->_post(self::VERIFY_ENDPOINT, $data);
         } catch (Exception $exception) {
@@ -737,8 +738,8 @@ class Http extends OpenPGPBackend
      * Sign a text.
      *
      * @param string $text plain text to be signed.
-     * @throws Exception if no key was set to sign
-     * @throws Exception if there is an issue with the key to sign
+     * @throws \Cake\Core\Exception\Exception if no key was set to sign
+     * @throws \Cake\Core\Exception\Exception if there is an issue with the key to sign
      * @return void
      */
     public function sign(string $text)

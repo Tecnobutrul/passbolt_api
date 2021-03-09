@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SARL (https://www.passbolt.com)
@@ -20,7 +22,7 @@ use Psr\Http\Message\ResponseInterface;
 class MultitenantRoutingMiddleware
 {
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function __invoke(RequestInterface $request, ResponseInterface $response, $next)
     {
@@ -29,7 +31,7 @@ class MultitenantRoutingMiddleware
         $isCli = PHP_SAPI === 'cli';
         if (!$isCli) {
             $path = $request->getUri()->getPath();
-            $arr = (explode('/', $path, 3));
+            $arr = explode('/', $path, 3);
             $newpath = '/';
             if (isset($arr[2])) {
                 $newpath = '/' . $arr[2];

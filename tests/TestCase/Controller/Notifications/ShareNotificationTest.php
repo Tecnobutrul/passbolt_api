@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -18,14 +20,13 @@ namespace App\Test\TestCase\Controller\Notifications;
 use App\Model\Entity\Permission;
 use App\Test\TestCase\Controller\Share\ShareControllerTest;
 use App\Utility\UuidFactory;
-use Cake\Core\Configure;
 
 class ShareNotificationTest extends ShareControllerTest
 {
     public $fixtures = [
         'app.Base/Users', 'app.Base/Gpgkeys', 'app.Base/Profiles', 'app.Base/Roles',
-        'app.Base/Groups', 'app.Base/GroupsUsers', 'app.Base/Resources', 'app.Base/Permissions', 'app.Base/Secrets',
-        'app.Base/EmailQueue', 'app.Base/Avatars', 'app.Base/Favorites', 'app.Base/OrganizationSettings',
+        'app.Base/Groups', 'app.Base/GroupsUsers', 'app.Base/Resources', 'app.Base/Permissions',
+        'app.Base/Secrets', 'app.Base/Avatars', 'app.Base/Favorites',
     ];
 
     public function testNotificationShareSuccess()
@@ -70,7 +71,7 @@ class ShareNotificationTest extends ShareControllerTest
         $data['secrets'][] = ['user_id' => $userFId, 'data' => $this->getValidSecret()];
 
         $this->authenticateAs('ada');
-        $this->putJson("/share/resource/$resourceId.json?api-version=v1", $data);
+        $this->putJson("/share/resource/$resourceId.json?api-version=v2", $data);
         $this->assertSuccess();
 
         // check email notification

@@ -5,7 +5,7 @@
 	  /_/    \__,_/____/____/_,___/\____/_/\__/
 
 	Passbolt Cloud API
-	Copyright (c) 2020 Passbolt SA
+	Copyright (c) 2021 Passbolt SA
 	https://www.passbolt.com
 
 # Getting started using docker

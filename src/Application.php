@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -18,10 +20,10 @@ use App\Middleware\ContentSecurityPolicyMiddleware;
 use App\Middleware\CsrfProtectionMiddleware;
 use App\Middleware\GpgAuthHeadersMiddleware;
 use App\Middleware\SessionPreventExtensionMiddleware;
-use App\Notification\EmailDigest\DigestRegister\GroupDigests;
-use App\Notification\EmailDigest\DigestRegister\ResourceDigests;
 use App\Notification\Email\EmailSubscriptionDispatcher;
 use App\Notification\Email\Redactor\CoreEmailRedactorPool;
+use App\Notification\EmailDigest\DigestRegister\GroupDigests;
+use App\Notification\EmailDigest\DigestRegister\ResourceDigests;
 use App\Notification\NotificationSettings\CoreNotificationSettingsDefinition;
 use App\Utility\ImageStorage\GoogleCloudStorageListener;
 use Burzum\FileStorage\Storage\Listener\ImageProcessingListener;
@@ -30,7 +32,6 @@ use Cake\Core\Exception\MissingPluginException;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
 use Cake\Event\EventManager;
 use Cake\Http\BaseApplication;
-use Cake\Http\MiddlewareQueue;
 use Cake\Http\Middleware\SecurityHeadersMiddleware;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
@@ -42,8 +43,8 @@ class Application extends BaseApplication
     /**
      * Setup the PSR-7 middleware passbolt application will use.
      *
-     * @param MiddlewareQueue $middleware The middleware queue to setup.
-     * @return MiddlewareQueue The updated middleware.
+     * @param \Cake\Http\MiddlewareQueue $middleware The middleware queue to setup.
+     * @return \Cake\Http\MiddlewareQueue The updated middleware.
      */
     public function middleware($middleware)
     {
@@ -121,6 +122,7 @@ class Application extends BaseApplication
     /**
      * Register core emails notification and settings
      * Register core email digests
+     *
      * @return void
      */
     public function initEmails()
@@ -141,6 +143,7 @@ class Application extends BaseApplication
     /**
      * Bootstrap all the loaded plugins
      * Any which require the application to be fully loaded should be registered here.
+     *
      * @return void
      */
     public function pluginBootstrap()
@@ -229,8 +232,9 @@ class Application extends BaseApplication
 
         // Add Common plugins.
         $this->addPlugin('Passbolt/AccountSettings', ['bootstrap' => true, 'routes' => true]);
-        $this->addPlugin('Passbolt/Export', ['bootstrap' => true, 'routes' => false]);
         $this->addPlugin('Passbolt/Import', ['bootstrap' => true, 'routes' => true]);
+        $this->addPlugin('Passbolt/Export', ['bootstrap' => true, 'routes' => false]);
+        $this->addPlugin('Passbolt/ResourceTypes', ['bootstrap' => true, 'routes' => false]);
         $this->addPlugin('Passbolt/RememberMe', ['bootstrap' => true, 'routes' => false]);
         $this->addPlugin('Passbolt/EmailNotificationSettings', ['bootstrap' => true, 'routes' => true]);
         $this->addPlugin('Passbolt/EmailDigest', ['bootstrap' => true, 'routes' => true]);
