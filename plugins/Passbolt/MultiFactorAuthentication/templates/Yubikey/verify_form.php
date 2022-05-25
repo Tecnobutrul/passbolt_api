@@ -13,6 +13,7 @@
     $this->assign('pageClass', 'login');
     $formContext = [
         'url' => Router::url('/mfa/verify/yubikey', true),
+        'class' => ['yubikey-setup'],
     ];
     ?>
 <div class="login-form ">

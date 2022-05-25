@@ -28,10 +28,10 @@
                     <?= __('Plug in the yubikey and put your finger on it.'); ?>
                 </div>
             </div>
-        </div>
-        <div class="actions-wrapper">
-            <a href="<?= Router::url('/mfa/setup/select', true); ?>" class="button cancel">Cancel</a>
-            <input type="submit" class="button primary" value="Validate">
+            <div class="actions-wrapper">
+                <a href="<?= Router::url('/mfa/setup/select', true); ?>" class="button cancel">Cancel</a>
+                <button type="submit" class="button primary">Validate</button>
+            </div>
         </div>
     </div>
     <?= $this->Form->end(); ?>
