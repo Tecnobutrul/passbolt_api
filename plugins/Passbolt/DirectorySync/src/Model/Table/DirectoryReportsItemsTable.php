@@ -108,7 +108,7 @@ class DirectoryReportsItemsTable extends Table
      * @param \Passbolt\DirectorySync\Actions\Reports\ActionReport $reportItem report item
      * @return bool|\Passbolt\DirectorySync\Model\Entity\DirectoryReportsItem
      */
-    public function create(?string $reportId = null, ActionReport $reportItem)
+    public function create(?string $reportId, ActionReport $reportItem)
     {
         $entity = $this->newEntity([
             'report_id' => $reportId,

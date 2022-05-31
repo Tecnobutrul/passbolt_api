@@ -100,8 +100,8 @@ trait SyncAddTrait
      */
     public function handleAddIgnore(
         array $data,
-        ?DirectoryEntry $entry = null,
-        ?Entity $existingEntity = null,
+        ?DirectoryEntry $entry,
+        ?Entity $existingEntity,
         bool $ignoreEntity
     ): void {
         if (!$this->directoryOrgSettings->isSyncOperationEnabled(strtolower(self::ENTITY_TYPE), 'create')) {

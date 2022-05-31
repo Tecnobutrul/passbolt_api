@@ -221,7 +221,7 @@ class TagsTable extends Table
      * @throws \Cake\Http\Exception\BadRequestException if the validation fails
      * @return array $tags list of tag entities
      */
-    public function buildEntitiesOrFail(?string $userId = null, array $tags)
+    public function buildEntitiesOrFail(?string $userId, array $tags)
     {
         $collection = [];
         if (!empty($tags)) {

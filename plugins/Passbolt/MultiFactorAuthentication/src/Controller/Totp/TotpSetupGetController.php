@@ -86,13 +86,13 @@ class TotpSetupGetController extends MfaSetupController
         // even though they can be set manually in the post as well
         $uac = $this->User->getAccessControl();
         $uri = MfaOtpFactory::generateTOTP($uac);
-        $qrCode = MfaOtpFactory::getQrCodeInline($uri);
+        $qrCode = MfaOtpFactory::getQrCodeInlineSvg($uri);
 
         if (!$this->request->is('json')) {
             $this->set('totpSetupForm', $totpSetupForm);
             $this->set('theme', $this->User->theme());
             $this->request = $this->request
-                ->withData('otpQrCodeImage', $qrCode)
+                ->withData('otpQrCodeSvg', $qrCode)
                 ->withData('otpProvisioningUri', $uri);
             $this->viewBuilder()
                 ->setLayout('mfa_setup')
@@ -100,7 +100,7 @@ class TotpSetupGetController extends MfaSetupController
                 ->setTemplate('setupForm');
         } else {
             $data = [
-                'otpQrCodeImage' => $qrCode,
+                'otpQrCodeSvg' => $qrCode,
                 'otpProvisioningUri' => $uri,
             ];
             $this->success(__('Please setup the TOTP application.'), $data);

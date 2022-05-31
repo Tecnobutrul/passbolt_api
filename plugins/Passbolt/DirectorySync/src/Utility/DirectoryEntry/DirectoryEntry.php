@@ -124,8 +124,9 @@ abstract class DirectoryEntry implements ArrayAccess
 
     /**
      * @param mixed $offset Offset
-     * @return mixed|null
+     * @return mixed|null // not strict for 7.3 compatibility
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->{$offset} ?? null;
