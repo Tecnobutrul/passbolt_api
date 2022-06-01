@@ -50,7 +50,7 @@ class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
     /**
      * Test that the groups users are properly retrieved and populated in the results.
      */
-    public function testGroupUsersArePopulated()
+    public function testDirectoryGroupUsersArePopulated()
     {
         $retrievedGroups = $this->directoryResults->getGroups();
         $this->assertEquals(5, count($retrievedGroups));
@@ -96,7 +96,7 @@ class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
     /**
      * test that the groups that are retrieved by function getRecursivelyFromParentGroup are correct.
      */
-    public function testGroupsFromParentGroup()
+    public function testDirectoryGroupsFromParentGroup()
     {
         $retrievedGroups = $this->directoryResults
             ->getRecursivelyFromParentGroup(LdapObjectType::GROUP, 'Administration')
@@ -129,7 +129,7 @@ class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
         }
     }
 
-    public function testUsersFromParentGroup()
+    public function testDirectoryUsersFromParentGroup()
     {
         $retrievedUsers = $this->directoryResults
             ->getRecursivelyFromParentGroup(LdapObjectType::USER, 'Administration')
@@ -146,7 +146,7 @@ class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
         $this->assertEquals($expectedUsers, array_keys($retrievedUsers));
     }
 
-    public function testGetTree()
+    public function testDirectoryGetTree()
     {
         $tree = $this->directoryResults->getTree();
         $this->assertTrue(isset($tree['CN=Administration,OU=PassboltUsers,DC=passbolt,DC=local']));
@@ -156,7 +156,7 @@ class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
         $this->assertTrue(isset($group2['group']['groups']['CN=CLevel,OU=PassboltUsers,DC=passbolt,DC=local']));
     }
 
-    public function testGetFlattenedTree()
+    public function testDirectoryGetFlattenedTree()
     {
         $flatTree = $this->directoryResults->getFlattenedTree();
         $expectedEntities = [

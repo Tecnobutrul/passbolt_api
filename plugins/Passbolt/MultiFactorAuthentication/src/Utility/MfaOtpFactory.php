@@ -17,10 +17,7 @@ declare(strict_types=1);
 namespace Passbolt\MultiFactorAuthentication\Utility;
 
 use App\Utility\UserAccessControl;
-use BaconQrCode\Common\ErrorCorrectionLevel;
 use BaconQrCode\Encoder\Encoder;
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\Image\Png;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
@@ -80,7 +77,6 @@ class MfaOtpFactory
      *
      * @param string $provisioningUri provisioning uri
      * @param int|null $width width default 256
-     * @param int|null $height height default 256
      * @param string|null $encoding encoding default ISO-8859-1
      * @return string
      */
@@ -96,6 +92,6 @@ class MfaOtpFactory
         $writer = new Writer($renderer);
         $inlineSvg = $writer->writeString($provisioningUri, $encoding);
 
-        return str_replace('<?xml version="1.0" encoding="UTF-8"?>','', $inlineSvg);
+        return str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $inlineSvg);
     }
 }

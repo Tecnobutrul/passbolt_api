@@ -28,7 +28,7 @@ class IgnoreListCommandTest extends DirectorySyncConsoleIntegrationTestCase
      *
      * @return void
      */
-    public function testIgnoreListCommandHelp(): void
+    public function testDirectoryIgnoreListCommandHelp(): void
     {
         $this->exec('directory_sync ignore_list -h');
         $this->assertExitSuccess();

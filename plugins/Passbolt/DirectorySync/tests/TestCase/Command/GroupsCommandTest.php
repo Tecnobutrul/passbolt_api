@@ -28,7 +28,7 @@ class GroupsCommandTest extends DirectorySyncConsoleIntegrationTestCase
      *
      * @return void
      */
-    public function testGroupsCommandHelp(): void
+    public function testDirectoryGroupsCommandHelp(): void
     {
         $this->exec('directory_sync groups -h');
         $this->assertExitSuccess();

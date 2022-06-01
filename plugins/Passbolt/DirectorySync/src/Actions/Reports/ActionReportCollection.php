@@ -59,7 +59,7 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      * Get By Action
      *
      * @param string $actionName action name
-     * @return \Passbolt\DirectorySync\Actions\Reports\ActionReportCollection
+     * @return \Passbolt\DirectorySync\Actions\Reports\ActionReportCollection // phpcs:ignore
      */
     public function getByAction(string $actionName): ActionReportCollection
     {
@@ -77,7 +77,7 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      * Get by status.
      *
      * @param string $status status
-     * @return \Passbolt\DirectorySync\Actions\Reports\ActionReportCollection
+     * @return \Passbolt\DirectorySync\Actions\Reports\ActionReportCollection // phpcs:ignore
      */
     public function getByStatus(string $status): ActionReportCollection
     {
@@ -142,23 +142,25 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
         $this->position = 0;
     }
 
+    #[\ReturnTypeWillChange]
+
     /**
      * Current
      *
      * @return mixed // not strict for 7.3 compatibility
      */
-    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->reports[$this->position];
     }
+
+    #[\ReturnTypeWillChange]
 
     /**
      * Key
      *
      * @return int // should be mixed for PHP 8 interface compliance
      */
-    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;
@@ -222,13 +224,14 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
         unset($this->reports[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
+
     /**
      * Get offset.
      *
      * @param mixed $offset offset
      * @return mixed|null // not strict for 7.3 compatibility
      */
-    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->reports[$offset] ?? null;

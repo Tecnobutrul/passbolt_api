@@ -29,7 +29,7 @@ class AllCommandTest extends DirectorySyncConsoleIntegrationTestCase
      *
      * @return void
      */
-    public function testAllCommandHelp(): void
+    public function testDirectoryAllCommandHelp(): void
     {
         $this->useCommandRunner();
         $this->exec('directory_sync all -h');
@@ -37,7 +37,7 @@ class AllCommandTest extends DirectorySyncConsoleIntegrationTestCase
         $this->assertOutputContains('Directory Sync');
     }
 
-    public function testAllCommandWithExistingAdmin(): void
+    public function testDirectoryAllCommandWithExistingAdmin(): void
     {
         UserFactory::make()->admin()->persist();
 

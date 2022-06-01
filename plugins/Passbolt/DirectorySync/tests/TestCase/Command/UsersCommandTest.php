@@ -28,7 +28,7 @@ class UsersCommandTest extends DirectorySyncConsoleIntegrationTestCase
      *
      * @return void
      */
-    public function testUsersCommandHelp(): void
+    public function testDirectoryUsersCommandHelp(): void
     {
         $this->exec('directory_sync users -h');
         $this->assertExitSuccess();

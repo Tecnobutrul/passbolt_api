@@ -28,7 +28,7 @@ class IgnoreDeleteCommandTest extends DirectorySyncConsoleIntegrationTestCase
      *
      * @return void
      */
-    public function testIgnoreDeleteCommandHelp(): void
+    public function testDirectoryIgnoreDeleteCommandHelp(): void
     {
         $this->exec('directory_sync ignore_delete -h');
         $this->assertExitSuccess();
