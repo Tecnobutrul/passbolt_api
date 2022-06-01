@@ -63,7 +63,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         return $ldapObject;
     }
 
-    public function testMappingSuccess()
+    public function testDirectoryMappingSuccess()
     {
         $ldapObject = $this->_getSampleLdapObject();
 
@@ -79,7 +79,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertTrue($userEntry->validate());
     }
 
-    public function testValidateErrorNoId()
+    public function testDirectoryValidateErrorNoId()
     {
         $ldapObject = $this->_getSampleLdapObject(['guid' => null]);
 
@@ -92,7 +92,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($userEntry->errors()['id']);
     }
 
-    public function testValidateErrorInvalidId()
+    public function testDirectoryValidateErrorInvalidId()
     {
         $ldapObject = $this->_getSampleLdapObject(['guid' => 'thisisnotavalidguid']);
 
@@ -104,7 +104,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($userEntry->errors()['id']);
     }
 
-    public function testValidateErrorNoDn()
+    public function testDirectoryValidateErrorNoDn()
     {
         $ldapObject = $this->_getSampleLdapObject(['dn' => null]);
 
@@ -116,7 +116,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($userEntry->errors()['dn']);
     }
 
-    public function testValidateErrorDnIsInvalid()
+    public function testDirectoryValidateErrorDnIsInvalid()
     {
         $ldapObject = $this->_getSampleLdapObject(['dn' => 'invaliddn']);
 
@@ -128,7 +128,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($userEntry->errors()['dn']);
     }
 
-    public function testValidateErrorNoCreated()
+    public function testDirectoryValidateErrorNoCreated()
     {
         $ldapObject = $this->_getSampleLdapObject(['created' => null]);
 
@@ -140,7 +140,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($userEntry->errors()['created']);
     }
 
-    public function testValidateErrorNoModified()
+    public function testDirectoryValidateErrorNoModified()
     {
         $ldapObject = $this->_getSampleLdapObject(['modified' => null]);
 
@@ -152,7 +152,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($userEntry->errors()['modified']);
     }
 
-    public function testValidateErrorNoFirstName()
+    public function testDirectoryValidateErrorNoFirstName()
     {
         $ldapObject = $this->_getSampleLdapObject(['firstName' => null]);
 
@@ -164,7 +164,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($userEntry->errors()['first_name']);
     }
 
-    public function testValidateErrorNoLastName()
+    public function testDirectoryValidateErrorNoLastName()
     {
         $ldapObject = $this->_getSampleLdapObject(['lastName' => null]);
 
@@ -176,7 +176,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($userEntry->errors()['last_name']);
     }
 
-    public function testValidateErrorNoEmailAddress()
+    public function testDirectoryValidateErrorNoEmailAddress()
     {
         $ldapObject = $this->_getSampleLdapObject(['emailAddress' => null]);
 
@@ -188,7 +188,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($userEntry->errors()['email']);
     }
 
-    public function testValidateErrorInvalidEmailAddress()
+    public function testDirectoryValidateErrorInvalidEmailAddress()
     {
         $ldapObject = $this->_getSampleLdapObject(['emailAddress' => 'invalidemail']);
 

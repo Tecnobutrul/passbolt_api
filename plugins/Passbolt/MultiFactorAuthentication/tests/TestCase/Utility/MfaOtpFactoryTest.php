@@ -74,7 +74,8 @@ class MfaOtpFactoryTest extends MfaIntegrationTestCase
     public function testMfaOtpQrCodeInline()
     {
         $otp = MfaOtpFactory::generateTOTP($this->mockUserAccessControl('ada'));
-        $qrcode = MfaOtpFactory::getQrCodeInline($otp);
-        $this->assertStringContainsString('data:image/png;base64,', $qrcode);
+        $qrcode = MfaOtpFactory::getQrCodeInlineSvg($otp);
+        $this->assertStringNotContainsString('<?xml version="1.0" encoding="UTF-8"?>', $qrcode);
+        $this->assertStringContainsString('<svg', $qrcode);
     }
 }

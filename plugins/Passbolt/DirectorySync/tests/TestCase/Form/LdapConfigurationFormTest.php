@@ -63,7 +63,7 @@ class LdapConfigurationFormTest extends AppTestCase
         ];
     }
 
-    public function testLdapConfigurationFormValidateError_DirectoryType()
+    public function testDirectoryLdapConfigurationFormValidateError_DirectoryType()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -74,7 +74,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'directory_type', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_DomainName()
+    public function testDirectoryLdapConfigurationFormValidateError_DomainName()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -85,7 +85,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'domain_name', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_Username()
+    public function testDirectoryLdapConfigurationFormValidateError_Username()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -95,7 +95,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'username', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_Password()
+    public function testDirectoryLdapConfigurationFormValidateError_Password()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -105,7 +105,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'password', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_BaseDn()
+    public function testDirectoryLdapConfigurationFormValidateError_BaseDn()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -115,7 +115,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'base_dn', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_Server()
+    public function testDirectoryLdapConfigurationFormValidateError_Server()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -126,7 +126,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'server', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_Port()
+    public function testDirectoryLdapConfigurationFormValidateError_Port()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -137,7 +137,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'port', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_ConnectionType()
+    public function testDirectoryLdapConfigurationFormValidateError_ConnectionType()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -148,7 +148,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'connection_type', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_DefaultUser()
+    public function testDirectoryLdapConfigurationFormValidateError_DefaultUser()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -172,7 +172,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'default_user', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_DefaultGroupAdminUser()
+    public function testDirectoryLdapConfigurationFormValidateError_DefaultGroupAdminUser()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -198,7 +198,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'default_group_admin_user', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_GroupObjectClass()
+    public function testDirectoryLdapConfigurationFormValidateError_GroupObjectClass()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -208,7 +208,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'group_object_class', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_UserObjectClass()
+    public function testDirectoryLdapConfigurationFormValidateError_UserObjectClass()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -218,7 +218,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'user_object_class', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_GroupPath()
+    public function testDirectoryLdapConfigurationFormValidateError_GroupPath()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -228,7 +228,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'group_path', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_UserPath()
+    public function testDirectoryLdapConfigurationFormValidateError_UserPath()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -238,7 +238,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'user_path', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_UseEmailPrefixSuffix()
+    public function testDirectoryLdapConfigurationFormValidateError_UseEmailPrefixSuffix()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -248,7 +248,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'use_email_prefix_suffix', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_EmailPrefix()
+    public function testDirectoryLdapConfigurationFormValidateError_EmailPrefix()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -258,7 +258,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'email_prefix', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_EmailSuffix()
+    public function testDirectoryLdapConfigurationFormValidateError_EmailSuffix()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -268,7 +268,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'email_suffix', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_SyncUsersCreate()
+    public function testDirectoryLdapConfigurationFormValidateError_SyncUsersCreate()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -278,7 +278,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_users_create', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_SyncUsersDelete()
+    public function testDirectoryLdapConfigurationFormValidateError_SyncUsersDelete()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -288,7 +288,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_users_delete', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_SyncGroupsCreate()
+    public function testDirectoryLdapConfigurationFormValidateError_SyncGroupsCreate()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -298,7 +298,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_groups_create', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_SyncGroupsDelete()
+    public function testDirectoryLdapConfigurationFormValidateError_SyncGroupsDelete()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -308,7 +308,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_groups_delete', $ldapSettings, $testCases);
     }
 
-    public function testLdapConfigurationFormValidateError_SyncGroupsUpdate()
+    public function testDirectoryLdapConfigurationFormValidateError_SyncGroupsUpdate()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
@@ -318,7 +318,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_groups_update', $ldapSettings, $testCases);
     }
 
-    public function testFormatFormDataToOrgSettings()
+    public function testDirectoryFormatFormDataToOrgSettings()
     {
         $data = self::getDummyFormData();
         $config = LdapConfigurationForm::formatFormDataToOrgSettings($data);
@@ -336,7 +336,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertEquals(Hash::get($config, 'jobs.groups.update'), true);
     }
 
-    public function testFormatOrgSettingsToFormData()
+    public function testDirectoryFormatOrgSettingsToFormData()
     {
         $settings = DirectoryOrgSettingsTest::getDummySettings();
         $formData = LdapConfigurationForm::formatOrgSettingsToFormData($settings);

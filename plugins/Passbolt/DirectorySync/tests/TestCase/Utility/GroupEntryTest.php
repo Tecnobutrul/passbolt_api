@@ -61,7 +61,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
         return $ldapObject;
     }
 
-    public function testMappingSuccess()
+    public function testDirectoryMappingSuccess()
     {
         $ldapObject = $this->_getSampleLdapObject();
 
@@ -75,7 +75,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertTrue($groupEntry->validate());
     }
 
-    public function testValidateErrorNoId()
+    public function testDirectoryValidateErrorNoId()
     {
         $ldapObject = $this->_getSampleLdapObject(['guid' => null]);
 
@@ -88,7 +88,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($groupEntry->errors()['id']);
     }
 
-    public function testValidateErrorInvalidId()
+    public function testDirectoryValidateErrorInvalidId()
     {
         $ldapObject = $this->_getSampleLdapObject(['guid' => 'thisisnotavalidguid']);
 
@@ -100,7 +100,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($groupEntry->errors()['id']);
     }
 
-    public function testValidateErrorNoDn()
+    public function testDirectoryValidateErrorNoDn()
     {
         $ldapObject = $this->_getSampleLdapObject(['dn' => null]);
 
@@ -112,7 +112,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($groupEntry->errors()['dn']);
     }
 
-    public function testValidateErrorDnIsInvalid()
+    public function testDirectoryValidateErrorDnIsInvalid()
     {
         $ldapObject = $this->_getSampleLdapObject(['dn' => 'invaliddn']);
 
@@ -124,7 +124,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($groupEntry->errors()['dn']);
     }
 
-    public function testValidateErrorNoCreated()
+    public function testDirectoryValidateErrorNoCreated()
     {
         $ldapObject = $this->_getSampleLdapObject(['created' => null]);
 
@@ -136,7 +136,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($groupEntry->errors()['created']);
     }
 
-    public function testValidateErrorNoModified()
+    public function testDirectoryValidateErrorNoModified()
     {
         $ldapObject = $this->_getSampleLdapObject(['modified' => null]);
 
@@ -148,7 +148,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
         $this->assertNotEmpty($groupEntry->errors()['modified']);
     }
 
-    public function testValidateErrorNoName()
+    public function testDirectoryValidateErrorNoName()
     {
         $ldapObject = $this->_getSampleLdapObject(['name' => null]);
 

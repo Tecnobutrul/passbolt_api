@@ -50,7 +50,7 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      * @param \Passbolt\DirectorySync\Actions\Reports\ActionReport $report report
      * @return void
      */
-    public function add(ActionReport $report)
+    public function add(ActionReport $report): void
     {
         $this->reports[] = $report;
     }
@@ -59,9 +59,9 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      * Get By Action
      *
      * @param string $actionName action name
-     * @return \Passbolt\DirectorySync\Actions\Reports\ActionReportCollection
+     * @return \Passbolt\DirectorySync\Actions\Reports\ActionReportCollection // phpcs:ignore
      */
-    public function getByAction(string $actionName)
+    public function getByAction(string $actionName): ActionReportCollection
     {
         $result = [];
         foreach ($this->reports as $i => $report) {
@@ -77,9 +77,9 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      * Get by status.
      *
      * @param string $status status
-     * @return \Passbolt\DirectorySync\Actions\Reports\ActionReportCollection
+     * @return \Passbolt\DirectorySync\Actions\Reports\ActionReportCollection // phpcs:ignore
      */
-    public function getByStatus(string $status)
+    public function getByStatus(string $status): ActionReportCollection
     {
         $result = [];
         foreach ($this->reports as $i => $report) {
@@ -96,7 +96,7 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      *
      * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return count($this->reports) === 0;
     }
@@ -106,7 +106,7 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->reports;
     }
@@ -137,25 +137,29 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      *
      * @return void
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
 
+    #[\ReturnTypeWillChange]
+
     /**
      * Current
      *
-     * @return mixed
+     * @return mixed // not strict for 7.3 compatibility
      */
     public function current()
     {
         return $this->reports[$this->position];
     }
 
+    #[\ReturnTypeWillChange]
+
     /**
      * Key
      *
-     * @return int
+     * @return int // should be mixed for PHP 8 interface compliance
      */
     public function key()
     {
@@ -167,7 +171,7 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      *
      * @return void
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
@@ -177,7 +181,7 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      *
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->reports[$this->position]);
     }
@@ -189,7 +193,7 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      * @param mixed $value value
      * @return void
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (is_null($offset)) {
             $this->reports[] = $value;
@@ -204,7 +208,7 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      * @param mixed $offset offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->reports[$offset]);
     }
@@ -215,16 +219,18 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      * @param mixed $offset offset
      * @return void
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->reports[$offset]);
     }
+
+    #[\ReturnTypeWillChange]
 
     /**
      * Get offset.
      *
      * @param mixed $offset offset
-     * @return mixed|null
+     * @return mixed|null // not strict for 7.3 compatibility
      */
     public function offsetGet($offset)
     {
@@ -236,7 +242,7 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->reports);
     }
@@ -246,7 +252,7 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
      *
      * @return array
      */
-    public function toFormattedArray()
+    public function toFormattedArray(): array
     {
         $res = [];
         foreach ($this->reports as $report) {

@@ -43,7 +43,7 @@ class FavoritesDeleteControllerTest extends AppIntegrationTestCase
         $this->disableCsrfToken();
         $this->authenticateAs('dame');
         $favoriteId = UuidFactory::uuid('favorite.id.dame-apache');
-        $this->delete("/favorites/$favoriteId.json?api-version=v2");
+        $this->delete("/favorites/$favoriteId.json");
         $this->assertResponseCode(403);
     }
 
@@ -51,7 +51,7 @@ class FavoritesDeleteControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('dame');
         $favoriteId = 'invalid-id';
-        $this->deleteJson("/favorites/$favoriteId.json?api-version=v2");
+        $this->deleteJson("/favorites/$favoriteId.json");
         $this->assertError(400, 'The favorite id is not valid.');
     }
 
@@ -59,7 +59,7 @@ class FavoritesDeleteControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('dame');
         $favoriteId = UuidFactory::uuid();
-        $this->deleteJson("/favorites/$favoriteId.json?api-version=v2");
+        $this->deleteJson("/favorites/$favoriteId.json");
         $this->assertError(404, 'The favorite does not exist.');
     }
 
@@ -67,14 +67,14 @@ class FavoritesDeleteControllerTest extends AppIntegrationTestCase
     {
         $this->authenticateAs('ada');
         $favoriteId = UuidFactory::uuid('favorite.id.dame-apache');
-        $this->deleteJson("/favorites/$favoriteId.json?api-version=v2");
+        $this->deleteJson("/favorites/$favoriteId.json");
         $this->assertError(404, 'The favorite does not exist.');
     }
 
     public function testFavoritesDeleteErrorNotAuthenticated()
     {
         $favoriteId = UuidFactory::uuid('favorite.id.dame-apache');
-        $this->deleteJson("/favorites/$favoriteId.json?api-version=v2");
+        $this->deleteJson("/favorites/$favoriteId.json");
         $this->assertAuthenticationError();
     }
 }

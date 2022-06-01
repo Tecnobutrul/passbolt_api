@@ -28,7 +28,7 @@ class IgnoreCreateCommandTest extends DirectorySyncConsoleIntegrationTestCase
      *
      * @return void
      */
-    public function testIgnoreCreateCommandHelp(): void
+    public function testIDirectorygnoreCreateCommandHelp(): void
     {
         $this->exec('directory_sync ignore_create -h');
         $this->assertExitSuccess();

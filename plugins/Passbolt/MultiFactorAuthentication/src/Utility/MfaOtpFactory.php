@@ -17,9 +17,10 @@ declare(strict_types=1);
 namespace Passbolt\MultiFactorAuthentication\Utility;
 
 use App\Utility\UserAccessControl;
-use BaconQrCode\Common\ErrorCorrectionLevel;
 use BaconQrCode\Encoder\Encoder;
-use BaconQrCode\Renderer\Image\Png;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Routing\Router;
@@ -76,23 +77,21 @@ class MfaOtpFactory
      *
      * @param string $provisioningUri provisioning uri
      * @param int|null $width width default 256
-     * @param int|null $height height default 256
      * @param string|null $encoding encoding default ISO-8859-1
      * @return string
      */
-    public static function getQrCodeInline(
+    public static function getQrCodeInlineSvg(
         string $provisioningUri,
         ?int $width = 256,
-        ?int $height = 256,
         ?string $encoding = Encoder::DEFAULT_BYTE_MODE_ECODING
     ): string {
-        $renderer = new Png();
-        $renderer->setHeight($width);
-        $renderer->setWidth($height);
+        $renderer = new ImageRenderer(
+            new RendererStyle($width),
+            new SvgImageBackEnd()
+        );
         $writer = new Writer($renderer);
-        $ecLevel = ErrorCorrectionLevel::L;
-        $inline = base64_encode($writer->writeString($provisioningUri, $encoding, $ecLevel));
+        $inlineSvg = $writer->writeString($provisioningUri, $encoding);
 
-        return "data:image/png;base64,{$inline}";
+        return str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $inlineSvg);
     }
 }

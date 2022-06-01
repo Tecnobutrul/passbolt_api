@@ -40,7 +40,7 @@ class DirectoryResultsIgnoreInvalidTest extends DirectorySyncIntegrationTestCase
      * Test that the invalid users that are returned are correct.
      * Scenario: no filter, 2 invalid users should be returned.
      */
-    public function testIgnoredInvalidUsers()
+    public function testDirectoryIgnoredInvalidUsers()
     {
         $groups = $this->userSyncAction->getDirectory()->getGroups(false);
         $users = $this->userSyncAction->getDirectory()->getUsers(false);
@@ -64,7 +64,7 @@ class DirectoryResultsIgnoreInvalidTest extends DirectorySyncIntegrationTestCase
      * Test that the invalid users that are returned are correct.
      * Scenario: filter on parentGroup 'Administration', only 1 invalid users should be returned.
      */
-    public function testIgnoredInvalidUsersWithGroupFilter()
+    public function testDirectoryIgnoredInvalidUsersWithGroupFilter()
     {
         $groups = $this->userSyncAction->getDirectory()->getGroups(false);
         $users = $this->userSyncAction->getDirectory()->getUsers(false);
@@ -90,7 +90,7 @@ class DirectoryResultsIgnoreInvalidTest extends DirectorySyncIntegrationTestCase
      * Test that the invalid users that are returned are correct.
      * Scenario: no filter, 2 invalid users should be returned.
      */
-    public function testIgnoredInvalidGroups()
+    public function testDirectoryIgnoredInvalidGroups()
     {
         $groups = $this->userSyncAction->getDirectory()->getGroups(false);
         $users = $this->userSyncAction->getDirectory()->getUsers(false);

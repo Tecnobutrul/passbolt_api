@@ -1,6 +1,19 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         2.2.0
+ */
 namespace Passbolt\DirectorySync\Model\Table;
 
 use Cake\ORM\RulesChecker;
@@ -108,7 +121,7 @@ class DirectoryReportsItemsTable extends Table
      * @param \Passbolt\DirectorySync\Actions\Reports\ActionReport $reportItem report item
      * @return bool|\Passbolt\DirectorySync\Model\Entity\DirectoryReportsItem
      */
-    public function create(?string $reportId = null, ActionReport $reportItem)
+    public function create(?string $reportId, ActionReport $reportItem)
     {
         $entity = $this->newEntity([
             'report_id' => $reportId,

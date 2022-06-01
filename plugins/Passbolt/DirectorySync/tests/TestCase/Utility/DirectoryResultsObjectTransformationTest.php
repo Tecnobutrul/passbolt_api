@@ -39,7 +39,7 @@ class DirectoryResultsObjectTransformationTest extends DirectorySyncIntegrationT
      *
      * @throws \Exception
      */
-    public function testUserEntryIdProvidedIsNotTransformed()
+    public function testDirectoryUserEntryIdProvidedIsNotTransformed()
     {
         Configure::write('passbolt.plugins.directorySync.enabled', true);
         $this->loadPlugins(['Passbolt/DirectorySync' => []]);
@@ -76,7 +76,7 @@ class DirectoryResultsObjectTransformationTest extends DirectorySyncIntegrationT
      *
      * @throws \Exception
      */
-    public function testUserEntryTransformNoId()
+    public function testDirectoryUserEntryTransformNoId()
     {
         Configure::write('passbolt.plugins.directorySync.enabled', true);
         $this->loadPlugins(['Passbolt/DirectorySync' => []]);
@@ -112,7 +112,7 @@ class DirectoryResultsObjectTransformationTest extends DirectorySyncIntegrationT
      *
      * @throws \Exception
      */
-    public function testUserEntryTransformEmail()
+    public function testDirectoryUserEntryTransformEmail()
     {
         Configure::write('passbolt.plugins.directorySync.enabled', true);
         $this->loadPlugins(['Passbolt/DirectorySync' => []]);

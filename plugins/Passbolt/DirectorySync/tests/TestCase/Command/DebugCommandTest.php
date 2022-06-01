@@ -31,7 +31,7 @@ class DebugCommandTest extends DirectorySyncConsoleIntegrationTestCase
      *
      * @return void
      */
-    public function testDebugCommandHelp(): void
+    public function testDirectoryDebugCommandHelp(): void
     {
         $this->exec('directory_sync debug -h');
         $this->assertExitSuccess();
@@ -45,7 +45,7 @@ class DebugCommandTest extends DirectorySyncConsoleIntegrationTestCase
      *
      * @return void
      */
-    public function testDebugCommand(): void
+    public function testDirectoryDebugCommand(): void
     {
         $admin = UserFactory::make()->admin()->persist();
         $uac = $this->makeUac($admin);

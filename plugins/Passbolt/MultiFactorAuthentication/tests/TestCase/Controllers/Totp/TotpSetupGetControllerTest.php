@@ -81,7 +81,7 @@ class TotpSetupGetControllerTest extends MfaIntegrationTestCase
         $this->get('/mfa/setup/totp');
         $this->assertResponseOk();
         $this->assertResponseContains('<form');
-        $this->assertResponseContains('<img class="qrcode"');
+        $this->assertResponseContains('<svg');
     }
 
     /**
@@ -96,7 +96,7 @@ class TotpSetupGetControllerTest extends MfaIntegrationTestCase
         $this->loadFixtureScenario(MfaTotpOrganizationOnlyScenario::class);
         $this->getJson('/mfa/setup/totp.json?api-version=v2');
         $this->assertResponseOk();
-        $this->assertNotEmpty($this->_responseJsonBody->otpQrCodeImage);
+        $this->assertNotEmpty($this->_responseJsonBody->otpQrCodeSvg);
         $this->assertNotEmpty($this->_responseJsonBody->otpProvisioningUri);
     }
 }

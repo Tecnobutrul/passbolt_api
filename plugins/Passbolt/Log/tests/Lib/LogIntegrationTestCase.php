@@ -74,8 +74,6 @@ abstract class LogIntegrationTestCase extends AppIntegrationTestCase
         UserAction::destroy();
         TableRegistry::getTableLocator()->clear();
 
-        TableRegistry::getTableLocator()->clear();
-
         $this->Resources = TableRegistry::getTableLocator()->get('Resources');
         $this->Permissions = TableRegistry::getTableLocator()->get('Permissions');
         $this->Secrets = TableRegistry::getTableLocator()->get('Secrets');
