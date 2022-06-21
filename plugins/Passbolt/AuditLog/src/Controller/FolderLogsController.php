@@ -12,39 +12,33 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.7.0
+ * @since         2.0.0
  */
 
 namespace Passbolt\AuditLog\Controller;
 
-use App\Model\Entity\User;
 use Cake\Http\Exception\BadRequestException;
-use Cake\Http\Exception\ForbiddenException;
 use Cake\Validation\Validation;
-use Passbolt\AuditLog\Utility\UserActionLogsFinder;
+use Passbolt\AuditLog\Utility\FolderActionLogsFinder;
+use Passbolt\Folders\Model\Entity\Folder;
 
-class UserLogsController extends BaseLogsController
+class FolderLogsController extends BaseLogsController
 {
     /**
-     * View action logs for a given user.
+     * View action logs for a given folder.
      *
-     * @param string|null $userId user id
+     * @param string|null $folderId folder id
      * @return void
-     * @throws \Cake\Http\Exception\BadRequestException if the user id has the wrong format
+     * @throws \Cake\Http\Exception\BadRequestException if the resource id has the wrong format
      * @throws \Cake\Http\Exception\NotFoundException if the user cannot access the given resource, or if the resource does not exist
-     * @throws \Cake\Http\Exception\ForbiddenException if the UAC is not admin
      */
-    public function view(?string $userId = null)
+    public function view(?string $folderId = null)
     {
-        if (!$this->User->isAdmin()) {
-            throw new ForbiddenException(__('Only administrators can view user logs.'));
-        }
-
         // Check request sanity
-        if (!Validation::uuid($userId)) {
-            throw new BadRequestException(__('The user identifier should be a valid UUID.'));
+        if (!Validation::uuid($folderId)) {
+            throw new BadRequestException(__('The folder id is not valid.'));
         }
 
-        $this->viewByEntity(new UserActionLogsFinder(), User::class, $userId);
+        $this->viewByEntity(new FolderActionLogsFinder(), Folder::class, $folderId);
     }
 }

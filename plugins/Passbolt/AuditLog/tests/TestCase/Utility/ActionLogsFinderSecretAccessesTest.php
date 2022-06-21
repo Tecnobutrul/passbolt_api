@@ -21,7 +21,7 @@ use App\Model\Entity\Role;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
 use Passbolt\AuditLog\Test\TestCase\Traits\ActionLogsOperationsTrait;
-use Passbolt\AuditLog\Utility\ActionLogsFinder;
+use Passbolt\AuditLog\Utility\ResourceActionLogsFinder;
 use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 
 class ActionLogsFinderSecretAccessesTest extends LogIntegrationTestCase
@@ -47,8 +47,8 @@ class ActionLogsFinderSecretAccessesTest extends LogIntegrationTestCase
         $uac = new UserAccessControl(Role::USER, UuidFactory::uuid('user.id.ada'));
         $this->simulateMultipleResourceGetWithSecrets($uac, [UuidFactory::uuid('resource.id.cakephp')]);
 
-        $ActionLogsFinder = new ActionLogsFinder();
-        $actionLogs = $ActionLogsFinder->findForResource($uac, UuidFactory::uuid('resource.id.cakephp'));
+        $ActionLogsFinder = new ResourceActionLogsFinder();
+        $actionLogs = $ActionLogsFinder->find($uac, UuidFactory::uuid('resource.id.cakephp'));
 
         $this->assertEquals(count($actionLogs), 1);
         $this->assertEquals($actionLogs[0]['type'], 'Resource.Secrets.read');
@@ -69,8 +69,8 @@ class ActionLogsFinderSecretAccessesTest extends LogIntegrationTestCase
         $uac = new UserAccessControl(Role::USER, UuidFactory::uuid('user.id.ada'));
         $this->simulateMultipleResourceGetWithSecrets($uac, [UuidFactory::uuid('resource.id.apache'), UuidFactory::uuid('resource.id.cakephp')]);
 
-        $ActionLogsFinder = new ActionLogsFinder();
-        $actionLogs = $ActionLogsFinder->findForResource($uac, UuidFactory::uuid('resource.id.apache'));
+        $ActionLogsFinder = new ResourceActionLogsFinder();
+        $actionLogs = $ActionLogsFinder->find($uac, UuidFactory::uuid('resource.id.apache'));
 
         $this->assertEquals(count($actionLogs), 1);
         $this->assertEquals($actionLogs[0]['type'], 'Resource.Secrets.read');

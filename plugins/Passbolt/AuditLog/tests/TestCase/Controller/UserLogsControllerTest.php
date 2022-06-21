@@ -12,13 +12,11 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.0.0
+ * @since         3.7.0
  */
 
 namespace Passbolt\AuditLog\Test\TestCase\Controller;
 
-use App\Test\Factory\ResourceFactory;
-use App\Test\Factory\UserFactory;
 use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 
 /**
@@ -28,20 +26,9 @@ class UserLogsControllerTest extends LogIntegrationTestCase
 {
     public function testAuditLogUserLogsControllerViewByResourceEmpty()
     {
-        $user = UserFactory::make()->user()->persist();
-        $resource = ResourceFactory::make()->withCreatorAndPermission($user)->persist();
-        $this->logInAs($user);
-        $this->getJson("/actionlog/resource/{$resource->id}.json?api-version=v2");
-        $this->assertSuccess();
-        $this->assertEmpty($this->_responseJsonBody);
-    }
-
-    public function testAuditLogUserLogsControllerViewByResourceUserDoesNotHavePermission()
-    {
-        $resource = ResourceFactory::make()->withCreator(UserFactory::make()->user())->persist();
-        $user = $resource->creator;
-        $this->logInAs($user);
-        $this->getJson("/actionlog/resource/{$resource->id}.json?api-version=v2");
-        $this->assertError(404, 'The resource does not exist.');
+        $this->logInAsUser();
+        $this->getJson('/actionlog/user/foo.json');
+        $this->assertResponseCode(403);
+        $this->assertResponseContains('Only administrators can view user logs.');
     }
 }

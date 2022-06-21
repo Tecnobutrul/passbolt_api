@@ -12,39 +12,33 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.7.0
+ * @since         2.0.0
  */
 
 namespace Passbolt\AuditLog\Controller;
 
-use App\Model\Entity\User;
+use App\Model\Entity\Resource;
 use Cake\Http\Exception\BadRequestException;
-use Cake\Http\Exception\ForbiddenException;
 use Cake\Validation\Validation;
-use Passbolt\AuditLog\Utility\UserActionLogsFinder;
+use Passbolt\AuditLog\Utility\ResourceActionLogsFinder;
 
-class UserLogsController extends BaseLogsController
+class ResourceLogsController extends BaseLogsController
 {
     /**
-     * View action logs for a given user.
+     * View action logs for a given resource.
      *
-     * @param string|null $userId user id
+     * @param string|null $resourceId resource id
      * @return void
-     * @throws \Cake\Http\Exception\BadRequestException if the user id has the wrong format
+     * @throws \Cake\Http\Exception\BadRequestException if the resource id has the wrong format
      * @throws \Cake\Http\Exception\NotFoundException if the user cannot access the given resource, or if the resource does not exist
-     * @throws \Cake\Http\Exception\ForbiddenException if the UAC is not admin
      */
-    public function view(?string $userId = null)
+    public function view(?string $resourceId = null)
     {
-        if (!$this->User->isAdmin()) {
-            throw new ForbiddenException(__('Only administrators can view user logs.'));
-        }
-
         // Check request sanity
-        if (!Validation::uuid($userId)) {
-            throw new BadRequestException(__('The user identifier should be a valid UUID.'));
+        if (!Validation::uuid($resourceId)) {
+            throw new BadRequestException(__('The resource identifier should be a valid UUID.'));
         }
 
-        $this->viewByEntity(new UserActionLogsFinder(), User::class, $userId);
+        $this->viewByEntity(new ResourceActionLogsFinder(), Resource::class, $resourceId);
     }
 }

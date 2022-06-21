@@ -52,6 +52,9 @@ class ActionLogResultsParser
     public const TYPE_FOLDER_CREATED = 'Folders.created';
     public const TYPE_FOLDER_UPDATED = 'Folders.updated';
     public const TYPE_FOLDER_DELETED = 'Folders.deleted';
+    public const TYPE_USER_CREATED = 'Users.created';
+    public const TYPE_USER_UPDATED = 'Users.updated';
+    public const TYPE_USER_DELETED = 'Users.deleted';
 
     /**
      * ActionLogResultsParser constructor.
@@ -72,7 +75,7 @@ class ActionLogResultsParser
      *
      * @return array list of entries
      */
-    public function parse()
+    public function parse(): array
     {
         foreach ($this->actionLogs as $actionLog) {
             $this->addEntries($actionLog);
@@ -89,7 +92,7 @@ class ActionLogResultsParser
      * @param \Passbolt\Log\Model\Entity\ActionLog $actionLog actionLog object
      * @return array corresponding entry
      */
-    protected function _addEntry(string $type, array $data, ActionLog $actionLog)
+    protected function _addEntry(string $type, array $data, ActionLog $actionLog): array
     {
         $entry = [
             'action_log_id' => $actionLog->id,
@@ -114,7 +117,7 @@ class ActionLogResultsParser
      * @param array $entry entry
      * @return string entry id
      */
-    protected function getEntryId(array $entry)
+    protected function getEntryId(array $entry): string
     {
         $nbEntriesForActionLog = 0;
 
@@ -124,9 +127,7 @@ class ActionLogResultsParser
             }
         }
 
-        $id = UuidFactory::uuid($entry['action_log_id'] . $nbEntriesForActionLog);
-
-        return $id;
+        return UuidFactory::uuid($entry['action_log_id'] . $nbEntriesForActionLog);
     }
 
     /**
@@ -138,20 +139,20 @@ class ActionLogResultsParser
     protected function _processResourcesCrudOperations(ActionLog $actionLog)
     {
         foreach ($actionLog->entities_history as $entityHistory) {
-            if ($entityHistory->foreign_model == 'Resources') {
+            if ($entityHistory->foreign_model === 'Resources') {
                 $data = [
                     'resource' => $entityHistory->resource->toArray(),
                 ];
 
-                if ($entityHistory->crud == EntityHistory::CRUD_CREATE) {
+                if ($entityHistory->crud === EntityHistory::CRUD_CREATE) {
                     $type = self::TYPE_RESOURCE_CREATED;
                 }
 
-                if ($entityHistory->crud == EntityHistory::CRUD_UPDATE) {
+                if ($entityHistory->crud === EntityHistory::CRUD_UPDATE) {
                     $type = self::TYPE_RESOURCE_UPDATED;
                 }
 
-                if ($entityHistory->crud == EntityHistory::CRUD_DELETE) {
+                if ($entityHistory->crud === EntityHistory::CRUD_DELETE) {
                     $type = self::TYPE_RESOURCE_DELETED;
                 }
 
@@ -171,21 +172,54 @@ class ActionLogResultsParser
     protected function _processFoldersCrudOperations(ActionLog $actionLog)
     {
         foreach ($actionLog->entities_history as $entityHistory) {
-            if ($entityHistory->foreign_model == 'FoldersHistory') {
+            if ($entityHistory->foreign_model === 'FoldersHistory') {
                 $data = [
                     'folder' => $entityHistory->folders_history->toArray(),
                 ];
 
-                if ($entityHistory->crud == EntityHistory::CRUD_CREATE) {
+                if ($entityHistory->crud === EntityHistory::CRUD_CREATE) {
                     $type = self::TYPE_FOLDER_CREATED;
                 }
 
-                if ($entityHistory->crud == EntityHistory::CRUD_UPDATE) {
+                if ($entityHistory->crud === EntityHistory::CRUD_UPDATE) {
                     $type = self::TYPE_FOLDER_UPDATED;
                 }
 
-                if ($entityHistory->crud == EntityHistory::CRUD_DELETE) {
+                if ($entityHistory->crud === EntityHistory::CRUD_DELETE) {
                     $type = self::TYPE_FOLDER_DELETED;
+                }
+
+                if (isset($type)) {
+                    $this->_addEntry($type, $data, $actionLog);
+                }
+            }
+        }
+    }
+
+    /**
+     * Process users crud operations.
+     *
+     * @param \Passbolt\Log\Model\Entity\ActionLog $actionLog action log
+     * @return void
+     */
+    protected function _processUsersCrudOperations(ActionLog $actionLog)
+    {
+        foreach ($actionLog->entities_history as $entityHistory) {
+            if ($entityHistory->foreign_model === 'Users') {
+                $data = [
+                    'user' => $entityHistory->user->toArray(),
+                ];
+
+                if ($entityHistory->crud === EntityHistory::CRUD_CREATE) {
+                    $type = self::TYPE_USER_CREATED;
+                }
+
+                if ($entityHistory->crud === EntityHistory::CRUD_UPDATE) {
+                    $type = self::TYPE_USER_UPDATED;
+                }
+
+                if ($entityHistory->crud === EntityHistory::CRUD_DELETE) {
+                    $type = self::TYPE_USER_DELETED;
                 }
 
                 if (isset($type)) {
@@ -210,7 +244,7 @@ class ActionLogResultsParser
         ];
 
         foreach ($actionLog->entities_history as $entityHistory) {
-            if ($entityHistory->foreign_model == 'SecretsHistory' && isset($entityHistory->secrets_history)) {
+            if ($entityHistory->foreign_model === 'SecretsHistory' && isset($entityHistory->secrets_history)) {
                 $secretUpdated = true;
                 if (!isset($data['resource'])) {
                     $data['resource'] = $entityHistory->secrets_history->secrets_history_resource;
@@ -233,7 +267,7 @@ class ActionLogResultsParser
     protected function _processSecretAccessesOperations(ActionLog $actionLog)
     {
         foreach ($actionLog->entities_history as $entityHistory) {
-            if ($entityHistory->foreign_model == 'SecretAccesses') {
+            if ($entityHistory->foreign_model === 'SecretAccesses') {
                 // If the resources filter is set, and the current resource is not in the filter, we skip the entry.
                 if (
                     !empty($this->filters)
@@ -247,7 +281,7 @@ class ActionLogResultsParser
                     'resource' => $entityHistory->secret_access->secret_access_resource->toArray(),
                 ];
 
-                if ($entityHistory->crud == EntityHistory::CRUD_CREATE) {
+                if ($entityHistory->crud === EntityHistory::CRUD_CREATE) {
                     $this->_addEntry(self::TYPE_SECRETS_READ, $data, $actionLog);
                 }
             }
@@ -273,11 +307,11 @@ class ActionLogResultsParser
         foreach ($actionLog->entities_history as $entityHistory) {
             if ($entityHistory->foreign_model === 'PermissionsHistory') {
                 // Added permissions
-                if ($entityHistory->crud == EntityHistory::CRUD_CREATE) {
+                if ($entityHistory->crud === EntityHistory::CRUD_CREATE) {
                     $type = 'added';
-                } elseif ($entityHistory->crud == EntityHistory::CRUD_DELETE) {
+                } elseif ($entityHistory->crud === EntityHistory::CRUD_DELETE) {
                     $type = 'removed';
-                } elseif ($entityHistory->crud == EntityHistory::CRUD_UPDATE) {
+                } elseif ($entityHistory->crud === EntityHistory::CRUD_UPDATE) {
                     $type = 'updated';
                 }
 
@@ -362,6 +396,7 @@ class ActionLogResultsParser
         if (Configure::read('passbolt.plugins.folders.enabled')) {
             $this->_processFoldersCrudOperations($actionLog);
         }
+        $this->_processUsersCrudOperations($actionLog);
     }
 
     /**
@@ -369,7 +404,7 @@ class ActionLogResultsParser
      *
      * @return array entries
      */
-    public function getEntries()
+    public function getEntries(): array
     {
         return $this->entries;
     }
