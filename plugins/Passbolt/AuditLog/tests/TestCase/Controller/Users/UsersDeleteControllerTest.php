@@ -27,7 +27,7 @@ class UsersDeleteControllerTest extends LogIntegrationTestCase
     public function testUsersDeleteSuccess()
     {
         RoleFactory::make()->guest()->persist();
-        $this->logInAsAdmin();
+        $admin = $this->logInAsAdmin();
         $user = UserFactory::make()->user()->persist();
         $this->deleteJson("/users/{$user->id}.json?api-version=v2");
         $this->assertSuccess();
@@ -41,5 +41,26 @@ class UsersDeleteControllerTest extends LogIntegrationTestCase
             'crud' => EntityHistory::CRUD_DELETE,
             'action_log_id' => ActionLogFactory::find()->firstOrFail()->get('id'),
         ]);
+
+        // Assert User Action Logs
+        $this->getJson("/actionlog/user/{$user->get('id')}.json");
+        $this->assertResponseOk();
+        $body = json_decode(json_encode($this->_responseJsonBody), true);
+        $this->assertCount(1, $body);
+        $creator = $body[0]['creator'];
+        $data = $body[0]['data'];
+        $expected = ['user' => [
+            'id' => $user->get('id'),
+            'role_id' => $user->role_id,
+            'username' => $user->username,
+            'profile' => [
+                'first_name' => $user->profile->first_name,
+                'last_name' => $user->profile->last_name,
+            ],
+            'last_logged_in' => null,
+        ]];
+        $this->assertSame($expected, $data);
+        $this->assertSame($admin->id, $creator['id']);
+        $this->assertSame($admin->profile->first_name, $creator['profile']['first_name']);
     }
 }

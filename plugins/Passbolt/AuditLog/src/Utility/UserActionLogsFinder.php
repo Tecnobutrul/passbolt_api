@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace Passbolt\AuditLog\Utility;
 
 use App\Utility\UserAccessControl;
+use Cake\Database\Expression\IdentifierExpression;
 use Cake\ORM\Query;
 use Cake\ORM\TableRegistry;
 
@@ -31,17 +32,14 @@ class UserActionLogsFinder extends BaseActionLogsFinder
         // Build query.
         $query = TableRegistry::getTableLocator()->get('Passbolt/Log.ActionLogs')
             ->find()
-            ->where(['ActionLogs.status' => 1,]);
+            ->where(['ActionLogs.status' => 1,])
+            ->contain(['Actions' => [
+                'fields' => ['Actions.name'],
+            ]])
+            ->group(['ActionLogs.id', 'Actions.name']);
 
-        // Filter the user
-        $query
-            ->innerJoinWith('EntitiesHistory', function (Query $q) use ($entityId) {
-                return $q->where([
-                    'EntitiesHistory.foreign_key' => $entityId,
-                    'EntitiesHistory.foreign_model' => 'Users',
-                ]);
-            })
-            ->group(['ActionLogs.id']);
+        $this->_filterQueryByUserId($query, $entityId);
+
         // Join the action log related user
         $this->joinUser($query);
         // Join the history related user
@@ -64,5 +62,55 @@ class UserActionLogsFinder extends BaseActionLogsFinder
         $resultParser = new ActionLogResultsParser($actionLogs, ['users' => [$entityId]]);
 
         return $resultParser->parse();
+    }
+
+    /**
+     * Filter query by user id
+     *
+     * @param \Cake\ORM\Query $query query
+     * @param string $userId user id
+     * @return void
+     */
+    protected function _filterQueryByUserId(Query $query, string $userId): void
+    {
+        $subQuery = $this->_findActionLogIdsForUserCrud($userId);
+
+        $query->join([
+            'userActionLogs' => [
+                'table' => $subQuery,
+                'alias' => 'userActionLogs',
+                'type' => 'INNER',
+                'conditions' => ['userActionLogs.ActionLogs__id' => new IdentifierExpression('ActionLogs.id')],
+            ],
+        ]);
+
+        $query->order([
+            'ActionLogs.created' => 'DESC',
+        ]);
+    }
+
+    /**
+     * Find ActionLog ids for a given user id for CRUD actions
+     *
+     * @param string $userId user id
+     * @return \Cake\ORM\Query query
+     */
+    protected function _findActionLogIdsForUserCrud(string $userId): Query
+    {
+        return $this->ActionLogs
+            ->find()
+            ->select(['ActionLogs__id' => 'ActionLogs.id', 'Actions__name' => 'Actions.name'])
+            ->contain('EntitiesHistory')
+            ->innerJoinWith('Actions')
+            ->innerJoinWith('EntitiesHistory', function (Query $q) use ($userId) {
+                return $q->where([
+                    'EntitiesHistory.foreign_key' => $userId,
+                    'EntitiesHistory.foreign_model' => 'Users',
+                ]);
+            })
+            ->where([
+                'ActionLogs.status' => 1,
+            ])
+            ->group(['ActionLogs.id', 'Actions.name']);
     }
 }

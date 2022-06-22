@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\AuditLog\Test\TestCase\Controller;
 
+use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
 use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 
@@ -46,6 +47,15 @@ class UserLogsControllerTest extends LogIntegrationTestCase
         $id = UuidFactory::uuid();
         $this->logInAsAdmin();
         $this->getJson('/actionlog/user/' . $id . '.json');
+        $this->assertResponseCode(400);
+        $this->assertResponseContains('The user does not exist.');
+    }
+
+    public function testUserLogsController_User_Exists()
+    {
+        $user = UserFactory::make()->persist();
+        $this->logInAsAdmin();
+        $this->getJson('/actionlog/user/' . $user->id . '.json');
         $this->assertResponseOk();
     }
 }

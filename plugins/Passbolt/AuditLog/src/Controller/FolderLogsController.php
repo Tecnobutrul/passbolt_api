@@ -35,7 +35,7 @@ class FolderLogsController extends BaseLogsController
     {
         // Check request sanity
         if (!Validation::uuid($folderId)) {
-            throw new BadRequestException(__('The folder id is not valid.'));
+            throw new BadRequestException(__('The folder identifier should be a valid UUID.'));
         }
 
         $this->viewByEntity(new FolderActionLogsFinder(), $folderId);
