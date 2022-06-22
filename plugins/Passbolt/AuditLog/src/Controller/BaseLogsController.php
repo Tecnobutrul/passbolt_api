@@ -48,13 +48,11 @@ abstract class BaseLogsController extends AppController
 
     /**
      * @param \Passbolt\AuditLog\Utility\BaseActionLogsFinder $logsFinder Log Finder
-     * @param string $entityType Entity model name.
      * @param string $entityId Uuid of the entity handled.
      * @return void
      * @throws \Cake\Http\Exception\NotFoundException if the user cannot access the given entity, or if the entity does not exist
-     * @throws \Cake\Http\Exception\InternalErrorException if an entity else than a resource or a folder is handled.
      */
-    protected function viewByEntity(BaseActionLogsFinder $logsFinder, string $entityType, string $entityId): void
+    protected function viewByEntity(BaseActionLogsFinder $logsFinder, string $entityId): void
     {
         // Get pagination options.
         $options = $this->Paginator->mergeOptions('', $this->paginate);

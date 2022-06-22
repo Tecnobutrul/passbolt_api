@@ -19,29 +19,43 @@ namespace Passbolt\AuditLog\Utility;
 
 use App\Utility\UserAccessControl;
 use Cake\ORM\Query;
+use Cake\ORM\TableRegistry;
 
 class UserActionLogsFinder extends BaseActionLogsFinder
 {
     /**
      * @inheritDoc
      */
-    public function find(UserAccessControl $user, string $entityId, ?array $options = []): array
+    public function find(UserAccessControl $uac, string $entityId, ?array $options = []): array
     {
         // Build query.
-        $query = $this->_getBaseQuery();
+        $query = TableRegistry::getTableLocator()->get('Passbolt/Log.ActionLogs')
+            ->find()
+            ->where(['ActionLogs.status' => 1,]);
+
         // Filter the user
-        $query->where(['EntitiesHistory.foreign_key' => $entityId]);
-        // Join the user and profile
-        $query->contain('EntitiesHistory.Users', function (Query $q) {
-            return $q
-                ->select(['Users.id', 'Users.role_id', 'Users.username'])
-                ->contain('Profiles', function (Query $q) {
-                    return $q->select([
-                        'Profiles.first_name',
-                        'Profiles.last_name',
-                    ]);
-                });
-        });
+        $query
+            ->innerJoinWith('EntitiesHistory', function (Query $q) use ($entityId) {
+                return $q->where([
+                    'EntitiesHistory.foreign_key' => $entityId,
+                    'EntitiesHistory.foreign_model' => 'Users',
+                ]);
+            })
+            ->group(['ActionLogs.id']);
+        // Join the action log related user
+        $this->joinUser($query);
+        // Join the history related user
+        $query
+            ->contain('EntitiesHistory.Users', function (Query $q) {
+                return $q
+                    ->select(['Users.id', 'Users.role_id', 'Users.username'])
+                    ->contain('Profiles', function (Query $q) {
+                        return $q->select([
+                            'Profiles.first_name',
+                            'Profiles.last_name',
+                        ]);
+                    });
+            });
 
         if (!empty($options)) {
             $query = $this->_paginate($query, $options);

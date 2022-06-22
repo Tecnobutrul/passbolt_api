@@ -29,12 +29,12 @@ abstract class BaseActionLogsFinder
     /**
      * Find action logs for a given entity
      *
-     * @param \App\Utility\UserAccessControl $user user
+     * @param \App\Utility\UserAccessControl $uac UAC
      * @param string $entityId entity id
      * @param array|null $options options array
      * @return array
      */
-    abstract public function find(UserAccessControl $user, string $entityId, ?array $options = []): array;
+    abstract public function find(UserAccessControl $uac, string $entityId, ?array $options = []): array;
 
     /**
      * @var \Passbolt\Log\Model\Table\ActionLogsTable
@@ -68,24 +68,7 @@ abstract class BaseActionLogsFinder
         $query->contain(['Actions' => [
             'fields' => ['Actions.name']]]);
 
-        $query->contain(['Users' => [
-                'fields' => [
-                    'Users.id',
-                    'Users.username']]]);
-
-        $query->contain(['Users.Profiles' => [
-                'Avatars' => [
-                    'queryBuilder' => AvatarsTable::addContainAvatar()['Avatars'],
-                    'fields' => [
-                        'Avatars.id',
-                        'Avatars.profile_id',
-                    ],
-                ],
-                'fields' => [
-                    'Profiles.first_name',
-                    'Profiles.last_name']]]);
-
-        $query->innerJoinWith('Users.Profiles');
+        $this->joinUser($query);
 
         $query->contain(['EntitiesHistory.PermissionsHistory' => [
             'fields' => [
@@ -171,6 +154,34 @@ abstract class BaseActionLogsFinder
         }
 
         return $query;
+    }
+
+    /**
+     * Contain the user associated of the action log
+     *
+     * @param \Cake\ORM\Query $query Query
+     * @return void
+     */
+    public function joinUser(Query $query): void
+    {
+        $query->contain(['Users' => [
+            'fields' => [
+                'Users.id',
+                'Users.username']]]);
+
+        $query->contain(['Users.Profiles' => [
+            'Avatars' => [
+                'queryBuilder' => AvatarsTable::addContainAvatar()['Avatars'],
+                'fields' => [
+                    'Avatars.id',
+                    'Avatars.profile_id',
+                ],
+            ],
+            'fields' => [
+                'Profiles.first_name',
+                'Profiles.last_name']]]);
+
+        $query->innerJoinWith('Users.Profiles');
     }
 
     /**

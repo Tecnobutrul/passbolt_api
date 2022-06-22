@@ -167,10 +167,10 @@ class ResourceActionLogsFinder extends BaseActionLogsFinder
     /**
      * @inheritDoc
      */
-    public function find(UserAccessControl $user, string $entityId, ?array $options = []): array
+    public function find(UserAccessControl $uac, string $entityId, ?array $options = []): array
     {
         // Check that user can access to resource.
-        $this->_checkUserCanAccessResource($user, $entityId);
+        $this->_checkUserCanAccessResource($uac, $entityId);
 
         // Build query.
         $q = $this->_getBaseQuery();

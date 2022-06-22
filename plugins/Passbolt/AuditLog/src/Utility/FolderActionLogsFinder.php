@@ -98,7 +98,7 @@ class FolderActionLogsFinder extends BaseActionLogsFinder
     /**
      * @inheritDoc
      */
-    public function find(UserAccessControl $user, string $entityId, ?array $options = []): array
+    public function find(UserAccessControl $uac, string $entityId, ?array $options = []): array
     {
         if (!Configure::read('passbolt.plugins.folders.enabled')) {
             return [];
@@ -107,7 +107,7 @@ class FolderActionLogsFinder extends BaseActionLogsFinder
         // Check that the folder exists and is accessible.
         /** @var \Passbolt\Folders\Model\Table\FoldersTable $Folders */
         $Folders = TableRegistry::getTableLocator()->get('Passbolt/Folders.Folders');
-        $folder = $Folders->findView($user->getId(), $entityId, $options)->first();
+        $folder = $Folders->findView($uac->getId(), $entityId, $options)->first();
 
         if (empty($folder)) {
             throw new NotFoundException('The folder does not exist.');

@@ -17,7 +17,6 @@ declare(strict_types=1);
 
 namespace Passbolt\AuditLog\Controller;
 
-use App\Model\Entity\Resource;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Validation\Validation;
 use Passbolt\AuditLog\Utility\ResourceActionLogsFinder;
@@ -39,6 +38,6 @@ class ResourceLogsController extends BaseLogsController
             throw new BadRequestException(__('The resource identifier should be a valid UUID.'));
         }
 
-        $this->viewByEntity(new ResourceActionLogsFinder(), Resource::class, $resourceId);
+        $this->viewByEntity(new ResourceActionLogsFinder(), $resourceId);
     }
 }

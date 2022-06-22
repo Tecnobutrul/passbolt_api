@@ -20,7 +20,6 @@ namespace Passbolt\AuditLog\Controller;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Validation\Validation;
 use Passbolt\AuditLog\Utility\FolderActionLogsFinder;
-use Passbolt\Folders\Model\Entity\Folder;
 
 class FolderLogsController extends BaseLogsController
 {
@@ -39,6 +38,6 @@ class FolderLogsController extends BaseLogsController
             throw new BadRequestException(__('The folder id is not valid.'));
         }
 
-        $this->viewByEntity(new FolderActionLogsFinder(), Folder::class, $folderId);
+        $this->viewByEntity(new FolderActionLogsFinder(), $folderId);
     }
 }

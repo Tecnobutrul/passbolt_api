@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\AuditLog\Test\TestCase\Controller;
 
+use App\Utility\UuidFactory;
 use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 
 /**
@@ -24,11 +25,27 @@ use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
  */
 class UserLogsControllerTest extends LogIntegrationTestCase
 {
-    public function testAuditLogUserLogsControllerViewByResourceEmpty()
+    public function testUserLogsController_Not_Admin_Should_Not_Be_Authorized()
     {
         $this->logInAsUser();
         $this->getJson('/actionlog/user/foo.json');
         $this->assertResponseCode(403);
         $this->assertResponseContains('Only administrators can view user logs.');
+    }
+
+    public function testUserLogsController_User_Id_Not_UUID()
+    {
+        $this->logInAsAdmin();
+        $this->getJson('/actionlog/user/foo.json');
+        $this->assertResponseCode(400);
+        $this->assertResponseContains('The user identifier should be a valid UUID.');
+    }
+
+    public function testUserLogsController_User_Does_Not_Exist()
+    {
+        $id = UuidFactory::uuid();
+        $this->logInAsAdmin();
+        $this->getJson('/actionlog/user/' . $id . '.json');
+        $this->assertResponseOk();
     }
 }
