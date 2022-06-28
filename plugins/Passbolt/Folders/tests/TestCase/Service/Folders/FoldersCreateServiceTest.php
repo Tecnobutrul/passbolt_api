@@ -32,15 +32,11 @@ use App\Test\Lib\Model\EmailQueueTrait;
 use App\Test\Lib\Model\PermissionsModelTrait;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
-use Cake\Core\Configure;
 use Cake\Event\EventDispatcherTrait;
-use Cake\Event\EventManager;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\Utility\Hash;
 use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
-use Passbolt\Folders\Notification\Email\FoldersEmailRedactorPool;
-use Passbolt\Folders\Notification\NotificationSettings\FolderNotificationSettingsDefinition;
 use Passbolt\Folders\Service\Folders\FoldersCreateService;
 use Passbolt\Folders\Test\Lib\FoldersTestCase;
 use Passbolt\Folders\Test\Lib\Model\FoldersModelTrait;
@@ -84,14 +80,12 @@ class FoldersCreateServiceTest extends FoldersTestCase
     public function setUp(): void
     {
         parent::setUp();
-        Configure::write('passbolt.plugins.folders', ['enabled' => true]);
-        /** @var FoldersCreateService $service */
-        $this->service = new FoldersCreateService();
 
         $this->loadNotificationSettings();
-        EventManager::instance()->on(new FolderNotificationSettingsDefinition());
-        EventManager::instance()->on(new FoldersEmailRedactorPool());
         (new EmailSubscriptionDispatcher())->collectSubscribedEmailRedactors();
+
+        /** @var FoldersCreateService $service */
+        $this->service = new FoldersCreateService();
     }
 
     public function tearDown(): void
@@ -164,7 +158,6 @@ class FoldersCreateServiceTest extends FoldersTestCase
 
     public function testCreateFolder_CommonSuccess_NotifyUserAfterCreate()
     {
-        $this->loadPlugins(['Passbolt/Folders' => [], 'Passbolt/EmailDigest' => []]);
         $userId = UuidFactory::uuid('user.id.ada');
         $uac = new UserAccessControl(Role::USER, $userId);
         $folderData = ['name' => 'A'];

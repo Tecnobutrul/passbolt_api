@@ -17,36 +17,18 @@ declare(strict_types=1);
 namespace Passbolt\Folders\Test\Lib;
 
 use App\Test\Lib\AppIntegrationTestCase;
-use Cake\Core\Configure;
-use Cake\ORM\TableRegistry;
-use Passbolt\Folders\Model\Behavior\FolderizableBehavior;
 
 abstract class FoldersIntegrationTestCase extends AppIntegrationTestCase
 {
     public function setUp(): void
     {
         parent::setUp();
-
-        Configure::write('passbolt.plugins.folders.enabled', true);
-
-        $permissionsTable = TableRegistry::getTableLocator()->get('Permissions');
-        $permissionsTable->belongsTo('Passbolt/Log.PermissionsHistory', [
-            'foreignKey' => 'foreign_key',
-        ]);
-
-        $resourcesTable = TableRegistry::getTableLocator()->get('Resources');
-        $resourcesTable->belongsTo('Passbolt/Log.EntitiesHistory', [
-            'foreignKey' => 'foreign_key',
-        ]);
-
-        $resourcesTable = TableRegistry::getTableLocator()->get('Resources');
-        $resourcesTable->addBehavior(FolderizableBehavior::class);
+        $this->enableFeaturePlugin('Folders');
     }
 
     public function tearDown(): void
     {
         parent::tearDown();
-
-        Configure::write('passbolt.plugins.folders.enabled', false);
+        $this->disableFeaturePlugin('Folders');
     }
 }

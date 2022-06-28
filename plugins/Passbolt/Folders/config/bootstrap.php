@@ -15,23 +15,8 @@
 
 use App\Command\CleanupCommand;
 use Cake\Core\Configure;
-use Cake\Event\EventManager;
-use Passbolt\Folders\EventListener\AddFolderizableBehavior;
-use Passbolt\Folders\EventListener\GroupsUsersEventListener;
-use Passbolt\Folders\EventListener\PermissionsModelInitializeEventListener;
-use Passbolt\Folders\EventListener\ResourcesEventListener;
-use Passbolt\Folders\Notification\Email\FoldersEmailRedactorPool;
-use Passbolt\Folders\Notification\NotificationSettings\FolderNotificationSettingsDefinition;
 
 Configure::load('Passbolt/Folders.config', 'default', true);
-
-EventManager::instance()
-    ->on(new ResourcesEventListener()) //Add / remove folders relations when a resources is created / deleted
-    ->on(new GroupsUsersEventListener()) // Add / remove folders relations when a group members list is updated
-    ->on(new AddFolderizableBehavior()) // Decorate the core/other plugins table classes that can be organized in folder
-    ->on(new PermissionsModelInitializeEventListener()) // Decorate the permissions table class to add cleanup method
-    ->on(new FolderNotificationSettingsDefinition())// Add email notification settings definition
-    ->on(new FoldersEmailRedactorPool()); // Register email redactors
 
 // Add cleanup tasks jobs.
 if (PHP_SAPI === 'cli') {

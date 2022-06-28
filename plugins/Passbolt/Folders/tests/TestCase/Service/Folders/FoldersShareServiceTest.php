@@ -36,15 +36,12 @@ use App\Test\Lib\Model\PermissionsModelTrait;
 use App\Test\Lib\Utility\FixtureProviderTrait;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
-use Cake\Event\EventManager;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\Utility\Hash;
 use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
-use Passbolt\Folders\Notification\Email\FoldersEmailRedactorPool;
-use Passbolt\Folders\Notification\NotificationSettings\FolderNotificationSettingsDefinition;
 use Passbolt\Folders\Service\Folders\FoldersShareService;
 use Passbolt\Folders\Test\Lib\FoldersTestCase;
 use Passbolt\Folders\Test\Lib\Model\FoldersModelTrait;
@@ -90,12 +87,11 @@ class FoldersShareServiceTest extends FoldersTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->service = new FoldersShareService();
 
         $this->loadNotificationSettings();
-        EventManager::instance()->on(new FolderNotificationSettingsDefinition());
-        EventManager::instance()->on(new FoldersEmailRedactorPool());
         (new EmailSubscriptionDispatcher())->collectSubscribedEmailRedactors();
+
+        $this->service = new FoldersShareService();
     }
 
     public function tearDown(): void
@@ -207,7 +203,6 @@ class FoldersShareServiceTest extends FoldersTestCase
 
     public function testShareFolderSuccess_NotifyUserAfterShare()
     {
-                $this->loadPlugins(['Passbolt/Folders' => [], 'Passbolt/EmailDigest' => []]);
         [$folderA, $userAId] = $this->insertFixture_ShareFolderSuccess_AddUser();
         $uac = new UserAccessControl(Role::USER, $userAId);
 
