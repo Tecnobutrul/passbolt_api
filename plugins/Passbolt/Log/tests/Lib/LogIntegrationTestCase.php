@@ -73,7 +73,6 @@ abstract class LogIntegrationTestCase extends AppIntegrationTestCase
     public function setUp(): void
     {
         parent::setUp();
-        Configure::write('passbolt.plugins.tags.enabled', true);
         Configure::write('passbolt.plugins.log.enabled', true);
 
         UserAction::destroy();

@@ -76,7 +76,7 @@ abstract class AppIntegrationTestCase extends TestCase
         $this->cleanup();
         $this->enableCsrfToken();
         $this->loadRoutes();
-        Configure::write('passbolt.plugins.tags.enabled', false);
+        $this->disableFeaturePlugin('Tags');
         Configure::write('passbolt.plugins.multiFactorAuthentication.enabled', false);
         Configure::write('passbolt.plugins.log.enabled', false);
         Configure::write('passbolt.plugins.folders.enabled', false);

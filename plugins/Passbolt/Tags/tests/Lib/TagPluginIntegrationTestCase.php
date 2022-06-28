@@ -18,6 +18,7 @@ namespace Passbolt\Tags\Test\Lib;
 
 use App\Test\Lib\AppIntegrationTestCase;
 use Cake\Core\Configure;
+use CakephpFixtureFactories\ORM\FactoryTableRegistry;
 
 abstract class TagPluginIntegrationTestCase extends AppIntegrationTestCase
 {
@@ -28,6 +29,11 @@ abstract class TagPluginIntegrationTestCase extends AppIntegrationTestCase
      */
     public function setUp(): void
     {
+        /**
+         * @psalm-suppress InternalMethod
+         * @psalm-suppress InternalClass
+         */
+        FactoryTableRegistry::getTableLocator()->clear();
         parent::setUp();
         Configure::write('passbolt.plugins.tags.enabled', true);
     }

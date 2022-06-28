@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since         2.13.0
  */
 
-namespace Passbolt\Folders\Test\TestCase\Service\Groups;
+namespace Passbolt\Folders\Test\TestCase\Service\GroupsUsers;
 
 use App\Model\Entity\Permission;
 use App\Test\Fixture\Base\GroupsFixture;
@@ -28,17 +28,17 @@ use App\Test\Fixture\Base\UsersFixture;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
-use Passbolt\Folders\Service\Groups\GroupsAfterUserRemovedService;
+use Passbolt\Folders\Service\GroupsUsers\HandleGroupUserDeletedService;
 use Passbolt\Folders\Test\Lib\FoldersTestCase;
 use Passbolt\Folders\Test\Lib\Model\FoldersModelTrait;
 use Passbolt\Folders\Test\Lib\Model\FoldersRelationsModelTrait;
 
 /**
- * Passbolt\Folders\Service\Groups\GroupsAfterUserRemovedService Test Case
+ * Passbolt\Folders\Service\Groups\HandleGroupUserDeletedServices Test Case
  *
- * @uses \Passbolt\Folders\Service\Groups\GroupsAfterUserRemovedService
+ * @uses \Passbolt\Folders\Service\GroupsUsers\HandleGroupUserDeletedService
  */
-class GroupsAfterUserRemovedServiceTest extends FoldersTestCase
+class HandleGroupUserDeletedServiceTest extends FoldersTestCase
 {
     use FoldersModelTrait;
     use FoldersRelationsModelTrait;
@@ -59,7 +59,7 @@ class GroupsAfterUserRemovedServiceTest extends FoldersTestCase
     private $groupsUsersTable;
 
     /**
-     * @var GroupsAfterUserRemovedService
+     * @var HandleGroupUserDeletedService
      */
     private $service;
 
@@ -67,7 +67,7 @@ class GroupsAfterUserRemovedServiceTest extends FoldersTestCase
     {
         parent::setUp();
         $this->groupsUsersTable = TableRegistry::getTableLocator()->get('GroupsUsers');
-        $this->service = new GroupsAfterUserRemovedService();
+        $this->service = new HandleGroupUserDeletedService();
     }
 
     public function testGroupsAfterUserRemovedSuccess_RemoveResourceFromUserTree()
@@ -79,7 +79,7 @@ class GroupsAfterUserRemovedServiceTest extends FoldersTestCase
         $userBGroupUser = $this->groupsUsersTable->findByGroupIdAndUserId($g1->id, $userBId)->first();
         $this->groupsUsersTable->delete($userBGroupUser);
 
-        $this->service->afterUserRemoved($userBGroupUser);
+        $this->service->handle($userBGroupUser);
 
         $this->assertItemIsInTrees($r1->id, 1);
         $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userAId, null);
@@ -118,7 +118,7 @@ class GroupsAfterUserRemovedServiceTest extends FoldersTestCase
         $userBGroupUser = $this->groupsUsersTable->findByGroupIdAndUserId($g1->get('id'), $userBId)->first();
         $this->groupsUsersTable->delete($userBGroupUser);
 
-        $this->service->afterUserRemoved($userBGroupUser);
+        $this->service->handle($userBGroupUser);
 
         $this->assertItemIsInTrees($r1->get('id'), 2);
         $this->assertFolderRelation($r1->get('id'), FoldersRelation::FOREIGN_MODEL_RESOURCE, $userAId, null);
@@ -157,7 +157,7 @@ class GroupsAfterUserRemovedServiceTest extends FoldersTestCase
         $userBGroupUser = $this->groupsUsersTable->findByGroupIdAndUserId($g1->id, $userBId)->first();
         $this->groupsUsersTable->delete($userBGroupUser);
 
-        $this->service->afterUserRemoved($userBGroupUser);
+        $this->service->handle($userBGroupUser);
 
         $this->assertItemIsInTrees($folderA->id, 1);
         $this->assertFolderRelation($folderA->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId, null);
@@ -197,7 +197,7 @@ class GroupsAfterUserRemovedServiceTest extends FoldersTestCase
         $userBGroupUser = $this->groupsUsersTable->findByGroupIdAndUserId($g1->id, $userBId)->first();
         $this->groupsUsersTable->delete($userBGroupUser);
 
-        $this->service->afterUserRemoved($userBGroupUser);
+        $this->service->handle($userBGroupUser);
 
         $this->assertItemIsInTrees($folderA->id, 1);
         $this->assertFolderRelation($folderA->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId, null);
@@ -239,7 +239,7 @@ class GroupsAfterUserRemovedServiceTest extends FoldersTestCase
         $userBGroupUser = $this->groupsUsersTable->findByGroupIdAndUserId($g1->id, $userBId)->first();
         $this->groupsUsersTable->delete($userBGroupUser);
 
-        $this->service->afterUserRemoved($userBGroupUser);
+        $this->service->handle($userBGroupUser);
 
         $this->assertItemIsInTrees($folderA->id, 2);
         $this->assertFolderRelation($folderA->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId, null);

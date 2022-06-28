@@ -17,10 +17,12 @@ declare(strict_types=1);
 namespace Passbolt\Tags\Test\Lib;
 
 use App\Test\Lib\AppTestCase;
-use Cake\Core\Configure;
+use CakephpFixtureFactories\ORM\FactoryTableRegistry;
 
 abstract class TagTestCase extends AppTestCase
 {
+    protected $pluginEnabled;
+
     /**
      * setUp method
      *
@@ -28,13 +30,24 @@ abstract class TagTestCase extends AppTestCase
      */
     public function setUp(): void
     {
+        /**
+         * @psalm-suppress InternalMethod
+         * @psalm-suppress InternalClass
+         */
+        FactoryTableRegistry::getTableLocator()->clear();
         parent::setUp();
-        Configure::write('passbolt.plugins.tags.enabled', true);
+        $this->enableFeaturePlugin('Tags');
+        $this->loadPlugins(['Passbolt/Tags' => []]);
     }
 
+    /**
+     * tearDown method
+     *
+     * @return void
+     */
     public function tearDown(): void
     {
         parent::tearDown();
-        Configure::write('passbolt.plugins.tags.enabled', false);
+        $this->disableFeaturePlugin('Tags');
     }
 }
