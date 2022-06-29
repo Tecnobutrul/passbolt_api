@@ -100,7 +100,6 @@ class UserActionLogsFinder extends BaseActionLogsFinder
         return $this->ActionLogs
             ->find()
             ->select(['ActionLogs__id' => 'ActionLogs.id', 'Actions__name' => 'Actions.name'])
-            ->contain('EntitiesHistory')
             ->innerJoinWith('Actions')
             ->innerJoinWith('EntitiesHistory', function (Query $q) use ($userId) {
                 return $q->where([

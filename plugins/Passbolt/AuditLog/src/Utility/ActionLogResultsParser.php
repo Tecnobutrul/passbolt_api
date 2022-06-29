@@ -21,7 +21,7 @@ use App\Model\Entity\User;
 use App\Model\Table\AvatarsTable;
 use App\Utility\UuidFactory;
 use Cake\Core\Configure;
-use Cake\ORM\ResultSet;
+use Cake\Datasource\ResultSetInterface;
 use Cake\ORM\TableRegistry;
 use Passbolt\Log\Model\Entity\ActionLog;
 use Passbolt\Log\Model\Entity\EntityHistory;
@@ -29,9 +29,9 @@ use Passbolt\Log\Model\Entity\EntityHistory;
 class ActionLogResultsParser
 {
     /**
-     * @var array|\Cake\ORM\ResultSet
+     * @var \Cake\Datasource\ResultSetInterface
      */
-    protected $actionLogs = [];
+    protected $actionLogs;
 
     /**
      * @var array
@@ -59,12 +59,12 @@ class ActionLogResultsParser
     /**
      * ActionLogResultsParser constructor.
      *
-     * @param \Cake\ORM\ResultSet $actionLogs action logs
+     * @param \Cake\Datasource\ResultSetInterface $actionLogs action logs
      * @param array $filters list of filters
      *   - array resources is the one currently supported. It should contain a list of ids.
      * @return void
      */
-    public function __construct(ResultSet $actionLogs, array $filters = [])
+    public function __construct(ResultSetInterface $actionLogs, array $filters = [])
     {
         $this->actionLogs = $actionLogs;
         $this->filters = $filters;

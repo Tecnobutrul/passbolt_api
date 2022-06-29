@@ -19,6 +19,7 @@ namespace Passbolt\AuditLog\Controller;
 
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\ForbiddenException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 use Cake\Validation\Validation;
 use Passbolt\AuditLog\Utility\UserActionLogsFinder;
@@ -32,6 +33,7 @@ class UserLogsController extends BaseLogsController
      * @return void
      * @throws \Cake\Http\Exception\BadRequestException if the user id has the wrong format
      * @throws \Cake\Http\Exception\ForbiddenException if the UAC is not admin
+     * @throws \Cake\Http\Exception\NotFoundException if the user does not exist
      */
     public function view(?string $userId = null)
     {
@@ -44,7 +46,7 @@ class UserLogsController extends BaseLogsController
             throw new BadRequestException(__('The user identifier should be a valid UUID.'));
         }
         if (!TableRegistry::getTableLocator()->get('Users')->exists(['id' => $userId])) {
-            throw new BadRequestException(__('The user does not exist.'));
+            throw new NotFoundException(__('The user does not exist.'));
         }
 
         $this->viewByEntity(new UserActionLogsFinder(), $userId);

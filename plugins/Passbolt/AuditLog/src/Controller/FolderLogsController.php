@@ -29,7 +29,7 @@ class FolderLogsController extends BaseLogsController
      * @param string|null $folderId folder id
      * @return void
      * @throws \Cake\Http\Exception\BadRequestException if the resource id has the wrong format
-     * @throws \Cake\Http\Exception\NotFoundException if the user cannot access the given resource, or if the resource does not exist
+     * @throws \Cake\Http\Exception\NotFoundException if the user cannot access the given folder, or if the folder does not exist
      */
     public function view(?string $folderId = null)
     {

@@ -58,8 +58,7 @@ abstract class BaseActionLogsFinder
      */
     protected function _getBaseQuery(array $options = []): Query
     {
-        $ActionLog = TableRegistry::getTableLocator()->get('Passbolt/Log.ActionLogs');
-        $query = $ActionLog->find();
+        $query = $this->ActionLogs->find();
         $query->group([
             'ActionLogs.id',
             'Actions.name',
@@ -189,9 +188,9 @@ abstract class BaseActionLogsFinder
      *
      * @param \Cake\ORM\Query $query query
      * @param array $options options
-     * @return mixed
+     * @return \Cake\ORM\Query
      */
-    protected function _paginate(Query $query, array $options)
+    protected function _paginate(Query $query, array $options): Query
     {
         $paginator = new Paginator();
         $paginator->paginate($query, $options);

@@ -47,7 +47,7 @@ class UserLogsControllerTest extends LogIntegrationTestCase
         $id = UuidFactory::uuid();
         $this->logInAsAdmin();
         $this->getJson('/actionlog/user/' . $id . '.json');
-        $this->assertResponseCode(400);
+        $this->assertResponseCode(404);
         $this->assertResponseContains('The user does not exist.');
     }
 
