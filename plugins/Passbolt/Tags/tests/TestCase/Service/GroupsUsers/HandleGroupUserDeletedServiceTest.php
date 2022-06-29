@@ -105,24 +105,23 @@ class HandleGroupUserDeletedServiceTest extends TagTestCase
      * Fixtures
      ****************************************** */
 
-    public function insertFixture_2GroupUsers_1SharedResource_TaggedWithSameTags(): array
+    protected function insertFixture_2GroupUsers_1SharedResource_TaggedWith2Tags(): array
     {
-        [$u1, $u2] = UserFactory::make(2)->persist();
-        $g1 = GroupFactory::make()->withGroupsManagersFor([$u1, $u2])->persist();
-        $r1Factory = ResourceFactory::make()->withPermissionsFor([$g1]);
-        $t1 = TagFactory::make()->persist();
-        $r1 = TagFactory::decorateResourceFactoryWithPersonalTagsFor($r1Factory, [$u1, $u2], $t1)->persist();
+        [$user1, $user2] = UserFactory::make(2)->persist();
+        $group = GroupFactory::make()->withGroupsManagersFor([$user1, $user2])->persist();
 
-        return [$u1, $u2, $g1, $r1, $t1];
-    }
+        $resource = ResourceFactory::make()
+            ->withPermissionsFor([$group])
+            ->with(
+                'ResourcesTags',
+                ResourcesTagFactory::make()->with('Users', $user1)->with('Tags')
+            )
+            ->with(
+                'ResourcesTags',
+                ResourcesTagFactory::make()->with('Users', $user2)->with('Tags')
+            )
+            ->persist();
 
-    public function insertFixture_2GroupUsers_1SharedResource_TaggedWith2Tags(): array
-    {
-        [$u1, $u2] = UserFactory::make(2)->persist();
-        $g1 = GroupFactory::make()->withGroupsManagersFor([$u1, $u2])->persist();
-        $r1Factory = ResourceFactory::make()->withPermissionsFor([$g1]);
-        $r1 = TagFactory::decorateResourceFactoryWithPersonalTagsFor($r1Factory, [$u1, $u2])->persist();
-
-        return [$u1, $u2, $g1, $r1];
+        return [$user1, $user2, $group, $resource];
     }
 }

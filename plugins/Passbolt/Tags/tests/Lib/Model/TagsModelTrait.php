@@ -18,6 +18,8 @@ declare(strict_types=1);
 namespace Passbolt\Tags\Test\Lib\Model;
 
 use Cake\ORM\TableRegistry;
+use Passbolt\Tags\Test\Factory\ResourcesTagFactory;
+use Passbolt\Tags\Test\Factory\TagFactory;
 
 trait TagsModelTrait
 {
@@ -109,8 +111,7 @@ trait TagsModelTrait
      */
     protected function assertTagExists(string $tagId)
     {
-        $tagsTable = TableRegistry::getTableLocator()->get('Passbolt/Tags.Tags');
-        $tag = $tagsTable->find()->where(['id' => $tagId])->count();
+        $tag = TagFactory::find()->where(['id' => $tagId])->count();
         $this->assertNotEmpty($tag, 'Expect an existing tag');
     }
 
@@ -123,13 +124,9 @@ trait TagsModelTrait
      */
     protected function assertPersonalResourceTagExistsFor(string $resourceId, string $tagId, string $userId)
     {
-        $tagsTable = TableRegistry::getTableLocator()->get('Passbolt/Tags.Tags');
-        $resourcesTagsTable = TableRegistry::getTableLocator()->get('Passbolt/Tags.ResourcesTags');
+        $this->assertTagExists($tagId);
 
-        $tag = $tagsTable->find()->where(['id' => $tagId])->count();
-        $this->assertNotEmpty($tag);
-
-        $resourceTag = $resourcesTagsTable->find()->where(['resource_id' => $resourceId, 'tag_id' => $tagId, 'user_id' => $userId])->first();
+        $resourceTag = ResourcesTagFactory::find()->where(['resource_id' => $resourceId, 'tag_id' => $tagId, 'user_id' => $userId])->first();
         $this->assertNotEmpty($resourceTag);
     }
 
@@ -142,8 +139,7 @@ trait TagsModelTrait
      */
     protected function assertPersonalResourceTagNotExistFor(string $resourceId, string $tagId, string $userId)
     {
-        $resourcesTagsTable = TableRegistry::getTableLocator()->get('Passbolt/Tags.ResourcesTags');
-        $resourceTag = $resourcesTagsTable->find()->where(['resource_id' => $resourceId, 'tag_id' => $tagId, 'user_id' => $userId])->first();
+        $resourceTag = ResourcesTagFactory::find()->where(['resource_id' => $resourceId, 'tag_id' => $tagId, 'user_id' => $userId])->first();
         $this->assertEmpty($resourceTag);
     }
 }
