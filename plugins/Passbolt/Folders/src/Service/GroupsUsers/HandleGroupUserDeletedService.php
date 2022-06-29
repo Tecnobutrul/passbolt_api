@@ -19,36 +19,31 @@ namespace Passbolt\Folders\Service\GroupsUsers;
 
 use App\Model\Entity\GroupsUser;
 use App\Model\Table\PermissionsTable;
-use App\Service\Permissions\UserHasPermissionService;
+use Cake\ORM\Query;
 use Cake\ORM\TableRegistry;
-use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsRemoveItemFromUserTreeService;
+use Passbolt\Folders\Model\Entity\FoldersRelation;
 
 class HandleGroupUserDeletedService
 {
-    /**
-     * @var \Passbolt\Folders\Service\FoldersRelations\FoldersRelationsRemoveItemFromUserTreeService
-     */
-    private $foldersRelationsRemoveItemFromUserTree;
-
     /**
      * @var \App\Model\Table\PermissionsTable
      */
     private $permissionsTable;
 
     /**
-     * @var \App\Service\Permissions\UserHasPermissionService
+     * @var \Passbolt\Folders\Model\Table\FoldersRelationsTable
      */
-    private $userHasPermissionService;
+    private $foldersRelationsTable;
 
     /**
      * Instantiate the service.
      */
     public function __construct()
     {
-        $this->foldersRelationsRemoveItemFromUserTree = new FoldersRelationsRemoveItemFromUserTreeService();
-        $this->userHasPermissionService = new UserHasPermissionService();
         /** @phpstan-ignore-next-line */
         $this->permissionsTable = TableRegistry::getTableLocator()->get('Permissions');
+        /** @phpstan-ignore-next-line */
+        $this->foldersRelationsTable = TableRegistry::getTableLocator()->get('FoldersRelations');
     }
 
     /**
@@ -60,82 +55,79 @@ class HandleGroupUserDeletedService
      */
     public function handle(GroupsUser $groupUser)
     {
-        $foldersIdsGroupHasAccess = $this->getFoldersIdsGroupHasAccess($groupUser->group_id);
-        foreach ($foldersIdsGroupHasAccess as $folderIdGroupHasAccess) {
-            $this->removeFolderFromUserTree($folderIdGroupHasAccess, $groupUser->user_id);
-        }
-
-        $resourcesIdsGroupHasAccess = $this->getResourcesIdsGroupHasAccess($groupUser->group_id);
-        foreach ($resourcesIdsGroupHasAccess as $resourceIdGroupHasAccess) {
-            $this->removeResourceFromUserTree($resourceIdGroupHasAccess, $groupUser->user_id);
-        }
+        $this->removeLostAccessesResourcesFromUserTree($groupUser);
+        $this->removeLostAccessesFoldersFromUserTree($groupUser);
     }
 
     /**
-     * Retrieve the folders ids a group has access.
-     *
-     * @param string $groupId The target group
-     * @return array The list of resources ids
-     */
-    private function getFoldersIdsGroupHasAccess(string $groupId)
-    {
-        return $this->permissionsTable->findAllByAro(PermissionsTable::FOLDER_ACO, $groupId)
-            ->select('aco_foreign_key')
-            ->all()
-            ->extract('aco_foreign_key')
-            ->toArray();
-    }
-
-    /**
-     * Remove a folder from a user tree
-     *
-     * @param string $folderId The target folder
-     * @param string $userId The target user
+     * Remove resources the user lost access from its tree.
+     * @param GroupsUser $groupUser $groupUser The deleted group user.
      * @return void
-     * @throws \Exception
      */
-    private function removeFolderFromUserTree(string $folderId, string $userId)
+    private function removeLostAccessesResourcesFromUserTree(GroupsUser $groupUser): void
     {
-        // If the user still has access to the folder, don't alter the user tree.
-        $hasAccess = $this->userHasPermissionService->check(PermissionsTable::FOLDER_ACO, $folderId, $userId);
-        if ($hasAccess) {
-            return;
-        }
-
-        $this->foldersRelationsRemoveItemFromUserTree->removeItemFromUserTree($folderId, $userId, true);
+        $this->foldersRelationsTable->deleteAll([
+            'foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE,
+            'user_id' => $groupUser->user_id,
+            'foreign_id IN' => $this->findLostAccessResourcesIdsQuery($groupUser),
+        ]);
     }
 
     /**
-     * Retrieve the resources ids a group has access.
-     *
-     * @param string $groupId The target group
-     * @return array The list of resources ids
-     */
-    private function getResourcesIdsGroupHasAccess(string $groupId)
-    {
-        return $this->permissionsTable->findAllByAro(PermissionsTable::RESOURCE_ACO, $groupId)
-            ->select('aco_foreign_key')
-            ->all()
-            ->extract('aco_foreign_key')
-            ->toArray();
-    }
-
-    /**
-     * Remove a resource from a user tree
-     *
-     * @param string $resourceId The target resource
-     * @param string $userId The target user
+     * Remove folders the user lost access from its tree.
+     * @param GroupsUser $groupUser $groupUser The deleted group user.
      * @return void
-     * @throws \Exception
      */
-    private function removeResourceFromUserTree(string $resourceId, string $userId)
+    private function removeLostAccessesFoldersFromUserTree(GroupsUser $groupUser): void
     {
-        // If the user still has access to the resource, don't alter the user tree.
-        $hasAccess = $this->userHasPermissionService->check(PermissionsTable::RESOURCE_ACO, $resourceId, $userId);
-        if ($hasAccess) {
-            return;
-        }
+        $this->foldersRelationsTable->deleteAll([
+            'foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER,
+            'user_id' => $groupUser->user_id,
+            'foreign_id IN' => $this->findLostAccessFoldersIdsQuery($groupUser),
+        ]);
+        $this->moveToRootLostAccessFoldersContent($groupUser);
+    }
 
-        $this->foldersRelationsRemoveItemFromUserTree->removeItemFromUserTree($resourceId, $userId);
+    /**
+     * Move folders the user lost access content to the user tree root.
+     * @param GroupsUser $groupUser $groupUser The deleted group user.
+     * @return void
+     */
+    private function moveToRootLostAccessFoldersContent(GroupsUser $groupUser): void
+    {
+        $this->foldersRelationsTable->updateAll(['folder_parent_id' => null], [
+            'user_id' => $groupUser->user_id,
+            'folder_parent_id IN' => $this->findLostAccessFoldersIdsQuery($groupUser),
+        ]);
+    }
+
+    /**
+     * Find the lost access resources ids.
+     *
+     * @param \App\Model\Entity\GroupsUser $groupUser The group user to delete.
+     * @return \Cake\ORM\Query
+     */
+    private function findLostAccessResourcesIdsQuery(GroupsUser $groupUser): Query
+    {
+        return $this->permissionsTable->findAcosAccessesDiffBetweenGroupAndUser(
+            PermissionsTable::RESOURCE_ACO,
+            $groupUser->group_id,
+            $groupUser->user_id,
+        );
+    }
+
+    /**
+     * Find the lost access folders ids.
+     *
+     * @param \App\Model\Entity\GroupsUser $groupUser The group user to delete.
+     * @return \Cake\ORM\Query
+     */
+    private function findLostAccessFoldersIdsQuery(GroupsUser $groupUser): Query
+    {
+        return $this->permissionsTable->findAcosAccessesDiffBetweenGroupAndUser(
+            PermissionsTable::FOLDER_ACO,
+            $groupUser->group_id,
+            $groupUser->user_id,
+        );
     }
 }
