@@ -16,12 +16,15 @@ declare(strict_types=1);
  */
 namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Event;
 
+use App\Controller\ErrorController;
 use App\Controller\Setup\RecoverAbortController;
 use App\Controller\Setup\RecoverCompleteController;
 use App\Controller\Setup\SetupCompleteController;
 use App\Controller\Users\UsersRecoverController;
 use App\Controller\Users\UsersRegisterController;
 use App\Test\Factory\RoleFactory;
+use Cake\Event\Event;
+use Cake\Http\ServerRequest;
 use Passbolt\MultiFactorAuthentication\Event\ClearMfaCookieOnSetupAndRecover;
 use Passbolt\MultiFactorAuthentication\Test\Lib\MfaIntegrationTestCase;
 use Passbolt\MultiFactorAuthentication\Utility\MfaVerifiedCookie;
@@ -38,6 +41,63 @@ class ClearMfaCookieOnSetupAndRecoverTest extends MfaIntegrationTestCase
             RecoverCompleteController::class,
             RecoverAbortController::class,
         ], $controllersConcerned);
+    }
+
+    public function testClearMfaCookieOnSetupAndRecover_clearMfaCookieInResponse_Post_In_List_Should_Set_Expired_Cookie()
+    {
+        $request = (new ServerRequest([
+            'environment' => ['REQUEST_METHOD' => 'POST'],
+        ]));
+        $controller = new UsersRegisterController($request);
+        $event = new Event('Foo', $controller);
+
+        (new ClearMfaCookieOnSetupAndRecover())->clearMfaCookieInResponse($event);
+
+        $cookie = $controller->getResponse()->getCookieCollection()->get(MfaVerifiedCookie::MFA_COOKIE_ALIAS);
+        $this->assertTrue($cookie->isExpired());
+    }
+
+    public function testClearMfaCookieOnSetupAndRecover_clearMfaCookieInResponse_Post_In_List_No_User_Component_Should_Not_Set_Expired_Cookie()
+    {
+        $request = (new ServerRequest([
+            'environment' => ['REQUEST_METHOD' => 'POST'],
+        ]));
+        $controller = new UsersRegisterController($request);
+        $event = new Event('Foo', $controller);
+        unset($controller->User);
+
+        (new ClearMfaCookieOnSetupAndRecover())->clearMfaCookieInResponse($event);
+
+        $hasCookie = $controller->getResponse()->getCookieCollection()->has(MfaVerifiedCookie::MFA_COOKIE_ALIAS);
+        $this->assertFalse($hasCookie);
+    }
+
+    public function testClearMfaCookieOnSetupAndRecover_clearMfaCookieInResponse_GET_In_List_Should_Not_Set_Expired_Cookie()
+    {
+        $request = (new ServerRequest([
+            'environment' => ['REQUEST_METHOD' => 'GET'],
+        ]));
+        $controller = new UsersRegisterController($request);
+        $event = new Event('Foo', $controller);
+
+        (new ClearMfaCookieOnSetupAndRecover())->clearMfaCookieInResponse($event);
+
+        $hasCookie = $controller->getResponse()->getCookieCollection()->has(MfaVerifiedCookie::MFA_COOKIE_ALIAS);
+        $this->assertFalse($hasCookie);
+    }
+
+    public function testClearMfaCookieOnSetupAndRecover_clearMfaCookieInResponse_Post_Not_In_List_No_Cookie()
+    {
+        $request = (new ServerRequest([
+            'environment' => ['REQUEST_METHOD' => 'POST'],
+        ]));
+        $controller = new ErrorController($request);
+        $event = new Event('Foo', $controller);
+
+        (new ClearMfaCookieOnSetupAndRecover())->clearMfaCookieInResponse($event);
+
+        $hasCookie = $controller->getResponse()->getCookieCollection()->has(MfaVerifiedCookie::MFA_COOKIE_ALIAS);
+        $this->assertFalse($hasCookie);
     }
 
     /**
