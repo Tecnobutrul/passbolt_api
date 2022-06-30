@@ -18,7 +18,7 @@ namespace Passbolt\Tags;
 
 use Cake\Core\BasePlugin;
 use Cake\Core\PluginApplicationInterface;
-use Passbolt\Tags\EventListener\AddTaggableBehavior;
+use Passbolt\Tags\EventListener\AddTaggableBehaviorToTaggableTables;
 use Passbolt\Tags\EventListener\GroupsUsersEventListener;
 
 class Plugin extends BasePlugin
@@ -42,7 +42,7 @@ class Plugin extends BasePlugin
     public function registerListeners(PluginApplicationInterface $app): void
     {
         $app->getEventManager()
-            ->on(new AddTaggableBehavior()) // Decorate the core/other plugins table classes that can be tagged.
+            ->on(new AddTaggableBehaviorToTaggableTables()) // Decorate the core/other plugins table classes that can be tagged.
             ->on(new GroupsUsersEventListener()); // Remove tags when a group user is deleted and the user lost access to some resources.
     }
 }

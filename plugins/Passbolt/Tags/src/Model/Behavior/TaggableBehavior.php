@@ -32,9 +32,9 @@ class TaggableBehavior extends Behavior
     {
         parent::initialize($config);
 
-        $this->_table->belongsToMany('Passbolt/Tags.Tags', [
+        $this->table()->belongsToMany('Passbolt/Tags.Tags', [
             'through' => 'Passbolt/Tags.ResourcesTags',
         ]);
-        $this->_table->hasMany('Passbolt/Tags.ResourcesTags');
+        $this->table()->hasMany('Passbolt/Tags.ResourcesTags');
     }
 }

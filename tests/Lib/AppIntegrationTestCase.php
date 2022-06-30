@@ -31,7 +31,7 @@ use App\Test\Lib\Model\SecretsModelTrait;
 use App\Test\Lib\Model\UsersModelTrait;
 use App\Test\Lib\Utility\ArrayTrait;
 use App\Test\Lib\Utility\EntityTrait;
-use App\Test\Lib\Utility\ErrorIntegrationTrait;
+use App\Test\Lib\Utility\ErrorIntegrationTestTrait;
 use App\Test\Lib\Utility\JsonRequestTrait;
 use App\Test\Lib\Utility\ObjectTrait;
 use App\Utility\Application\FeaturePluginAwareTrait;
@@ -52,7 +52,7 @@ abstract class AppIntegrationTestCase extends TestCase
     use ArrayTrait;
     use AvatarsModelTrait;
     use EntityTrait;
-    use ErrorIntegrationTrait;
+    use ErrorIntegrationTestTrait;
     use FeaturePluginAwareTrait;
     use GpgkeysModelTrait;
     use IntegrationTestTrait;

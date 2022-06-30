@@ -25,11 +25,11 @@ use Passbolt\Tags\Model\Behavior\TaggableBehavior;
 /**
  * Add the taggable behavior at runtime to the core or other plugins table classes.
  *
- * Class AddTaggableBehavior
+ * Class AddTaggableBehaviorToTaggableTables
  *
  * @package Passbolt\Tags\EventListener
  */
-class AddTaggableBehavior implements EventListenerInterface
+class AddTaggableBehaviorToTaggableTables implements EventListenerInterface
 {
     public const TABLES_TO_ADD = [
         ResourcesTable::class,
