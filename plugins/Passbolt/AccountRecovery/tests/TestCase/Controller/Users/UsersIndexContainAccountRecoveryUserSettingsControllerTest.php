@@ -63,4 +63,10 @@ class UsersIndexContainAccountRecoveryUserSettingsControllerTest extends Account
             }
         }
     }
+
+    public function testUsersIndexControllerGetSuccess_ContainAccountRecoveryUserSetting_Not_logged_In_Should_Not_Throw_500()
+    {
+        $this->getJson('/users.json?contain[account_recovery_user_setting]=1&contain[foo]=1');
+        $this->assertAuthenticationError();
+    }
 }

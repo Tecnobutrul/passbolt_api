@@ -94,7 +94,7 @@ class MfaRequiredCheckMiddleware implements MiddlewareInterface
 
         $uac = $this->getUacInRequest($request);
         // Return false if user is not authenticated
-        if (empty($uac)) {
+        if (empty($uac->getId())) {
             return false;
         }
 

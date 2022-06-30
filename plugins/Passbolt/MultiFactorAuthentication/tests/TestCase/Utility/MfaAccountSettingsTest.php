@@ -17,7 +17,10 @@ declare(strict_types=1);
 namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Utility;
 
 use App\Error\Exception\ValidationException;
+use App\Model\Entity\Role;
+use App\Utility\UserAccessControl;
 use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\Http\Exception\InternalErrorException;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\TableRegistry;
 use Passbolt\MultiFactorAuthentication\Test\Lib\MfaIntegrationTestCase;
@@ -55,6 +58,18 @@ class MfaAccountSettingsTest extends MfaIntegrationTestCase
     {
         $uac = $this->mockUserAccessControl('ada');
         $this->expectException(RecordNotFoundException::class);
+        MfaAccountSettings::get($uac);
+    }
+
+    /**
+     * @group mfa
+     * @group mfaAccountSettings
+     */
+    public function testMfaAccountSettings_Guest_Sould_Throw_NotFoundException()
+    {
+        $uac = new UserAccessControl(Role::GUEST);
+        $this->expectException(InternalErrorException::class);
+        $this->expectExceptionMessage('Invalid User Account Control ID.');
         MfaAccountSettings::get($uac);
     }
 

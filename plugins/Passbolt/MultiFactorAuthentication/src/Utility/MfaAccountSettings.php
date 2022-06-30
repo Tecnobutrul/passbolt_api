@@ -18,7 +18,9 @@ namespace Passbolt\MultiFactorAuthentication\Utility;
 
 use App\Utility\UserAccessControl;
 use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\Http\Exception\InternalErrorException;
 use Cake\I18n\FrozenTime;
+use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 
 class MfaAccountSettings
@@ -51,13 +53,20 @@ class MfaAccountSettings
      * Get MfaSettings (Singleton)
      *
      * @param \App\Utility\UserAccessControl $uac user access control
-     * @return \Passbolt\MultiFactorAuthentication\Utility\MfaAccountSettings
+     * @return self
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException if the property is not found or the user not identified.
+     * @throws \Cake\Http\Exception\InternalErrorException if the UAC's ID is not a valid UUID.
      */
-    public static function get(UserAccessControl $uac)
+    public static function get(UserAccessControl $uac): MfaAccountSettings
     {
+        $uacId = $uac->getId();
+        if (is_null($uacId)) {
+            Log::error('User Account Control ID provided to MfaAccountSettings::get() cannot be null.');
+            throw new InternalErrorException('Invalid User Account Control ID.');
+        }
         /** @var \Passbolt\AccountSettings\Model\Table\AccountSettingsTable $AccountSettings */
         $AccountSettings = TableRegistry::getTableLocator()->get('Passbolt/AccountSettings.AccountSettings');
-        $settings = $AccountSettings->getFirstPropertyOrFail($uac->getId(), MfaSettings::MFA);
+        $settings = $AccountSettings->getFirstPropertyOrFail($uacId, MfaSettings::MFA);
         $decodedJson = json_decode($settings->value, true);
 
         return new MfaAccountSettings($uac, $decodedJson);
@@ -180,7 +189,6 @@ class MfaAccountSettings
     public static function enableProvider(UserAccessControl $uac, string $provider, ?array $data = [])
     {
         $data['verified'] = FrozenTime::now();
-        $mfaAccountSettings = null;
         try {
             /** @var \Passbolt\AccountSettings\Model\Table\AccountSettingsTable $AccountSettings */
             $AccountSettings = TableRegistry::getTableLocator()->get('Passbolt/AccountSettings.AccountSettings');
