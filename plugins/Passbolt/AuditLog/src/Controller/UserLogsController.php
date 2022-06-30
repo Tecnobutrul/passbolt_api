@@ -12,106 +12,43 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.0.0
+ * @since         3.7.0
  */
 
 namespace Passbolt\AuditLog\Controller;
 
-use App\Controller\AppController;
-use App\Model\Entity\Resource;
-use Cake\Datasource\Exception\PageOutOfBoundsException;
 use Cake\Http\Exception\BadRequestException;
-use Cake\Http\Exception\InternalErrorException;
+use Cake\Http\Exception\ForbiddenException;
+use Cake\Http\Exception\NotFoundException;
+use Cake\ORM\TableRegistry;
 use Cake\Validation\Validation;
-use Passbolt\AuditLog\Utility\ActionLogsFinder;
-use Passbolt\Folders\Model\Entity\Folder;
+use Passbolt\AuditLog\Utility\UserActionLogsFinder;
 
-class UserLogsController extends AppController
+class UserLogsController extends BaseLogsController
 {
     /**
-     * Paginator options
+     * View action logs for a given user.
      *
-     * @var array
-     */
-    public $paginate = [
-        'limit' => 5,
-        'maxLimit' => 20,
-        'whiteList' => ['limit', 'page'],
-    ];
-
-    /**
-     * Initialize
-     *
-     * @throws \Exception If a component class cannot be found.
+     * @param string|null $userId user id
      * @return void
+     * @throws \Cake\Http\Exception\BadRequestException if the user id has the wrong format
+     * @throws \Cake\Http\Exception\ForbiddenException if the UAC is not admin
+     * @throws \Cake\Http\Exception\NotFoundException if the user does not exist
      */
-    public function initialize(): void
+    public function view(?string $userId = null)
     {
-        parent::initialize();
-        $this->loadComponent('Paginator');
-    }
+        if (!$this->User->isAdmin()) {
+            throw new ForbiddenException(__('Only administrators can view user logs.'));
+        }
 
-    /**
-     * View action logs for a given resource.
-     *
-     * @param string $resourceId resource id
-     * @return void
-     * @throws \Cake\Http\Exception\BadRequestException if the resource id has the wrong format
-     * @throws \Cake\Http\Exception\NotFoundException if the user cannot access the given resource, or if the resource does not exist
-     */
-    public function viewByResource(?string $resourceId = null)
-    {
         // Check request sanity
-        if (!Validation::uuid($resourceId)) {
-            throw new BadRequestException(__('The resource identifier should be a valid UUID.'));
+        if (!Validation::uuid($userId)) {
+            throw new BadRequestException(__('The user identifier should be a valid UUID.'));
+        }
+        if (!TableRegistry::getTableLocator()->get('Users')->exists(['id' => $userId])) {
+            throw new NotFoundException(__('The user does not exist.'));
         }
 
-        $this->viewByEntity(Resource::class, $resourceId);
-    }
-
-    /**
-     * View action logs for a given folder.
-     *
-     * @param string $folderId folder id
-     * @return void
-     * @throws \Cake\Http\Exception\BadRequestException if the resource id has the wrong format
-     * @throws \Cake\Http\Exception\NotFoundException if the user cannot access the given resource, or if the resource does not exist
-     */
-    public function viewByFolder(?string $folderId = null)
-    {
-        // Check request sanity
-        if (!Validation::uuid($folderId)) {
-            throw new BadRequestException(__('The folder id is not valid.'));
-        }
-
-        $this->viewByEntity(Folder::class, $folderId);
-    }
-
-    /**
-     * @param string $entityType Entity model name.
-     * @param string $entityId Uuid of the entity handled.
-     * @return void
-     * @throws \Cake\Http\Exception\NotFoundException if the user cannot access the given entity, or if the entity does not exist
-     * @throws \Cake\Http\Exception\InternalErrorException if an entity else than a resource or a folder is handled.
-     */
-    private function viewByEntity(string $entityType, string $entityId): void
-    {
-        // Get pagination options.
-        $options = $this->Paginator->mergeOptions('', $this->paginate);
-
-        try {
-            $actionLogFinder = new ActionLogsFinder();
-            if ($entityType === Resource::class) {
-                $userLogs = $actionLogFinder->findForResource($this->User->getAccessControl(), $entityId, $options);
-            } elseif ($entityType === Folder::class) {
-                $userLogs = $actionLogFinder->findForFolder($this->User->getAccessControl(), $entityId, $options);
-            } else {
-                throw new InternalErrorException(__('Resources or folders supported only.'));
-            }
-        } catch (PageOutOfBoundsException $e) {
-            $userLogs = [];
-        }
-
-        $this->success(__('The operation was successful.'), $userLogs);
+        $this->viewByEntity(new UserActionLogsFinder(), $userId);
     }
 }

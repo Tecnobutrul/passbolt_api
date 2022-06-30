@@ -12,13 +12,13 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.0.0
+ * @since         3.7.0
  */
 
 namespace Passbolt\AuditLog\Test\TestCase\Controller;
 
-use App\Test\Factory\ResourceFactory;
 use App\Test\Factory\UserFactory;
+use App\Utility\UuidFactory;
 use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 
 /**
@@ -26,22 +26,36 @@ use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
  */
 class UserLogsControllerTest extends LogIntegrationTestCase
 {
-    public function testAuditLogUserLogsControllerViewByResourceEmpty()
+    public function testUserLogsController_Not_Admin_Should_Not_Be_Authorized()
     {
-        $user = UserFactory::make()->user()->persist();
-        $resource = ResourceFactory::make()->withCreatorAndPermission($user)->persist();
-        $this->logInAs($user);
-        $this->getJson("/actionlog/resource/{$resource->id}.json?api-version=v2");
-        $this->assertSuccess();
-        $this->assertEmpty($this->_responseJsonBody);
+        $this->logInAsUser();
+        $this->getJson('/actionlog/user/foo.json');
+        $this->assertResponseCode(403);
+        $this->assertResponseContains('Only administrators can view user logs.');
     }
 
-    public function testAuditLogUserLogsControllerViewByResourceUserDoesNotHavePermission()
+    public function testUserLogsController_User_Id_Not_UUID()
     {
-        $resource = ResourceFactory::make()->withCreator(UserFactory::make()->user())->persist();
-        $user = $resource->creator;
-        $this->logInAs($user);
-        $this->getJson("/actionlog/resource/{$resource->id}.json?api-version=v2");
-        $this->assertError(404, 'The resource does not exist.');
+        $this->logInAsAdmin();
+        $this->getJson('/actionlog/user/foo.json');
+        $this->assertResponseCode(400);
+        $this->assertResponseContains('The user identifier should be a valid UUID.');
+    }
+
+    public function testUserLogsController_User_Does_Not_Exist()
+    {
+        $id = UuidFactory::uuid();
+        $this->logInAsAdmin();
+        $this->getJson('/actionlog/user/' . $id . '.json');
+        $this->assertResponseCode(404);
+        $this->assertResponseContains('The user does not exist.');
+    }
+
+    public function testUserLogsController_User_Exists()
+    {
+        $user = UserFactory::make()->persist();
+        $this->logInAsAdmin();
+        $this->getJson('/actionlog/user/' . $user->id . '.json');
+        $this->assertResponseOk();
     }
 }

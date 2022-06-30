@@ -26,7 +26,7 @@ use Cake\Event\EventManager;
 use Cake\Routing\Router;
 use Passbolt\JwtAuthentication\Authenticator\GpgJwtAuthenticator;
 use Passbolt\JwtAuthentication\Test\Utility\JwtTestTrait;
-use Passbolt\Log\Test\Lib\Traits\ActionLogsTrait;
+use Passbolt\Log\Test\Lib\Traits\ActionLogsTestTrait;
 use Passbolt\MultiFactorAuthentication\Test\Factory\MfaAuthenticationTokenFactory;
 use Passbolt\MultiFactorAuthentication\Test\Lib\MfaIntegrationTestCase;
 use Passbolt\MultiFactorAuthentication\Test\Scenario\Totp\MfaTotpScenario;
@@ -43,7 +43,7 @@ use Passbolt\MultiFactorAuthentication\Utility\MfaVerifiedCookie;
  */
 class JwtMfaLoginControllerTest extends MfaIntegrationTestCase
 {
-    use ActionLogsTrait;
+    use ActionLogsTestTrait;
     use JwtTestTrait;
     use ModelAwareTrait;
 

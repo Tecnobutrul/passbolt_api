@@ -21,9 +21,8 @@ use App\Model\Entity\Permission;
 use App\Model\Entity\Role;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
-use Cake\Datasource\ModelAwareTrait;
 use Passbolt\AuditLog\Test\TestCase\Traits\ActionLogsOperationsTrait;
-use Passbolt\AuditLog\Utility\ActionLogsFinder;
+use Passbolt\AuditLog\Utility\ResourceActionLogsFinder;
 use Passbolt\Log\Model\Entity\EntityHistory;
 use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 
@@ -34,7 +33,6 @@ use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 class ActionLogsFinderPermissionsUpdateTest extends LogIntegrationTestCase
 {
     use ActionLogsOperationsTrait;
-    use ModelAwareTrait;
 
     public $fixtures = [
         'app.Base/Users',
@@ -50,13 +48,6 @@ class ActionLogsFinderPermissionsUpdateTest extends LogIntegrationTestCase
         'app.Base/Favorites',
     ];
 
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->loadModel('Users');
-        $this->loadModel('Passbolt/Log.PermissionsHistory');
-    }
-
     public function testAuditLogsActionLogsFinderPermissionCreated()
     {
         $uac = new UserAccessControl(Role::USER, UuidFactory::uuid('user.id.ada'));
@@ -70,8 +61,8 @@ class ActionLogsFinderPermissionsUpdateTest extends LogIntegrationTestCase
             Permission::READ
         );
 
-        $ActionLogsFinder = new ActionLogsFinder();
-        $actionLogs = $ActionLogsFinder->findForResource($uac, UuidFactory::uuid('resource.id.apache'));
+        $ActionLogsFinder = new ResourceActionLogsFinder();
+        $actionLogs = $ActionLogsFinder->find($uac, UuidFactory::uuid('resource.id.apache'));
 
         $this->assertEquals(count($actionLogs), 1);
         $this->assertEquals($actionLogs[0]['type'], 'Permissions.updated');
@@ -99,8 +90,8 @@ class ActionLogsFinderPermissionsUpdateTest extends LogIntegrationTestCase
             Permission::OWNER
         );
 
-        $ActionLogsFinder = new ActionLogsFinder();
-        $actionLogs = $ActionLogsFinder->findForResource($uac, UuidFactory::uuid('resource.id.apache'));
+        $ActionLogsFinder = new ResourceActionLogsFinder();
+        $actionLogs = $ActionLogsFinder->find($uac, UuidFactory::uuid('resource.id.apache'));
 
         $this->assertEquals(count($actionLogs), 1);
         $this->assertEquals($actionLogs[0]['type'], 'Permissions.updated');
@@ -127,8 +118,8 @@ class ActionLogsFinderPermissionsUpdateTest extends LogIntegrationTestCase
             Permission::OWNER
         );
 
-        $ActionLogsFinder = new ActionLogsFinder();
-        $actionLogs = $ActionLogsFinder->findForResource($uac, UuidFactory::uuid('resource.id.apache'));
+        $ActionLogsFinder = new ResourceActionLogsFinder();
+        $actionLogs = $ActionLogsFinder->find($uac, UuidFactory::uuid('resource.id.apache'));
 
         $this->assertEquals(count($actionLogs), 1);
         $this->assertEquals($actionLogs[0]['type'], 'Permissions.updated');

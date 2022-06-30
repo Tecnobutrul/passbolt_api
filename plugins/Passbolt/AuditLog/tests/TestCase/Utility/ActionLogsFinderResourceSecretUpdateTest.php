@@ -20,9 +20,8 @@ namespace Passbolt\AuditLog\Test\TestCase\Utility;
 use App\Model\Entity\Role;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
-use Cake\Datasource\ModelAwareTrait;
 use Passbolt\AuditLog\Test\TestCase\Traits\ActionLogsOperationsTrait;
-use Passbolt\AuditLog\Utility\ActionLogsFinder;
+use Passbolt\AuditLog\Utility\ResourceActionLogsFinder;
 use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 
 /**
@@ -32,7 +31,6 @@ use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 class ActionLogsFinderResourceSecretUpdateTest extends LogIntegrationTestCase
 {
     use ActionLogsOperationsTrait;
-    use ModelAwareTrait;
 
     public $fixtures = [
         'app.Base/Users',
@@ -48,20 +46,13 @@ class ActionLogsFinderResourceSecretUpdateTest extends LogIntegrationTestCase
         'app.Base/Favorites',
     ];
 
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->loadModel('Users');
-        $this->loadModel('Passbolt/Log.PermissionsHistory');
-    }
-
     public function testAuditLogsActionLogsFinderResourceSecretUpdated()
     {
         $uac = new UserAccessControl(Role::USER, UuidFactory::uuid('user.id.ada'));
         $this->simulateResourceSecretUpdate($uac, UuidFactory::uuid('resource.id.apache'));
 
-        $ActionLogsFinder = new ActionLogsFinder();
-        $actionLogs = $ActionLogsFinder->findForResource($uac, UuidFactory::uuid('resource.id.apache'));
+        $ActionLogsFinder = new ResourceActionLogsFinder();
+        $actionLogs = $ActionLogsFinder->find($uac, UuidFactory::uuid('resource.id.apache'));
 
         $this->assertEquals(count($actionLogs), 1);
 
