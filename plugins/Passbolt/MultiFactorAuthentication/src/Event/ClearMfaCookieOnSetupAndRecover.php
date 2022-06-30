@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\MultiFactorAuthentication\Event;
 
+use App\Controller\Component\UserComponent;
 use App\Controller\Setup\RecoverAbortController;
 use App\Controller\Setup\RecoverCompleteController;
 use App\Controller\Setup\SetupCompleteController;
@@ -24,6 +25,7 @@ use App\Controller\Users\UsersRegisterController;
 use App\Model\Entity\Role;
 use Cake\Event\EventInterface;
 use Cake\Event\EventListenerInterface;
+use Cake\Log\Log;
 use Passbolt\MultiFactorAuthentication\Service\ClearMfaCookieInResponseService;
 
 class ClearMfaCookieOnSetupAndRecover implements EventListenerInterface
@@ -63,13 +65,24 @@ class ClearMfaCookieOnSetupAndRecover implements EventListenerInterface
      */
     public function clearMfaCookieInResponse(EventInterface $event): void
     {
-        /** @var \App\Controller\AppController $controller */
+        /** @var \Cake\Controller\Controller $controller */
         $controller = $event->getSubject();
-        $isUserGuest = $controller->User->getAccessControl()->roleName() === Role::GUEST;
+
         $isControllerInList = in_array(get_class($controller), $this->getListOfControllers());
         $isPost = $controller->getRequest()->is(['POST', 'PUT']);
 
-        if ($isUserGuest && $isControllerInList && $isPost) {
+        if (!$isControllerInList) {
+            return;
+        } elseif (!$isPost) {
+            return;
+        } elseif (!isset($controller->User) || !($controller->User instanceof UserComponent)) {
+            Log::error('The User component is not set for ' . get_class($controller));
+
+            return;
+        }
+
+        $isUserGuest = $controller->User->getAccessControl()->roleName() === Role::GUEST;
+        if ($isUserGuest) {
             (new ClearMfaCookieInResponseService($controller))->clearMfaCookie();
         }
     }
