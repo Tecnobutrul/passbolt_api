@@ -17,20 +17,21 @@ declare(strict_types=1);
 
 namespace Passbolt\Folders\EventListener;
 
-use App\Service\Groups\GroupsUpdateService;
+use App\Service\GroupsUsers\GroupsUsersAddService;
+use App\Service\GroupsUsers\GroupsUsersDeleteService;
 use Cake\Event\Event;
 use Cake\Event\EventListenerInterface;
-use Passbolt\Folders\Service\Groups\GroupsAfterUserAddedService;
-use Passbolt\Folders\Service\Groups\GroupsAfterUserRemovedService;
+use Passbolt\Folders\Service\GroupsUsers\HandleGroupUserAddedService;
+use Passbolt\Folders\Service\GroupsUsers\HandleGroupUserDeletedService;
 
 /**
- * Listen when an event happens on a group:
- * - A user is added to a group.
- * - A user is removed from a group.
+ * Listen when:
+ * - a group user is added;
+ * - a group user is deleted.
  *
  * @package Passbolt\Folders\EventListener
  */
-class GroupsEventListener implements EventListenerInterface
+class GroupsUsersEventListener implements EventListenerInterface
 {
     /**
      * @inheritDoc
@@ -38,37 +39,37 @@ class GroupsEventListener implements EventListenerInterface
     public function implementedEvents(): array
     {
         return [
-            GroupsUpdateService::AFTER_GROUP_USER_REMOVED_EVENT_NAME => 'handleGroupsAfterUserRemovedEvent',
-            GroupsUpdateService::AFTER_GROUP_USER_ADDED_EVENT_NAME => 'handleGroupsAfterUserAddedEvent',
+            GroupsUsersDeleteService::AFTER_GROUP_USER_DELETED_EVENT_NAME => 'handleGroupUserDeletedEvent',
+            GroupsUsersAddService::AFTER_GROUP_USER_ADDED_EVENT_NAME => 'handleGroupUserAddedEvent',
         ];
     }
 
     /**
-     * Handle a group after user added event.
+     * Handle group user added event.
      *
      * @param \Cake\Event\Event $event The event.
      * @return void
      * @throws \Exception
      */
-    public function handleGroupsAfterUserAddedEvent(Event $event)
+    public function handleGroupUserAddedEvent(Event $event)
     {
         $uac = $event->getData('accessControl');
         $groupUser = $event->getData('groupUser');
-        $service = new GroupsAfterUserAddedService();
-        $service->afterUserAdded($uac, $groupUser);
+        $service = new HandleGroupUserAddedService();
+        $service->handle($uac, $groupUser);
     }
 
     /**
-     * Handle a group after user removed event.
+     * Handle group user deleted event.
      *
      * @param \Cake\Event\Event $event The event.
      * @return void
      * @throws \Exception
      */
-    public function handleGroupsAfterUserRemovedEvent(Event $event)
+    public function handleGroupUserDeletedEvent(Event $event)
     {
         $groupUser = $event->getData('groupUser');
-        $service = new GroupsAfterUserRemovedService();
-        $service->afterUserRemoved($groupUser);
+        $service = new HandleGroupUserDeletedService();
+        $service->handle($groupUser);
     }
 }

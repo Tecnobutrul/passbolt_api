@@ -62,7 +62,7 @@ class ResourcesTagsTable extends Table
             'foreignKey' => 'resource_id',
             'joinType' => 'INNER',
         ]);
-        $this->belongsTo('Tags', [
+        $this->belongsTo('Passbolt/Tags.Tags', [
             'foreignKey' => 'tag_id',
             'joinType' => 'INNER',
         ]);

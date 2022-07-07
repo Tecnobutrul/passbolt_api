@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since         2.13.0
  */
 
-namespace Passbolt\Folders\Service\Groups;
+namespace Passbolt\Folders\Service\GroupsUsers;
 
 use App\Model\Entity\GroupsUser;
 use App\Model\Table\PermissionsTable;
@@ -24,7 +24,7 @@ use Cake\ORM\TableRegistry;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemToUserTreeService;
 
-class GroupsAfterUserAddedService
+class HandleGroupUserAddedService
 {
     /**
      * @var \Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemToUserTreeService
@@ -47,14 +47,14 @@ class GroupsAfterUserAddedService
     }
 
     /**
-     * Handle a user added to a group.
+     * Handle a group user addition.
      *
      * @param \App\Utility\UserAccessControl $uac The current user
      * @param \App\Model\Entity\GroupsUser $groupUser The added group user.
      * @return void
      * @throws \Exception If something unexpected occurred
      */
-    public function afterUserAdded(UserAccessControl $uac, GroupsUser $groupUser)
+    public function handle(UserAccessControl $uac, GroupsUser $groupUser)
     {
         $foldersIdsGroupHasAccess = $this->getFoldersIdsGroupHasAccess($groupUser->group_id);
         foreach ($foldersIdsGroupHasAccess as $folderIdGroupHasAccess) {

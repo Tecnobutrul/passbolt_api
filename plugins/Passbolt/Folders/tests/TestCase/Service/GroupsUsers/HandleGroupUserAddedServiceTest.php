@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since         2.13.0
  */
 
-namespace Passbolt\Folders\Test\TestCase\Service\Groups;
+namespace Passbolt\Folders\Test\TestCase\Service\GroupsUsers;
 
 use App\Model\Entity\Permission;
 use App\Model\Entity\Role;
@@ -29,21 +29,21 @@ use App\Test\Fixture\Base\UsersFixture;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
-use Passbolt\Folders\Service\Groups\GroupsAfterUserAddedService;
+use Passbolt\Folders\Service\GroupsUsers\HandleGroupUserAddedService;
 use Passbolt\Folders\Test\Lib\FoldersTestCase;
 use Passbolt\Folders\Test\Lib\Model\FoldersModelTrait;
 use Passbolt\Folders\Test\Lib\Model\FoldersRelationsModelTrait;
 
 /**
- * \Passbolt\Folders\Service\Groups\GroupsAfterUserAddedService Test Case
+ * \Passbolt\Folders\Service\Groups\HandleGroupUserAddedServiceTest Test Case
  *
  * Test that after a user is added to a group, the user's folders tree is reconstructed.
  * Only simple tests with resources and folders are tested here.
  * Complex scenarios can be found in the FoldersRelationsAddItemFromUserTreeServiceTest.
  *
- * @uses \Passbolt\Folders\Service\Groups\GroupsAfterUserAddedService
+ * @uses \Passbolt\Folders\Service\GroupsUsers\HandleGroupUserAddedService
  */
-class GroupsAfterUserAddedServiceTest extends FoldersTestCase
+class HandleGroupUserAddedServiceTest extends FoldersTestCase
 {
     use FoldersModelTrait;
     use FoldersRelationsModelTrait;
@@ -59,14 +59,14 @@ class GroupsAfterUserAddedServiceTest extends FoldersTestCase
     ];
 
     /**
-     * @var GroupsAfterUserAddedService
+     * @var HandleGroupUserAddedService
      */
     private $service;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->service = new GroupsAfterUserAddedService();
+        $this->service = new HandleGroupUserAddedService();
     }
 
     public function testGroupsAfterUserAddedSuccess_AddResourceToUserTree()
@@ -78,7 +78,7 @@ class GroupsAfterUserAddedServiceTest extends FoldersTestCase
         // Prepare the test by deleting the group user entry
         $userBGroupUser = $this->addGroupUser(['group_id' => $g1->id, 'user_id' => $userBId]);
 
-        $this->service->afterUserAdded($uac, $userBGroupUser);
+        $this->service->handle($uac, $userBGroupUser);
 
         $this->assertItemIsInTrees($r1->id, 2);
         $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userAId, null);
@@ -117,7 +117,7 @@ class GroupsAfterUserAddedServiceTest extends FoldersTestCase
         // Prepare the test by deleting the group user entry
         $userBGroupUser = $this->addGroupUser(['group_id' => $g1->id, 'user_id' => $userBId]);
 
-        $this->service->afterUserAdded($uac, $userBGroupUser);
+        $this->service->handle($uac, $userBGroupUser);
 
         $this->assertItemIsInTrees($r1->id, 2);
         $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userAId, null);
@@ -156,7 +156,7 @@ class GroupsAfterUserAddedServiceTest extends FoldersTestCase
         // Prepare the test by deleting the group user entry
         $userBGroupUser = $this->addGroupUser(['group_id' => $g1->id, 'user_id' => $userBId]);
 
-        $this->service->afterUserAdded($uac, $userBGroupUser);
+        $this->service->handle($uac, $userBGroupUser);
 
         $this->assertItemIsInTrees($folderA->id, 2);
         $this->assertFolderRelation($folderA->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId, null);
@@ -194,7 +194,7 @@ class GroupsAfterUserAddedServiceTest extends FoldersTestCase
         // Prepare the test by deleting the group user entry
         $userBGroupUser = $this->addGroupUser(['group_id' => $g1->id, 'user_id' => $userBId]);
 
-        $this->service->afterUserAdded($uac, $userBGroupUser);
+        $this->service->handle($uac, $userBGroupUser);
 
         $this->assertItemIsInTrees($folderA->id, 2);
         $this->assertFolderRelation($folderA->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId, null);

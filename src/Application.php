@@ -271,11 +271,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             $this->addPlugin('Passbolt/DirectorySync', ['bootstrap' => true, 'routes' => true]);
         }
 
-        // Allow switching on / off tags plugin
-        $tagsEnabled = Configure::read('passbolt.plugins.tags.enabled');
-        if (!isset($tagsEnabled) || $tagsEnabled) {
-            $this->addPlugin('Passbolt/Tags', ['bootstrap' => true, 'routes' => true]);
-        }
+        $this->addFeaturePluginIfEnabled($this, 'Tags', [], true);
 
         $logEnabled = Configure::read('passbolt.plugins.log.enabled');
         if (!isset($logEnabled) || $logEnabled) {

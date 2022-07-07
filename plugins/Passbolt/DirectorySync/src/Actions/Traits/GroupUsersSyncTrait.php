@@ -16,10 +16,11 @@ declare(strict_types=1);
  */
 namespace Passbolt\DirectorySync\Actions\Traits;
 
-use App\Error\Exception\CustomValidationException;
+use App\Error\Exception\ValidationException;
 use App\Model\Entity\Group;
 use App\Model\Entity\Role;
-use App\Service\Groups\GroupsUpdateGroupUsersService;
+use App\Service\GroupsUsers\GroupsUsersAddService;
+use App\Service\GroupsUsers\GroupsUsersDeleteService;
 use App\Utility\UserAccessControl;
 use Cake\Event\Event;
 use Cake\Event\EventDispatcherTrait;
@@ -349,19 +350,18 @@ trait GroupUsersSyncTrait
     protected function addGroupUsers(Group $group, array $userIdsToAdd)
     {
         $uac = new UserAccessControl(Role::ADMIN, $this->defaultAdmin->get('id'));
-        $groupUpdateGroupsUsersCreateService = new GroupsUpdateGroupUsersService();
+        $groupsUsersAddService = new GroupsUsersAddService();
 
         foreach ($userIdsToAdd as $userId) {
             $user = $this->Users->get($userId);
-            $groupsUsersChange = [[
+            $groupUserData = [
                 'group_id' => $group->id,
                 'user_id' => $userId,
                 'is_admin' => false,
-            ]];
+            ];
 
             try {
-                $result = $groupUpdateGroupsUsersCreateService->updateGroupUsers($uac, $group->id, $groupsUsersChange);
-                $groupUser = $result['added'][0];
+                $groupUser = $groupsUsersAddService->add($uac, $groupUserData);
                 $this->DirectoryRelations->createFromGroupUser($groupUser);
                 $this->addReportItem(new ActionReport(
                     __('The user {0} was successfully added to the group {1}.', $user->username, $group->name),
@@ -370,10 +370,10 @@ trait GroupUsersSyncTrait
                     Alias::STATUS_SUCCESS,
                     $group
                 ));
-            } catch (CustomValidationException $exception) {
+            } catch (ValidationException $exception) {
                 $errors = $exception->getErrors();
-                $isNotActive = !empty(Hash::extract($errors, '0.user_id.user_is_active'));
-                $isDeleted = !empty(Hash::extract($errors, '0.user_id.user_is_not_soft_deleted'));
+                $isNotActive = !empty(Hash::extract($errors, 'user_id.user_is_active'));
+                $isDeleted = !empty(Hash::extract($errors, 'user_id.user_is_not_soft_deleted'));
                 if (($isNotActive && $isDeleted) || $isDeleted) {
                     $msg = __('The user {0} could not be added to the group {1} because his account was priorly deleted in passbolt.', $user->username, $group->name);//phpcs:ignore
                 } elseif ($isNotActive) {
@@ -413,7 +413,7 @@ trait GroupUsersSyncTrait
     protected function removeGroupUsers(Group $group, array $groupUserIdsToRemove)
     {
         $uac = new UserAccessControl(Role::ADMIN, $this->defaultAdmin->get('id'));
-        $groupUpdateGroupsUsersCreateService = new GroupsUpdateGroupUsersService();
+        $groupUserDeleteService = new GroupsUsersDeleteService();
 
         foreach ($groupUserIdsToRemove as $groupUserId) {
             // If corresponding groupUser does not exist, cleanup the relation.
@@ -423,15 +423,11 @@ trait GroupUsersSyncTrait
                 continue;
             }
 
-            /** @var \App\Model\Entity\GroupsUser|null $gp */
-            $gp = $this->GroupsUsers->findById($groupUserId)->contain(['Users'])->first();
-            $username = $gp->get('user')->username;
-            $groupsUsersChanges = [[
-                'id' => $groupUserId,
-                'delete' => true,
-            ]];
+            /** @var \App\Model\Entity\GroupsUser|null $groupUserToDelete */
+            $groupUserToDelete = $this->GroupsUsers->findById($groupUserId)->contain(['Users'])->first();
+            $username = $groupUserToDelete->get('user')->username;
             try {
-                $groupUpdateGroupsUsersCreateService->updateGroupUsers($uac, $group->id, $groupsUsersChanges);
+                $groupUserDeleteService->delete($uac, $groupUserToDelete->id);
                 // Delete relation
                 $directoryRelation = $this->DirectoryRelations->get($groupUserId);
                 $this->DirectoryRelations->delete($directoryRelation);
@@ -443,9 +439,9 @@ trait GroupUsersSyncTrait
                     Alias::STATUS_SUCCESS,
                     $group
                 ));
-            } catch (CustomValidationException $exception) {
-                $errors = $group->getErrors();
-                if (isset($errors['groups_users']['at_least_one_admin'])) {
+            } catch (ValidationException $exception) {
+                $errors = $exception->getEntity()->getErrors();
+                if (isset($errors['is_admin']['at_least_one_group_manager'])) {
                     $msg = __('The user {0} could not be removed from the group {1} because it is the only group manager.', $username, $group->name);//phpcs:ignore
                 } else {
                     $msg = __('The user {0} could not be removed from the group {1} because some validation issues.', $username, $group->name);//phpcs:ignore
@@ -457,7 +453,7 @@ trait GroupUsersSyncTrait
                 $this->addReportItem(new ActionReport(
                     __('The user {0} could not be removed from the group {1} because of an internal error.', $username, $group->name),//phpcs:ignore
                     Alias::MODEL_GROUPS_USERS,
-                    Alias::ACTION_CREATE,
+                    Alias::ACTION_DELETE,
                     Alias::STATUS_ERROR,
                     $error
                 ));

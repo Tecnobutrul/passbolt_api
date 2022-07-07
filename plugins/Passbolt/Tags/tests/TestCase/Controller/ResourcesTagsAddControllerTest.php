@@ -67,7 +67,9 @@ class ResourcesTagsAddControllerTest extends TagPluginIntegrationTestCase
         $this->assertSuccess();
         $response = json_decode($this->_getBodyAsString());
         $results = Hash::extract($response->body, '{n}.slug');
-        $this->assertEquals($results, ['tag1', '🤔']);
+        $this->assertCount(2, $results);
+        $this->assertContains('tag1', $results);
+        $this->assertContains('🤔', $results);
     }
 
     // A user can add personal tags on a resource with read access (V1 format)
@@ -81,7 +83,9 @@ class ResourcesTagsAddControllerTest extends TagPluginIntegrationTestCase
         $this->assertSuccess();
         $response = json_decode($this->_getBodyAsString());
         $results = Hash::extract($response->body, '{n}.slug');
-        $this->assertEquals($results, ['tag1', '🤔']);
+        $this->assertCount(2, $results);
+        $this->assertContains('tag1', $results);
+        $this->assertContains('🤔', $results);
     }
 
     // A user can not add shared tags on a resource with read access
@@ -121,7 +125,11 @@ class ResourcesTagsAddControllerTest extends TagPluginIntegrationTestCase
         $this->assertSuccess();
         $response = json_decode($this->_getBodyAsString());
         $results = Hash::extract($response->body, '{n}.slug');
-        $this->assertEquals($results, ['#bravo', '#stup', 'flip', 'hotel']);
+        $this->assertCount(4, $results);
+        $this->assertContains('#bravo', $results);
+        $this->assertContains('#stup', $results);
+        $this->assertContains('flip', $results);
+        $this->assertContains('hotel', $results);
     }
 
     // A user can add shared and personal tags on a resource it owns via group permission
@@ -135,7 +143,10 @@ class ResourcesTagsAddControllerTest extends TagPluginIntegrationTestCase
         $response = json_decode($this->_getBodyAsString());
         $this->assertSuccess();
         $results = Hash::extract($response->body, '{n}.slug');
-        $this->assertEquals($results, ['#bravo', 'flip', 'stup']);
+        $this->assertCount(3, $results);
+        $this->assertContains('#bravo', $results);
+        $this->assertContains('stup', $results);
+        $this->assertContains('flip', $results);
     }
 
     // A user can add personal tags on a resource it can read via group permission
@@ -149,7 +160,10 @@ class ResourcesTagsAddControllerTest extends TagPluginIntegrationTestCase
         $response = json_decode($this->_getBodyAsString());
         $this->assertSuccess();
         $results = Hash::extract($response->body, '{n}.slug');
-        $this->assertEquals($results, ['#golf', 'flip', 'stup']);
+        $this->assertCount(3, $results);
+        $this->assertContains('#golf', $results);
+        $this->assertContains('stup', $results);
+        $this->assertContains('flip', $results);
     }
 
     // A user can delete shared and personal tags on a resource it owns via direct permission

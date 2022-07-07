@@ -103,6 +103,18 @@ trait TagsModelTrait
     }
 
     /**
+     * Assert a tag exists
+     *
+     * @param string $tagId The tag id
+     */
+    protected function assertTagExists(string $tagId)
+    {
+        $tagsTable = TableRegistry::getTableLocator()->get('Passbolt/Tags.Tags');
+        $tag = $tagsTable->find()->where(['id' => $tagId])->count();
+        $this->assertNotEmpty($tag, 'Expect an existing tag');
+    }
+
+    /**
      * Assert a tag exists for a given user
      *
      * @param string $resourceId The resource id

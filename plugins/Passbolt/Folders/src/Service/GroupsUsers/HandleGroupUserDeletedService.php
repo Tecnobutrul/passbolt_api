@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since         2.13.0
  */
 
-namespace Passbolt\Folders\Service\Groups;
+namespace Passbolt\Folders\Service\GroupsUsers;
 
 use App\Model\Entity\GroupsUser;
 use App\Model\Table\PermissionsTable;
@@ -23,7 +23,7 @@ use App\Service\Permissions\UserHasPermissionService;
 use Cake\ORM\TableRegistry;
 use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsRemoveItemFromUserTreeService;
 
-class GroupsAfterUserRemovedService
+class HandleGroupUserDeletedService
 {
     /**
      * @var \Passbolt\Folders\Service\FoldersRelations\FoldersRelationsRemoveItemFromUserTreeService
@@ -52,13 +52,13 @@ class GroupsAfterUserRemovedService
     }
 
     /**
-     * Handle a user removed from a group.
+     * Handle a group user deletion.
      *
      * @param \App\Model\Entity\GroupsUser $groupUser The deleted group user.
      * @return void
      * @throws \Exception
      */
-    public function afterUserRemoved(GroupsUser $groupUser)
+    public function handle(GroupsUser $groupUser)
     {
         $foldersIdsGroupHasAccess = $this->getFoldersIdsGroupHasAccess($groupUser->group_id);
         foreach ($foldersIdsGroupHasAccess as $folderIdGroupHasAccess) {
