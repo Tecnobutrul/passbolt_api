@@ -24,7 +24,7 @@ use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Validation\Validator;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
-use Passbolt\Folders\Model\Traits\Folders\FoldersRelationsFindersTrait;
+use Passbolt\Folders\Model\Traits\FoldersRelations\FoldersRelationsFindersTrait;
 
 /**
  * FoldersRelations Model

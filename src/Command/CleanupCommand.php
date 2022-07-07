@@ -175,6 +175,7 @@ class CleanupCommand extends PassboltCommand
             $table = TableRegistry::getTableLocator()->get($tableName);
             foreach ($tableCleanup as $i => $cleanupName) {
                 $cleanupMethod = 'cleanup' . str_replace(' ', '', $cleanupName);
+                $io->verbose(" cleaning up $tableName:$cleanupMethod");
                 $recordCount = $table->{$cleanupMethod}($dryRun);
                 $totalErrorCount += $recordCount;
                 if ($recordCount) {

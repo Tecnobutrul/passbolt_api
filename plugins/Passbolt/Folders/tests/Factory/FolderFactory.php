@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\Folders\Test\Factory;
 
+use App\Model\Entity\User;
 use App\Model\Table\PermissionsTable;
 use App\Test\Factory\Traits\FactoryDeletedTrait;
 use Cake\Chronos\Chronos;
@@ -67,13 +68,14 @@ class FolderFactory extends CakephpBaseFactory
     /**
      * Define the associated permissions to create for a given list of users.
      *
-     * @param array $users Array of users to create the folder for
+     * @param array $aros Array of users or groups to create a permission for
      * @return FolderFactory
      */
-    public function withPermissionsFor(array $users): FolderFactory
+    public function withPermissionsFor(array $aros): FolderFactory
     {
-        foreach ($users as $user) {
-            $permissionsMeta = ['aco' => PermissionsTable::FOLDER_ACO, 'aro' => PermissionsTable::USER_ARO, 'aro_foreign_key' => $user->id];
+        foreach ($aros as $aro) {
+            $aroType = $aro instanceof User ? PermissionsTable::USER_ARO : PermissionsTable::GROUP_ARO;
+            $permissionsMeta = ['aco' => PermissionsTable::FOLDER_ACO, 'aro' => $aroType, 'aro_foreign_key' => $aro->id];
             $this->with('Permissions', $permissionsMeta);
         }
 
