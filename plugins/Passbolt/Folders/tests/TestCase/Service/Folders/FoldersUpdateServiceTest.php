@@ -32,14 +32,11 @@ use App\Test\Lib\Model\PermissionsModelTrait;
 use App\Test\Lib\Utility\FixtureProviderTrait;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
-use Cake\Event\EventManager;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
-use Passbolt\Folders\Notification\Email\FoldersEmailRedactorPool;
-use Passbolt\Folders\Notification\NotificationSettings\FolderNotificationSettingsDefinition;
 use Passbolt\Folders\Service\Folders\FoldersUpdateService;
 use Passbolt\Folders\Test\Lib\FoldersTestCase;
 use Passbolt\Folders\Test\Lib\Model\FoldersModelTrait;
@@ -87,13 +84,12 @@ class FoldersUpdateServiceTest extends FoldersTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->service = new FoldersUpdateService();
-        $this->foldersTable = TableRegistry::getTableLocator()->get('Passbolt/Folders.Folders');
 
         $this->loadNotificationSettings();
-        EventManager::instance()->on(new FolderNotificationSettingsDefinition());
-        EventManager::instance()->on(new FoldersEmailRedactorPool());
         (new EmailSubscriptionDispatcher())->collectSubscribedEmailRedactors();
+
+        $this->service = new FoldersUpdateService();
+        $this->foldersTable = TableRegistry::getTableLocator()->get('Passbolt/Folders.Folders');
     }
 
     public function tearDown(): void
@@ -126,7 +122,6 @@ class FoldersUpdateServiceTest extends FoldersTestCase
 
     public function testUpdateFolderSuccess_NotifyUserAfterUpdate()
     {
-                $this->loadPlugins(['Passbolt/Folders' => [], 'Passbolt/EmailDigest' => []]);
         [$folderA, $userAId, $userBId] = $this->insertFixture_InsufficientPermission();
         $uac = new UserAccessControl(Role::USER, $userAId);
 

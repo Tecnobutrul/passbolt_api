@@ -171,6 +171,11 @@ class ResourceEventListenerTest extends FoldersIntegrationTestCase
         $data['secrets'][] = ['user_id' => $userBId, 'data' => Hash::get($this->getDummySecretData(), 'data')];
 
         $this->authenticateAs('ada');
+        /*
+         * If not cleared, the folderizable behavior cannot be applied on the ResourcesTable as the ResourcesTable is already in the registry.
+         * Error: Unknown finder method "folder_parent" on App\Model\Table\ResourcesTable.
+         */
+        TableRegistry::getTableLocator()->clear();
         $this->putJson("/share/resource/{$resource->id}.json", $data);
         $this->assertSuccess();
 
@@ -197,6 +202,11 @@ class ResourceEventListenerTest extends FoldersIntegrationTestCase
         $data['permissions'][] = ['id' => $permission->get('id'), 'delete' => true];
 
         $this->authenticateAs('ada');
+        /*
+         * If not cleared, the folderizable behavior cannot be applied on the ResourcesTable as the ResourcesTable is already in the registry.
+         * Error: Unknown finder method "folder_parent" on App\Model\Table\ResourcesTable.
+         */
+        TableRegistry::getTableLocator()->clear();
         $this->putJson("/share/resource/{$resource->id}.json", $data);
         $this->assertSuccess();
 

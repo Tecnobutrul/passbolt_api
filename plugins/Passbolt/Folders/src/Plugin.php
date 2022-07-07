@@ -14,12 +14,16 @@ declare(strict_types=1);
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.7.0
  */
-namespace Passbolt\Tags;
+namespace Passbolt\Folders;
 
 use Cake\Core\BasePlugin;
 use Cake\Core\PluginApplicationInterface;
-use Passbolt\Tags\EventListener\AddTaggableBehaviorToTaggableTables;
-use Passbolt\Tags\EventListener\GroupsUsersEventListener;
+use Passbolt\Folders\EventListener\AddFolderizableBehavior;
+use Passbolt\Folders\EventListener\GroupsUsersEventListener;
+use Passbolt\Folders\EventListener\PermissionsModelInitializeEventListener;
+use Passbolt\Folders\EventListener\ResourcesEventListener;
+use Passbolt\Folders\Notification\Email\FoldersEmailRedactorPool;
+use Passbolt\Folders\Notification\NotificationSettings\FolderNotificationSettingsDefinition;
 
 class Plugin extends BasePlugin
 {
@@ -29,7 +33,6 @@ class Plugin extends BasePlugin
     public function bootstrap(PluginApplicationInterface $app): void
     {
         parent::bootstrap($app);
-
         $this->registerListeners($app);
     }
 
@@ -42,7 +45,11 @@ class Plugin extends BasePlugin
     public function registerListeners(PluginApplicationInterface $app): void
     {
         $app->getEventManager()
-            ->on(new AddTaggableBehaviorToTaggableTables()) // Decorate the core/other plugins table classes that can be tagged.
-            ->on(new GroupsUsersEventListener()); // Remove tags when a group user is deleted and the user lost access to some resources.
+            ->on(new ResourcesEventListener()) //Add / remove folders relations when a resources is created / deleted
+            ->on(new GroupsUsersEventListener()) // Add / remove folders relations when a group members list is updated
+            ->on(new AddFolderizableBehavior()) // Decorate the core/other plugins table classes that can be organized in folder
+            ->on(new PermissionsModelInitializeEventListener()) // Decorate the permissions table class to add cleanup method
+            ->on(new FolderNotificationSettingsDefinition())// Add email notification settings definition
+            ->on(new FoldersEmailRedactorPool()); // Register email redactors
     }
 }

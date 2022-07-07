@@ -37,14 +37,11 @@ use App\Test\Lib\Utility\FixtureProviderTrait;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
 use Cake\Datasource\ModelAwareTrait;
-use Cake\Event\EventManager;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\TestSuite\IntegrationTestTrait;
 use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
-use Passbolt\Folders\Notification\Email\FoldersEmailRedactorPool;
-use Passbolt\Folders\Notification\NotificationSettings\FolderNotificationSettingsDefinition;
 use Passbolt\Folders\Service\Folders\FoldersDeleteService;
 use Passbolt\Folders\Test\Lib\FoldersTestCase;
 use Passbolt\Folders\Test\Lib\Model\FoldersModelTrait;
@@ -94,12 +91,12 @@ class FoldersDeleteServiceTest extends FoldersTestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->loadNotificationSettings();
+        (new EmailSubscriptionDispatcher())->collectSubscribedEmailRedactors();
+
         $this->service = new FoldersDeleteService();
         $this->loadModel('Resources');
-        $this->loadNotificationSettings();
-        EventManager::instance()->on(new FolderNotificationSettingsDefinition());
-        EventManager::instance()->on(new FoldersEmailRedactorPool());
-        (new EmailSubscriptionDispatcher())->collectSubscribedEmailRedactors();
     }
 
     public function tearDown(): void
@@ -132,7 +129,6 @@ class FoldersDeleteServiceTest extends FoldersTestCase
 
     public function testFolderDelete_CommonSuccess2_NotifyUsersAfterDelete()
     {
-                $this->loadPlugins(['Passbolt/Folders' => [], 'Passbolt/EmailDigest' => []]);
         [$folderA, $folderB, $userAId, $userBId] = $this->insertSharedSuccess2Fixture();
 
         $uac = new UserAccessControl(Role::USER, $userAId);
