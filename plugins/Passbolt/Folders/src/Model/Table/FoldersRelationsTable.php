@@ -20,7 +20,6 @@ namespace Passbolt\Folders\Model\Table;
 use App\Model\Entity\Role;
 use App\Model\Rule\IsNotSoftDeletedRule;
 use App\Model\Traits\Cleanup\TableCleanupTrait;
-use App\Service\Permissions\PermissionsGetUsersIdsHavingAccessToService;
 use App\Utility\UserAccessControl;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\I18n\FrozenTime;
@@ -29,7 +28,7 @@ use Cake\ORM\Table;
 use Cake\Utility\Inflector;
 use Cake\Validation\Validator;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
-use Passbolt\Folders\Model\Traits\Folders\FoldersRelationsFindersTrait;
+use Passbolt\Folders\Model\Traits\FoldersRelations\FoldersRelationsFindersTrait;
 use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemToUserTreeService;
 
 /**
@@ -60,6 +59,7 @@ use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemToUserTreeS
  * @method \Cake\ORM\Query findByUserIdAndForeignModel(string $userId, string $foreignModel)
  * @method \Cake\ORM\Query findByForeignIdAndFolderParentId(string $foreignId, string $folderParentId)
  * @method \Cake\ORM\Query findByUserIdAndFolderParentId(string $userId, string $folderParentId)
+ * @method \Cake\ORM\Query findMissingFoldersRelations(string $foreignModel)
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class FoldersRelationsTable extends Table
@@ -335,28 +335,24 @@ class FoldersRelationsTable extends Table
      */
     public function cleanupMissingFoldersRelations(string $foreignModel, ?bool $dryRun = false): int
     {
-        $count = 0;
         $admin = $this->Users->findFirstAdmin();
         $uac = new UserAccessControl(Role::ADMIN, $admin->id);
         $addItemToUserTreeService = new FoldersRelationsAddItemToUserTreeService();
-        $getUsersIdsHavingAccessToService = new PermissionsGetUsersIdsHavingAccessToService();
 
-        $modelName = Inflector::pluralize($foreignModel);
-        $items = $this->$modelName->find();
-        foreach ($items as $item) {
-            $usersIdsHavingAccess = $getUsersIdsHavingAccessToService->getUsersIdsHavingAccessTo($item->id);
-            foreach ($usersIdsHavingAccess as $userId) {
-                $isInUserTree = $this->isItemInUserTree($userId, $item->id);
-                if (!$isInUserTree) {
-                    $count++;
-                    if (!$dryRun) {
-                        $addItemToUserTreeService->addItemToUserTree($uac, $foreignModel, $item->id, $userId);
-                    }
-                }
+        $missingFoldersRelations = $this->findMissingFoldersRelations($foreignModel)->all();
+
+        foreach ($missingFoldersRelations as $missingFolderRelation) {
+            if (!$dryRun) {
+                $addItemToUserTreeService->addItemToUserTree(
+                    $uac,
+                    $foreignModel,
+                    $missingFolderRelation['foreign_id'],
+                    $missingFolderRelation['user_id']
+                );
             }
         }
 
-        return $count;
+        return count($missingFoldersRelations);
     }
 
     /**

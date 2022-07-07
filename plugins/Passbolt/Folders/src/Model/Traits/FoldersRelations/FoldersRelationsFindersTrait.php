@@ -15,8 +15,11 @@ declare(strict_types=1);
  * @since         2.13.0
  */
 
-namespace Passbolt\Folders\Model\Traits\Folders;
+namespace Passbolt\Folders\Model\Traits\FoldersRelations;
 
+use App\Model\Table\PermissionsTable;
+use Cake\Database\Expression\IdentifierExpression;
+use Cake\Database\Expression\QueryExpression;
 use Cake\ORM\Query;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 
@@ -94,5 +97,62 @@ trait FoldersRelationsFindersTrait
             ->leftJoinWith('FoldersParents')
             ->whereNull('FoldersParents.id')
             ->whereNotNull('FoldersRelations.folder_parent_id');
+    }
+
+    /**
+     * Returns a query that retrieves all the missing folders relations for a given foreign model.
+     *
+     * @param string $foreignModel The foreign model to filter on
+     * @return \Cake\ORM\Query
+     */
+    public function findMissingFoldersRelations(string $foreignModel): Query
+    {
+        // Find direct users accesses.
+        $directUsersSecretsQuery = $this->Resources->Permissions->find()
+            ->select([
+                'aco_foreign_key' => 'aco_foreign_key',
+                'user_id' => 'aro_foreign_key',
+            ])
+            ->where([
+                'aco' => $foreignModel,
+                'aro' => PermissionsTable::USER_ARO,
+            ]);
+
+        // Find inherited users accesses.
+        $inheritedUsersSecretsQuery = $this->Resources->Permissions->find()
+            ->select([
+                'aco_foreign_key' => 'aco_foreign_key',
+                'user_id' => 'groups_users.user_id',
+            ])
+            ->leftJoin('groups_users', 'aro_foreign_key = group_id')
+            ->where([
+                'aco' => $foreignModel,
+                'aro' => PermissionsTable::GROUP_ARO,
+            ]);
+
+        // Find users accesses = direct users accesses + inherited users accesses.
+        $userExpectedAccessesQuery = $directUsersSecretsQuery
+            ->union($inheritedUsersSecretsQuery)
+            ->group(['aco_foreign_key', 'user_id']);
+
+        /*
+         * Find users accesses for which a folder relation is missing.
+         * A right join strategy is used instead of a subquery to improve the query performance.
+         */
+        return $this->find()
+            ->join([
+                'table' => $userExpectedAccessesQuery,
+                'alias' => 'ExpectedAccesses',
+                'type' => 'RIGHT',
+                'conditions' => [
+                    'ExpectedAccesses.aco_foreign_key' => new IdentifierExpression('FoldersRelations.foreign_id'),
+                    'ExpectedAccesses.user_id' => new IdentifierExpression('FoldersRelations.user_id'),
+                ],
+            ])
+            ->select(['foreign_id' => 'ExpectedAccesses.aco_foreign_key', 'user_id' => 'ExpectedAccesses.user_id'])
+            ->where(function (QueryExpression $exp) {
+                return $exp
+                    ->isNull('FoldersRelations.foreign_id');
+            });
     }
 }
