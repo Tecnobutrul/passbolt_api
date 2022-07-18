@@ -58,7 +58,7 @@ class InjectMfaFormMiddleware implements MiddlewareInterface
 
         // If the url starts with "mfa" and the user is logged in
         // Inject the appropriate MFA Form according to the route.
-        if ($path && isset($uac)) {
+        if ($path && is_string($uac->getId())) {
             $mfaSettings = MfaSettings::get($uac);
             $this->services($this->getContainer($request), $path, $uac, $mfaSettings);
         }

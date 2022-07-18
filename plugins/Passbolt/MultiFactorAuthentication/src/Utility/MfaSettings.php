@@ -81,7 +81,7 @@ class MfaSettings
     {
         if (self::$instance !== null) {
             if (self::$instance->uac->getId() !== $uac->getId()) {
-                throw new InternalErrorException('Invalid UserControl user id.');
+                throw new InternalErrorException('Invalid User Account Control ID.');
             }
 
             return self::$instance;
@@ -95,7 +95,7 @@ class MfaSettings
         }
         try {
             $accountSettings = MfaAccountSettings::get($uac);
-        } catch (RecordNotFoundException $exception) {
+        } catch (RecordNotFoundException | InternalErrorException $exception) {
             $accountSettings = null;
         }
 
