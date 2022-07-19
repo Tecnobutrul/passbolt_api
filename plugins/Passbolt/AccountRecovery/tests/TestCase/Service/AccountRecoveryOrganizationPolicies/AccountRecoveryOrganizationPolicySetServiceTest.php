@@ -341,7 +341,7 @@ NZMBGPJsxOKQExEOZncOVsY7ZqLrecuR8UJBQnhPd1aoz3HCJppaPxL4Q==
             $this->fail();
         } catch (CustomValidationException $exception) {
             $e = $exception->getErrors();
-            $this->assertSame('Invalid key. No user ID found.', $e['account_recovery_organization_public_key']['fingerprint']['isMatchingKeyFingerprintRule']);
+            $this->assertSame('Could not parse the OpenPGP public key.', $e['account_recovery_organization_public_key']['fingerprint']['isMatchingKeyFingerprintRule']);
         }
     }
 
@@ -418,6 +418,26 @@ NZMBGPJsxOKQExEOZncOVsY7ZqLrecuR8UJBQnhPd1aoz3HCJppaPxL4Q==
         } catch (CustomValidationException $exception) {
             $e = $exception->getErrors();
             $this->assertNotEmpty($e['account_recovery_organization_public_key']['armored_key']['isValidKeySizeStrictRule']);
+        }
+    }
+
+    /**
+     * Disabled => Enabled with rsa2048 key
+     */
+    public function testAccountRecoveryOrganizationPolicySetService_PublicKeyValidation_Error_NotRSAKey()
+    {
+        try {
+            $this->service->set($this->getUac(), [
+                'policy' => 'opt-in',
+                'account_recovery_organization_public_key' => [
+                    'fingerprint' => 'A0F8C364CDBF24A0B08705B9E26A323B3F4E4124',
+                    'armored_key' => file_get_contents(FIXTURES . 'OpenPGP' . DS . 'PublicKeys' . DS . 'elgamal_public.key'),
+                ],
+            ]);
+            $this->fail();
+        } catch (CustomValidationException $exception) {
+            $e = $exception->getErrors();
+            $this->assertNotEmpty($e['account_recovery_organization_public_key']['armored_key']['isValidAlgorithmStrictRule']);
         }
     }
 
