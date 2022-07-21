@@ -422,6 +422,26 @@ NZMBGPJsxOKQExEOZncOVsY7ZqLrecuR8UJBQnhPd1aoz3HCJppaPxL4Q==
     }
 
     /**
+     * Disabled => Enabled with broken key
+     */
+    public function testAccountRecoveryOrganizationPolicySetService_PublicKeyValidation_Error_BrokenKey()
+    {
+        try {
+            $this->service->set($this->getUac(), [
+                'policy' => 'opt-in',
+                'account_recovery_organization_public_key' => [
+                    'fingerprint' => '67BFFCB7B74AF4C85E81AB26508850525CD78BAA',
+                    'armored_key' => file_get_contents(FIXTURES . 'OpenPGP' . DS . 'PublicKeys' . DS . 'rsa4096_public_broken.key'),
+                ],
+            ]);
+            $this->fail();
+        } catch (CustomValidationException $exception) {
+            $e = $exception->getErrors();
+            $this->assertNotEmpty($e['account_recovery_organization_public_key']['armored_key']['canEncrypt']);
+        }
+    }
+
+    /**
      * Disabled => Enabled with rsa2048 key
      */
     public function testAccountRecoveryOrganizationPolicySetService_PublicKeyValidation_Error_NotRSAKey()

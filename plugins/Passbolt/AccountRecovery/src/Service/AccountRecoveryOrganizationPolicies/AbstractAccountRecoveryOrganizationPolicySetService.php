@@ -19,11 +19,13 @@ namespace Passbolt\AccountRecovery\Service\AccountRecoveryOrganizationPolicies;
 
 use App\Error\Exception\CustomValidationException;
 use App\Error\Exception\ValidationException;
+use App\Service\OpenPGP\PublicKeyCanEncryptCheckService;
 use App\Service\OpenPGP\PublicKeyRevocationCheckService;
 use App\Service\OpenPGP\PublicKeyValidationService;
 use App\Utility\UserAccessControl;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\ModelAwareTrait;
+use Cake\Log\Log;
 use Cake\Utility\Hash;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryOrganizationPolicy;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryOrganizationPublicKey;
@@ -216,11 +218,22 @@ class AbstractAccountRecoveryOrganizationPolicySetService
         try {
             $data = $this->getData('account_recovery_organization_public_key');
             $entity = $this->AccountRecoveryOrganizationPublicKeys->buildAndValidateEntity($uac, $data);
+
+            // Check key can be parsed
             PublicKeyValidationService::parseAndValidatePublicKey(
                 $entity->armored_key,
                 PublicKeyValidationService::getStrictRules()
             );
+
+            // Prevent key reuse
             $this->assertPublicKeyModelRules($entity);
+
+            // Make sure key can be used to encrypt - ref. PBL-07-002
+            if (!PublicKeyCanEncryptCheckService::check($entity->armored_key, $entity->fingerprint)) {
+                $msg = __('The OpenPGP key can not be used to encrypt.');
+                throw new CustomValidationException($msg, ['armored_key' => ['canEncrypt' => $msg]]);
+            }
+
         } catch (ValidationException | CustomValidationException $exception) {
             throw new CustomValidationException(__('Could not validate policy data.'), [
                 'account_recovery_organization_public_key' => $exception->getErrors(),
