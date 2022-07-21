@@ -25,7 +25,6 @@ use App\Service\OpenPGP\PublicKeyValidationService;
 use App\Utility\UserAccessControl;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\ModelAwareTrait;
-use Cake\Log\Log;
 use Cake\Utility\Hash;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryOrganizationPolicy;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryOrganizationPublicKey;
@@ -233,7 +232,6 @@ class AbstractAccountRecoveryOrganizationPolicySetService
                 $msg = __('The OpenPGP key can not be used to encrypt.');
                 throw new CustomValidationException($msg, ['armored_key' => ['canEncrypt' => $msg]]);
             }
-
         } catch (ValidationException | CustomValidationException $exception) {
             throw new CustomValidationException(__('Could not validate policy data.'), [
                 'account_recovery_organization_public_key' => $exception->getErrors(),
