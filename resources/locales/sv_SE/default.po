@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 41c2572bd9bd4cc908d3e09e0cbed6e5\n"
-"POT-Creation-Date: 2021-10-06 16:57+0000\n"
-"PO-Revision-Date: 2022-01-11 13:44\n"
+"POT-Creation-Date: 2022-07-22 12:47+0000\n"
+"PO-Revision-Date: 2022-07-22 14:39\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -286,56 +286,29 @@ msgstr "Resursen har uppdaterats."
 msgid "The secret does not exist."
 msgstr "Hemligheten finns inte."
 
-msgid "The key provided does not belong to given user."
-msgstr "Nyckeln som anges tillhör inte användaren."
+msgid "Only guest are allowed to abort recovery process."
+msgstr ""
+
+msgid "An authentication token must be provided."
+msgstr ""
+
+msgid "The recovery process was aborted."
+msgstr ""
+
+msgid "Only guest are allowed to complete setup."
+msgstr ""
 
 msgid "The recovery was completed successfully."
 msgstr "Återställningen slutfördes framgångsrikt."
 
-msgid "The user identifier should be a valid UUID."
-msgstr "Användarmarkören ska vara ett giltigt UUID."
-
-msgid "The user does not exist, has not completed the setup or was deleted."
-msgstr "Användaren existerar inte, har inte slutfört installationen eller har tagits bort."
-
-msgid "The user does not exist or is not active."
-msgstr "Användaren existerar inte eller är inte aktiv."
-
-msgid "The authentication token is not valid."
-msgstr "Autentiserings-token är inte giltig."
-
-msgid "The token is expired."
-msgstr "Token har löpt ut."
-
-msgid "The OpenPGP key data is not valid."
-msgstr "OpenPGP-nyckeldatan är inte giltig."
+msgid "Only guest are allowed to proceed with account recovery."
+msgstr ""
 
 msgid "The setup was completed successfully."
 msgstr "Konfigurationen har slutförts."
 
-msgid "An authentication token should be provided."
-msgstr "En autentiseringstoken bör anges."
-
-msgid "The authentication token should be a valid UUID."
-msgstr "Autentiseringstoken bör vara ett giltigt UUID."
-
-msgid "The authentication token is not valid or has expired."
-msgstr "Autentiseringstoken är inte giltig eller har gått ut."
-
-msgid "The user does not exist, is already active or has been deleted."
-msgstr "Användaren finns inte, är redan aktiv eller har tagits bort."
-
-msgid "An OpenPGP key must be provided."
-msgstr "En OpenPGP-nyckel måste anges."
-
-msgid "A valid OpenPGP key must be provided."
-msgstr "En giltig OpenPGP-nyckel måste anges."
-
-msgid "The token should be a valid UUID."
-msgstr "Token ska vara ett giltigt UUID."
-
-msgid "The user does not exist or is active."
-msgstr "Användaren finns inte eller är aktiv."
+msgid "Only guest are allowed to start setup."
+msgstr ""
 
 msgid "You are not authorized to share this resource."
 msgstr "Du har inte behörighet att dela denna resurs."
@@ -351,6 +324,9 @@ msgstr "Användaren kan tas bort."
 
 msgid "The user has been deleted successfully."
 msgstr "Användaren har tagits bort."
+
+msgid "The user identifier should be a valid UUID."
+msgstr "Användarmarkören ska vara ett giltigt UUID."
 
 msgid "You are not allowed to delete yourself."
 msgstr "Du får inte ta bort dig själv."
@@ -394,18 +370,6 @@ msgstr "Endast gäster tillåts återställa ett konto. Vänligen logga ut förs
 msgid "Recovery process started, check your email."
 msgstr "Återställningsprocessen har startats, kolla din e-post."
 
-msgid "Please provide a valid email address."
-msgstr "Vänligen ange en giltig e-postadress."
-
-msgid "This user does not exist or has been deleted."
-msgstr "Den här användaren finns inte eller har tagits bort."
-
-msgid "Please register and complete the setup first."
-msgstr "Vänligen registrera dig och slutför installationen först."
-
-msgid "Please contact your administrator."
-msgstr "Kontakta din administratör."
-
 msgid "Registration is not opened to public. Please contact your administrator."
 msgstr "Registreringen är inte öppen för allmänheten. Kontakta din administratör."
 
@@ -420,6 +384,9 @@ msgstr "Användaren finns inte."
 
 msgid "The identifier should not be empty."
 msgstr "Identifieraren får inte vara tom."
+
+msgid "The token should be a valid UUID."
+msgstr "Token ska vara ett giltigt UUID."
 
 msgid "A token is required."
 msgstr "En token måste anges."
@@ -568,8 +535,14 @@ msgstr "En bepansrad nyckel krävs."
 msgid "The armored key should not be empty."
 msgstr "Den bepansrade nyckeln får inte vara tom."
 
-msgid "The armored key should be a valid ASCII-armored OpenPGP key."
-msgstr "Den bepansrade nyckeln bör vara en giltig ASCII-bepansrad OpenPGP-nyckel."
+msgid "The fingerprint should be a valid ASCII string."
+msgstr "Fingeravtrycket bör vara en giltig ASCII-sträng."
+
+msgid "A fingerprint is required"
+msgstr "Ett fingeravtryck krävs"
+
+msgid "The fingerprint should not be empty"
+msgstr "Fingeravtrycket får inte vara tomt"
 
 msgid "A length is required."
 msgstr "Det krävs en längd."
@@ -586,21 +559,6 @@ msgstr "En nyckel-identifierare krävs."
 msgid "The key identifier should not be empty."
 msgstr "Nyckelidentifieraren får inte vara tom."
 
-msgid "The key identifier should be a string of 8 hexadecimal characters."
-msgstr "Nyckeln identifierare bör vara en sträng av 8 hexadecimala tecken."
-
-msgid "The fingerprint should be a valid ASCII string."
-msgstr "Fingeravtrycket bör vara en giltig ASCII-sträng."
-
-msgid "A fingerprint is required"
-msgstr "Ett fingeravtryck krävs"
-
-msgid "The fingerprint should not be empty"
-msgstr "Fingeravtrycket får inte vara tomt"
-
-msgid "The fingerprint should be a string of 40 hexadecimal characters."
-msgstr "Fingeravtrycket bör vara en sträng av 40 hexadecimala tecken."
-
 msgid "The type should be a valid ASCII string."
 msgstr "Typen ska vara en giltig ASCII-sträng."
 
@@ -610,14 +568,8 @@ msgstr "En typ är obligatorisk"
 msgid "The type should not be empty"
 msgstr "Typen får inte vara tom"
 
-msgid "The type should be one of the following: RSA, DSA, ECC, ELGAMAL, ECDSA, DH."
-msgstr "Typen ska vara en av följande: RSA, DSA, ECC, ELGAMAL, ECDSA, DH."
-
 msgid "The expiry should be a valid date."
 msgstr "Förfallodatum ska vara ett giltigt datum."
-
-msgid "The key should not already be expired."
-msgstr "Nyckeln bör inte redan ha gått ut."
 
 msgid "The creation date should be a valid date."
 msgstr "Skapandedatum måste vara ett giltigt datum."
@@ -627,9 +579,6 @@ msgstr "Ett skapandedatum måste fyllas i."
 
 msgid "The creation date should not be empty."
 msgstr "Skapandedatumet får inte vara tomt."
-
-msgid "The creation date should be set in the past."
-msgstr "Skapandedatum måste fastställas i det förflutna."
 
 msgid "The deleted status should be a valid boolean."
 msgstr "Den borttagna statusen ska vara en giltig boolean."
@@ -643,8 +592,17 @@ msgstr "En användaridentifiering krävs"
 msgid "The user identifier should not be empty"
 msgstr "Användaridentifieraren får inte vara tom"
 
-msgid "Could not parse the key info."
-msgstr "Kan inte tolka nyckelinformationen."
+msgid "You cannot reuse the server keys."
+msgstr ""
+
+msgid "A valid OpenPGP key must be provided."
+msgstr "En giltig OpenPGP-nyckel måste anges."
+
+msgid "The OpenPGP armored key could not be parsed."
+msgstr ""
+
+msgid "The OpenPGP armored key could not be validated."
+msgstr ""
 
 msgid "The name should be a valid UTF8 string."
 msgstr "Namnet bör vara en giltig UTF8-sträng."
@@ -721,8 +679,8 @@ msgstr "En egenskap krävs."
 msgid "The property should not be empty."
 msgstr "Egenskapen får inte vara tom."
 
-msgid "The property should be an alphabetical string and only point is accepted as special characters."
-msgstr "Egenskapen bör vara en alfabetisk sträng och endast punkt accepteras som specialtecken."
+msgid "The property should be an alphabetical string and only dot is accepted as special characters."
+msgstr ""
 
 msgid "The property identifier should be a valid UUID."
 msgstr "Egenskapsidentifieraren bör vara ett giltigt UUID."
@@ -958,9 +916,6 @@ msgstr "Resursidentifieraren får inte vara tom."
 msgid "The message should be a valid ASCII string."
 msgstr "Meddelandet ska vara en giltig ASCII-sträng."
 
-msgid "The message should be a valid ASCII-armored gpg message."
-msgstr "Meddelandet bör vara ett giltigt ASCII-pansarat gpg-meddelande."
-
 msgid "A message is required."
 msgstr "Ett meddelande måste anges."
 
@@ -1009,6 +964,33 @@ msgstr "Användaren bör inte vara ensam gruppchef för grupp(er), överför han
 msgid "Could not delete the user {0}, please try again later."
 msgstr "Kunde inte ta bort användaren {0}, försök igen senare."
 
+msgid "The armored key should be a valid ASCII-armored OpenPGP key."
+msgstr "Den bepansrade nyckeln bör vara en giltig ASCII-bepansrad OpenPGP-nyckel."
+
+msgid "The message should be a valid ASCII-armored OpenPGP message."
+msgstr ""
+
+msgid "The creation date should be set in the past."
+msgstr "Skapandedatum måste fastställas i det förflutna."
+
+msgid "The key should not already be expired."
+msgstr "Nyckeln bör inte redan ha gått ut."
+
+msgid "The fingerprint does not match the one of the armored key."
+msgstr ""
+
+msgid "The fingerprint should be a string of 40 hexadecimal characters."
+msgstr "Fingeravtrycket bör vara en sträng av 40 hexadecimala tecken."
+
+msgid "The type should be one of the following: RSA, DSA, ECC, ELGAMAL, ECDSA, DH."
+msgstr "Typen ska vara en av följande: RSA, DSA, ECC, ELGAMAL, ECDSA, DH."
+
+msgid "The delete status should be a valid boolean."
+msgstr ""
+
+msgid "The key identifier should be a string of 8 hexadecimal characters."
+msgstr "Nyckeln identifierare bör vara en sträng av 8 hexadecimala tecken."
+
 msgid "{0} just activated their account on passbolt"
 msgstr "{0} aktiverade precis sitt konto på passbolt"
 
@@ -1033,6 +1015,12 @@ msgstr "{0} tog bort dig från gruppen {1}"
 msgid "{0} updated your membership in the group {1}"
 msgstr "{0} uppdaterade ditt medlemskap i gruppen {1}"
 
+msgid "{0} just completed the account recovery process"
+msgstr ""
+
+msgid "You just completed the account recovery process!"
+msgstr ""
+
 msgid "Your account recovery, {0}!"
 msgstr "Återställning av ditt konto, {0}!"
 
@@ -1044,6 +1032,9 @@ msgstr "{0} tog bort lösenordet {1}"
 
 msgid "{0} edited the password {1}"
 msgstr "{0} redigerade lösenordet {1}"
+
+msgid "{0} can not complete the account recovery process!"
+msgstr ""
 
 msgid "{0} shared the password {1}"
 msgstr "{0} delade lösenordet {1}"
@@ -1099,6 +1090,9 @@ msgstr "Inställningen för visa användarnamn bör vara en boolean."
 msgid "The send on user setup completed setting should be a boolean."
 msgstr "Inställningen att skicka när användarkonfigurationen är klar måste vara en boolean."
 
+msgid "The send on user recover abort setting should be a boolean."
+msgstr ""
+
 msgid "The send on comment added setting should be a boolean."
 msgstr "Inställningen skicka när kommentar lagts till bör vara en boolean."
 
@@ -1134,6 +1128,18 @@ msgstr "Inställningen skicka när användare skapats bör vara en boolean."
 
 msgid "The send on user recovered setting should be a boolean."
 msgstr "Inställningen skicka när användare återställts bör vara en boolean."
+
+msgid "The token is expired."
+msgstr "Token har löpt ut."
+
+msgid "The authentication token is not valid."
+msgstr "Autentiserings-token är inte giltig."
+
+msgid "The authentication token could not be found."
+msgstr ""
+
+msgid "The token is already consumed."
+msgstr ""
 
 msgid "Validation failed for authenticationToken {0}. {1}"
 msgstr "Validering misslyckades för autentiseringtoken {0}. {1}"
@@ -1171,6 +1177,12 @@ msgstr "Kryptering lyckades för nyckel {0}"
 msgid "Failed to encrypt with key {0}. {1}"
 msgstr "Misslyckades att kryptera med nyckeln {0}. {1}"
 
+msgid "Key expired: {0}."
+msgstr ""
+
+msgid "Expiration date valid for key {0}."
+msgstr ""
+
 msgid "Validation failed for group {0}. {1}"
 msgstr "Validering misslyckades för gruppen {0}. {1}"
 
@@ -1180,11 +1192,77 @@ msgstr "Validering lyckades för grupp {0}"
 msgid "Could not validate group user data."
 msgstr "Kunde inte validera användardata för grupp."
 
-msgid "The group user does not exist."
-msgstr "Gruppanvändaren finns inte."
+msgid "Could not validate sub key data."
+msgstr ""
 
-msgid "At least one group manager should be provided."
-msgstr "Minst en gruppchef bör tillhandahållas."
+msgid "Public key sub key id could not be found."
+msgstr ""
+
+msgid "Could not validate message data."
+msgstr ""
+
+msgid "Recipient information could not be found."
+msgstr ""
+
+msgid "The public key could not be parsed."
+msgstr ""
+
+msgid "The armored message must not contain an extra line before the end block."
+msgstr ""
+
+msgid "The message must contain an asymmetric packet."
+msgstr ""
+
+msgid "The message must contain a symmetric packet."
+msgstr ""
+
+msgid "The message must contain only one recipient."
+msgstr ""
+
+msgid "Unknown key validation rule: {0}"
+msgstr ""
+
+msgid "The armored message could not be validated."
+msgstr ""
+
+msgid "The algorithm is invalid."
+msgstr ""
+
+msgid "The fingerprint id is invalid."
+msgstr ""
+
+msgid "The public key id is invalid."
+msgstr ""
+
+msgid "The key size is not valid."
+msgstr ""
+
+msgid "The key size must match security recommendations."
+msgstr ""
+
+msgid "The key creation date must not be in the future."
+msgstr ""
+
+msgid "The key must not be expired."
+msgstr ""
+
+msgid "The key must not include an expiry date."
+msgstr ""
+
+msgid "The key must be revoked."
+msgstr ""
+
+msgid "The key must not be revoked."
+msgstr ""
+
+msgid "The armored key must not contain an extra line before the end block."
+msgstr ""
+
+msgid "The armored key must not contain multiple keys."
+msgstr ""
+
+msgid "The public key could not be validated."
+msgstr ""
 
 msgid "Could not validate permission data."
 msgstr "Kunde inte validera behörighetsdata."
@@ -1249,6 +1327,63 @@ msgstr "Kunde inte validera hemlighetsdata."
 msgid "The secrets of all the users having access to the resource are required."
 msgstr "Hemligheterna för alla användare som har tillgång till resursen krävs."
 
+msgid "An authentication token should be provided."
+msgstr "En autentiseringstoken bör anges."
+
+msgid "The authentication token should be a valid UUID."
+msgstr "Autentiseringstoken bör vara ett giltigt UUID."
+
+msgid "An OpenPGP key must be provided."
+msgstr "En OpenPGP-nyckel måste anges."
+
+msgid "The authentication token could not be saved."
+msgstr ""
+
+msgid "The user does not exist, has not completed the setup or was deleted."
+msgstr "Användaren existerar inte, har inte slutfört installationen eller har tagits bort."
+
+msgid "Could not update the authentication token data."
+msgstr ""
+
+msgid "The key provided does not belong to given user."
+msgstr "Nyckeln som anges tillhör inte användaren."
+
+msgid "The user does not exist or is not active."
+msgstr "Användaren existerar inte eller är inte aktiv."
+
+msgid "The OpenPGP key data is not valid."
+msgstr "OpenPGP-nyckeldatan är inte giltig."
+
+msgid "The OpenPGP key can not be used to encrypt."
+msgstr ""
+
+msgid "The user does not exist, is already active or has been deleted."
+msgstr "Användaren finns inte, är redan aktiv eller har tagits bort."
+
+msgid "The user does not exist or is already active."
+msgstr ""
+
+msgid "The user should not be a guest."
+msgstr ""
+
+msgid "Account recovery case must be a string."
+msgstr ""
+
+msgid "Account recovery reason not supported."
+msgstr ""
+
+msgid "Please provide a valid email address."
+msgstr "Vänligen ange en giltig e-postadress."
+
+msgid "This user does not exist or has been deleted."
+msgstr "Den här användaren finns inte eller har tagits bort."
+
+msgid "Please register and complete the setup first."
+msgstr "Vänligen registrera dig och slutför installationen först."
+
+msgid "Please contact your administrator."
+msgstr "Kontakta din administratör."
+
 msgid "Validation failed for user {0}. {1}"
 msgstr "Validering misslyckades för användare {0}. {1}"
 
@@ -1272,12 +1407,6 @@ msgstr "Kunde inte använda nyckel {0} för att signera."
 
 msgid "Could not parse the OpenPGP public key."
 msgstr "Kunde inte tolka OpenPGP publika nyckel."
-
-msgid "Invalid key. No OpenPGP public key package found."
-msgstr "Ogiltig nyckel. Inget OpenPGP-paket för publik nyckel hittades."
-
-msgid "Invalid key. No user ID found."
-msgstr "Ogiltig nyckel. Inget användar-ID hittades."
 
 msgid "Could not import the OpenPGP key."
 msgstr "Kunde inte importera OpenPGP-nyckeln."
@@ -1318,11 +1447,557 @@ msgstr "Fingeravtrycket matchar inte den som är associerad med nyckeln i filen.
 msgid "No OpenPGP marker found."
 msgstr "Ingen OpenPGP-markör hittades."
 
+msgid "Invalid key. No OpenPGP public key package found."
+msgstr "Ogiltig nyckel. Inget OpenPGP-paket för publik nyckel hittades."
+
+msgid "Invalid key. No user ID found."
+msgstr "Ogiltig nyckel. Inget användar-ID hittades."
+
+msgid "Unsupported algorithm."
+msgstr ""
+
+msgid "Invalid key. No OpenPGP package found."
+msgstr ""
+
 msgid "This is not a valid OpenPGP armored marker."
 msgstr "Detta är inte en giltig OpenPGP pansarmarkör."
 
 msgid "The key {0} was not found in the keyring"
 msgstr "Nyckeln {0} hittades inte i nyckelringen"
+
+msgid "The user id is invalid."
+msgstr ""
+
+msgid "The authentication token id is invalid."
+msgstr ""
+
+msgid "The request data should not be empty."
+msgstr ""
+
+msgid "You are not allowed to access this location."
+msgstr "Du har inte behörighet att komma åt den här platsen."
+
+msgid "Only guest are allowed to create an account recovery request."
+msgstr ""
+
+msgid "Invalid request. Please provide the required data."
+msgstr ""
+
+msgid "The request id is invalid."
+msgstr ""
+
+msgid "Please provide a valid request id."
+msgstr ""
+
+msgid "Only admin are allowed to create an account recovery request."
+msgstr ""
+
+msgid "A policy is required."
+msgstr ""
+
+msgid "The policy name should not be empty."
+msgstr ""
+
+msgid "The policy should be one of the following: {0}."
+msgstr ""
+
+msgid "The public key identifier should be a valid UUID."
+msgstr ""
+
+msgid "The public key identifier should not be empty."
+msgstr ""
+
+msgid "The identifier of the user who created the organization policy should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who created the organization policy is required."
+msgstr ""
+
+msgid "The identifier of the user who created the organization policy should not be empty."
+msgstr ""
+
+msgid "The identifier of the user who modified the organization policy should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who modified the organization policy is required."
+msgstr ""
+
+msgid "The identifier of the user who modified the organization policy should not be empty."
+msgstr ""
+
+msgid "Could not validate policy data."
+msgstr ""
+
+msgid "The armored key is too big."
+msgstr ""
+
+msgid "The \"deleted\" field should be a valid date."
+msgstr ""
+
+msgid "The identifier of the user who created the organization public key should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who created the organization public key is required."
+msgstr ""
+
+msgid "The identifier of the user who created the organization public key should not be empty."
+msgstr ""
+
+msgid "The identifier of the user who modified the organization public key should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who modified the organization public key is required."
+msgstr ""
+
+msgid "The identifier of the user who modified the organization public key should not be empty."
+msgstr ""
+
+msgid "You cannot reuse the user keys."
+msgstr ""
+
+msgid "You cannot reuse account recovery organization public keys."
+msgstr ""
+
+msgid "Could not validate public key data."
+msgstr ""
+
+msgid "The recipient_foreign_model should be a valid string."
+msgstr ""
+
+msgid "The recipient_foreign_model must be provided."
+msgstr ""
+
+msgid "The recipient_foreign_model should not be empty."
+msgstr ""
+
+msgid "The recipient_foreign_model must be one of the following: {0}."
+msgstr ""
+
+msgid "The data should be a valid string."
+msgstr ""
+
+msgid "The data is required."
+msgstr ""
+
+msgid "The data should not be empty."
+msgstr ""
+
+msgid "The data is too big."
+msgstr ""
+
+msgid "The identifier of the user who created the private key passwords should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who created the private key passwords is required."
+msgstr ""
+
+msgid "The identifier of the user who created the private key passwords should not be empty."
+msgstr ""
+
+msgid "The identifier of the user who modified the private key passwords should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who modified the private key passwords is required."
+msgstr ""
+
+msgid "The identifier of the user who modified the private key passwords should not be empty."
+msgstr ""
+
+msgid "The private key identifier should be a valid UUID."
+msgstr ""
+
+msgid "A private key identifier is required."
+msgstr ""
+
+msgid "The private key identifier should not be empty."
+msgstr ""
+
+msgid "Could not validate password data."
+msgstr ""
+
+msgid "The identifier of the user who created the private key  should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who created the private key  is required."
+msgstr ""
+
+msgid "The identifier of the user who created the private key  should not be empty."
+msgstr ""
+
+msgid "The identifier of the user who modified the private key  should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who modified the private key is required."
+msgstr ""
+
+msgid "The identifier of the user who modified the private key  should not be empty."
+msgstr ""
+
+msgid "The account recovery private key is not valid."
+msgstr ""
+
+msgid "The status should not be a valid string."
+msgstr ""
+
+msgid "This status is not supported."
+msgstr ""
+
+msgid "The status length should be maximum {0} characters."
+msgstr ""
+
+msgid "A status is required."
+msgstr "En status måste anges."
+
+msgid "The status should not be empty."
+msgstr "Statusen får inte vara tom."
+
+msgid "The identifier of the user who created the request should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who created the request is required."
+msgstr ""
+
+msgid "The identifier of the user who created the request should not be empty."
+msgstr ""
+
+msgid "The identifier of the user who modified the request should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who modified the request is required."
+msgstr ""
+
+msgid "The identifier of the user who modified the request should not be empty."
+msgstr ""
+
+msgid "The user does not exist or is not active or has been deleted."
+msgstr "Användaren finns inte, är inte aktiv eller har tagits bort."
+
+msgid "The request is invalid."
+msgstr ""
+
+msgid "The account request is invalid."
+msgstr ""
+
+msgid "Invalid response status. Not supported."
+msgstr ""
+
+msgid "The responder_foreign_key should not be empty."
+msgstr ""
+
+msgid "The responder_foreign_key should be a valid UUID."
+msgstr ""
+
+msgid "The responder_foreign_model should be a valid string."
+msgstr ""
+
+msgid "The responder_foreign_model should not be empty."
+msgstr ""
+
+msgid "The responder_foreign_model must be one of the following: {0}."
+msgstr ""
+
+msgid "The identifier of the user who created the response should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who created the response is required."
+msgstr ""
+
+msgid "The identifier of the user who created the response should not be empty."
+msgstr ""
+
+msgid "The identifier of the user who modified the response should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who modified the response is required."
+msgstr ""
+
+msgid "The identifier of the user who modified the response should not be empty."
+msgstr ""
+
+msgid "The account recovery request response is invalid."
+msgstr ""
+
+msgid "The status should not be empty"
+msgstr ""
+
+msgid "The status should be one of the following: {0}."
+msgstr ""
+
+msgid "The identifier of the user who created the user settings should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who created the user settings is required."
+msgstr ""
+
+msgid "The identifier of the user who created the user settings should not be empty."
+msgstr ""
+
+msgid "The identifier of the user who modified the user settings should be a valid UUID."
+msgstr ""
+
+msgid "The identifier of the user who modified the user settings is required."
+msgstr ""
+
+msgid "The identifier of the user who modified the user settings should not be empty."
+msgstr ""
+
+msgid "This user already has an account recovery setting"
+msgstr ""
+
+msgid "The account recovery user setting is not valid."
+msgstr ""
+
+msgid "An email notification setting should be a boolean."
+msgstr "En e-postavisering bör vara en boolean."
+
+msgid "You have disabled the account recovery."
+msgstr ""
+
+msgid "{0} has disabled the account recovery."
+msgstr ""
+
+msgid "You have set the account recovery organization policy to {0}."
+msgstr ""
+
+msgid "{0} has set the account recovery organization policy to {1}."
+msgstr ""
+
+msgid "You have updated the account recovery organization policy to {0}."
+msgstr ""
+
+msgid "{0} has updated the account recovery organization policy to {1}."
+msgstr ""
+
+msgid "Suspicious account recovery request issued from IP {0} for {1}"
+msgstr ""
+
+msgid "{0} has initiated a recovery request"
+msgstr ""
+
+msgid "You have initiated a recovery request"
+msgstr ""
+
+msgid "Recovery request approved!"
+msgstr ""
+
+msgid "approved"
+msgstr ""
+
+msgid "rejected"
+msgstr ""
+
+msgid "Account recovery response set to {0}."
+msgstr ""
+
+msgid "Account recovery response set to {0} by {1}."
+msgstr ""
+
+msgid "Recovery request denied!"
+msgstr ""
+
+msgid "Could not validate key revocation."
+msgstr ""
+
+msgid "The fingerprint should match the one from the currently active key."
+msgstr ""
+
+msgid "Account recovery is disabled."
+msgstr ""
+
+msgid "The account recovery organization public key is not set."
+msgstr ""
+
+msgid "Invalid request. No policy change."
+msgstr ""
+
+msgid "Invalid request. Revoked key is required for key rotation."
+msgstr ""
+
+msgid "Invalid request. New key is required for key rotation."
+msgstr ""
+
+msgid "Invalid request. An organization recovery public key is required."
+msgstr ""
+
+msgid "Invalid request. Revoked key or passwords are not required."
+msgstr ""
+
+msgid "Invalid request. New key or passwords are not required."
+msgstr ""
+
+msgid "Invalid request. Keys are required for this change."
+msgstr ""
+
+msgid "Invalid request. Passwords are required for this change."
+msgstr ""
+
+msgid "An organization public key is required."
+msgstr ""
+
+msgid "The public_key_id must match current policy public_key_id."
+msgstr ""
+
+msgid "An invalid number of passwords sent. Expected {0} and got {1}."
+msgstr ""
+
+msgid "The message is not encrypted for the right recipient."
+msgstr ""
+
+msgid "Recovery request cannot be created when organization policy is disabled."
+msgstr ""
+
+msgid "Recovery request cannot be created when user is not enrolled."
+msgstr ""
+
+msgid "The authentication token is not valid or has expired."
+msgstr "Autentiseringstoken är inte giltig eller har gått ut."
+
+msgid "The account recovery request could not be found."
+msgstr ""
+
+msgid "The request is already completed."
+msgstr ""
+
+msgid "Recovery response cannot be created when organization policy is disabled."
+msgstr ""
+
+msgid "Could not validate response data."
+msgstr ""
+
+msgid "The account recovery response data is not required."
+msgstr ""
+
+msgid "The account recovery response data is required."
+msgstr ""
+
+msgid "The user is not enrolled in the account recovery program."
+msgstr ""
+
+msgid "User account recovery settings cannot be edited."
+msgstr ""
+
+msgid "The account recovery is mandatory and cannot be rejected."
+msgstr ""
+
+msgid "Invalid request. You cannot opt-out."
+msgstr ""
+
+msgid "The status must be set to approved."
+msgstr ""
+
+msgid "Invalid request. You cannot both opt-out and provide backup."
+msgstr ""
+
+msgid "The private key backup must be provided."
+msgstr ""
+
+msgid "Invalid request. Private key or password are missing."
+msgstr ""
+
+msgid "Could not validate private key data."
+msgstr ""
+
+msgid "The account recovery request identifier should be a valid UUID."
+msgstr ""
+
+msgid "The account recovery request status is not approved."
+msgstr ""
+
+msgid "Account recovery is disabled. Key backup is not supported."
+msgstr ""
+
+msgid "Account recovery is mandatory. Please provide the mandatory data."
+msgstr ""
+
+msgid "Account Recovery Disabled"
+msgstr ""
+
+msgid "Account Recovery Enabled"
+msgstr ""
+
+msgid "The fingerprint of the organization public key is {0}."
+msgstr ""
+
+msgid "Account Recovery Updated"
+msgstr ""
+
+msgid "{0} has initiated an account recovery request"
+msgstr ""
+
+msgid "Recovery request"
+msgstr ""
+
+msgid "Since you are an administrator, you are requested to help them."
+msgstr ""
+
+msgid "You will need your organization recovery key to continue."
+msgstr ""
+
+msgid "Review the recovery request"
+msgstr ""
+
+msgid "Suspicious recovery request"
+msgstr ""
+
+msgid "An account recovery request was attempted from a user with client IP {0} for {1}."
+msgstr ""
+
+msgid "The request could not be found in the database."
+msgstr ""
+
+msgid "This is a potential security threat."
+msgstr ""
+
+msgid "You have initiated an account recovery!"
+msgstr "Du har startat en kontoåterställning!"
+
+msgid "Recovery Request"
+msgstr ""
+
+msgid "You just requested an account recovery."
+msgstr ""
+
+msgid "Your administrator have been informed and will follow up with you."
+msgstr ""
+
+msgid "If you did not make this request please inform your administrator."
+msgstr ""
+
+msgid "You have updated a recovery request to {0}."
+msgstr ""
+
+msgid "You have set the status of the account recovery request initiated by {0} ({1}) to {2}."
+msgstr ""
+
+msgid "{0}({1}) has updated a recovery request to {2}."
+msgstr ""
+
+msgid "{0} ({1}) has set the status of the request initiated by {2} ({3}) to {4}."
+msgstr ""
+
+msgid "{0}({1}) has approved your recovery request."
+msgstr ""
+
+msgid "Your organization recovery contacts have reviewed and approved your account recovery request."
+msgstr ""
+
+msgid "Please click on the link below to continue."
+msgstr ""
+
+msgid "Important"
+msgstr ""
+
+msgid "Please use the same computer and browser that you used to initiate the request."
+msgstr ""
+
+msgid "Complete account recovery"
+msgstr ""
+
+msgid "{0} ({1}) has denied your recovery request."
+msgstr ""
+
+msgid "Your organization recovery contacts have reviewed and rejected your account recovery request."
+msgstr ""
 
 msgid "A value for the theme should be provided."
 msgstr "Ett värde för temat bör tillhandahållas."
@@ -1357,11 +2032,11 @@ msgstr "Parametern {0} är inte inställd."
 msgid "This theme is not supported."
 msgstr "Detta tema stöds inte."
 
-msgid "The folder id is not valid."
-msgstr "Mapp-id är inte giltigt."
+msgid "The folder identifier should be a valid UUID."
+msgstr "Mappens identifierare bör vara ett giltigt UUID."
 
-msgid "Resources or folders supported only."
-msgstr "Resurser eller mappar stöds endast."
+msgid "Only administrators can view user logs."
+msgstr ""
 
 msgid "The user {0} could not be added to the group {1} because his account was priorly deleted in passbolt."
 msgstr "Användaren {0} kunde inte läggas till i gruppen {1} eftersom kontot tidigare har tagits bort från passbolt."
@@ -1612,8 +2287,8 @@ msgstr "Den aktiverade användarens inställning bör vara en boolean."
 msgid "The sync of created users setting should be a boolean."
 msgstr "Synkroniseringen av skapade användare bör vara en boolean."
 
-msgid "The sync of deleted user setting should be a boolean."
-msgstr "Synkroniseringen av raderade användarinställningar bör vara en boolean."
+msgid "The sync of deleted users setting should be a boolean."
+msgstr ""
 
 msgid "The sync of created groups setting should be a boolean."
 msgstr "Synkroniseringen av skapade grupper bör vara en boolean."
@@ -1680,9 +2355,6 @@ msgstr "En gruppmedlem matchar inte det förväntade DN-formatet."
 
 msgid "The email should be a valid email address."
 msgstr "E-postadressen bör vara en giltig e-postadress."
-
-msgid "You are not allowed to access this location."
-msgstr "Du har inte behörighet att komma åt den här platsen."
 
 msgid "Subscription key data is required."
 msgstr "Prenumerationsnyckeldata krävs."
@@ -1780,6 +2452,9 @@ msgstr "Inställningarna för e-postaviseringar är inte giltiga"
 msgid "The folder has been added successfully."
 msgstr "Mappen har lagts till."
 
+msgid "The folder id is not valid."
+msgstr "Mapp-id är inte giltigt."
+
 msgid "The folder has been deleted successfully."
 msgstr "Mappen har tagits bort."
 
@@ -1797,9 +2472,6 @@ msgstr "Mappens överordnade identifierare bör vara ett giltigt UUID."
 
 msgid "Could not validate move data."
 msgstr "Kunde inte validera flyttdata."
-
-msgid "The folder identifier should be a valid UUID."
-msgstr "Mappens identifierare bör vara ett giltigt UUID."
 
 msgid "The folder identifier should not be empty."
 msgstr "Mappens identifierare får inte vara tom."
@@ -1876,9 +2548,6 @@ msgstr "{0} delade mappen {1}"
 msgid "{0} edited the folder {1}"
 msgstr "{0} redigerade mappen {1}"
 
-msgid "An email notification setting should be a boolean."
-msgstr "En e-postavisering bör vara en boolean."
-
 msgid "Could not validate folder data."
 msgstr "Kunde inte validera mappdata."
 
@@ -1939,6 +2608,9 @@ msgstr "delade en mapp med dig"
 msgid "{0} updated the folder {1}"
 msgstr "{0} uppdaterade mappen {1}"
 
+msgid "The user signature could not be verified."
+msgstr ""
+
 msgid "The challenge cannot be decrypted."
 msgstr "Utmaningen kan inte dekrypteras."
 
@@ -1960,9 +2632,6 @@ msgstr "Användar-ID saknas eller är ogiltigt."
 msgid "The user OpenPGP key does not exist, or is invalid, or has been deleted."
 msgstr "Användarens OpenPGP-nyckel finns inte, är ogiltig eller har tagits bort."
 
-msgid "The user signature is invalid."
-msgstr "Användarsignaturen är ogiltig."
-
 msgid "The user challenge is missing or invalid."
 msgstr "Användarutmaningen saknas eller är ogiltig."
 
@@ -1975,6 +2644,9 @@ msgstr "Domänen är ogiltig."
 msgid "The domain is invalid. Expected: {0} and got {1}"
 msgstr "Domänen är ogiltig. Förväntat: {0} och fick {1}"
 
+msgid "The following file could not be read: {0}."
+msgstr ""
+
 msgid "The authentication was a success."
 msgstr "Autentiseringen lyckades."
 
@@ -1984,14 +2656,23 @@ msgstr "Autentiseringen misslyckades."
 msgid "The credentials are missing."
 msgstr "Referenser saknas."
 
-msgid "The user does not exist or is not active or has been deleted."
-msgstr "Användaren finns inte, är inte aktiv eller har tagits bort."
-
 msgid "The credentials are invalid."
 msgstr "Referenserna är ogiltiga."
 
 msgid "An internal error occurred."
 msgstr "Ett internt fel har uppstått."
+
+msgid "Authentication security alert"
+msgstr ""
+
+msgid "No active refresh token matching the request could be found."
+msgstr "Ingen aktiv uppdateringstoken som matchar förfrågan kunde hittas."
+
+msgid "The user is deactivated."
+msgstr ""
+
+msgid "The user is deleted."
+msgstr ""
 
 msgid "The verify token is invalid."
 msgstr "Verifieringstoken är ogiltigt."
@@ -1999,8 +2680,8 @@ msgstr "Verifieringstoken är ogiltigt."
 msgid "The route {0} is not permitted with JWT authentication."
 msgstr "Rutt {0} är inte tillåtet med JWT-autentisering."
 
-msgid "The key pair for JWT Authentication is not complete. The following file could not be read: {0}."
-msgstr "Nyckelparet för JWT-autentisering är inte komplett. Följande fil kunde inte läsas: {0}."
+msgid "The key pair for JWT Authentication is not complete."
+msgstr ""
 
 msgid "The JWT public key could not be read or is not valid."
 msgstr "Den publika JWT-nyckeln kunde inte läsas eller är ogiltig."
@@ -2011,20 +2692,17 @@ msgstr "Den privata JWT-nyckeln bör vara minst {0} bytes lång."
 msgid "The configuration {0} is not correctly set."
 msgstr "Konfigurationen {0} är inte korrekt inställd."
 
-msgid "No active refresh token matching the request could be found."
-msgstr "Ingen aktiv uppdateringstoken som matchar förfrågan kunde hittas."
+msgid "The refresh token should be a valid UUID."
+msgstr "Uppdateringstoken bör vara ett giltigt UUID."
+
+msgid "The user ID should be a valid UUID."
+msgstr ""
 
 msgid "The refresh token provided was already used."
 msgstr "Uppdateringstoken som tillhandahålls har redan använts."
 
 msgid "Expired refresh token provided."
 msgstr "Förfallen uppdateringstoken angiven."
-
-msgid "The refresh token should be a valid UUID."
-msgstr "Uppdateringstoken bör vara ett giltigt UUID."
-
-msgid "This is not a valid user id."
-msgstr "Detta är inte ett giltigt användar-ID."
 
 msgid "Invalid verify token expiry."
 msgstr "Ogiltig verifieringstoken upphör."
@@ -2056,8 +2734,8 @@ msgstr "Vänligen undersök!"
 msgid "An unknown user with IP: {0}  attempted to steal your login data."
 msgstr "En okänd användare med IP: {0}  försökte stjäla dina inloggningsuppgifter."
 
-msgid "Please get in tough with one of your administrators."
-msgstr "Vänligen kontakta en av dina administratörer."
+msgid "Please get in touch with one of your administrators."
+msgstr ""
 
 msgid "This is not a valid locale."
 msgstr "Detta är inte ett giltigt språk."
@@ -2088,9 +2766,6 @@ msgstr "En kontext krävs."
 
 msgid "The status should be a valid boolean."
 msgstr "Statusen bör vara en giltig boolean."
-
-msgid "A status is required."
-msgstr "En status måste anges."
 
 msgid "Could not validate action log data."
 msgstr "Kunde inte validera data för åtgärdslogg."
@@ -2206,8 +2881,8 @@ msgstr "Det aktuella sidnumret ska vara lika med eller under det totala antalet 
 msgid "The current page cannot be greater than {0}"
 msgstr "Den aktuella sidan får inte vara större än {0}"
 
-msgid "The total number of pages should a non negative integer."
-msgstr "Det totala antalet sidor bör vara ett icke-negativt heltal."
+msgid "The total number of pages should be a non negative integer."
+msgstr ""
 
 msgid "The total number of pages is required."
 msgstr "Det totala antalet sidor krävs."
@@ -2217,9 +2892,6 @@ msgstr "Det totala antalet sidor bör vara större än 0."
 
 msgid "The total number of pages cannot be greater than {0}"
 msgstr "Det totala antalet sidor kan inte vara större än {0}"
-
-msgid "The status should not be empty."
-msgstr "Statusen får inte vara tom."
 
 msgid "The status is required."
 msgstr "Statusen måste anges."
@@ -3211,8 +3883,23 @@ msgstr "logga in"
 msgid "register"
 msgstr "registrera"
 
-msgid "You have initiated an account recovery!"
-msgstr "Du har startat en kontoåterställning!"
+msgid "{0} ({1}) just completed an account recovery. Feel free to get in touch with this user if you feel this action looks suspicious."
+msgstr ""
+
+msgid "View user in passbolt"
+msgstr ""
+
+msgid "{0} cannot complete the account recovery process!"
+msgstr ""
+
+msgid "This user lost their private key and/or passphrase and cannot complete the account recovery process."
+msgstr ""
+
+msgid "Unfortunately, they will need your help to delete their account and restart from scratch."
+msgstr ""
+
+msgid "Please check with them first to confirm."
+msgstr ""
 
 msgid "Welcome back!"
 msgstr "Välkommen tillbaka!"
@@ -3228,6 +3915,9 @@ msgstr "Klicka på länken nedan för att fortsätta."
 
 msgid "start recovery"
 msgstr "påbörja återställning"
+
+msgid "You just completed an account recovery. Feel free to get in touch with an admin if you feel this action looks suspicious."
+msgstr ""
 
 msgid "{0} just created an account for you on passbolt!"
 msgstr "{0} har precis skapat ett konto åt dig på passbolt!"
@@ -3387,6 +4077,12 @@ msgstr "Den här användaren blev inbjuden av {0} {1}."
 
 msgid "view users"
 msgstr "visa användare"
+
+msgid "This email is an automatic notification sent by"
+msgstr ""
+
+msgid "You can disable these notifications by requesting an administrator to delete your account."
+msgstr ""
 
 msgid "The locale {0} is not valid or not supported."
 msgstr "Språket {0} är inte giltigt eller stöds inte."
