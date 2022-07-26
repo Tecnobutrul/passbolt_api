@@ -61,7 +61,8 @@ class HandleGroupUserDeletedService
 
     /**
      * Remove resources the user lost access from its tree.
-     * @param GroupsUser $groupUser $groupUser The deleted group user.
+     *
+     * @param \App\Model\Entity\GroupsUser $groupUser $groupUser The deleted group user.
      * @return void
      */
     private function removeLostAccessesResourcesFromUserTree(GroupsUser $groupUser): void
@@ -75,7 +76,8 @@ class HandleGroupUserDeletedService
 
     /**
      * Remove folders the user lost access from its tree.
-     * @param GroupsUser $groupUser $groupUser The deleted group user.
+     *
+     * @param \App\Model\Entity\GroupsUser $groupUser $groupUser The deleted group user.
      * @return void
      */
     private function removeLostAccessesFoldersFromUserTree(GroupsUser $groupUser): void
@@ -90,7 +92,8 @@ class HandleGroupUserDeletedService
 
     /**
      * Move folders the user lost access content to the user tree root.
-     * @param GroupsUser $groupUser $groupUser The deleted group user.
+     *
+     * @param \App\Model\Entity\GroupsUser $groupUser $groupUser The deleted group user.
      * @return void
      */
     private function moveToRootLostAccessFoldersContent(GroupsUser $groupUser): void
