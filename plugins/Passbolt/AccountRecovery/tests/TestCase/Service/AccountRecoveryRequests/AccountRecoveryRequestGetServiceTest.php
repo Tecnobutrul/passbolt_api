@@ -133,7 +133,7 @@ class AccountRecoveryRequestGetServiceTest extends AccountRecoveryTestCase
         [$request, $user, $token] = AccountRecoveryRequestScenario::startContinueScenarioApproved();
 
         $service = new AccountRecoveryRequestGetService();
-        $this->expectException(BadRequestException::class);
+        $this->expectException(NotFoundException::class);
         $service->getNotCompletedOrFail($request->id, 'nope', $token->token);
     }
 

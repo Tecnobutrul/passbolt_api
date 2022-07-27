@@ -47,12 +47,6 @@ $routes->plugin('Passbolt/AccountRecovery', ['path' => '/account-recovery'], fun
         ])
         ->setMethods(['GET']);
 
-//    // Create temporary private key passwords
-//    // POST /account-recovery/temp/private-key-passwords.json
-//    $routes->connect('/temp/private-key-passwords', [
-//            'prefix' => '', 'controller' => '', 'action' => ''])
-//        ->setMethods(['POST']);
-//
     // Browse index of all the account recovery requests
     // GET /account-recovery/requests.json
     $routes->connect('/requests', [
