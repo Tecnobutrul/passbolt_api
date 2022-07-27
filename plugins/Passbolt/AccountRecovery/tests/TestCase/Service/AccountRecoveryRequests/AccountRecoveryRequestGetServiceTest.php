@@ -134,7 +134,7 @@ class AccountRecoveryRequestGetServiceTest extends AccountRecoveryTestCase
 
         $service = new AccountRecoveryRequestGetService();
         $this->expectException(NotFoundException::class);
-        $service->getNotCompletedOrFail($request->id, 'nope', $token->token);
+        $service->getNotCompletedOrFail($request->id, '00000000-0000-0000-0000-000000000000', $token->token);
     }
 
     public function testAccountRecoveryRequestGetService_Error_UserDeleted()
