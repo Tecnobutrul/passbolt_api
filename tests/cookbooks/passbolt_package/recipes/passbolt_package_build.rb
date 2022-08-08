@@ -160,7 +160,7 @@ elsif platform_family?('rhel', 'suse', 'fedora')
     if platform_family?('rhel', 'fedora')
       execute 'RHEL: Build passbolt-selinux RPM package' do
         cwd     "#{node['dest_dir']}"
-        command "PKG_VERSION=0.1 /bin/sh rpm/scripts/build-passbolt-selinux.sh"
+        command "PKG_VERSION=0.4 /bin/sh rpm/scripts/build-passbolt-selinux.sh"
         action :run
       end
     end
