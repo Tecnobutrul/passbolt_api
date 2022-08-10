@@ -67,9 +67,7 @@ class TagsTable extends Table
             'through' => 'ResourcesTags',
         ]);
 
-        $this->hasMany('Passbolt/Tags.ResourcesTags', [
-            'foreignKey' => 'tag_id',
-        ]);
+        $this->hasMany('ResourcesTags');
     }
 
     /**
