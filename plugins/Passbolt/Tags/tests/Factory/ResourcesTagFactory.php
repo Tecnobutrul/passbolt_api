@@ -37,7 +37,6 @@ class ResourcesTagFactory extends CakephpBaseFactory
         $this->setDefaultData(function (Generator $faker) {
             return [
                 'tag_id' => $faker->uuid(),
-                'user_id' => $faker->uuid(),
                 'resource_id' => $faker->uuid(),
             ];
         });
