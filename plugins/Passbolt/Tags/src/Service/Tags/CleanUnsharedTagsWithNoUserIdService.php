@@ -18,7 +18,6 @@ declare(strict_types=1);
 namespace Passbolt\Tags\Service\Tags;
 
 use Cake\Database\Expression\QueryExpression;
-use Cake\Datasource\ConnectionManager;
 use Cake\ORM\Query;
 use Cake\ORM\TableRegistry;
 
@@ -29,9 +28,9 @@ class CleanUnsharedTagsWithNoUserIdService
      * and for which the user_id is set to null.
      * This regression was introduced by 3.7
      *
-     * @return void
+     * @return int
      */
-    public function cleanUp(): void
+    public function cleanUp(): int
     {
         $ResourcesTagsTable = TableRegistry::getTableLocator()->get('Passbolt/Tags.ResourcesTags');
         $entriesToDelete = $ResourcesTagsTable->find('list', ['displayField' => 'id'])
@@ -45,12 +44,10 @@ class CleanUnsharedTagsWithNoUserIdService
             })
             ->toArray();
 
-        /** @var \Cake\Database\Connection $connection */
-        $connection = ConnectionManager::get('default');
+        if (count($entriesToDelete) === 0) {
+            return 0;
+        }
 
-        $connection->delete(
-            $ResourcesTagsTable->getTable(),
-            ['id IN' => $entriesToDelete]
-        );
+        return $ResourcesTagsTable->deleteAll(['ResourcesTags.id IN' => $entriesToDelete]);
     }
 }
