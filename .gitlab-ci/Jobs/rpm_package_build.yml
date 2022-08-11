@@ -54,7 +54,7 @@ build-yum:
   variables:
     DEPENDENCIES: "rpmdevtools rpmlint rsync selinux-policy-devel rpm-build bc createrepo_c firewalld"
   script:
-    - PKG_VERSION=0.3 /bin/sh rpm/scripts/build-passbolt-selinux.sh
+    - PKG_VERSION=0.4 /bin/sh rpm/scripts/build-passbolt-selinux.sh
     - *install-jq-rhel-8
     - *build-passbolt-rpm-package
 
@@ -64,7 +64,7 @@ build-yum-7:
   variables:
     DEPENDENCIES: "rpmdevtools rpmlint rsync selinux-policy-devel rpm-build bc createrepo_c firewalld"
   script:
-    - PKG_VERSION=0.3 /bin/sh rpm/scripts/build-passbolt-selinux.sh
+    - PKG_VERSION=0.4 /bin/sh rpm/scripts/build-passbolt-selinux.sh
     - *install-jq-rhel-7
     - *build-passbolt-rpm-package
 

@@ -40,4 +40,15 @@ class TagFactory extends CakephpBaseFactory
             ];
         });
     }
+
+    /**
+     * Set is_shared to boolean (true by default)
+     *
+     * @param bool $isShared is_shared
+     * @return $this
+     */
+    public function isShared(bool $isShared = true)
+    {
+        return $this->setField('is_shared', $isShared);
+    }
 }

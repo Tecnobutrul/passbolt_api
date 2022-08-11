@@ -59,16 +59,13 @@ class ResourcesTagsTable extends Table
         $this->addBehavior('Timestamp');
 
         $this->belongsTo('Resources', [
-            'foreignKey' => 'resource_id',
             'joinType' => 'INNER',
         ]);
-        $this->belongsTo('Passbolt/Tags.Tags', [
-            'foreignKey' => 'tag_id',
+        $this->belongsTo('Tags', [
+            'className' => 'Passbolt/Tags.Tags',
             'joinType' => 'INNER',
         ]);
-        $this->belongsTo('Users', [
-            'foreignKey' => 'user_id',
-        ]);
+        $this->belongsTo('Users');
     }
 
     /**
