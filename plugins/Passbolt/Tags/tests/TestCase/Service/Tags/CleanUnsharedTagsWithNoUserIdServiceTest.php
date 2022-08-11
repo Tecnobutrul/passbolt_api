@@ -36,7 +36,7 @@ class CleanUnsharedTagsWithNoUserIdServiceTest extends TagTestCase
         $this->service = new CleanUnsharedTagsWithNoUserIdService();
     }
 
-    public function testCleanUnsharedTagsWithNoUserIdServiceTest(): void
+    public function testCleanUnsharedTagsWithNoUserIdService(): void
     {
         $rTagsSharedWithUserId = ResourcesTagFactory::make(rand(5, 10))
             ->setField('user_id', UuidFactory::uuid())
@@ -49,14 +49,21 @@ class CleanUnsharedTagsWithNoUserIdServiceTest extends TagTestCase
             ->setField('user_id', UuidFactory::uuid())
             ->with('Tags')
             ->persist();
-        ResourcesTagFactory::make(rand(5, 10))
+        $rTagsNotSharedWithoutUserId = ResourcesTagFactory::make(rand(5, 10))
             ->with('Tags')
             ->persist();
 
-        $this->service->cleanUp();
+        $result = $this->service->cleanUp();
+        $this->assertSame(count($rTagsNotSharedWithoutUserId), $result);
 
         $rTagsCount = ResourcesTagFactory::count();
         $rTagsToBeKept = array_merge($rTagsSharedWithUserId, $rTagsSharedWithoutUserId, $rTagsNotSharedWithUserId);
         $this->assertSame($rTagsCount, count($rTagsToBeKept));
+    }
+
+    public function testCleanUnsharedTagsWithNoUserIdService_With_Nothing_To_Clean_Should_Not_Throw_An_Error(): void
+    {
+        $result = $this->service->cleanUp();
+        $this->assertSame(0, $result);
     }
 }
