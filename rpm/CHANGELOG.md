@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+* [3.7.1-1] Fri Ago 12 2022 Daniel Del Rio <daniel@passbolt.com>
+- PB-18486 Removes all resources_tags entries for tags that are not shared and for which the user_id is set to null.
+- PB-18398 Fix tag regression: sets associations name to be CakePHP compatible
+- PB-17072 Quotes fields in a join condition fixing Postgres
+- PB-17068 Fix postgresql compatibility issue
+- PB-18427 Fix LDAP/AD SELinux issue on RHEL
+- PB-18381 Fix source language typos
+- PB-18397 Fix as an admin I can generate a server key with the webinstaller within an instance over http
+- PB-17096 Fix resource_types name and slug postgresql compatibility
+- PB-18372 Bump styleguide version to 3.7.1
+- PB-17068 PBL-07-003 Remove non necessary user id enumeration possibility
+
 * [3.7.0-1] Thu July 28 2022 Gerold Mougenel <gerold@passbolt.com>
 - PB-17098 Add rockylinux 9 support
 - PB-16751 Add Redhat 9 support
