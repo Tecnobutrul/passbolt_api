@@ -19,6 +19,7 @@ namespace Passbolt\AuditLog\Utility;
 
 use App\Utility\UserAccessControl;
 use Cake\Core\Configure;
+use Cake\Database\Expression\IdentifierExpression;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\Query;
 use Cake\ORM\TableRegistry;
@@ -84,7 +85,7 @@ class FolderActionLogsFinder extends BaseActionLogsFinder
                 'table' => $subQuery,
                 'alias' => 'folderActionLogs',
                 'type' => 'INNER',
-                'conditions' => ['folderActionLogs.ActionLogs__id = ActionLogs.id'],
+                'conditions' => ['folderActionLogs.ActionLogs__id' => new IdentifierExpression('ActionLogs.id')],
             ],
         ]);
 

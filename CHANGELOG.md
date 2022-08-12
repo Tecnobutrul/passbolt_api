@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.7.1] - 2022-08-10
+### Fixed
+- PB-18486 Removes all resources_tags entries for tags that are not shared and for which the user_id is set to null.
+- PB-18398 Fix tag regression: sets associations name to be CakePHP compatible
+- PB-17072 Quotes fields in a join condition fixing Postgres
+- PB-17068 Fix postgresql compatibility issue
+- PB-18427 Fix LDAP/AD SELinux issue on RHEL
+- PB-18381 Fix source language typos
+- PB-18397 Fix as an admin I can generate a server key with the webinstaller within an instance over http
+- PB-17096 Fix resource_types name and slug postgresql compatibility
+- PB-18372 Bump styleguide version to 3.7.1
+- PB-17068 PBL-07-003 Remove non necessary user id enumeration possibility
+
 ## [3.7.0] - 2022-07-28
 ### Added
 PB-17098 Add rockylinux 9 support
@@ -1135,6 +1148,7 @@ PB-16161 Refactor to split folder, resource and user related logic in respective
 - AD: Admin
 
 [Unreleased]: https://github.com/passbolt/passbolt_api/compare/v3.7.0...HEAD
+[3.7.1]: https://github.com/passbolt/passbolt_api/compare/v3.7.0...v3.7.1
 [3.7.0]: https://github.com/passbolt/passbolt_api/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/passbolt/passbolt_api/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/passbolt/passbolt_api/compare/v3.4.0...v3.5.0
