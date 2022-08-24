@@ -47,16 +47,21 @@ abstract class MfaVerifyController extends MfaController
 
     /**
      * Trigger an error if current MFA settings do not allow verify for the given provider
+     * Redirect to password workspace if not JSON
      *
      * @throws \Cake\Http\Exception\InternalErrorException if there is no MFA settings for the user
      * @throws \Cake\Http\Exception\BadRequestException if there is no MFA settings for this provider
      * @param string $provider name of the provider
-     * @return void
+     * @return \Cake\Http\Response|void
      */
     protected function _handleInvalidSettings(string $provider)
     {
         if ($this->mfaSettings->getAccountSettings() === null) {
-            throw new InternalErrorException('No valid multi-factor authentication settings found.');
+            if ($this->getRequest()->is('json')) {
+                throw new InternalErrorException('No valid multi-factor authentication settings found.');
+            } else {
+                return $this->redirect('/');
+            }
         }
         if (!$this->mfaSettings->isProviderEnabled($provider)) {
             // for example a user is trying to force a check on a provider that is not set for the org
