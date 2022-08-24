@@ -22,11 +22,11 @@ use App\Model\Table\PermissionsTable;
 use App\Test\Lib\Model\FormatValidationTrait;
 use App\Test\Lib\Model\PermissionsModelTrait;
 use App\Utility\UuidFactory;
-use Cake\Core\Configure;
+use Cake\ORM\Exception\PersistenceFailedException;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 use Passbolt\Folders\Model\Table\FoldersRelationsTable;
-use Passbolt\Folders\Model\Table\FoldersTable;
+use Passbolt\Folders\Test\Factory\FolderFactory;
 use Passbolt\Folders\Test\Lib\FoldersTestCase;
 use Passbolt\Folders\Test\Lib\Model\FoldersModelTrait;
 use Passbolt\Folders\Test\Lib\Model\FoldersRelationsModelTrait;
@@ -64,9 +64,7 @@ class FoldersTableTest extends FoldersTestCase
     public function setUp(): void
     {
         parent::setUp();
-        Configure::write('passbolt.plugins.folders', ['enabled' => true]);
-        $config = TableRegistry::getTableLocator()->exists('Folders') ? [] : ['className' => FoldersTable::class];
-        $this->Folders = TableRegistry::getTableLocator()->get('Folders', $config);
+        $this->Folders = TableRegistry::getTableLocator()->get('Passbolt/Folders.Folders');
         $config = TableRegistry::getTableLocator()->exists('FoldersRelations') ? [] : ['className' => FoldersRelationsTable::class];
         $this->FoldersRelations = TableRegistry::getTableLocator()->get('FoldersRelations', $config);
         $config = TableRegistry::getTableLocator()->exists('Permissions') ? [] : ['className' => PermissionsTable::class];
@@ -88,12 +86,13 @@ class FoldersTableTest extends FoldersTestCase
     public function testValidationName()
     {
         $testCases = [
-            'utf8Extended' => self::getUtf8ExtendedTestCases(64),
-            'maxLength' => self::getMaxLengthTestCases(64),
+            'utf8Extended' => self::getUtf8ExtendedTestCases(128),
+            'maxLength' => self::getMaxLengthTestCases(128),
             'requirePresence' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
         ];
-        $this->assertFieldFormatValidation($this->Folders, 'name', self::getDummyFolderData(), self::getDummyFolderEntityDefaultOptions(), $testCases);
+        $data = FolderFactory::make()->getEntity()->toArray();
+        $this->assertFieldFormatValidation($this->Folders, 'name', $data, self::getDummyFolderEntityDefaultOptions(), $testCases);
     }
 
     /* FORMAT VALIDATION TESTS */
@@ -307,5 +306,21 @@ class FoldersTableTest extends FoldersTestCase
         $folderIds = Hash::extract($folders->toArray(), '{n}.id');
 
         $this->assertSame($folderIds, $expectedFolderIds, 'List of folders returned does not contain expected folders.');
+    }
+
+    public function testFoldersTable_Name_Should_Be_Max_128()
+    {
+        $name = str_repeat('a', 128);
+        $folder = FolderFactory::make(compact('name'))->getEntity();
+        $folder = $this->Folders->patchEntity($folder, $folder->toArray());
+        $this->assertFalse($folder->hasErrors());
+        $folder = $this->Folders->saveOrFail($folder);
+        $this->assertFalse($folder->hasErrors());
+
+        $name = str_repeat('a', 129);
+        $folder = $this->Folders->patchEntity($folder, compact('name'));
+        $this->assertTrue($folder->hasErrors());
+        $this->expectException(PersistenceFailedException::class);
+        $this->Folders->saveOrFail($folder);
     }
 }
