@@ -39,4 +39,15 @@ class MfaVerifyControllerTest extends MfaIntegrationTestCase
         $this->post('/mfa/verify/nope.json?api-version=v2', []);
         $this->assertResponseError();
     }
+
+    public function testMfaVerifyControllerHandleInvalidSettings()
+    {
+        $this->logInAsUser();
+
+        $this->get('/mfa/verify/totp');
+        $this->assertRedirect('/');
+
+        $this->getJson('/mfa/verify/totp.json');
+        $this->assertInternalError('No valid multi-factor authentication settings found.');
+    }
 }
