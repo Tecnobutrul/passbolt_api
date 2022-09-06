@@ -131,7 +131,7 @@ class FoldersTable extends Table
 
         $validator
             ->utf8Extended('name', __('The name should be a valid UTF8 string.'))
-            ->maxLength('name', 128, __('The name length should be maximum {0} characters.', 128))
+            ->maxLength('name', 256, __('The name length should be maximum {0} characters.', 256))
             ->requirePresence('name', 'create', __('A name is required.'))
             ->allowEmptyString('name', __('The name should not be empty.'), false);
 

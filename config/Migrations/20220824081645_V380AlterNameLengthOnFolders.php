@@ -29,7 +29,7 @@ class V380AlterNameLengthOnFolders extends AbstractMigration
     {
         $table = $this->table('folders');
         $table->changeColumn('name', 'string', [
-            'limit' => 128,
+            'limit' => 256,
         ]);
         $table->update();
     }

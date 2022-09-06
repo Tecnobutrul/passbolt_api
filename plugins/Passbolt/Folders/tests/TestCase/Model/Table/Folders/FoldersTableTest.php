@@ -86,8 +86,8 @@ class FoldersTableTest extends FoldersTestCase
     public function testValidationName()
     {
         $testCases = [
-            'utf8Extended' => self::getUtf8ExtendedTestCases(128),
-            'maxLength' => self::getMaxLengthTestCases(128),
+            'utf8Extended' => self::getUtf8ExtendedTestCases(256),
+            'maxLength' => self::getMaxLengthTestCases(256),
             'requirePresence' => self::getRequirePresenceTestCases(),
             'notEmpty' => self::getNotEmptyTestCases(),
         ];
@@ -308,16 +308,16 @@ class FoldersTableTest extends FoldersTestCase
         $this->assertSame($folderIds, $expectedFolderIds, 'List of folders returned does not contain expected folders.');
     }
 
-    public function testFoldersTable_Name_Should_Be_Max_128()
+    public function testFoldersTable_Name_Should_Be_Max_256()
     {
-        $name = str_repeat('a', 128);
+        $name = str_repeat('a', 256);
         $folder = FolderFactory::make(compact('name'))->getEntity();
         $folder = $this->Folders->patchEntity($folder, $folder->toArray());
         $this->assertFalse($folder->hasErrors());
         $folder = $this->Folders->saveOrFail($folder);
         $this->assertFalse($folder->hasErrors());
 
-        $name = str_repeat('a', 129);
+        $name = str_repeat('a', 257);
         $folder = $this->Folders->patchEntity($folder, compact('name'));
         $this->assertTrue($folder->hasErrors());
         $this->expectException(PersistenceFailedException::class);
