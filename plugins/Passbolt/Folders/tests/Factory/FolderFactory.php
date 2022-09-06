@@ -56,7 +56,7 @@ class FolderFactory extends CakephpBaseFactory
     {
         $this->setDefaultData(function (Generator $faker) {
             return [
-                'name' => $faker->text(128),
+                'name' => $faker->text(256),
                 'created' => Chronos::now()->subMinute($faker->randomNumber(8)),
                 'modified' => Chronos::now()->subMinute($faker->randomNumber(8)),
                 'created_by' => $faker->uuid(),
