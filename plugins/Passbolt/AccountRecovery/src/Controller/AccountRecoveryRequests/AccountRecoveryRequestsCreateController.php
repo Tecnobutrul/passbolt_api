@@ -49,7 +49,7 @@ class AccountRecoveryRequestsCreateController extends AppController
     public function create(): void
     {
         if ($this->User->role() !== Role::GUEST) {
-            throw new ForbiddenException(__('Only guest are allowed to create an account recovery request.'));
+            throw new ForbiddenException(__('Only guests are allowed to create an account recovery request.'));
         }
 
         $data = $this->getRequest()->getData();
