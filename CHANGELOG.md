@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.7.2] - 2022-09-13
+### Fixed
+- PB-18380 Let passbolt-configure script setup certbot for RHEL9 support
+- PB-18405 Redirect on non-json request if no MFA settings are found
+- PB-16983 Handles the lack of permissions on image directory when deleting
+- PB-16898 Redesign download a supported browser to get started
+
+### Improved
+- PB-18415 Extends folder name length to 256 chars
+- PB-18650 Add a check on mysql status in order to run mysql commands only when it's ready in unit tests
+- PB-18664 Add retry logic to Gitlab CI jobs
+- PB-18645 Bump Ldap tools version for better PHP8.x support
+
 ## [3.7.1] - 2022-08-10
 ### Fixed
 - PB-18486 Removes all resources_tags entries for tags that are not shared and for which the user_id is set to null.
