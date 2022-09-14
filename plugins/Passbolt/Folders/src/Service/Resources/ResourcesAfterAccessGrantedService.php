@@ -22,40 +22,40 @@ use App\Model\Entity\Resource;
 use App\Model\Table\PermissionsTable;
 use App\Utility\UserAccessControl;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\NotFoundException;
+use Cake\ORM\TableRegistry;
 use Passbolt\Folders\Model\Behavior\FolderizableBehavior;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
-use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemToUserTreeService;
+use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemsToUserTreeService;
 
 class ResourcesAfterAccessGrantedService
 {
-    use ModelAwareTrait;
-
     /**
      * @var \App\Model\Table\GroupsUsersTable
      */
-    private $GroupsUsers;
+    private $groupsUsersTable;
 
     /**
      * @var \App\Model\Table\ResourcesTable
      */
-    private $Resources;
+    private $resourcesTable;
 
     /**
-     * @var \Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemToUserTreeService
+     * @var \Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemsToUserTreeService
      */
-    private $foldersRelationsAddItemToUserTree;
+    private $foldersRelationsAddItemsToUserTree;
 
     /**
      * Instantiate the service.
      */
     public function __construct()
     {
-        $this->loadModel('GroupsUsers');
-        $this->loadModel('Resources');
+        /** @phpstan-ignore-next-line */
+        $this->groupsUsersTable = TableRegistry::getTableLocator()->get('GroupsUsers');
+        /** @phpstan-ignore-next-line */
+        $this->resourcesTable = TableRegistry::getTableLocator()->get('Resources');
 
-        $this->foldersRelationsAddItemToUserTree = new FoldersRelationsAddItemToUserTreeService();
+        $this->foldersRelationsAddItemsToUserTree = new FoldersRelationsAddItemsToUserTreeService();
     }
 
     /**
@@ -88,7 +88,7 @@ class ResourcesAfterAccessGrantedService
     private function getResource(UserAccessControl $uac, string $resourceId): Resource
     {
         try {
-            return $this->Resources->get($resourceId, [
+            return $this->resourcesTable->get($resourceId, [
                 'finder' => FolderizableBehavior::FINDER_NAME,
                 'user_id' => $uac->getId(),
             ]);
@@ -108,7 +108,7 @@ class ResourcesAfterAccessGrantedService
      */
     private function addResourceToGroupUsersTrees(UserAccessControl $uac, Resource $resource, string $groupId): void
     {
-        $grousUsersIds = $this->GroupsUsers->findByGroupId($groupId)
+        $grousUsersIds = $this->groupsUsersTable->findByGroupId($groupId)
             ->all()
             ->extract('user_id')
             ->toArray();
@@ -128,7 +128,7 @@ class ResourcesAfterAccessGrantedService
      */
     private function addResourceToUserTree(UserAccessControl $uac, Resource $resource, string $userId): void
     {
-        $foreignModel = FoldersRelation::FOREIGN_MODEL_RESOURCE;
-        $this->foldersRelationsAddItemToUserTree->addItemToUserTree($uac, $foreignModel, $resource->id, $userId);
+        $items = [['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $resource->id]];
+        $this->foldersRelationsAddItemsToUserTree->addItemsToUserTree($uac, $userId, $items);
     }
 }

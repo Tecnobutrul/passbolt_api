@@ -179,7 +179,7 @@ class FoldersRelationsCleanupTest extends FoldersTestCase
         $folderB = FolderFactory::make()->withPermissionsFor([$userAda])->withFoldersRelationsFor([$userAda], $folderA)->persist();
 
         // The folders missing a folder relation:
-        // All the scenarios won't be tested as the cleanup operation relies on the addItemToUserTree service.
+        // All the scenarios won't be tested as the cleanup operation relies on the addItemsToUserTree service.
         // - A user having access to a folder.
         $userFolderPermissionWithNoFolderRelation = PermissionFactory::make()->typeOwner()->withAcoFolder()->aroUser($userCarol)->persist();
         // - A user having access to a shared folder located in a shared folder visible in the user tree.
@@ -215,7 +215,7 @@ class FoldersRelationsCleanupTest extends FoldersTestCase
         $resourceA = ResourceFactory::make()->withFoldersRelationsFor([$userAda], $folderA)->withPermissionsFor([$userAda])->persist();
 
         // The resources missing a folder relation:
-        // All the scenarios won't be tested as the cleanup operation relies on the addItemToUserTree service.
+        // All the scenarios won't be tested as the cleanup operation relies on the addItemsToUserTree service.
         // - A user having access to a resource.
         $userResourcePermissionWithNoFolderRelation = PermissionFactory::make()->typeOwner()->withAcoResource()->aroUser($userCarol)->persist();
         // - A user having access to a shared folder located in a shared folder visible in the user tree.
