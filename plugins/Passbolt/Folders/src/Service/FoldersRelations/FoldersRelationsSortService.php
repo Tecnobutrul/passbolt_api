@@ -46,169 +46,333 @@ class FoldersRelationsSortService
      * 3. (Optional) The folder relation presence in the target user tree. Priority to the target user view.
      * 4. The folder relation age. Priority to the oldest folder relation.
      *
-     * @param array<FoldersRelation> &$folderRelations The array of folders relations to sort.
+     * @param array<FoldersRelation> &$foldersRelations The array of folders relations to sort.
      * @param \App\Utility\UserAccessControl $uac The user at the origin of the action.
      * @param string|null $userId The target user id
+     * @return void
      */
-    public function sort(array &$folderRelations, UserAccessControl $uac, ?string $userId = null)
+    public function sort(array &$foldersRelations, UserAccessControl $uac, ?string $userId = null)
     {
-        $foldersRelationsChangesDetails = $this->getFolderRelationsDetails($folderRelations, $uac, $userId);
+        if (empty($foldersRelations)) {
+            return;
+        }
 
-        usort($folderRelations, function (FoldersRelation $folderRelationA, FoldersRelation $folderRelationB) use ($foldersRelationsChangesDetails, $userId) {
-            $isFolderRelationAInOperatorTree = $this->isFolderRelationInOperatorTree($folderRelationA, $foldersRelationsChangesDetails);
-            $isFolderRelationBInOperatorTree = $this->isFolderRelationInOperatorTree($folderRelationB, $foldersRelationsChangesDetails);
-            if ($isFolderRelationAInOperatorTree && !$isFolderRelationBInOperatorTree) {
-                return -1;
-            } elseif (!$isFolderRelationAInOperatorTree && $isFolderRelationBInOperatorTree) {
-                return 1;
+        $changesDetails = $this->getFolderRelationsDetails($foldersRelations, $uac, $userId);
+//        var_dump($changesDetails);
+
+        usort($foldersRelations, function (
+            FoldersRelation $relationA,
+            FoldersRelation $relationB
+        ) use (
+            $changesDetails,
+            $userId
+        ) {
+            $inOperatorTreePriority = $this->hasInOperatorTreePriority($relationA, $relationB, $changesDetails);
+            if (!is_null($inOperatorTreePriority)) {
+                return $inOperatorTreePriority ? -1 : 1;
             }
-            // Otherwise most used relations should be applied in priority.
-            if ($this->isFolderRelationMoreUsedThan($folderRelationA, $folderRelationB, $foldersRelationsChangesDetails)) {
-                return -1;
-            } elseif ($this->isFolderRelationMoreUsedThan($folderRelationB, $folderRelationA, $foldersRelationsChangesDetails)) {
-                return 1;
+            $usagePriority = $this->hasUsagePriority($relationA, $relationB, $changesDetails);
+            if (!is_null($usagePriority)) {
+                return $usagePriority ? -1 : 1;
             }
-            if (!is_null($userId)) {
-                $isFolderRelationAInUserTree = $this->isFolderRelationInUserTree($folderRelationA, $foldersRelationsChangesDetails);
-                $isFolderRelationBInUserTree = $this->isFolderRelationInUserTree($folderRelationB, $foldersRelationsChangesDetails);
-                if ($isFolderRelationAInUserTree && !$isFolderRelationBInUserTree) {
-                    return -1;
-                } elseif (!$isFolderRelationAInUserTree && $isFolderRelationBInUserTree) {
-                    return 1;
+            if ($userId) {
+                $inUserTreePriority = $this->hasInUserTreePriority($relationA, $relationB, $changesDetails);
+                if (!is_null($inUserTreePriority)) {
+                    return $inUserTreePriority ? -1 : 1;
                 }
             }
-            // Otherwise oldest relations should be applied in priority.
-            if ($this->isFolderRelationOlderThan($folderRelationA, $folderRelationB, $foldersRelationsChangesDetails)) {
-                return -1;
-            } elseif ($this->isFolderRelationOlderThan($folderRelationB, $folderRelationA, $foldersRelationsChangesDetails)) {
-                return 1;
+            $grandPaPriority = $this->hasGrandPaPriority($relationA, $relationB, $changesDetails);
+            if (!is_null($grandPaPriority)) {
+                return $grandPaPriority ? -1 : 1;
             }
 
             return 0;
         });
     }
 
-    private function getFolderRelationsDetails(array $foldersRelations, UserAccessControl $uac, ?string $userId = null)
-    {
-        if (empty($foldersRelations)) {
-            return [];
+    /**
+     * Get the folders relations details:
+     * - In operator tree
+     * - Usage
+     * - (Optional) In user tree.
+     * - Created oldest
+     *
+     * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations The folders relations to sort
+     * @param \App\Utility\UserAccessControl $uac The user at the origin of the operation
+     * @param string|null $userId (Optional) The target user
+     * @return array
+     * [
+     *   RELATION_ID => [
+     *     in_operator_tree => bool,
+     *     usage_count => int,
+     *     in_user_tree => bool,
+     *     created_oldest => string,
+     *   ]
+     * ]
+     * Where RELATION_ID is a composite of the folder relation foreign_id and folder_parent_id
+     */
+    private function getFolderRelationsDetails(
+        array $foldersRelations,
+        UserAccessControl $uac,
+        ?string $userId = null
+    ): array {
+        $inOperatorTreeDetails = $this->getFoldersRelationsInOperatorTreeDetails($foldersRelations, $uac);
+        $usageDetails = $this->getFoldersRelationsUsageDetails($foldersRelations);
+        $inUserTreeDetails = [];
+        if (!is_null($userId)) {
+            $inUserTreeDetails = $this->getFoldersRelationsInUserTreeDetails($foldersRelations, $userId);
         }
+        $createdOldestDetails = $this->getFoldersRelationsCreatedOldestDetails($foldersRelations);
 
-        $foldersRelationsArray = Hash::map($foldersRelations, '{n}', function (FoldersRelation $excludeFolderRelation) {
-            return [
-                'foreign_id' => $excludeFolderRelation->foreign_id,
-                'folder_parent_id' => $excludeFolderRelation->folder_parent_id,
-            ];
-        });
+        return array_merge_recursive($inOperatorTreeDetails, $usageDetails, $inUserTreeDetails, $createdOldestDetails);
+    }
 
-        $foldersRelationsInOperatorTreeCollection = $this->foldersRelationsTable
+    /**
+     * Retrieve the folders relations "in operator tree" details.
+     *
+     * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations The folders relations to sort
+     * @param \App\Utility\UserAccessControl $uac The user at the origin of the operation
+     * @return array
+     * [
+     *   RELATION_ID => [
+     *     in_operator_tree => bool,
+     *   ]
+     * ]
+     * Where RELATION_ID is a composite of the folder relation foreign_id and folder_parent_id
+     */
+    private function getFoldersRelationsInOperatorTreeDetails(array $foldersRelations, UserAccessControl $uac): array
+    {
+        return $this->foldersRelationsTable
             ->findByUserId($uac->getId())
             ->select([
                 'foreign_id' => 'foreign_id',
                 'folder_parent_id' => 'folder_parent_id',
             ])
-            ->where(new TupleComparison(['foreign_id', 'folder_parent_id'], $foldersRelationsArray, [], 'IN'))
+            ->where($this->buildFoldersRelationsTupleComparisonExpression($foldersRelations))
             ->all()
-            ->combine([$this, 'getFolderRelationKey'], function () {
-                return ['inOperatorTree' => true];
+            ->combine([$this, 'getRelationDetailsKey'], function () {
+                return ['in_operator_tree' => true];
             })
             ->toArray();
+    }
 
-        $foldersRelationsInUserTreeCollection = [];
-        if (!is_null($userId)) {
-            $foldersRelationsInUserTreeCollection = $this->foldersRelationsTable
-                ->findByUserId($userId)
-                ->select([
-                    'foreign_id' => 'foreign_id',
-                    'folder_parent_id' => 'folder_parent_id',
-                ])
-                ->where(new TupleComparison(['foreign_id', 'folder_parent_id'], $foldersRelationsArray, [], 'IN'))
-                ->all()
-                ->combine([$this, 'getFolderRelationKey'], function () {
-                    return ['inUserTree' => true];
-                })
-                ->toArray();
-        }
-
+    /**
+     * Retrieve the folders relations "usage" details.
+     *
+     * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations The folders relations to sort
+     * @return array
+     * [
+     *   RELATION_ID => [
+     *     usage_count => int,
+     *   ]
+     * ]
+     * Where RELATION_ID is a composite of the folder relation foreign_id and folder_parent_id
+     */
+    private function getFoldersRelationsUsageDetails(array $foldersRelations): array
+    {
         $foldersRelationsUsageQuery = $this->foldersRelationsTable->find();
-        $foldersRelationsUsageCollection = $foldersRelationsUsageQuery->select([
+
+        return $foldersRelationsUsageQuery->select([
             'foreign_id' => 'foreign_id',
             'folder_parent_id' => 'folder_parent_id',
             'usage_count' => $foldersRelationsUsageQuery->func()->count('*'),
         ])
-            ->where(new TupleComparison(['foreign_id', 'folder_parent_id'], $foldersRelationsArray, [], 'IN'))
+            ->select([
+                'foreign_id' => 'foreign_id',
+                'folder_parent_id' => 'folder_parent_id',
+            ])
+            ->where($this->buildFoldersRelationsTupleComparisonExpression($foldersRelations))
             ->group(['foreign_id', 'folder_parent_id'])
             ->all()
-            ->combine([$this, 'getFolderRelationKey'], function ($folderRelation) {
+            ->combine([$this, 'getRelationDetailsKey'], function ($folderRelation) {
                 return $folderRelation->extract(['usage_count']);
             })
             ->toArray();
+    }
 
-        $foldersRelationsCreatedQuery = $this->foldersRelationsTable->find();
-        $foldersRelationsCreatedCollection = $foldersRelationsCreatedQuery->select(['foreign_id' => 'foreign_id', 'folder_parent_id' => 'folder_parent_id', 'created_oldest' => 'MIN(created)'])
-            ->where(new TupleComparison(['foreign_id', 'folder_parent_id'], $foldersRelationsArray, [], 'IN'))
+    /**
+     * Retrieve the folders relations "in user tree" details.
+     *
+     * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations The folders relations to sort
+     * @param string $userId The target user id
+     * @return array
+     * [
+     *   RELATION_ID => [
+     *     in_user_tree => bool,
+     *   ]
+     * ]
+     * Where RELATION_ID is a composite of the folder relation foreign_id and folder_parent_id
+     */
+    private function getFoldersRelationsInUserTreeDetails(array $foldersRelations, string $userId): array
+    {
+        return $this->foldersRelationsTable
+            ->findByUserId($userId)
+            ->select(['foreign_id', 'folder_parent_id'])
+            ->where($this->buildFoldersRelationsTupleComparisonExpression($foldersRelations))
+            ->all()
+            ->combine([$this, 'getRelationDetailsKey'], function () {
+                return ['in_user_tree' => true];
+            })
+            ->toArray();
+    }
+
+    /**
+     * Retrieve the folders relations "created oldest" details.
+     *
+     * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations The folders relations to sort
+     * @return array
+     * [
+     *   RELATION_ID => [
+     *     created_oldest => string,
+     *   ]
+     * ]
+     * Where RELATION_ID is a composite of the folder relation foreign_id and folder_parent_id
+     */
+    private function getFoldersRelationsCreatedOldestDetails(array $foldersRelations): array
+    {
+        return $this->foldersRelationsTable->find()
+            ->select([
+                'foreign_id' => 'foreign_id',
+                'folder_parent_id' => 'folder_parent_id',
+                'created_oldest' => 'MIN(created)',
+            ])
+            ->where($this->buildFoldersRelationsTupleComparisonExpression($foldersRelations))
             ->group(['foreign_id', 'folder_parent_id'])
             ->all()
-            ->combine([$this, 'getFolderRelationKey'], function ($folderRelation) {
+            ->combine([$this, 'getRelationDetailsKey'], function ($folderRelation) {
                 return $folderRelation->extract(['created_oldest']);
             })
             ->toArray();
-
-        return array_merge_recursive($foldersRelationsInOperatorTreeCollection, $foldersRelationsUsageCollection, $foldersRelationsInUserTreeCollection, $foldersRelationsCreatedCollection);
     }
 
-    public function getFolderRelationKey(FoldersRelation $folderRelation): string
+    /**
+     * Build a folders relations IN or NOT IN tuple comparison used in query where clause.
+     * Output SQL like:
+     * WHERE (foreign_id, folder_parent_id) IN ((FOLDER_RELATION_1_FOREIGN_ID, FOLDER_RELATION_1_FOLDER_PARENT_ID), ...)
+     *
+     * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations The folders relations to build a tuple comparison expression for
+     * @param bool $isInOperator (Optional) By default true and the expression with use the IN operator. If false the
+     * expression will use the NOT IN operator.
+     * @return \Cake\Database\Expression\TupleComparison
+     */
+    private function buildFoldersRelationsTupleComparisonExpression(
+        array $foldersRelations,
+        bool $isInOperator = true
+    ): TupleComparison {
+        $operator = $isInOperator ? 'IN' : 'NOT IN';
+        $excludeFoldersRelationsArray = array_map(function (FoldersRelation $excludeFolderRelation) {
+            return $excludeFolderRelation->extract(['foreign_id', 'folder_parent_id']);
+        }, $foldersRelations);
+
+        return new TupleComparison(['foreign_id', 'folder_parent_id'], $excludeFoldersRelationsArray, [], $operator);
+    }
+
+    /**
+     * Get the key of a folder relation in the folders relations details hashtable.
+     *
+     * @param \Passbolt\Folders\Model\Entity\FoldersRelation<\Passbolt\Folders\Model\Entity\FoldersRelation> $folderRelation The list of folders relations to sort.
+     * @return string
+     */
+    public function getRelationDetailsKey(FoldersRelation $folderRelation): string
     {
         return "{$folderRelation->foreign_id} {$folderRelation->folder_parent_id}";
     }
 
-    private function isFolderRelationInOperatorTree(FoldersRelation $folderRelation, array $foldersRelationsChangesDetails): bool
-    {
-        $folderRelationKey = $this->getFolderRelationKey($folderRelation);
-        if (isset($foldersRelationsChangesDetails[$folderRelationKey]['inOperatorTree'])) {
-            return $foldersRelationsChangesDetails[$folderRelationKey]['inOperatorTree'];
+    /**
+     * Check which folder relation has the operator tree priority. Which relation is in the tree while the
+     * other one is not.
+     *
+     * @param \Passbolt\Folders\Model\Entity\FoldersRelation $relationA The first folder relation to check the priority for.
+     * @param \Passbolt\Folders\Model\Entity\FoldersRelation $relationB The second folder relation to check the priority for.
+     * @param array $changesDetails The array of folders relations details
+     * @return bool|null return true if the first relation has the priority, return false if the second relation has
+     * the priority or return null if none of them has the priority.
+     */
+    private function hasInOperatorTreePriority(
+        FoldersRelation $relationA,
+        FoldersRelation $relationB,
+        array $changesDetails
+    ) {
+        $inTreeA = Hash::get($changesDetails, "{$this->getRelationDetailsKey($relationA)}.in_operator_tree", false);
+        $inTreeB = Hash::get($changesDetails, "{$this->getRelationDetailsKey($relationB)}.in_operator_tree", false);
+        if ($inTreeA && !$inTreeB) {
+            return true;
+        } elseif (!$inTreeA && $inTreeB) {
+            return false;
         }
 
-        return false;
+        return null;
     }
 
-    private function isFolderRelationInUserTree(FoldersRelation $folderRelation, array $foldersRelationsChangesDetails): bool
+    /**
+     * Check which folder relation has the usage priority. Which relation is more used than the other one.
+     *
+     * @param \Passbolt\Folders\Model\Entity\FoldersRelation $relationA The first folder relation to check the priority for.
+     * @param \Passbolt\Folders\Model\Entity\FoldersRelation $relationB The second folder relation to check the priority for.
+     * @param array $changesDetails The array of folders relations details
+     * @return bool|null return true if the first relation has the priority, return false if the second relation has
+     * the priority or return null if none of them has the priority.
+     */
+    private function hasUsagePriority(FoldersRelation $relationA, FoldersRelation $relationB, array $changesDetails)
     {
-        $folderRelationKey = $this->getFolderRelationKey($folderRelation);
-        if (isset($foldersRelationsChangesDetails[$folderRelationKey]['inUserTree'])) {
-            return $foldersRelationsChangesDetails[$folderRelationKey]['inUserTree'];
+        $usageCountA = Hash::get($changesDetails, "{$this->getRelationDetailsKey($relationA)}.usage_count", 0);
+        $usageCountB = Hash::get($changesDetails, "{$this->getRelationDetailsKey($relationB)}.usage_count", 0);
+
+        if ($usageCountA > $usageCountB) {
+            return true;
+        } elseif ($usageCountA < $usageCountB) {
+            return false;
         }
 
-        return false;
+        return null;
     }
 
-    private function isFolderRelationMoreUsedThan(FoldersRelation $folderRelationA, FoldersRelation $folderRelationB, array $foldersRelationsChangesDetails): bool
-    {
-        $folderRelationAUsageCount = $folderRelationBUsageCount = 0;
-        $folderRelationAKey = $this->getFolderRelationKey($folderRelationA);
-        $folderRelationBKey = $this->getFolderRelationKey($folderRelationB);
-        if (isset($foldersRelationsChangesDetails[$folderRelationAKey]['usage_count'])) {
-            $folderRelationAUsageCount = $foldersRelationsChangesDetails[$folderRelationAKey]['usage_count'];
-        }
-        if (isset($foldersRelationsChangesDetails[$folderRelationBKey]['usage_count'])) {
-            $folderRelationBUsageCount = $foldersRelationsChangesDetails[$folderRelationBKey]['usage_count'];
+    /**
+     * Check which folder relation has the target user tree priority. Which relation is in the tree while the
+     * other one is not.
+     *
+     * @param \Passbolt\Folders\Model\Entity\FoldersRelation $relationA The first folder relation to check the priority for.
+     * @param \Passbolt\Folders\Model\Entity\FoldersRelation $relationB The second folder relation to check the priority for.
+     * @param array $changesDetails The array of folders relations details
+     * @return bool|null return true if the first relation has the priority, return false if the second relation has
+     * the priority or return null if none of them has the priority.
+     */
+    private function hasInUserTreePriority(
+        FoldersRelation $relationA,
+        FoldersRelation $relationB,
+        array $changesDetails
+    ) {
+        $inTreeA = Hash::get($changesDetails, "{$this->getRelationDetailsKey($relationA)}.in_user_tree", false);
+        $inTreeB = Hash::get($changesDetails, "{$this->getRelationDetailsKey($relationB)}.in_user_tree", false);
+        if ($inTreeA && !$inTreeB) {
+            return true;
+        } elseif (!$inTreeA && $inTreeB) {
+            return false;
         }
 
-        return $folderRelationAUsageCount > $folderRelationBUsageCount;
+        return null;
     }
 
-    private function isFolderRelationOlderThan(FoldersRelation $folderRelationA, FoldersRelation $folderRelationB, array $foldersRelationsChangesDetails): bool
+    /**
+     * Check which folder relation has the grand pa priority. Which relation is older than the other one.
+     *
+     * @param \Passbolt\Folders\Model\Entity\FoldersRelation $relationA The first folder relation to check the priority for.
+     * @param \Passbolt\Folders\Model\Entity\FoldersRelation $relationB The second folder relation to check the priority for.
+     * @param array $changesDetails The array of folders relations details
+     * @return bool|null return true if the first relation has the priority, return false if the second relation has
+     * the priority or return null if none of them has the priority.
+     */
+    private function hasGrandPaPriority(FoldersRelation $relationA, FoldersRelation $relationB, array $changesDetails)
     {
-        $folderRelationACreated = $folderRelationBCreated = 0;
-        $folderRelationAKey = $this->getFolderRelationKey($folderRelationA);
-        $folderRelationBKey = $this->getFolderRelationKey($folderRelationB);
-        if (isset($foldersRelationsChangesDetails[$folderRelationAKey]['created_oldest'])) {
-            $folderRelationACreated = $foldersRelationsChangesDetails[$folderRelationAKey]['created_oldest'];
-        }
-        if (isset($foldersRelationsChangesDetails[$folderRelationBKey]['created_oldest'])) {
-            $folderRelationBCreated = $foldersRelationsChangesDetails[$folderRelationBKey]['created_oldest'];
+        $createdOldestA = Hash::get($changesDetails, "{$this->getRelationDetailsKey($relationA)}.created_oldest", 0);
+        $createdOldestB = Hash::get($changesDetails, "{$this->getRelationDetailsKey($relationB)}.created_oldest", 0);
+
+        if ($createdOldestA < $createdOldestB) {
+            return true;
+        } elseif ($createdOldestA > $createdOldestB) {
+            return false;
         }
 
-        return $folderRelationACreated < $folderRelationBCreated;
+        return null;
     }
 }

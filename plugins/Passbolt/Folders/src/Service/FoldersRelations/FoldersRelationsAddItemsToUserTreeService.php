@@ -82,16 +82,25 @@ class FoldersRelationsAddItemsToUserTreeService
     /**
      * Add items to a user tree.
      *
-     * This function doesn't check if the user has access to the items to add.
-     * This function doesn't check if the items are already present in the user tree.
+     * This function doesn't check:
+     * - The existence of target user
+     * - The existence of the items to add to the target user tree
+     * - The right for the target user to access the items
+     * - The presence of the items in the user tree
      *
      * @param \App\Utility\UserAccessControl $uac The user at the origin of the operation
      * @param string $userId The target user id the items are added for
      * @param array $items The list of items to add to the tree
-     * For performance reason on large operation such as user to group, this operation is already guaranteed by the caller.
+     * [
+     *   [
+     *      foreign_id => UUID,
+     *      foreign_model => Resource|Folder
+     *   ],
+     *   ...
+     * ]
+     * @todo Format of the items parameter is error prone. Review the format and validation.
      * @return void
      * @throws \Exception If an unexpected error occurred
-     * @todo Format of the items parameter is error prone. Review the format and validation.
      */
     public function addItemsToUserTree(UserAccessControl $uac, string $userId, array $items): void
     {
@@ -275,7 +284,7 @@ class FoldersRelationsAddItemsToUserTreeService
         $changesToApply = [];
         $changesToCancel = [];
 
-        /**
+        /*
          * Sort out the changes to apply and the changes to cancel. Only one folder relation change for a given item
          * defined by its foreign_id can be played, other changes for the same item will be cancelled.
          * Regroup the folders relations changes to apply by folder parent. This will improve the performance by
@@ -308,7 +317,8 @@ class FoldersRelationsAddItemsToUserTreeService
     }
 
     /**
-     * Detect and repair any strongly
+     * Detect and repair strongly connected components created between the users impacted by the changes and the users
+     * having a tree intersecting the previous ones.
      *
      * @param \App\Utility\UserAccessControl $uac The user at the origin of the action
      * @param string $userId The target user id the items are added for
@@ -343,7 +353,8 @@ class FoldersRelationsAddItemsToUserTreeService
     }
 
     /**
-     * Look for a cycle in the target user tree the items are added for and repair it.
+     * Detect and repair strongly connected components created in the target user tree impacted by the changes and
+     * involving a target user personal folder.
      *
      * @param string $userId The target user id the items are added for
      * @return void
