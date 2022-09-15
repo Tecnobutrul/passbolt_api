@@ -46,7 +46,9 @@ class FoldersRelationsSortService
      * 3. (Optional) The folder relation presence in the target user tree. Priority to the target user view.
      * 4. The folder relation age. Priority to the oldest folder relation.
      *
-     * @param array<FoldersRelation> &$foldersRelations The array of folders relations to sort.
+     * **Note** The function doesn't sort folders relations having root as folder parent.
+     *
+     * @param array $foldersRelations The array of folders relations to sort.
      * @param \App\Utility\UserAccessControl $uac The user at the origin of the action.
      * @param string|null $userId The target user id
      * @return void
@@ -58,7 +60,6 @@ class FoldersRelationsSortService
         }
 
         $changesDetails = $this->getFolderRelationsDetails($foldersRelations, $uac, $userId);
-//        var_dump($changesDetails);
 
         usort($foldersRelations, function (
             FoldersRelation $relationA,
@@ -270,7 +271,7 @@ class FoldersRelationsSortService
     /**
      * Get the key of a folder relation in the folders relations details hashtable.
      *
-     * @param \Passbolt\Folders\Model\Entity\FoldersRelation<\Passbolt\Folders\Model\Entity\FoldersRelation> $folderRelation The list of folders relations to sort.
+     * @param \Passbolt\Folders\Model\Entity\FoldersRelation $folderRelation The list of folders relations to sort.
      * @return string
      */
     public function getRelationDetailsKey(FoldersRelation $folderRelation): string

@@ -184,21 +184,21 @@ class FoldersRelationsSortServiceTest extends FoldersTestCase
 
         $folderA = FolderFactory::make()->persist();
         $folderB = FolderFactory::make()->persist();
-        $foldersRelationsA = FoldersRelationFactory::make(3)
+        [$folderRelationAForOther1] = FoldersRelationFactory::make(3)
             ->foreignModelFolder($folderA)->folderParent($folderB)->persist();
 
         $folderC = FolderFactory::make()->persist();
         $folderD = FolderFactory::make()->persist();
-        $foldersRelationsB = FoldersRelationFactory::make(2)
+        [$folderRelationBForOther1] = FoldersRelationFactory::make(2)
             ->foreignModelFolder($folderC)->folderParent($folderD)->persist();
 
         $folderRelationC = FoldersRelationFactory::make()->persist();
 
-        $foldersRelations = [$folderRelationC, $foldersRelationsB[0], $foldersRelationsA[0]];
+        $foldersRelations = [$folderRelationC, $folderRelationBForOther1, $folderRelationAForOther1];
 
         $this->service->sort($foldersRelations, $uac);
-        $this->assertEquals($foldersRelationsA[0]->id, $foldersRelations[0]->id);
-        $this->assertEquals($foldersRelationsB[0]->id, $foldersRelations[1]->id);
+        $this->assertEquals($folderRelationAForOther1->id, $foldersRelations[0]->id);
+        $this->assertEquals($folderRelationBForOther1->id, $foldersRelations[1]->id);
         $this->assertEquals($folderRelationC->id, $foldersRelations[2]->id);
     }
 
@@ -225,15 +225,15 @@ class FoldersRelationsSortServiceTest extends FoldersTestCase
 
         $folderC = FolderFactory::make()->persist();
         $folderD = FolderFactory::make()->persist();
-        $foldersRelationsB = FoldersRelationFactory::make(2)
+        [$folderRelationBForOther1] = FoldersRelationFactory::make(2)
             ->foreignModelFolder($folderC)->folderParent($folderD)->persist();
 
         $folderRelationC = FoldersRelationFactory::make()->persist();
-        $foldersRelations = [$folderRelationC, $foldersRelationsB[0], $folderRelationAForBetty];
+        $foldersRelations = [$folderRelationC, $folderRelationBForOther1, $folderRelationAForBetty];
 
         $this->service->sort($foldersRelations, $uac, $userB->id);
         $this->assertEquals($folderRelationAForBetty->id, $foldersRelations[0]->id);
-        $this->assertEquals($foldersRelationsB[0]->id, $foldersRelations[1]->id);
+        $this->assertEquals($folderRelationBForOther1->id, $foldersRelations[1]->id);
         $this->assertEquals($folderRelationC->id, $foldersRelations[2]->id);
     }
 
@@ -260,15 +260,15 @@ class FoldersRelationsSortServiceTest extends FoldersTestCase
 
         $folderC = FolderFactory::make()->persist();
         $folderD = FolderFactory::make()->persist();
-        $foldersRelationsB = FoldersRelationFactory::make(2)
+        [$folderRelationBForOther1] = FoldersRelationFactory::make(2)
             ->foreignModelFolder($folderC)->folderParent($folderD)->persist();
 
         $folderRelationC = FoldersRelationFactory::make()->persist();
-        $foldersRelations = [$folderRelationC, $foldersRelationsB[0], $folderRelationAForOther1];
+        $foldersRelations = [$folderRelationC, $folderRelationBForOther1, $folderRelationAForOther1];
 
         $this->service->sort($foldersRelations, $uac);
         $this->assertEquals($folderRelationAForOther1->id, $foldersRelations[0]->id);
-        $this->assertEquals($foldersRelationsB[0]->id, $foldersRelations[1]->id);
+        $this->assertEquals($folderRelationBForOther1->id, $foldersRelations[1]->id);
         $this->assertEquals($folderRelationC->id, $foldersRelations[2]->id);
     }
 

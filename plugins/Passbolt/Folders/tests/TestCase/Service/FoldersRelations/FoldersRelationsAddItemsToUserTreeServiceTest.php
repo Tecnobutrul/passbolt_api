@@ -979,7 +979,6 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         // Folder A.
         $this->assertItemIsInTrees($folderA->id, 2);
         $this->assertFolderRelation($folderA->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId, FoldersRelation::ROOT);
-        var_dump("---folder A ($folderA->id)");
         $this->assertFolderRelation($folderA->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userCId, FoldersRelation::ROOT);
         // Folder B
         $this->assertItemIsInTrees($folderB->id, 3);

@@ -344,7 +344,7 @@ class FoldersRelationsAddItemsToUserTreeService
                 $foldersRelationsScc
             );
 
-            if (!$brokenFolderRelation) {
+            if (is_null($brokenFolderRelation)) {
                 $msg = "Strongly connected components found, but cannot be repaired."; // phpcs:ignore
                 throw new InternalErrorException($msg);
             }

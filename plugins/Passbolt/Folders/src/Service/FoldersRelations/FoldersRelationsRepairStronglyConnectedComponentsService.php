@@ -50,16 +50,18 @@ class FoldersRelationsRepairStronglyConnectedComponentsService
      * @param string $userId The user tree that is at the origin at the conflict. Most of the time it's the modified
      *                        tree.
      * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations The relations forming a strongly connected components set
-     * @return \Passbolt\Folders\Model\Entity\FoldersRelation|void Return the folder relation that was broken to repair the SCC.
+     * @return \Passbolt\Folders\Model\Entity\FoldersRelation|null Return the folder relation that was broken to repair the SCC.
      */
-    public function repair(UserAccessControl $uac, string $userId, array $foldersRelations): FoldersRelation
+    public function repair(UserAccessControl $uac, string $userId, array $foldersRelations)
     {
         $folderRelationToBreak = $this->identifyFolderRelationToBreak($uac, $userId, $foldersRelations);
-        $this->foldersRelationsTable->moveItemFrom(
-            $folderRelationToBreak->foreign_id,
-            [$folderRelationToBreak->folder_parent_id],
-            FoldersRelation::ROOT
-        );
+        if (!is_null($folderRelationToBreak)) {
+            $this->foldersRelationsTable->moveItemFrom(
+                $folderRelationToBreak->foreign_id,
+                [$folderRelationToBreak->folder_parent_id],
+                FoldersRelation::ROOT
+            );
+        }
 
         return $folderRelationToBreak;
     }
@@ -78,13 +80,17 @@ class FoldersRelationsRepairStronglyConnectedComponentsService
      * @param string $userId The user tree that is at the origin at the conflict. Most of the time it's the modified
      * tree.
      * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations The list of folders relations involved in the conflict.
-     * @return \Passbolt\Folders\Model\Entity\FoldersRelation|void
+     * @return \Passbolt\Folders\Model\Entity\FoldersRelation|null
      */
     private function identifyFolderRelationToBreak(
         UserAccessControl $uac,
         string $userId,
         array $foldersRelations
-    ): FoldersRelation {
+    ) {
+        if (empty($foldersRelations)) {
+            return null;
+        }
+
         $foldersRelationsToSort = $foldersRelations;
         $this->foldersRelationsSortService->sort($foldersRelationsToSort, $uac, $userId);
 
@@ -95,9 +101,9 @@ class FoldersRelationsRepairStronglyConnectedComponentsService
      * Repair an SCC related to a personal folder.
      *
      * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations The list of folders relations involved in the conflict.
-     * @return \Passbolt\Folders\Model\Entity\FoldersRelation|void Return the folder relation that was broken to repair the SCC.
+     * @return \Passbolt\Folders\Model\Entity\FoldersRelation|null Return the folder relation that was broken to repair the SCC.
      */
-    public function repairPersonal(array $foldersRelations): FoldersRelation
+    public function repairPersonal(array $foldersRelations)
     {
         $folderRelationToBreak = $this->identifyPersonalFolderRelationToBreak($foldersRelations);
         if ($folderRelationToBreak) {
@@ -116,9 +122,9 @@ class FoldersRelationsRepairStronglyConnectedComponentsService
      * Return the first personal relation found in the list of folders relations involved in the cycle.
      *
      * @param array $foldersRelations The list of folders relations involved in a cycle
-     * @return \Passbolt\Folders\Model\Entity\FoldersRelation|void
+     * @return \Passbolt\Folders\Model\Entity\FoldersRelation|null
      */
-    private function identifyPersonalFolderRelationToBreak(array $foldersRelations): FoldersRelation
+    private function identifyPersonalFolderRelationToBreak(array $foldersRelations)
     {
         foreach ($foldersRelations as $folderRelation) {
             $isPersonal = $this->foldersRelationsTable->isItemPersonal($folderRelation['folder_parent_id']);
@@ -126,5 +132,7 @@ class FoldersRelationsRepairStronglyConnectedComponentsService
                 return $folderRelation;
             }
         }
+
+        return null;
     }
 }
