@@ -181,7 +181,7 @@ class WebInstallerTest extends WebInstallerIntegrationTestCase
         $webInstaller = new WebInstaller(null);
         $webInstaller->setSettings('user', ['user_id' => $user->id]);
         $subscriptionSettings = [
-            'subscription_key' => file_get_contents(PLUGINS . DS . 'Passbolt' . DS . 'Ee' . DS . 'tests' . DS . 'data' . DS . 'subscription' . DS . 'subscription_dev'),
+            'subscription_key' => file_get_contents(PLUGINS . DS . 'PassboltEe' . DS . 'Ee' . DS . 'tests' . DS . 'data' . DS . 'subscription' . DS . 'subscription_dev'),
         ];
         $webInstaller->setSettings('subscription', $subscriptionSettings);
 

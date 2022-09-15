@@ -31,13 +31,13 @@ class SubscriptionKeyControllerTest extends WebInstallerIntegrationTestCase
     protected function mockSubscriptionKeyIssuerKey()
     {
         Configure::load('Passbolt/Ee.config', 'default', true);
-        $licenseDevPublicKey = PLUGINS . DS . 'Passbolt' . DS . 'Ee' . DS . 'tests' . DS . 'data' . DS . 'gpg' . DS . 'subscription_dev_public.key';
+        $licenseDevPublicKey = PLUGINS . DS . 'PassboltEe' . DS . 'Ee' . DS . 'tests' . DS . 'data' . DS . 'gpg' . DS . 'subscription_dev_public.key';
         Configure::write('passbolt.plugins.ee.subscriptionKey.public', $licenseDevPublicKey);
     }
 
     protected function checkPluginSubscriptionKeyExists()
     {
-        return file_exists(PLUGINS . DS . 'Passbolt' . DS . 'Ee');
+        return file_exists(PLUGINS . DS . 'PassboltEe' . DS . 'Ee');
     }
 
     public function testWebInstallerSubscriptionKeyViewSuccess()
@@ -53,7 +53,7 @@ class SubscriptionKeyControllerTest extends WebInstallerIntegrationTestCase
         if ($this->checkPluginSubscriptionKeyExists()) {
             $this->mockSubscriptionKeyIssuerKey();
             $postData = [
-                'subscription_key' => file_get_contents(PLUGINS . DS . 'Passbolt' . DS . 'Ee' . DS . 'tests' . DS . 'data' . DS . 'subscription' . DS . 'subscription_dev'),
+                'subscription_key' => file_get_contents(PLUGINS . DS . 'PassboltEe' . DS . 'Ee' . DS . 'tests' . DS . 'data' . DS . 'subscription' . DS . 'subscription_dev'),
             ];
             $this->post('/install/subscription', $postData);
             $this->assertResponseCode(302);
@@ -83,7 +83,7 @@ class SubscriptionKeyControllerTest extends WebInstallerIntegrationTestCase
         if ($this->checkPluginSubscriptionKeyExists()) {
             $this->mockSubscriptionKeyIssuerKey();
             $postData = [
-                'subscription_key' => file_get_contents(PLUGINS . DS . 'Passbolt' . DS . 'Ee' . DS . 'tests' . DS . 'data' . DS . 'subscription' . DS . 'subscription_expired'),
+                'subscription_key' => file_get_contents(PLUGINS . DS . 'PassboltEe' . DS . 'Ee' . DS . 'tests' . DS . 'data' . DS . 'subscription' . DS . 'subscription_expired'),
             ];
             $this->post('/install/subscription', $postData);
             $data = $this->_getBodyAsString();

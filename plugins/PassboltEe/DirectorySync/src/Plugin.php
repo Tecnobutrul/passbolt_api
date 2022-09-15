@@ -20,4 +20,5 @@ use Cake\Core\BasePlugin;
 
 class Plugin extends BasePlugin
 {
+    public const PLUGIN_CONFIG_PATH = PLUGINS . 'PassboltEe' . DS . 'DirectorySync' . DS . 'config' . DS;
 }

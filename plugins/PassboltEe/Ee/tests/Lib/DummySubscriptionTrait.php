@@ -35,7 +35,7 @@ trait DummySubscriptionTrait
 
     protected function setUpPathAndPublicSubscriptionKey()
     {
-        $this->baseTestPath = PLUGINS . 'Passbolt' . DS . 'Ee' . DS . 'tests';
+        $this->baseTestPath = PLUGINS . 'PassboltEe' . DS . 'Ee' . DS . 'tests';
         $subscriptionDevPublicKey = $this->baseTestPath . DS . 'data' . DS . 'gpg' . DS . 'subscription_dev_public.key';
         Configure::write('passbolt.plugins.ee.subscriptionKey.public', $subscriptionDevPublicKey);
     }
@@ -54,7 +54,7 @@ trait DummySubscriptionTrait
 
     protected function getDummySubscriptionFileName(string $scenario)
     {
-        return PLUGINS . DS . 'Passbolt' . DS . 'Ee' . DS . 'tests' . DS . 'data' . DS . 'subscription' . DS . $scenario;
+        return PLUGINS . DS . 'PassboltEe' . DS . 'Ee' . DS . 'tests' . DS . 'data' . DS . 'subscription' . DS . $scenario;
     }
 
     protected function getValidSubscriptionFileName(): string

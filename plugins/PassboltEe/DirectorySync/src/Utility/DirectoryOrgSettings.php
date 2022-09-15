@@ -23,6 +23,7 @@ use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
+use Passbolt\DirectorySync\Plugin;
 
 class DirectoryOrgSettings
 {
@@ -128,7 +129,7 @@ class DirectoryOrgSettings
      */
     private static function getDefaultSettings()
     {
-        $path = PLUGINS . 'Passbolt' . DS . 'DirectorySync' . DS . 'config' . DS . 'config.php';
+        $path = Plugin::PLUGIN_CONFIG_PATH . 'config.php';
         if (!\file_exists($path)) {
             return [];
         }

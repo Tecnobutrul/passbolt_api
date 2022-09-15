@@ -40,7 +40,7 @@ class SubscriptionKeyDtoFormTest extends TestCase
     {
         parent::setUp();
         $this->loadPlugins(['Passbolt/Ee' => []]);
-        $this->baseTestPath = PLUGINS . 'Passbolt' . DS . 'Ee' . DS . 'tests';
+        $this->baseTestPath = PLUGINS . 'PassboltEe' . DS . 'Ee' . DS . 'tests';
     }
 
     private function mergeWithStandardData(array $data)
