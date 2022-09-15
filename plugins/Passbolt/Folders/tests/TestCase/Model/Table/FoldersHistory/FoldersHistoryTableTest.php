@@ -17,9 +17,11 @@ declare(strict_types=1);
 
 namespace Passbolt\Folders\Test\TestCase\Model\Table\FoldersHistory;
 
+use App\Error\Exception\ValidationException;
 use App\Utility\UuidFactory;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\TestSuite\TestCase;
+use Passbolt\Folders\Model\Entity\Folder;
 use Passbolt\Folders\Model\Entity\FolderHistory;
 
 /**
@@ -62,10 +64,22 @@ class FoldersHistoryTableTest extends TestCase
     {
         $data = [
             'id' => UuidFactory::uuid(),
-            'name' => UuidFactory::uuid(),
+            'name' => str_repeat('1', Folder::MAX_NAME_LENGTH),
         ];
 
         $entity = $this->FoldersHistory->create($data);
         $this->assertInstanceOf(FolderHistory::class, $entity);
+    }
+
+    public function testCreateFoldersHistory_Name_Too_long(): void
+    {
+        $data = [
+            'id' => UuidFactory::uuid(),
+            'name' => str_repeat('1', Folder::MAX_NAME_LENGTH + 1),
+        ];
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Could not validate folder history data.');
+        $entity = $this->FoldersHistory->create($data);
     }
 }
