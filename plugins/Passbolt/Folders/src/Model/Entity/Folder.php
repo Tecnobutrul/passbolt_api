@@ -40,6 +40,7 @@ use Cake\ORM\Entity;
 class Folder extends Entity
 {
     public const ROOT_ID = false;
+    public const MAX_NAME_LENGTH = 256;
 
     /**
      * List of property names that should **not** be included in JSON or Array
