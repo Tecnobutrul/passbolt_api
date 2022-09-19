@@ -104,8 +104,8 @@ class FoldersRelationsAddItemsToUserTreeService
      */
     public function addItemsToUserTree(UserAccessControl $uac, string $userId, array $items): void
     {
-        $foldersRelationsChanges = $this->getFoldersRelationsChanges($uac, $userId, $items);
         $this->insertItemsInUserRootTree($userId, $items);
+        $foldersRelationsChanges = $this->getFoldersRelationsChanges($uac, $userId, $items);
         if (!empty($foldersRelationsChanges)) {
             $this->applyFoldersRelationsChanges($userId, $foldersRelationsChanges);
             $this->detectAndRepairSCCs($uac, $userId, $foldersRelationsChanges);

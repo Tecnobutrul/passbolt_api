@@ -61,9 +61,9 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         $this->service = new FoldersRelationsAddItemsToUserTreeService();
     }
 
-    /* FOLDER - FOLDER NO PARENT NO CHILD */
+    /* ADD A UNIQUE ITEM - FOLDER - FOLDER NO PARENT NO CHILD */
 
-    public function testAddItemsToUserTreeSuccess_Folder_NoParentNoChild()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_NoParentNoChild()
     {
         [$folderA, $userAId, $userBId] = $this->insertFixture_Folder_NoParentNoChild1();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -90,9 +90,9 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $userAId, $userBId];
     }
 
-    /* FOLDER - FOLDER HAVING A PARENT */
+    /* ADD A UNIQUE ITEM - FOLDER - FOLDER HAVING A PARENT */
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingOneParent1_ParentVisibleInOperatorTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingOneParent1_ParentVisibleInOperatorTree()
     {
         [$folderA, $folderB, $userAId, $userBId] = $this->insertFixture_Folder_HavingOneParent1();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -130,7 +130,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $userAId, $userBId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingOneParent2_ParentNotVisibleInOperatorTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingOneParent2_ParentNotVisibleInOperatorTree()
     {
         [$folderA, $folderB, $userAId, $userBId] = $this->insertFixture_Folder_HavingOneParent2();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -166,7 +166,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $userAId, $userBId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingOneParent3_ParentVisibleInOtherUserTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingOneParent3_ParentVisibleInOtherUserTree()
     {
         [$folderA, $folderB, $userAId, $userBId, $userCId] = $this->insertFixture_Folder_HavingOneParent3();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -211,9 +211,9 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $userAId, $userBId, $userCId];
     }
 
-    /* FOLDER - FOLDER HAVING MULTIPLE PARENT */
+    /* ADD A UNIQUE ITEM - FOLDER - FOLDER HAVING MULTIPLE PARENT */
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingMultipleParents1_PriorityToTheOperatorParent()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingMultipleParents1_PriorityToTheOperatorParent()
     {
         [$folderA, $folderB, $folderC, $userAId, $userBId, $userCId] = $this->insertFixture_Folder_HavingMultipleParents1();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -270,7 +270,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $userAId, $userBId, $userCId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingMultipleParents2_NoParentInOperatorTree_PriorityToTheMostUsed()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingMultipleParents2_NoParentInOperatorTree_PriorityToTheMostUsed()
     {
         [$folderA, $folderB, $folderC, $userAId, $userBId, $userCId, $userDId, $userEId] = $this->insertFixture_Folder_HavingMultipleParents2();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -340,7 +340,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $userAId, $userBId, $userCId, $userDId, $userEId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingMultipleParents3_NoParentInOperatorTree_PriorityToTheOldestParent()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingMultipleParents3_NoParentInOperatorTree_PriorityToTheOldestParent()
     {
         [$folderA, $folderB, $folderC, $userAId, $userBId, $userCId, $userDId] = $this->insertFixture_Folder_HavingMultipleParents3();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -401,9 +401,9 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $userAId, $userBId, $userCId, $userDId];
     }
 
-    /* FOLDER - FOLDER HAVING CHILDREN */
+    /* ADD A UNIQUE ITEM - FOLDER - FOLDER HAVING CHILDREN */
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingChildren1_ChildInOperatorTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingChildren1_ChildInOperatorTree()
     {
         [$folderA, $folderB, $userAId, $userBId] = $this->insertFixture_Folder_HavingChildren1();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -445,7 +445,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $userAId, $userBId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingChildren2_ChildInOperatorTree_ChildAlreadyOrganizedInTargetUserTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingChildren2_ChildInOperatorTree_ChildAlreadyOrganizedInTargetUserTree()
     {
         [$folderA, $folderB, $folderC, $userAId, $userBId] = $this->insertFixture_Folder_HavingChildren2();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -495,7 +495,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $userAId, $userBId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingChildren3_VisibleChildInOtherUsersTrees()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingChildren3_VisibleChildInOtherUsersTrees()
     {
         [$folderA, $folderB, $userAId, $userBId, $userCId] = $this->insertFixture_Folder_HavingChildren3();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -560,7 +560,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $resource1, $userAId, $userBId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingChildrenResources1()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingChildrenResources1()
     {
         [$folderA, $resource1, $userAId, $userBId] = $this->insertFixture_FolderHavingChildrenResources1();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -602,7 +602,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $resource1, $userAId, $userBId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingChildrenResources2()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingChildrenResources2()
     {
         [$folderA, $folderB, $resource1, $userAId, $userBId] = $this->insertFixture_FolderHavingChildrenResources2();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -645,7 +645,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $resource1, $userAId, $userBId, $userCId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingChildrenResources4()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingChildrenResources4()
     {
         [$folderA, $resource1, $userAId, $userBId, $userCId] = $this->insertFixture_FolderHavingChildrenResources4();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -664,9 +664,9 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         $this->assertFolderRelation($resource1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userCId, $folderA->id);
     }
 
-    /* FOLDER - FOLDER HAVING PARENT(S) AND CHILDREN */
+    /* ADD A UNIQUE ITEM - FOLDER - FOLDER HAVING PARENT(S) AND CHILDREN */
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren1_CycleDetectedWhenReconstructingParent_ParentInOperatorTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren1_CycleDetectedWhenReconstructingParent_ParentInOperatorTree()
     {
         [$folderA, $folderB, $folderC, $userAId, $userBId, $userCId] = $this->insertFixture_Folder_HavingParentsAndChildren1();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -733,7 +733,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $userAId, $userBId, $userCId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren2_CycleDetectedWhenReconstructingParent_ParentInOperatorTree_CycleDetectedInParentAncestors()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren2_CycleDetectedWhenReconstructingParent_ParentInOperatorTree_CycleDetectedInParentAncestors()
     {
         [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId] =
             $this->insertFixture_Folder_HavingParentsAndChildren2();
@@ -817,7 +817,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren2_1_CycleNotDetectedWhenReconstructingParent_ParentInOperatorTree_PersonalFolderInvolved()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren2_1_CycleNotDetectedWhenReconstructingParent_ParentInOperatorTree_PersonalFolderInvolved()
     {
         [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId] = $this->insertFixture_Folder_HavingParentsAndChildren2_1();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -897,7 +897,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren3_CycleDetectedWhenReconstructingChildren_ChildrenInOperatorTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren3_CycleDetectedWhenReconstructingChildren_ChildrenInOperatorTree()
     {
         [$folderA, $folderB, $folderC, $userAId, $userBId, $userCId] = $this->insertFixture_Folder_HavingParentsAndChildren3();
         $uac = new UserAccessControl(Role::USER, $userAId);
@@ -967,7 +967,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $userAId, $userBId, $userCId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren4_CycleDetectedWhenReconstructingChildren_ChildrenInOperatorTree_CycleDetectedInChildrenOfChildren()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren4_CycleDetectedWhenReconstructingChildren_ChildrenInOperatorTree_CycleDetectedInChildrenOfChildren()
     {
         [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId] =
             $this->insertFixture_Folder_HavingParentsAndChildren4();
@@ -1051,7 +1051,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren5_CycleDetectedWhenReconstructingParent_ParentInAnotherUserTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren5_CycleDetectedWhenReconstructingParent_ParentInAnotherUserTree()
     {
         [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId] =
             $this->insertFixture_Folder_HavingParentsAndChildren5();
@@ -1138,7 +1138,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren5_1()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren5_1()
     {
         [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId] =
             $this->insertFixture_Folder_HavingParentsAndChildren5_1();
@@ -1219,7 +1219,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren6()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren6()
     {
         [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId] =
             $this->insertFixture_Folder_HavingParentsAndChildren6();
@@ -1306,7 +1306,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren6_1()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren6_1()
     {
         [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId] =
             $this->insertFixture_Folder_HavingParentsAndChildren6_1();
@@ -1385,7 +1385,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren7()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren7()
     {
         [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId, $userEId, $userFId] =
             $this->insertFixture_Folder_HavingParentsAndChildren7();
@@ -1468,7 +1468,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId, $userEId, $userFId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren8_SCCBetweenTargetUserAndAnotherOne_SolveWithUsagePriority()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren8_SCCBetweenTargetUserAndAnotherOne_SolveWithUsagePriority()
     {
         [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId, $userEId, $userFId] =
             $this->insertFixture_Folder_HavingParentsAndChildren8();
@@ -1552,7 +1552,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $folderD, $userAId, $userBId, $userCId, $userDId, $userEId, $userFId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Folder_HavingParentsAndChildren9_SolveCycleInTargetUserTreeInvolvingPersonalFolder()
+    public function testAddItemsToUserTreeSuccess_OneItem_Folder_HavingParentsAndChildren9_SolveCycleInTargetUserTreeInvolvingPersonalFolder()
     {
         [$folderA, $folderB, $folderC, $folderP, $userAId, $userBId, $userCId] =
             $this->insertFixture_Folder_HavingParentsAndChildren9();
@@ -1617,11 +1617,11 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $folderB, $folderC, $folderP, $userAId, $userBId, $userCId];
     }
 
-    /* RESOURCE - RESOURCE NO PARENT */
+    /* ADD A UNIQUE ITEM - RESOURCE - RESOURCE NO PARENT */
 
-    public function testAddItemsToUserTreeSuccess_Resource_NotParent1()
+    public function testAddItemsToUserTreeSuccess_OneItem_Resource_NotParent1()
     {
-        [$r1, $userAId, $userBId] = $this->insertFixture_Resource_NotParent1();
+        [$r1, $userAId, $userBId] = $this->insertFixture_OneItem_Resource_NotParent1();
         $uac = new UserAccessControl(Role::USER, $userAId);
         $items = [['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r1->id]];
 
@@ -1632,7 +1632,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userBId, FoldersRelation::ROOT);
     }
 
-    public function insertFixture_Resource_NotParent1()
+    public function insertFixture_OneItem_Resource_NotParent1()
     {
         // Ada is OWNER of resource R1
         // R1 (Ada:O)
@@ -1646,11 +1646,11 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$r1, $userAId, $userBId];
     }
 
-    /* RESOURCE - RESOURCE HAVING A PARENT */
+    /* ADD A UNIQUE ITEM - RESOURCE - RESOURCE HAVING A PARENT */
 
-    public function testAddItemsToUserTreeSuccess_Resource_HavingOneParent1_VisibleParentInOperatorTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Resource_HavingOneParent1_VisibleParentInOperatorTree()
     {
-        [$folderA, $r1, $userAId, $userBId] = $this->insertFixture_Resource_HavingOneParent1();
+        [$folderA, $r1, $userAId, $userBId] = $this->insertFixture_OneItem_Resource_HavingOneParent1();
         $uac = new UserAccessControl(Role::USER, $userAId);
         $items = [['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r1->id]];
 
@@ -1666,7 +1666,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userBId, $folderA->id);
     }
 
-    public function insertFixture_Resource_HavingOneParent1()
+    public function insertFixture_OneItem_Resource_HavingOneParent1()
     {
         // Ada is OWNER of folder A
         // Betty is OWNER of folder A
@@ -1686,9 +1686,9 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $r1, $userAId, $userBId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Resource_HavingOneParent1_1_VisibleParentInOperatorTree_OperatorReadOnParent()
+    public function testAddItemsToUserTreeSuccess_OneItem_Resource_HavingOneParent1_1_VisibleParentInOperatorTree_OperatorReadOnParent()
     {
-        [$folderA, $r1, $userAId, $userBId] = $this->insertFixture_Resource_HavingOneParent1_1();
+        [$folderA, $r1, $userAId, $userBId] = $this->insertFixture_OneItem_Resource_HavingOneParent1_1();
         $uac = new UserAccessControl(Role::USER, $userAId);
         $items = [['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r1->id]];
 
@@ -1704,7 +1704,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userBId, $folderA->id);
     }
 
-    public function insertFixture_Resource_HavingOneParent1_1()
+    public function insertFixture_OneItem_Resource_HavingOneParent1_1()
     {
         // Ada has READ on folder A
         // Betty is OWNER of folder A
@@ -1724,9 +1724,9 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $r1, $userAId, $userBId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Resource_HavingOneParent2_NotVisibleParentInOperatorTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Resource_HavingOneParent2_NotVisibleParentInOperatorTree()
     {
-        [$folderA, $r1, $userAId, $userBId] = $this->insertFixture_Resource_HavingOneParent2();
+        [$folderA, $r1, $userAId, $userBId] = $this->insertFixture_OneItem_Resource_HavingOneParent2();
         $uac = new UserAccessControl(Role::USER, $userAId);
         $items = [['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r1->id]];
 
@@ -1741,7 +1741,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userBId, FoldersRelation::ROOT);
     }
 
-    public function insertFixture_Resource_HavingOneParent2()
+    public function insertFixture_OneItem_Resource_HavingOneParent2()
     {
         // Ada is OWNER of folder A
         // Ada is OWNER of resource R1
@@ -1760,9 +1760,9 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $r1, $userAId, $userBId];
     }
 
-    public function testAddItemsToUserTreeSuccess_Resource_HavingOneParent3_VisibleParentInOtherUserTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Resource_HavingOneParent3_VisibleParentInOtherUserTree()
     {
-        [$folderA, $r1, $userAId, $userBId, $userCId] = $this->insertFixture_Resource_HavingOneParent3();
+        [$folderA, $r1, $userAId, $userBId, $userCId] = $this->insertFixture_OneItem_Resource_HavingOneParent3();
         $uac = new UserAccessControl(Role::USER, $userAId);
         $items = [['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r1->id]];
 
@@ -1779,7 +1779,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userCId, $folderA->id);
     }
 
-    public function insertFixture_Resource_HavingOneParent3()
+    public function insertFixture_OneItem_Resource_HavingOneParent3()
     {
         // Betty is OWNER of folder A
         // Carol is OWNER of folder A
@@ -1805,11 +1805,11 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         return [$folderA, $r1, $userAId, $userBId, $userCId];
     }
 
-    /* RESOURCE - RESOURCE HAVING MULTIPLE PARENT */
+    /* ADD A UNIQUE ITEM - RESOURCE - RESOURCE HAVING MULTIPLE PARENT */
 
-    public function testAddItemsToUserTreeSuccess_Resource_HavingMultipleParents1_MultipleVisibleParents_OneParentInOperatorTree()
+    public function testAddItemsToUserTreeSuccess_OneItem_Resource_HavingMultipleParents1_MultipleVisibleParents_OneParentInOperatorTree()
     {
-        [$folderA, $r1, $folderC, $userAId, $userBId, $userCId] = $this->insertFixture_Resource_HavingMultipleParents1();
+        [$folderA, $r1, $folderC, $userAId, $userBId, $userCId] = $this->insertFixture_OneItem_Resource_HavingMultipleParents1();
         $uac = new UserAccessControl(Role::USER, $userAId);
         $items = [['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r1->id]];
 
@@ -1830,7 +1830,7 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         $this->assertFolderRelation($folderC->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userCId, FoldersRelation::ROOT);
     }
 
-    public function insertFixture_Resource_HavingMultipleParents1()
+    public function insertFixture_OneItem_Resource_HavingMultipleParents1()
     {
         // Ada is OWNER of folder A
         // Betty is OWNER of folder A
@@ -1862,5 +1862,105 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
         $this->addPermission(PermissionsTable::RESOURCE_ACO, $r1->id, PermissionsTable::USER_ARO, $userBId);
 
         return [$folderA, $r1, $folderC, $userAId, $userBId, $userCId];
+    }
+
+    /* ADD MULTIPLE ITEMS - MULTIPLE RESOURCES/FOLDERS - */
+
+    public function testAddItemsToUserTreeSuccess_MultipleItems_FolderResource_ItemsInEachOthers()
+    {
+        [$folderA, $folderB, $folderC, $folderD, $folderE, $folderF, $r1, $r2, $r3, $r4, $r5, $userAId] =
+            $this->insertFixture_MultipleItems_Folder_FoldersInEachOthers();
+        $uac = new UserAccessControl(Role::USER, $userAId);
+        $userBId = UuidFactory::uuid('user.id.betty');
+        $items = [
+            ['foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER, 'foreign_id' => $folderA->id],
+            ['foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER, 'foreign_id' => $folderB->id],
+            ['foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER, 'foreign_id' => $folderC->id],
+            ['foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER, 'foreign_id' => $folderD->id],
+            ['foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER, 'foreign_id' => $folderE->id],
+            ['foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER, 'foreign_id' => $folderF->id],
+            ['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r1->id],
+            ['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r2->id],
+            ['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r3->id],
+            ['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r4->id],
+            ['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r5->id],
+        ];
+
+        $this->service->addItemsToUserTree($uac, $userBId, $items);
+
+        $this->assertItemIsInTrees($folderA->id, 2);
+        $this->assertFolderRelation($folderA->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId);
+        $this->assertFolderRelation($folderA->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userBId);
+        $this->assertItemIsInTrees($folderB->id, 2);
+        $this->assertFolderRelation($folderB->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId, $folderA->id);
+        $this->assertFolderRelation($folderB->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userBId, $folderA->id);
+        $this->assertItemIsInTrees($folderC->id, 2);
+        $this->assertFolderRelation($folderC->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId, $folderB->id);
+        $this->assertFolderRelation($folderC->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userBId, $folderB->id);
+        $this->assertItemIsInTrees($folderD->id, 2);
+        $this->assertFolderRelation($folderD->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId);
+        $this->assertFolderRelation($folderD->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userBId);
+        $this->assertItemIsInTrees($folderE->id, 2);
+        $this->assertFolderRelation($folderE->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId, $folderD->id);
+        $this->assertFolderRelation($folderE->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userBId, $folderD->id);
+        $this->assertItemIsInTrees($folderF->id, 2);
+        $this->assertFolderRelation($folderF->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userAId, $folderE->id);
+        $this->assertFolderRelation($folderF->id, FoldersRelation::FOREIGN_MODEL_FOLDER, $userBId, $folderE->id);
+
+        $this->assertItemIsInTrees($r1->id, 2);
+        $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userAId);
+        $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userBId);
+        $this->assertItemIsInTrees($r2->id, 2);
+        $this->assertFolderRelation($r2->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userAId, $folderA->id);
+        $this->assertFolderRelation($r2->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userBId, $folderA->id);
+        $this->assertItemIsInTrees($r3->id, 2);
+        $this->assertFolderRelation($r3->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userAId, $folderB->id);
+        $this->assertFolderRelation($r3->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userBId, $folderB->id);
+        $this->assertItemIsInTrees($r4->id, 2);
+        $this->assertFolderRelation($r4->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userAId, $folderD->id);
+        $this->assertFolderRelation($r4->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userBId, $folderD->id);
+        $this->assertItemIsInTrees($r5->id, 2);
+        $this->assertFolderRelation($r5->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userAId, $folderE->id);
+        $this->assertFolderRelation($r5->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userBId, $folderE->id);
+    }
+
+    public function insertFixture_MultipleItems_Folder_FoldersInEachOthers()
+    {
+        // Ada is OWNER of all resources and folders
+        // A (Ada:O)
+        // |- B (Ada:O)
+        //   |- R2 (Ada:O)
+        //   |-C (Ada:O)
+        //     |- R3 (Ada:O)
+        // D (Ada:O)
+        // |- E (Ada:O)
+        //   |- R4 (Ada:O)
+        //   |-F (Ada:O)
+        //     |- R5 (Ada:O)
+        // R1 (Ada:O)
+        $userAId = UuidFactory::uuid('user.id.ada');
+        $r1 = $this->addResourceFor(['name' => 'R1'], [$userAId => Permission::OWNER]);
+
+        $folderA = $this->addFolderFor(['name' => 'A'], [$userAId => Permission::OWNER]);
+        $folderB = $this->addFolderFor(['name' => 'B', 'folder_parent_id' => $folderA->id], [$userAId => Permission::OWNER]);
+        $folderC = $this->addFolderFor(['name' => 'C', 'folder_parent_id' => $folderB->id], [$userAId => Permission::OWNER]);
+        $r2 = $this->addResourceFor(['name' => 'R2', 'folder_parent_id' => $folderA->id], [$userAId => Permission::OWNER]);
+        $r3 = $this->addResourceFor(['name' => 'R3', 'folder_parent_id' => $folderB->id], [$userAId => Permission::OWNER]);
+        $this->addFolderRelation(['foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER, 'foreign_id' => $folderB->get('id'), 'user_id' => $userAId, 'folder_parent_id' => $folderA->get('id')]);
+        $this->addFolderRelation(['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r1->get('id'), 'user_id' => $userAId, 'folder_parent_id' => $folderA->get('id')]);
+        $this->addFolderRelation(['foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER, 'foreign_id' => $folderC->get('id'), 'user_id' => $userAId, 'folder_parent_id' => $folderB->get('id')]);
+        $this->addFolderRelation(['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r2->get('id'), 'user_id' => $userAId, 'folder_parent_id' => $folderB->get('id')]);
+
+        $folderD = $this->addFolderFor(['name' => 'D'], [$userAId => Permission::OWNER]);
+        $folderE = $this->addFolderFor(['name' => 'E', 'folder_parent_id' => $folderD->id], [$userAId => Permission::OWNER]);
+        $folderF = $this->addFolderFor(['name' => 'F', 'folder_parent_id' => $folderE->id], [$userAId => Permission::OWNER]);
+        $r4 = $this->addResourceFor(['name' => 'R4', 'folder_parent_id' => $folderD->id], [$userAId => Permission::OWNER]);
+        $r5 = $this->addResourceFor(['name' => 'R5', 'folder_parent_id' => $folderE->id], [$userAId => Permission::OWNER]);
+        $this->addFolderRelation(['foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER, 'foreign_id' => $folderE->get('id'), 'user_id' => $userAId, 'folder_parent_id' => $folderD->get('id')]);
+        $this->addFolderRelation(['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r3->get('id'), 'user_id' => $userAId, 'folder_parent_id' => $folderD->get('id')]);
+        $this->addFolderRelation(['foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER, 'foreign_id' => $folderF->get('id'), 'user_id' => $userAId, 'folder_parent_id' => $folderE->get('id')]);
+        $this->addFolderRelation(['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $r4->get('id'), 'user_id' => $userAId, 'folder_parent_id' => $folderE->get('id')]);
+
+        return [$folderA, $folderB, $folderC, $folderD, $folderE, $folderF, $r1, $r2, $r3, $r4, $r5, $userAId];
     }
 }
