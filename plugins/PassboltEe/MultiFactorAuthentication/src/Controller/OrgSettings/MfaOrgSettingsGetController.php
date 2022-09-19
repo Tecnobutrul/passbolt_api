@@ -16,9 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\MultiFactorAuthentication\Controller\OrgSettings;
 
-use App\Model\Entity\Role;
 use Cake\Http\Exception\BadRequestException;
-use Cake\Http\Exception\ForbiddenException;
 use Passbolt\MultiFactorAuthentication\Controller\MfaController;
 
 class MfaOrgSettingsGetController extends MfaController
@@ -30,9 +28,8 @@ class MfaOrgSettingsGetController extends MfaController
      */
     public function get()
     {
-        if ($this->User->role() !== Role::ADMIN) {
-            throw new ForbiddenException(__('You are not allowed to access this location.'));
-        }
+        $this->User->assertIsAdmin();
+
         if (!$this->request->is('json')) {
             throw new BadRequestException(__('This is not a valid Ajax/Json request.'));
         }

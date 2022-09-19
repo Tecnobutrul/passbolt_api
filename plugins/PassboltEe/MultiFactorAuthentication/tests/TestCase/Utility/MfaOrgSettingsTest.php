@@ -17,11 +17,13 @@ declare(strict_types=1);
 namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Utility;
 
 use App\Error\Exception\CustomValidationException;
+use App\Test\Factory\UserFactory;
 use Cake\Core\Configure;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\TableRegistry;
 use Passbolt\MultiFactorAuthentication\Test\Lib\MfaIntegrationTestCase;
+use Passbolt\MultiFactorAuthentication\Test\Scenario\Totp\MfaTotpUserOnlyScenario;
 use Passbolt\MultiFactorAuthentication\Utility\MfaOrgSettings;
 use Passbolt\MultiFactorAuthentication\Utility\MfaSettings;
 
@@ -34,23 +36,7 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
      */
     protected $OrganizationSettings;
 
-    protected $defaultConfig = [
-        'providers' => [
-            MfaSettings::PROVIDER_DUO => true,
-            MfaSettings::PROVIDER_TOTP => true,
-            MfaSettings::PROVIDER_YUBIKEY => true,
-        ],
-        MfaSettings::PROVIDER_YUBIKEY => [
-            'clientId' => '40123',
-            'secretKey' => 'i2/j3jIQBO/axOl3ah4mlgXlXUY=',
-        ],
-        MfaSettings::PROVIDER_DUO => [
-            'salt' => '__CHANGE_ME__THIS_MUST_BE_AT_LEAST_FOURTY_CHARACTERS_____',
-            'integrationKey' => 'UICPIC93F14RWR5F55SJ',
-            'secretKey' => '8tkYNgi8aGAqa3KW1eqhsJLfjc1nJnHDYC1siNYX',
-            'hostName' => 'api-45e9f2ca.duosecurity.com',
-        ],
-    ];
+    protected $defaultConfig;
 
     /**
      * Setup.
@@ -59,6 +45,7 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
     {
         parent::setUp();
         $this->OrganizationSettings = TableRegistry::getTableLocator()->get('OrganizationSettings');
+        $this->defaultConfig = $this->getDefaultMfaOrgSettings();
     }
 
     /**
@@ -129,6 +116,22 @@ class MfaOrgSettingsTest extends MfaIntegrationTestCase
         $settings = MfaOrgSettings::get();
         $this->assertFalse($settings->isProviderEnabled(MfaSettings::PROVIDER_YUBIKEY));
         $this->assertFalse($settings->isProviderEnabled(MfaSettings::PROVIDER_TOTP));
+    }
+
+    /**
+     * @group mfa
+     * @group mfaOrgSettings
+     */
+    public function testMfaOrgSettingsisProviderEnabledFail_If_Organization_Is_Deactivated()
+    {
+        $user = UserFactory::make()->persist();
+        $uac = $this->makeUac($user);
+        $this->loadFixtureScenario(MfaTotpUserOnlyScenario::class, $user);
+
+        $settings = MfaSettings::get($uac);
+        foreach (MfaSettings::getProviders() as $provider) {
+            $this->assertFalse($settings->isProviderEnabled($provider));
+        }
     }
 
     /**

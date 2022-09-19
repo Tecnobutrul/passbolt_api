@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace Passbolt\MultiFactorAuthentication\Service;
 
 use App\Model\Entity\User;
+use Passbolt\MultiFactorAuthentication\Service\MfaOrgSettings\MfaOrgSettingsGetService;
 use Throwable;
 
 class IsMfaEnabledService
@@ -28,20 +29,20 @@ class IsMfaEnabledService
     private $getMfaAccountSettingsService;
 
     /**
-     * @var \Passbolt\MultiFactorAuthentication\Service\GetMfaOrgSettingsService
+     * @var \Passbolt\MultiFactorAuthentication\Service\MfaOrgSettings\MfaOrgSettingsGetService
      */
     private $getMfaOrgSettingsService;
 
     /**
-     * @param \Passbolt\MultiFactorAuthentication\Service\GetMfaOrgSettingsService|null $getMfaOrgSettingsService Service to retrieve MfaOrgSettings
+     * @param \Passbolt\MultiFactorAuthentication\Service\MfaOrgSettings\MfaOrgSettingsGetService|null $getMfaOrgSettingsService Service to retrieve MfaOrgSettings
      * @param \Passbolt\MultiFactorAuthentication\Service\GetMfaAccountSettingsService|null $getMfaAccountSettingsService Service to retrieve MfaAccountSettings
      */
     public function __construct(
-        ?GetMfaOrgSettingsService $getMfaOrgSettingsService = null,
+        ?MfaOrgSettingsGetService $getMfaOrgSettingsService = null,
         ?GetMfaAccountSettingsService $getMfaAccountSettingsService = null
     ) {
         $this->getMfaAccountSettingsService = $getMfaAccountSettingsService ?? new GetMfaAccountSettingsService();
-        $this->getMfaOrgSettingsService = $getMfaOrgSettingsService ?? new GetMfaOrgSettingsService();
+        $this->getMfaOrgSettingsService = $getMfaOrgSettingsService ?? new MfaOrgSettingsGetService();
     }
 
     /**

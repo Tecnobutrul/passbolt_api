@@ -6,7 +6,7 @@ return [
                 'version' => '1.1.0',
                 'enabled' => true,
                 'providers' => [
-                    'totp' => filter_var(env('PASSBOLT_PLUGINS_MFA_PROVIDERS_TOTP', true), FILTER_VALIDATE_BOOLEAN),
+                    'totp' => filter_var(env('PASSBOLT_PLUGINS_MFA_PROVIDERS_TOTP', false), FILTER_VALIDATE_BOOLEAN),
                     'duo' => filter_var(env('PASSBOLT_PLUGINS_MFA_PROVIDERS_DUO', false), FILTER_VALIDATE_BOOLEAN),
                     'yubikey' => filter_var(env('PASSBOLT_PLUGINS_MFA_PROVIDERS_YUBIKEY', false), FILTER_VALIDATE_BOOLEAN), //phpcs:ignore
                 ],
