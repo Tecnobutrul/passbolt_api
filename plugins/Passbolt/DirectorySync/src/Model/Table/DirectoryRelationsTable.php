@@ -18,8 +18,6 @@ namespace Passbolt\DirectorySync\Model\Table;
 
 use App\Model\Entity\GroupsUser;
 use App\Model\Traits\Cleanup\TableCleanupTrait;
-use Cake\Database\Expression\QueryExpression;
-use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
@@ -120,11 +118,7 @@ class DirectoryRelationsTable extends Table
     {
         $orphans = $this->find()
             ->select(['DirectoryRelations.id'])
-            ->contain('GroupUser', function (Query $q) {
-                return $q->where(function (QueryExpression $exp) {
-                    return $exp->isNull('GroupUser.id');
-                });
-            });
+            ->where(['id NOT IN' => $this->GroupUser->find()->select('id')]);
 
         if (!empty($entryIds)) {
             $orphans->where(['DirectoryRelations.parent_key NOT IN' => $entryIds]);
