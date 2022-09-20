@@ -16,8 +16,12 @@ declare(strict_types=1);
  */
 namespace Passbolt\Folders;
 
+use App\Model\Table\PermissionsTable;
+use App\Model\Table\ResourcesTable;
 use Cake\Core\BasePlugin;
 use Cake\Core\PluginApplicationInterface;
+use Cake\ORM\Table;
+use Cake\ORM\TableRegistry;
 use Passbolt\Folders\EventListener\AddFolderizableBehavior;
 use Passbolt\Folders\EventListener\GroupsUsersEventListener;
 use Passbolt\Folders\EventListener\PermissionsModelInitializeEventListener;
@@ -34,6 +38,8 @@ class Plugin extends BasePlugin
     {
         parent::bootstrap($app);
         $this->registerListeners($app);
+        $this->addAssociationsToResourcesTable(TableRegistry::getTableLocator()->get('Resources'));
+        $this->addAssociationsToPermissionsTable(TableRegistry::getTableLocator()->get('Permissions'));
     }
 
     /**
@@ -51,5 +57,41 @@ class Plugin extends BasePlugin
             ->on(new PermissionsModelInitializeEventListener()) // Decorate the permissions table class to add cleanup method
             ->on(new FolderNotificationSettingsDefinition())// Add email notification settings definition
             ->on(new FoldersEmailRedactorPool()); // Register email redactors
+    }
+
+    /**
+     * @param \Cake\ORM\Table $table Resources table
+     * @return void
+     */
+    public static function addAssociationsToResourcesTable(Table $table): void
+    {
+        if (!($table instanceof ResourcesTable)) {
+            return;
+        }
+
+        $table->hasMany('FoldersRelations', [
+            'className' => 'Passbolt/Folders.FoldersRelations',
+            'foreignKey' => 'foreign_id',
+            'conditions' => [
+                'FoldersRelations.foreign_model' => 'Resource',
+            ],
+            'dependent' => true,
+        ]);
+    }
+
+    /**
+     * @param \Cake\ORM\Table $table Permissions table
+     * @return void
+     */
+    public static function addAssociationsToPermissionsTable(Table $table): void
+    {
+        if (!($table instanceof PermissionsTable)) {
+            return;
+        }
+
+        $table->belongsTo('Folders', [
+            'className' => 'Passbolt/Folders.Folders',
+            'foreignKey' => 'aco_foreign_key',
+        ]);
     }
 }

@@ -19,12 +19,19 @@ namespace Passbolt\Folders\Test\Factory;
 use App\Test\Factory\ResourceFactory as ResourceCoreFactory;
 use Passbolt\Folders\Model\Entity\Folder;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
+use Passbolt\Folders\Plugin;
 
 /**
  * ResourceFactory
  */
 class ResourceFactory extends ResourceCoreFactory
 {
+    public function initialize(): void
+    {
+        parent::initialize();
+        Plugin::addAssociationsToResourcesTable($this->getTable());
+    }
+
     /**
      * Define the associated folders relation to create for a given list of users.
      *

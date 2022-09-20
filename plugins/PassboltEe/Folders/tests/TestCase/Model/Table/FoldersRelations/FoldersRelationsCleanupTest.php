@@ -17,13 +17,13 @@ declare(strict_types=1);
 
 namespace Passbolt\Folders\Test\TestCase\Model\Table\FoldersRelations;
 
-use App\Test\Factory\PermissionFactory;
 use App\Test\Factory\UserFactory;
 use App\Test\Lib\Utility\CleanupTrait;
 use Cake\I18n\FrozenTime;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 use Passbolt\Folders\Test\Factory\FolderFactory;
 use Passbolt\Folders\Test\Factory\FoldersRelationFactory;
+use Passbolt\Folders\Test\Factory\PermissionFactory;
 use Passbolt\Folders\Test\Factory\ResourceFactory;
 use Passbolt\Folders\Test\Lib\FoldersTestCase;
 use Passbolt\Folders\Test\Lib\Model\FoldersRelationsModelTrait;
