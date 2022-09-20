@@ -1,3 +1,15 @@
+passbolt-pro-server (3.7.0-1) buster; urgency=medium
+  * PB-17098 Add rockylinux 9 support
+  * PB-16751 Add Redhat 9 support
+  * PB-16749 Add Ubuntu 22.04 support
+  * PB-16950 Add Spanish and Lithuanian support
+  * PB-14514 Add PHP8.0 support
+  * PB-14514 Fix PHP8.1 compatibility issues
+  * PB-16161 Create action log endpoint for user CRUD
+  * PB-16844 Common part of the user recovery and setup audit log
+
+ -- Gerold Mougenel <gerold@passbolt.com>  Thu, 28 July 2022 15:35:00 +0000
+
 passbolt-pro-server (3.6.0-1) buster; urgency=medium
   * PB-9738 Add account recovery organization policy settings by admins
   * PB-13685 Add account recovery organization settings set with key rotation + misc cleanup
