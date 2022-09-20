@@ -21,6 +21,7 @@ use App\Error\Exception\ValidationException;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Passbolt\Folders\Model\Entity\Folder;
 use Passbolt\Folders\Model\Entity\FolderHistory;
 use Passbolt\Folders\Model\Traits\Folders\FoldersFindersTrait;
 
@@ -118,7 +119,11 @@ class FoldersHistoryTable extends Table
 
         $validator
             ->utf8Extended('name', __('The name should be a valid UTF8 string.'))
-            ->maxLength('name', 64, __('The name length should be maximum {0} characters.', 64))
+            ->maxLength(
+                'name',
+                Folder::MAX_NAME_LENGTH,
+                __('The name length should be maximum {0} characters.', Folder::MAX_NAME_LENGTH)
+            )
             ->requirePresence('name', 'create', __('A name is required.'))
             ->allowEmptyString('name', __('The name should not be empty.'), false);
 

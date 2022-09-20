@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2022-08-09 11:53+0000\n"
+"POT-Creation-Date: 2022-08-09 12:02+0000\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -1469,16 +1469,13 @@ msgstr ""
 msgid "The authentication token id is invalid."
 msgstr ""
 
-msgid "Only guest are allowed to proceed with account recovery."
-msgstr ""
-
 msgid "The request data should not be empty."
 msgstr ""
 
 msgid "You are not allowed to access this location."
 msgstr ""
 
-msgid "Only guest are allowed to create an account recovery request."
+msgid "Only guests are allowed to create an account recovery request."
 msgstr ""
 
 msgid "Invalid request. Please provide the required data."
