@@ -71,6 +71,32 @@ class GroupUserSyncActionTest extends DirectorySyncIntegrationTestCase
     }
 
     /**
+     * Test that orphans group user are cleaned up
+     */
+    public function testCleanupOrphanDirectoryRelation()
+    {
+        $this->mockDirectoryEntryGroup('network', null, null, null, null, UuidFactory::uuid('group.id.network'));
+        $this->mockDirectoryEntryGroup('accounting', null, null, null, null, UuidFactory::uuid('group.id.accounting'));
+        $userEntry = $this->mockDirectoryEntryUser(['fname' => 'ada', 'lname' => 'lovelace', 'foreign_key' => UuidFactory::uuid('user.id.ada')]);
+        $this->mockDirectoryRelationGroupUser('network', 'ada');
+        $relationAccounting = $this->mockDirectoryRelationGroupUser('accounting', 'ada');
+        $this->mockDirectoryUserData('ada', 'lovelace', 'ada@passbolt.com', new FrozenTime('now'), new FrozenTime('now'));
+        $this->mockDirectoryGroupData('network');
+        $this->mockDirectoryGroupData('accounting', [
+            'group_users' => [
+                $userEntry->directory_name,
+            ],
+        ]);
+
+        $reports = $this->action->execute();
+        $this->assertReportEmpty($reports);
+        $this->assertDirectoryEntryCount(3);
+        $this->assertDirectoryRelationCount(1);
+        $this->assertGroupUserExist($relationAccounting->id);
+        $this->assertDirectoryRelationExist($relationAccounting->id);
+    }
+
+    /**
      * Scenario: A group was deleted but no group users were ever created
      * Expected result: do nothing
      *
