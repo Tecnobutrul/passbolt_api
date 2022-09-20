@@ -181,11 +181,11 @@ class FoldersRelationsCleanupTest extends FoldersTestCase
         // The folders missing a folder relation:
         // All the scenarios won't be tested as the cleanup operation relies on the addItemToUserTree service.
         // - A user having access to a folder.
-        $userFolderPermissionWithNoFolderRelation = PermissionFactory::make()->typeOwner()->withAcoFolder()->aroUser($userCarol)->persist();
+        $userFolderPermissionWithNoFolderRelation = PermissionFactory::make()->withAcoFolder()->typeOwner()->aroUser($userCarol)->persist();
         // - A user having access to a shared folder located in a shared folder visible in the user tree.
-        PermissionFactory::make()->typeOwner()->acoFolder($folderB)->aroUser($userBetty)->persist();
+        PermissionFactory::make()->acoFolder($folderB)->typeOwner()->aroUser($userBetty)->persist();
         // - A user having access to a shared folder located in a shared folder not visible in the user tree.
-        PermissionFactory::make()->typeOwner()->acoFolder($folderB)->aroUser($userCarol)->persist();
+        PermissionFactory::make()->acoFolder($folderB)->typeOwner()->aroUser($userCarol)->persist();
 
         $cleanupOptions = ['isDeleteCleanup' => false, 'cleanupCount' => 3];
         $this->runCleanupChecks('Passbolt/Folders.FoldersRelations', 'cleanupMissingFoldersFoldersRelations', 6, $cleanupOptions);
