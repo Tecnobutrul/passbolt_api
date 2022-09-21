@@ -2,7 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-* [3.7.1-1] Fri Ago 12 2022 Daniel Del Rio <daniel@passbolt.com>
+* [3.7.2-1] Wed Sep 21 2022 Gerold Mougenel <gerold@passbolt.com>
+- PB-18380 Let passbolt-configure script setup certbot for RHEL9 support
+- PB-18405 Redirect on non-json request if no MFA settings are found
+- PB-16983 Handles the lack of permissions on image directory when deleting
+- PB-16898 Redesign download a supported browser to get started
+- PB-19040 As AD synchronizing with LDAP, users should be removed from passbolt groups
+- PB-18415 Extends folder name length to 256 chars
+- PB-18650 Add a check on mysql status in order to run mysql commands only when it's ready in unit tests
+- PB-18664 Add retry logic to Gitlab CI jobs
+- PB-18645 Bump Ldap tools version for better PHP8.x support
+
+* [3.7.1-1] Fri Aug 12 2022 Daniel Del Rio <daniel@passbolt.com>
 - PB-18486 Removes all resources_tags entries for tags that are not shared and for which the user_id is set to null.
 - PB-18398 Fix tag regression: sets associations name to be CakePHP compatible
 - PB-17072 Quotes fields in a join condition fixing Postgres
