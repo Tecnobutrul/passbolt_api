@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+* [3.7.3-1] Tue Sep 27 2022 Diego Lendoiro <diego@passbolt.com>
+- PB-19090 Protect forms from spell-jacking attack
+
 * [3.7.2-1] Wed Sep 21 2022 Gerold Mougenel <gerold@passbolt.com>
 - PB-18380 Let passbolt-configure script setup certbot for RHEL9 support
 - PB-18405 Redirect on non-json request if no MFA settings are found

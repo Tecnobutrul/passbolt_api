@@ -1,3 +1,8 @@
+passbolt-pro-server (3.7.3-1) buster; urgency=medium
+  * PB-19090 Protect forms from spell-jacking attack
+
+ -- Diego Lendoiro <diego@passbolt.com>  Tue, 27 Sep 2022 14:30:00 +0000
+
 passbolt-pro-server (3.7.2-1) buster; urgency=medium
   * PB-18380 Let passbolt-configure script setup certbot for RHEL9 support
   * PB-18405 Redirect on non-json request if no MFA settings are found
