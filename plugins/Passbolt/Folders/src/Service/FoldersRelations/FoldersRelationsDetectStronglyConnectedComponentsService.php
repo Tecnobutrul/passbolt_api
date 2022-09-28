@@ -57,20 +57,21 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
     {
         $result = [];
         $usersIdsToCompareWith = $this->usersTable->findActive()
+            ->disableHydration()
             ->all()
             ->extract('id')
             ->toArray();
-        $usersFoldersRelations = $this->getUsersFoldersRelationsGroupedByUser($usersIdsToCompareWith);
+        $usersFoldersRelationsDtos = $this->getUsersFoldersRelationsGroupedByUser($usersIdsToCompareWith);
 
         foreach ($usersIds as $firstUserId) {
             foreach ($usersIdsToCompareWith as $secondUserId) {
-                $foldersRelations = array_merge(
-                    $usersFoldersRelations[$firstUserId],
-                    $usersFoldersRelations[$secondUserId]
+                $foldersRelationsDtos = array_merge(
+                    $usersFoldersRelationsDtos[$firstUserId],
+                    $usersFoldersRelationsDtos[$secondUserId]
                 );
-                $scc = $this->detectInFoldersRelations($foldersRelations);
-                if (!empty($scc)) {
-                    return $scc;
+                $result = $this->detectInFoldersRelations($foldersRelationsDtos);
+                if (!empty($result)) {
+                    break 2;
                 }
             }
             // Avoid comparing users that have already been compared. As the user has already been compared with all non
@@ -90,11 +91,17 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
      *
      * @param array $usersIds The users to retrieve the folders relations for
      * @param bool $includePersonal Include personal folders. Default false
-     * @return array<array<\Passbolt\Folders\Model\Entity\FoldersRelation>> Return an array of folders relations grouped by users ids
+     * @return array<array<array>> Return an array of folders relations dtos grouped by users ids
      * [
-     * UUID => [<FoldersRelation>, ...],
-     * UUID => [<FoldersRelation>, ...],
-     * ...
+     *   USER_ID => [
+     *     [
+     *       foreign_id => <UUID>,
+     *       folder_parent_id => <UUID|null>,
+     *       user_id => <UUID>,
+     *     ],
+     *     ...
+     *   ],
+     *   ...
      * ]
      */
     private function getUsersFoldersRelationsGroupedByUser(array $usersIds, ?bool $includePersonal = false): array
@@ -107,12 +114,13 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
         if (!$includePersonal) {
             $query = $this->foldersRelationsTable->filterQueryByIsNotPersonalFolder($query);
         }
-        $foldersRelations = $query->select(['foreign_id', 'folder_parent_id', 'user_id'])
+        $foldersRelationsDtos = $query->select(['foreign_id', 'folder_parent_id', 'user_id'])
+            ->disableHydration()
             ->all()
             ->toArray();
 
-        foreach ($foldersRelations as $folderRelation) {
-            $result[$folderRelation->user_id][] = $folderRelation;
+        foreach ($foldersRelationsDtos as $folderRelationDto) {
+            $result[$folderRelationDto['user_id']][] = $folderRelationDto;
         }
 
         return $result;
@@ -121,22 +129,30 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
     /**
      * Return the first detected strongly components set represented as an array of folders relations.
      *
-     * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations An array folders relations to test
-     * @return array<\Passbolt\Folders\Model\Entity\FoldersRelation>
+     * @param array $foldersRelationsDtos An array folders relations dtos to test
+     * [
+     *   [
+     *     foreign_id => <UUID>,
+     *     folder_parent_id => <UUID|null>,
+     *     user_id => <UUID>,
+     *   ],
+     *   ...
+     * ]
+     * @return array<\Passbolt\Folders\Model\Entity\FoldersRelation> Array of SCCs containing folders relations involved
      * @throws \Exception If it cannot format the result.
      */
-    private function detectInFoldersRelations(array $foldersRelations): array
+    private function detectInFoldersRelations(array $foldersRelationsDtos): array
     {
         $result = [];
 
-        [$graph, $graphForeignIdsMap] = $this->formatFoldersRelationInAdjacencyGraph($foldersRelations);
+        [$graph, $graphForeignIdsMap] = $this->formatFoldersRelationInAdjacencyGraph($foldersRelationsDtos);
         $stronglyConnectedComponentsSets = Tarjan::detect($graph);
         if (!empty($stronglyConnectedComponentsSets)) {
             $nodes = explode('|', $stronglyConnectedComponentsSets[0]);
             $result = $this->formatDetectInGraphResultInFoldersRelations(
                 $nodes,
                 $graphForeignIdsMap,
-                $foldersRelations
+                $foldersRelationsDtos
             );
         }
 
@@ -150,7 +166,7 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
      * [0, 2, 3, 5, 1]
      * @param array $graphForeignIdsMap The nodes map. The map key is relative to a node when the value is relative to
      * a folder id.
-     * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations The folders relations to search
+     * @param array $foldersRelationsDtos The array of folders relations dtos to search in
      * a SCC in.
      * @return array<\Passbolt\Folders\Model\Entity\FoldersRelation>
      * @throws \Exception If it cannot format the result because a folder relation relative to a node cannot be found.
@@ -158,7 +174,7 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
     private function formatDetectInGraphResultInFoldersRelations(
         array $nodes,
         array $graphForeignIdsMap,
-        array $foldersRelations
+        array $foldersRelationsDtos
     ): array {
         $result = [];
 
@@ -169,7 +185,8 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
             $folderParentIdIndex = $i === 0 ? count($nodes) - 1 : $i - 1;
             $folderParentId = $graphForeignIdsMap[$nodes[$folderParentIdIndex]];
             // Retrieve the relative folder relation.
-            $result[] = $this->searchFolderRelationInArray($foldersRelations, $foreignId, $folderParentId);
+            $folderRelationDto = $this->searchFolderRelationInArray($foldersRelationsDtos, $foreignId, $folderParentId);
+            $result[] = new FoldersRelation($folderRelationDto);
         }
 
         return $result;
@@ -178,7 +195,15 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
     /**
      * Get an adjacency graph relative to the aggregated trees of the users given in parameter.
      *
-     * @param array<\Passbolt\Folders\Model\Entity\FoldersRelation> $foldersRelations The folders relations to format.
+     * @param array $foldersRelationsDtos An array folders relations dtos to format.
+     * [
+     *   [
+     *     foreign_id => <UUID>,
+     *     folder_parent_id => <UUID|null>,
+     *     user_id => <UUID>,
+     *   ],
+     *   ...
+     * ]
      * @return array
      * [
      *   array $graph The tarjan adjacency graph
@@ -201,26 +226,26 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
      *   1 => 904bcd9f-ff51-5cfd-9de8-d2c876ade498
      * ]
      */
-    private function formatFoldersRelationInAdjacencyGraph(array $foldersRelations): array
+    private function formatFoldersRelationInAdjacencyGraph(array $foldersRelationsDtos): array
     {
         $graphForeignIdsMap = [];
         $graph = [];
         $graphCount = 0;
 
         // Build the adjacency graph.
-        foreach ($foldersRelations as $folderRelation) {
-            if (!isset($graphForeignIdsMap[$folderRelation->foreign_id])) {
-                $graphForeignIdsMap[$folderRelation->foreign_id] = $graphCount++;
-                $graph[$graphForeignIdsMap[$folderRelation->foreign_id]] = [];
+        foreach ($foldersRelationsDtos as $folderRelationDto) {
+            if (!isset($graphForeignIdsMap[$folderRelationDto['foreign_id']])) {
+                $graphForeignIdsMap[$folderRelationDto['foreign_id']] = $graphCount++;
+                $graph[$graphForeignIdsMap[$folderRelationDto['foreign_id']]] = [];
             }
 
-            if (!is_null($folderRelation->folder_parent_id)) {
-                if (!isset($graphForeignIdsMap[$folderRelation->folder_parent_id])) {
-                    $graphForeignIdsMap[$folderRelation->folder_parent_id] = $graphCount++;
-                    $graph[$graphForeignIdsMap[$folderRelation->folder_parent_id]] = [];
+            if (!is_null($folderRelationDto['folder_parent_id'])) {
+                if (!isset($graphForeignIdsMap[$folderRelationDto['folder_parent_id']])) {
+                    $graphForeignIdsMap[$folderRelationDto['folder_parent_id']] = $graphCount++;
+                    $graph[$graphForeignIdsMap[$folderRelationDto['folder_parent_id']]] = [];
                 }
-                $graph[$graphForeignIdsMap[$folderRelation->folder_parent_id]][] =
-                    &$graphForeignIdsMap[$folderRelation->foreign_id];
+                $graph[$graphForeignIdsMap[$folderRelationDto['folder_parent_id']]][] =
+                    &$graphForeignIdsMap[$folderRelationDto['foreign_id']];
             }
         }
 
@@ -232,20 +257,31 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
     /**
      * Search a folder relation by its foreign id and folder parent id in an array of folders relations.
      *
-     * @param array $foldersRelations The haystack
+     * @param array<array> $foldersRelationsDtos An array folders relations dtos to search in.
+     * [
+     *   [
+     *     foreign_id => <UUID>,
+     *     folder_parent_id => <UUID|null>,
+     *     user_id => <UUID>,
+     *   ],
+     *   ...
+     * ]
      * @param string $foreignId The needle foreign id
      * @param string|null $folderParentId The needle folder parent id
-     * @return \Passbolt\Folders\Model\Entity\FoldersRelation
+     * @return array The found folder relation dto
      * @throws \Exception If a folder relation cannot be found.
      */
     private function searchFolderRelationInArray(
-        array $foldersRelations,
-        string $foreignId,
+        array   $foldersRelationsDtos,
+        string  $foreignId,
         ?string $folderParentId = null
-    ): FoldersRelation {
-        foreach ($foldersRelations as $folderRelation) {
-            if ($folderRelation->foreign_id === $foreignId && $folderRelation->folder_parent_id === $folderParentId) {
-                return $folderRelation;
+    ): array {
+        foreach ($foldersRelationsDtos as $folderRelationDto) {
+            if (
+                $folderRelationDto['foreign_id'] === $foreignId
+                && $folderRelationDto['folder_parent_id'] === $folderParentId
+            ) {
+                return $folderRelationDto;
             }
         }
 
@@ -258,15 +294,23 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
      * The script stops and returns the first SCC found.
      *
      * @param string $userId The target user
-     * @return array<\Passbolt\Folders\Model\Entity\FoldersRelation> The list of folders relations involved in the strongly connected components set
+     * @return array The list of folders relations dtos involved in the strongly connected components set
+     * [
+     *   [
+     *     foreign_id => <UUID>,
+     *     folder_parent_id => <UUID|null>,
+     *     user_id => <UUID>,
+     *   ],
+     *   ...
+     * ]
      */
     public function detectInUserTree(string $userId): array
     {
         $query = $this->foldersRelationsTable->findByUserId($userId);
         $query = $this->foldersRelationsTable->filterByForeignModel($query, FoldersRelation::FOREIGN_MODEL_FOLDER);
-        $foldersRelations = $query->select(['foreign_id', 'folder_parent_id'])
-            ->all()->toArray();
+        $foldersRelationsDtos = $query->select(['foreign_id', 'folder_parent_id'])
+            ->disableHydration()->all()->toArray();
 
-        return $this->detectInFoldersRelations($foldersRelations);
+        return $this->detectInFoldersRelations($foldersRelationsDtos);
     }
 }

@@ -38,11 +38,6 @@ class FoldersRelationsAddItemsToUserTreeService
     private $permissionsTables;
 
     /**
-     * @var \App\Model\Table\UsersTable
-     */
-    private $usersTable;
-
-    /**
      * @var \Passbolt\Folders\Service\FoldersRelations\FoldersRelationsSortService
      */
     private $foldersRelationsSortService;
@@ -71,8 +66,6 @@ class FoldersRelationsAddItemsToUserTreeService
         $this->foldersRelationsTable = TableRegistry::getTableLocator()->get('Passbolt/Folders.FoldersRelations');
         /** @phpstan-ignore-next-line */
         $this->permissionsTables = TableRegistry::getTableLocator()->get('Permissions');
-        /** @phpstan-ignore-next-line */
-        $this->usersTable = TableRegistry::getTableLocator()->get('Users');
         $this->foldersRelationsSortService = new FoldersRelationsSortService();
         $this->foldersRelationsCreateService = new FoldersRelationsCreateService();
         $this->folderRelationsDetectSCCsService = new FoldersRelationsDetectStronglyConnectedComponentsService();
@@ -328,14 +321,7 @@ class FoldersRelationsAddItemsToUserTreeService
      */
     private function detectAndRepairSCCs(UserAccessControl $uac, string $userId, array $foldersRelationsChanges): void
     {
-        /*
-         * Retrieving the users having a tree related or impacted by the folders relations changes is slower than
-         * trying to find SCCs by comparing all users trees.
-         * $this->foldersRelationsTable->find()
-         *   ->where($this->buildFoldersRelationsTupleComparisonExpression($foldersRelationsChanges))
-         */
-        $usersIds = $this->usersTable->findActive()->select('id')->all()->extract('id')->toArray();
-        $foldersRelationsScc = $this->folderRelationsDetectSCCsService->bulkDetectForUsers($usersIds);
+        $foldersRelationsScc = $this->folderRelationsDetectSCCsService->bulkDetectForUsers([$userId]);
 
         if (!empty($foldersRelationsScc)) {
             $brokenFolderRelation = $this->foldersRelationsRepairSCCsService->repair(
