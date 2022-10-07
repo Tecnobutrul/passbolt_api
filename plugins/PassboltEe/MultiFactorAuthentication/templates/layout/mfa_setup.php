@@ -35,7 +35,7 @@ $version = Configure::read('passbolt.version');
     <?= $this->fetch('js') ?>
 
 </head>
-<body>
+<body spellcheck="false">
 <div id="container" class="page <?= $this->fetch('pageClass') ?>">
     <?= $this->fetch('content') ?>
 </div>

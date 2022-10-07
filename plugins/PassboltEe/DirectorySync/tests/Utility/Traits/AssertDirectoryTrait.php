@@ -51,7 +51,17 @@ trait AssertDirectoryTrait
     public function assertDirectoryEntryCount(int $count)
     {
         $syncEntry = $this->action->DirectoryEntries->find()->all()->toArray();
-        $this->assertEquals(count($syncEntry), $count);
+        $this->assertEquals($count, count($syncEntry));
+    }
+
+    /**
+     * @param int $count
+     * @return void
+     */
+    public function assertDirectoryRelationCount(int $count)
+    {
+        $syncRelation = $this->action->DirectoryRelations->find()->all()->toArray();
+        $this->assertEquals($count, count($syncRelation));
     }
 
     /**

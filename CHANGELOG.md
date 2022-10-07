@@ -2,12 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [3.7.2] - 2022-09-13
+## [3.7.3] - 2022-09-27
+### Security
+- PB-19090 Protect forms from spell-jacking attack
+
+## [3.7.2] - 2022-09-20
 ### Fixed
 - PB-18380 Let passbolt-configure script setup certbot for RHEL9 support
 - PB-18405 Redirect on non-json request if no MFA settings are found
 - PB-16983 Handles the lack of permissions on image directory when deleting
 - PB-16898 Redesign download a supported browser to get started
+- PB-19040 As AD synchronizing with LDAP, users should be removed from passbolt groups
 
 ### Improved
 - PB-18415 Extends folder name length to 256 chars
@@ -27,6 +32,48 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-17096 Fix resource_types name and slug postgresql compatibility
 - PB-18372 Bump styleguide version to 3.7.1
 - PB-17068 PBL-07-003 Remove non necessary user id enumeration possibility
+
+## [3.7.0] - 2022-07-28
+### Added
+PB-17098 Add rockylinux 9 support
+PB-16751 Add Redhat 9 support
+PB-16749 Add Ubuntu 22.04 support
+PB-16950 Add Spanish and Lithuanian support
+PB-14514 Add PHP8.0 support
+PB-14514 Fix PHP8.1 compatibility issues
+PB-16161 Create action log endpoint for user CRUD
+PB-16844 Common part of the user recovery and setup audit log
+
+### Security
+PB-17068 PBL-07-003 Remove non necessary user id enumeration possibility
+PB-17068 Fix PBL-07-005 unusable organization key must be rejected
+PB-17068 PBL-07-002 Fix key algorithm validation should be set to strict in public key validation service
+PB-17068 Add test account recovery organization policy set should reject keys with weak algorithm
+PB-17068 PBL-07-002 Fix key algorithm validation should be set to strict on setup
+PB-17068 Fix OpenPGP unarmor should use base64_decode in strict mode
+PB-17068 SEC-1292 Fix unsafe default recipient email address (Credit: Ashley Primo)
+
+### Fixed
+PB-16705 As group manager updating group memberships I should not get a timeout
+PB-16949 As group manager deleting a group user the operation should not be slowed down by the folders plugin
+PB-16705 As a group manager updating group memberships I should not get a timeout due to a plugin integration
+PB-17068 Fix GroupsUsersValidatorTest psr-4 autoloading warning
+PB-17007 As AD performing a cleanup of the missing folders relations I should not get a timeout
+PB-16749 Fix jobs to reuse last job artifact instead of rebuilding it everytime
+PB-16877 Fixes ClearMfaCookieOnSetupAndRecover for controllers without User component
+PB-16666 GITHUB-432 Fix healthcheck style
+
+### Maintenance
+PB-17009 Replace createrepo by createrepo_c
+PB-16956 Misc Fixture Factories refactoring
+PB-16956 Modernize folders plugin bootstrap, add src/Plugin.php file
+PB-16806 UacAwareMiddleware trait now return UAC exclusively. More typing in UAC object.
+PB-16161 Renames ambiguous testing traits
+PB-16161Add and enhance log related factories
+PB-16791 Upgrade webinstaller openpgpjs to v5
+PB-14514 Update to composer v2.2 + Fix CI jobs
+PB-16657 Remove mariadb dependency
+PB-16161 Refactor to split folder, resource and user related logic in respective classes
 
 ## [3.6.0] - 2021-05-25
 ### Added
@@ -1118,7 +1165,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - AD: Admin
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v3.5.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v3.7.3...HEAD
+[3.7.3]: https://github.com/passbolt/passbolt_api/compare/v3.7.2...v3.7.3
+[3.7.2]: https://github.com/passbolt/passbolt_api/compare/v3.7.1...v3.7.2
+[3.7.1]: https://github.com/passbolt/passbolt_api/compare/v3.7.0...v3.7.1
+[3.7.0]: https://github.com/passbolt/passbolt_api/compare/v3.6.0...v3.7.0
+[3.6.0]: https://github.com/passbolt/passbolt_api/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/passbolt/passbolt_api/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/passbolt/passbolt_api/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/passbolt/passbolt_api/compare/v3.3.0...v3.3.1
