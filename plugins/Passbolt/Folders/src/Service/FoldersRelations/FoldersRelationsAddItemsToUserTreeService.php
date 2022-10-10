@@ -140,7 +140,7 @@ class FoldersRelationsAddItemsToUserTreeService
      *
      * @param string $userId The target user id the items are added for
      * @param array $items The items to look for potential parents
-     * @return array<FoldersRelation>
+     * @return array<\Passbolt\Folders\Model\Entity\FoldersRelation>
      */
     private function getParentFoldersRelationsChanges(string $userId, array $items): array
     {
@@ -181,7 +181,7 @@ class FoldersRelationsAddItemsToUserTreeService
      * @param string $userId The target user id the items are added for
      * @param array $items The items to look for potential parents
      * @param array $excludeFoldersRelations The folders relations to exclude
-     * @return array<FoldersRelation>
+     * @return array<\Passbolt\Folders\Model\Entity\FoldersRelation>
      */
     private function getChildrenFoldersRelationsChanges(
         string $userId,
@@ -219,13 +219,13 @@ class FoldersRelationsAddItemsToUserTreeService
         // Excluding the folders relations from the SQL query cost more than performing the operation in PHP at the moment
         // this code was written.
         if (!empty($excludeFoldersRelations)) {
-            $excludeFoldersRelationsHashMap = [];
+            $excludeRelationMap = [];
             foreach ($excludeFoldersRelations as $excludeFoldersRelation) {
-                $excludeFoldersRelationsHashMap[$excludeFoldersRelation->foreign_id][] = $excludeFoldersRelation->folder_parent_id;
+                $excludeRelationMap[$excludeFoldersRelation->foreign_id][] = $excludeFoldersRelation->folder_parent_id;
             }
-            $foldersRelations = array_filter($foldersRelations, function($folderRelation) use ($excludeFoldersRelationsHashMap) {
-               return !isset($excludeFoldersRelationsHashMap[$folderRelation->foreign_id])
-                   || !in_array($folderRelation->folder_parent_id, $excludeFoldersRelationsHashMap[$folderRelation->foreign_id]);
+            $foldersRelations = array_filter($foldersRelations, function ($folderRelation) use ($excludeRelationMap) {
+                return !isset($excludeRelationMap[$folderRelation->foreign_id])
+                   || !in_array($folderRelation->folder_parent_id, $excludeRelationMap[$folderRelation->foreign_id]);
             });
         }
 

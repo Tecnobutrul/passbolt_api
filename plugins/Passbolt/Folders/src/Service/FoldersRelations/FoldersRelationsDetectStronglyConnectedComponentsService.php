@@ -272,8 +272,8 @@ class FoldersRelationsDetectStronglyConnectedComponentsService
      * @throws \Exception If a folder relation cannot be found.
      */
     private function searchFolderRelationInArray(
-        array   $foldersRelationsDtos,
-        string  $foreignId,
+        array $foldersRelationsDtos,
+        string $foreignId,
         ?string $folderParentId = null
     ): array {
         foreach ($foldersRelationsDtos as $folderRelationDto) {
