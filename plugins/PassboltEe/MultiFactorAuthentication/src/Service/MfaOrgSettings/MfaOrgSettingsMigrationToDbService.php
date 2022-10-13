@@ -19,7 +19,6 @@ namespace Passbolt\MultiFactorAuthentication\Service\MfaOrgSettings;
 
 use App\Model\Entity\Role;
 use App\Utility\UserAccessControl;
-use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
 use Passbolt\MultiFactorAuthentication\Utility\MfaSettings;
 
@@ -38,6 +37,9 @@ final class MfaOrgSettingsMigrationToDbService
         }
 
         $uac = $this->getFirstAdminUac();
+        if (is_null($uac)) {
+            return;
+        }
         $mfaOrgSettings = $this->getMfaOrgSettings($uac);
         $this->storeMfaSettingsInDb($uac, $mfaOrgSettings);
     }
@@ -94,20 +96,18 @@ final class MfaOrgSettingsMigrationToDbService
     }
 
     /**
-     * @return \App\Utility\UserAccessControl
+     * @return \App\Utility\UserAccessControl|null
      */
-    protected function getFirstAdminUac(): UserAccessControl
+    protected function getFirstAdminUac(): ?UserAccessControl
     {
         /** @var \App\Model\Table\UsersTable $Users */
         $Users = TableRegistry::getTableLocator()->get('Users');
         $admin = $Users->findFirstAdmin();
         if (is_null($admin)) {
-            $adminId = UuidFactory::uuid();
+            return null;
         } else {
-            $adminId = $admin->id;
+            return new UserAccessControl(Role::ADMIN, $admin->get('id'));
         }
-
-        return new UserAccessControl(Role::ADMIN, $adminId);
     }
 
     /**

@@ -52,14 +52,12 @@ class MfaOrgSettingsMigrationToDbServiceTest extends TestCase
 
     /**
      * If no admins are in the DB, e.g. at installation
-     * Then store TOTP as enabled in the DB (legacy behavior with TOTP activated by default)
+     * Then do not activate the TOTP (TOTP de-activated by default)
      */
-    public function testMfaOrgSettingsMigrationToDbService_NoAdmin_Should_Save_Settings()
+    public function testMfaOrgSettingsMigrationToDbService_NoAdmin_Should_Not_Save_Settings()
     {
         $this->service->migrate();
-
-        $expectedConfig = ['providers' => ['totp']];
-        $this->assertSame($expectedConfig, $this->getMfaOrganizationSettingValue());
+        $this->assertSame(0, MfaOrganizationSettingFactory::count());
     }
 
     /**
@@ -86,6 +84,8 @@ class MfaOrgSettingsMigrationToDbServiceTest extends TestCase
      */
     public function testMfaOrgSettingsMigrationToDbService_WithEnvVariableSetToFalse_NoDBSettings_Should_DisableTotp_In_Db()
     {
+        UserFactory::make()->admin()->persist();
+
         putenv('PASSBOLT_PLUGINS_MFA_PROVIDERS_TOTP=false');
 
         $this->service->migrate();
@@ -98,6 +98,8 @@ class MfaOrgSettingsMigrationToDbServiceTest extends TestCase
 
     public function testMfaOrgSettingsMigrationToDbService_WithDBSettings_Should_Not_Overwrite_DB_Settings()
     {
+        UserFactory::make()->admin()->persist();
+
         $settings = ['foo' => 'bar'];
         MfaOrganizationSettingFactory::make()->value($settings)->persist();
 
@@ -109,6 +111,8 @@ class MfaOrgSettingsMigrationToDbServiceTest extends TestCase
 
     public function testMfaOrgSettingsMigrationToDbService_With_Unknown_Provider_Should_Not_Be_Stored()
     {
+        UserFactory::make()->admin()->persist();
+
         $settings['providers'] = ['foo' => true];
         $expectedSettings['providers'] = ['totp'];
         $this->mockMfaOrgSettings($settings);
@@ -121,6 +125,8 @@ class MfaOrgSettingsMigrationToDbServiceTest extends TestCase
 
     public function testMfaOrgSettingsMigrationToDbService_With_Complete_Settings()
     {
+        UserFactory::make()->admin()->persist();
+
         $settings = $this->getDefaultMfaOrgSettings();
         $this->mockMfaOrgSettings($settings);
 
@@ -133,6 +139,8 @@ class MfaOrgSettingsMigrationToDbServiceTest extends TestCase
 
     public function testMfaOrgSettingsMigrationToDbService_With_Invalid_Settings()
     {
+        UserFactory::make()->admin()->persist();
+
         $settings = $this->getDefaultMfaOrgSettings();
         $settings['yubikey']['clientId'] = 'invalid ';
         $this->mockMfaOrgSettings($settings);
