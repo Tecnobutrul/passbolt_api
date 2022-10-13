@@ -39,7 +39,7 @@ class MfaOrgSettingsPostController extends MfaController
         }
 
         $config = (new MfaOrgSettingsSetService())->setOrgSettings(
-            $this->getRequest()->getData(),
+            (array)$this->getRequest()->getData(),
             $this->User->getAccessControl()
         );
         $this->success(__('The multi factor authentication settings for the organization were updated.'), $config);

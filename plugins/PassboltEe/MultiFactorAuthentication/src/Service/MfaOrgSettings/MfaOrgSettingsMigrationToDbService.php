@@ -40,6 +40,7 @@ final class MfaOrgSettingsMigrationToDbService
         if (is_null($uac)) {
             return;
         }
+
         $mfaOrgSettings = $this->getMfaOrgSettings($uac);
         $this->storeMfaSettingsInDb($uac, $mfaOrgSettings);
     }

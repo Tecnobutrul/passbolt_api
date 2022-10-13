@@ -24,13 +24,13 @@ use Passbolt\MultiFactorAuthentication\Utility\MfaSettings;
 class MfaOrgSettingsSetService
 {
     /**
-     * @param mixed $data data in the payload
+     * @param array $data data in the payload
      * @param \App\Utility\UserAccessControl $uac UAC
      * @return array Organization Settings configs
      * @throws \Cake\Http\Exception\InternalErrorException if the UAC changed during the request (improbable)
      * @throws \App\Error\Exception\CustomValidationException in case of validation error
      */
-    public function setOrgSettings($data, UserAccessControl $uac): array
+    public function setOrgSettings(array $data, UserAccessControl $uac): array
     {
         $mfaSettings = MfaSettings::get($uac);
 

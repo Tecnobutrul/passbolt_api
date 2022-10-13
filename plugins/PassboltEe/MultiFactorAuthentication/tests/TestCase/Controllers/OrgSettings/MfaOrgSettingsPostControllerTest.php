@@ -30,7 +30,8 @@ class MfaOrgSettingsPostControllerTest extends MfaIntegrationTestCase
     public function testMfaOrgSettingsPostControllerNotLoggedIn()
     {
         $this->postJson('/mfa/settings.json?api-version=v2', ['providers' => []]);
-        $this->assertResponseError('You need to login to access this location.');
+        $this->assertResponseError();
+        $this->assertResponseContains('Authentication is required to continue');
     }
 
     /**
@@ -42,7 +43,21 @@ class MfaOrgSettingsPostControllerTest extends MfaIntegrationTestCase
     {
         $this->authenticateAs('admin');
         $this->post('/mfa/settings', ['providers' => []]);
-        $this->assertResponseError('This is not a valid Ajax/Json request.');
+        $this->assertResponseError();
+        $this->assertResponseContains('This is not a valid Ajax/Json request.');
+    }
+
+    /**
+     * @group mfa
+     * @group mfaOrgSettings
+     * @group mfaOrgSettingsPost
+     */
+    public function testMfaOrgSettingsPostControllerNoPayload()
+    {
+        $this->authenticateAs('admin');
+        $this->postJson('/mfa/settings.json');
+        $this->assertResponseError();
+        $this->assertResponseContains('The multi-factor authentication settings data should not be empty.');
     }
 
     /**
@@ -54,7 +69,8 @@ class MfaOrgSettingsPostControllerTest extends MfaIntegrationTestCase
     {
         $this->authenticateAs('ada');
         $this->postJson('/mfa/settings.json?api-version=v2', ['providers' => []]);
-        $this->assertResponseError('You are not allowed to access this location.');
+        $this->assertResponseError();
+        $this->assertResponseContains('Access restricted to administrators.');
     }
 
     /**
