@@ -62,8 +62,7 @@ class TotpVerifyGetControllerTest extends MfaIntegrationTestCase
         $user = $this->logInAsUser();
         $this->loadFixtureScenario(MfaDuoScenario::class, $user);
         $this->get('/mfa/verify/totp');
-        $this->assertResponseError();
-        $this->assertResponseContains('No valid multi-factor authentication settings found for this provider.');
+        $this->assertRedirect('/');
     }
 
     /**

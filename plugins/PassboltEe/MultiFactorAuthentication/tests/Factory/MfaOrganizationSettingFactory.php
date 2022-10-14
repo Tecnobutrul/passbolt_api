@@ -34,10 +34,9 @@ class MfaOrganizationSettingFactory extends OrganizationSettingFactory
     {
         parent::setDefaultTemplate();
 
-        $property = OrganizationSetting::UUID_NAMESPACE . MfaSettings::MFA;
         $this->patchData([
-            'property' => $property,
-            'property_id' => UuidFactory::uuid($property),
+            'property' => MfaSettings::MFA,
+            'property_id' => UuidFactory::uuid(OrganizationSetting::UUID_NAMESPACE . MfaSettings::MFA),
             'value' => json_encode(['providers' => []]),
         ]);
     }

@@ -15,11 +15,11 @@ declare(strict_types=1);
  * @since         2.12.0
  */
 
-namespace Passbolt\MultiFactorAuthentication\Service;
+namespace Passbolt\MultiFactorAuthentication\Service\MfaOrgSettings;
 
 use Passbolt\MultiFactorAuthentication\Utility\MfaOrgSettings;
 
-class GetMfaOrgSettingsService
+class MfaOrgSettingsGetService
 {
     /**
      * @return \Passbolt\MultiFactorAuthentication\Utility\MfaOrgSettings

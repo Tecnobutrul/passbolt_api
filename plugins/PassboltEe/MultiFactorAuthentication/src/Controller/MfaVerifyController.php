@@ -65,7 +65,13 @@ abstract class MfaVerifyController extends MfaController
         }
         if (!$this->mfaSettings->isProviderEnabled($provider)) {
             // for example a user is trying to force a check on a provider that is not set for the org
-            throw new BadRequestException(__('No valid multi-factor authentication settings found for this provider.'));
+            if ($this->getRequest()->is('json')) {
+                throw new BadRequestException(
+                    __('No valid multi-factor authentication settings found for this provider.')
+                );
+            } else {
+                return $this->redirect('/');
+            }
         }
     }
 

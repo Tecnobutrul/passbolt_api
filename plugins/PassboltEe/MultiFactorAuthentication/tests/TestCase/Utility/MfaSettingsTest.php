@@ -16,10 +16,12 @@ declare(strict_types=1);
  */
 namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Utility;
 
+use App\Test\Factory\UserFactory;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 use Passbolt\MultiFactorAuthentication\Test\Lib\MfaIntegrationTestCase;
+use Passbolt\MultiFactorAuthentication\Test\Scenario\Totp\MfaTotpUserOnlyScenario;
 use Passbolt\MultiFactorAuthentication\Utility\MfaAccountSettings;
 use Passbolt\MultiFactorAuthentication\Utility\MfaOrgSettings;
 use Passbolt\MultiFactorAuthentication\Utility\MfaOtpFactory;
@@ -145,6 +147,16 @@ class MfaSettingsTest extends MfaIntegrationTestCase
         $providers = $settings->getEnabledProviders();
         $this->assertTrue(count($providers) === 1);
         $this->assertEquals($providers[0], MfaSettings::PROVIDER_TOTP);
+    }
+
+    public function testMfaSettingsGetEnabledProviders_OrgDisabled_UserEnabled()
+    {
+        $user = UserFactory::make()->persist();
+        $uac = $this->makeUac($user);
+        $this->loadFixtureScenario(MfaTotpUserOnlyScenario::class, $user);
+        $settings = MfaSettings::get($uac);
+        $providers = $settings->getEnabledProviders();
+        $this->assertEmpty($providers);
     }
 
     /**

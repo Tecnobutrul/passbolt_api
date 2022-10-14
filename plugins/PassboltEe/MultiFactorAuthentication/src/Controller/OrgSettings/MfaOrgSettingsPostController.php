@@ -16,12 +16,9 @@ declare(strict_types=1);
  */
 namespace Passbolt\MultiFactorAuthentication\Controller\OrgSettings;
 
-use App\Model\Entity\Role;
 use Cake\Http\Exception\BadRequestException;
-use Cake\Http\Exception\ForbiddenException;
 use Passbolt\MultiFactorAuthentication\Controller\MfaController;
-use Passbolt\MultiFactorAuthentication\Utility\MfaOrgSettings;
-use Passbolt\MultiFactorAuthentication\Utility\MfaSettings;
+use Passbolt\MultiFactorAuthentication\Service\MfaOrgSettings\MfaOrgSettingsSetService;
 
 class MfaOrgSettingsPostController extends MfaController
 {
@@ -35,23 +32,16 @@ class MfaOrgSettingsPostController extends MfaController
      */
     public function post()
     {
-        if ($this->User->role() !== Role::ADMIN) {
-            throw new ForbiddenException(__('You are not allowed to access this location.'));
-        }
+        $this->User->assertIsAdmin();
+
         if (!$this->request->is('json')) {
             throw new BadRequestException(__('This is not a valid Ajax/Json request.'));
         }
-        // Allow some flexibility in inputs names
-        $data = $this->request->getData();
-        $provider = MfaSettings::PROVIDER_DUO;
-        $hostname = MfaOrgSettings::DUO_HOSTNAME;
-        if (isset($data[$provider]['hostname'])) {
-            $data[$provider][$hostname] = $data[$provider]['hostname'];
-        }
 
-        $orgSettings = $this->mfaSettings->getOrganizationSettings();
-        $orgSettings->save($data, $this->User->getAccessControl());
-        $config = $this->mfaSettings->getOrganizationSettings()->getConfig();
+        $config = (new MfaOrgSettingsSetService())->setOrgSettings(
+            (array)$this->getRequest()->getData(),
+            $this->User->getAccessControl()
+        );
         $this->success(__('The multi factor authentication settings for the organization were updated.'), $config);
     }
 }

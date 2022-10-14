@@ -30,7 +30,8 @@ class MfaOrgSettingsPostControllerTest extends MfaIntegrationTestCase
     public function testMfaOrgSettingsPostControllerNotLoggedIn()
     {
         $this->postJson('/mfa/settings.json?api-version=v2', ['providers' => []]);
-        $this->assertResponseError('You need to login to access this location.');
+        $this->assertResponseError();
+        $this->assertResponseContains('Authentication is required to continue');
     }
 
     /**
@@ -42,7 +43,21 @@ class MfaOrgSettingsPostControllerTest extends MfaIntegrationTestCase
     {
         $this->authenticateAs('admin');
         $this->post('/mfa/settings', ['providers' => []]);
-        $this->assertResponseError('This is not a valid Ajax/Json request.');
+        $this->assertResponseError();
+        $this->assertResponseContains('This is not a valid Ajax/Json request.');
+    }
+
+    /**
+     * @group mfa
+     * @group mfaOrgSettings
+     * @group mfaOrgSettingsPost
+     */
+    public function testMfaOrgSettingsPostControllerNoPayload()
+    {
+        $this->authenticateAs('admin');
+        $this->postJson('/mfa/settings.json');
+        $this->assertResponseError();
+        $this->assertResponseContains('The multi-factor authentication settings data should not be empty.');
     }
 
     /**
@@ -54,7 +69,8 @@ class MfaOrgSettingsPostControllerTest extends MfaIntegrationTestCase
     {
         $this->authenticateAs('ada');
         $this->postJson('/mfa/settings.json?api-version=v2', ['providers' => []]);
-        $this->assertResponseError('You are not allowed to access this location.');
+        $this->assertResponseError();
+        $this->assertResponseContains('Access restricted to administrators.');
     }
 
     /**
@@ -110,23 +126,7 @@ class MfaOrgSettingsPostControllerTest extends MfaIntegrationTestCase
         $config['providers'] = [MfaSettings::PROVIDER_TOTP => true];
         $this->mockMfaOrgSettings($config, 'database', $this->mockUserAccessControl('admin', Role::ADMIN));
         $this->authenticateAs('admin');
-        $this->putJson('/mfa/settings.json?api-version=v2', [
-            MfaSettings::PROVIDERS => [
-                MfaSettings::PROVIDER_DUO => true,
-                MfaSettings::PROVIDER_TOTP => true,
-                MfaSettings::PROVIDER_YUBIKEY => true,
-            ],
-            MfaSettings::PROVIDER_YUBIKEY => [
-                'clientId' => '12345',
-                'secretKey' => 'i2/j3jIQBO/axOl3ah4mlgXlXUY=',
-            ],
-            MfaSettings::PROVIDER_DUO => [
-                'salt' => '__CHANGE_ME__THIS_MUST_BE_AT_LEAST_FOURTY_CHARACTERS_____',
-                'integrationKey' => 'UICPIC93F14RWR5F55SJ',
-                'secretKey' => '8tkYNgi8aGAqa3KW1eqhsJLfjc1nJnHDYC1siNYX',
-                'hostName' => 'api-45e9f2ca.duosecurity.com',
-            ],
-        ]);
+        $this->putJson('/mfa/settings.json?api-version=v2', $this->getDefaultMfaOrgSettings());
         $this->assertResponseSuccess();
     }
 

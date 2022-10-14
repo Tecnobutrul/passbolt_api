@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Passbolt\MultiFactorAuthentication\Test\TestCase\Controllers;
 
 use Passbolt\MultiFactorAuthentication\Test\Lib\MfaIntegrationTestCase;
+use Passbolt\MultiFactorAuthentication\Test\Scenario\Totp\MfaTotpUserOnlyScenario;
 
 class MfaVerifyControllerTest extends MfaIntegrationTestCase
 {
@@ -49,5 +50,17 @@ class MfaVerifyControllerTest extends MfaIntegrationTestCase
 
         $this->getJson('/mfa/verify/totp.json');
         $this->assertInternalError('No valid multi-factor authentication settings found.');
+    }
+
+    public function testMfaVerifyControllerHandleInvalidSettings_MFASetForUserButNotForOrg()
+    {
+        $user = $this->logInAsUser();
+        $this->loadFixtureScenario(MfaTotpUserOnlyScenario::class, $user);
+
+        $this->get('/mfa/verify/totp');
+        $this->assertRedirect('/');
+
+        $this->get('/mfa/verify/totp.json');
+        $this->assertResponseError('No valid multi-factor authentication settings found for this provider.');
     }
 }
