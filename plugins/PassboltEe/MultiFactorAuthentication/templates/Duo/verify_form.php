@@ -6,7 +6,6 @@
  * @var string $sigRequest
  * @var mixed $verifyForm
  */
-    use Cake\Core\Configure;
     use Cake\Routing\Router;
     use Passbolt\MultiFactorAuthentication\Utility\MfaSettings;
 
@@ -15,7 +14,7 @@
     $this->assign('pageClass', 'login');
     $this->Html->css('Duo-Frame.css', ['block' => 'css', 'fullBase' => true]);
     $formContext = [
-        'url' => Router::url('/mfa/verify/duo', true),
+        'url' => Router::url('/mfa/verify/duo?redirect=' . $redirect, true),
         'id' => 'duo_form',
     ];
     ?>

@@ -4,7 +4,6 @@
  * @var mixed $providers
  * @var mixed $verifyForm
  */
-    use Cake\Core\Configure;
     use Cake\Routing\Router;
     use Passbolt\MultiFactorAuthentication\Utility\MfaSettings;
 
@@ -12,7 +11,7 @@
     $this->assign('title', $title);
     $this->assign('pageClass', 'login v240918');
     $formContext = [
-        'url' => Router::url('/mfa/verify/totp', true),
+        'url' => Router::url('/mfa/verify/totp?redirect=' . $redirect, true),
         'class' => ['totp-setup'],
     ];
     ?>

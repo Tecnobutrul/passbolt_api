@@ -33,14 +33,15 @@ class DuoVerifyGetControllerTest extends MfaIntegrationTestCase
         $this->assertResponseError('You need to login to access this location.');
     }
 
-    public function testMfaVerifyGetDuo_Mfa_Required()
+    public function testMfaVerifyGetDuo_Mfa_Required_With_Redirect()
     {
         $user = $this->logInAsUser();
         $hostName = 'Bar';
         $this->loadFixtureScenario(MfaDuoScenario::class, $user, true, $hostName);
-        $this->get('/mfa/verify/duo?api-version=v2');
+        $this->get('/mfa/verify/duo?api-version=v2&redirect=/app/users');
         $this->assertResponseSuccess();
         $this->assertResponseContains('data-host="' . $hostName . '"');
+        $this->assertResponseContains('/app/users');
     }
 
     public function testMfaVerifyGetDuo_Mfa_Not_Required()

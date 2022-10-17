@@ -75,11 +75,12 @@ class TotpVerifyGetControllerTest extends MfaIntegrationTestCase
     {
         $user = $this->logInAsUser();
         $this->loadFixtureScenario(MfaTotpScenario::class, $user);
-        $this->get('/mfa/verify/totp');
+        $this->get('/mfa/verify/totp?redirect=/app/users');
         $this->assertResponseOk();
         $this->assertResponseContains('<form');
         $this->assertResponseContains('<input type="text" name="totp"');
         $this->assertResponseContains('<input type="checkbox" name="remember"');
+        $this->assertResponseContains('/app/users');
     }
 
     /**
