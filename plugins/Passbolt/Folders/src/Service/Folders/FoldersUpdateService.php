@@ -21,36 +21,37 @@ use App\Error\Exception\ValidationException;
 use App\Model\Entity\Permission;
 use App\Model\Table\PermissionsTable;
 use App\Utility\UserAccessControl;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
+use Cake\ORM\TableRegistry;
 use Passbolt\Folders\Model\Entity\Folder;
 
 class FoldersUpdateService
 {
     use EventDispatcherTrait;
-    use ModelAwareTrait;
 
     public const FOLDERS_UPDATE_FOLDER_EVENT = 'folders.folder.update';
 
     /**
      * @var \Passbolt\Folders\Model\Table\FoldersTable
      */
-    public $Folders;
+    public $foldersTable;
 
     /**
      * @var \App\Model\Table\PermissionsTable
      */
-    private $Permissions;
+    private $permissionsTable;
 
     /**
      * Instantiate the service.
      */
     public function __construct()
     {
-        $this->loadModel('Passbolt/Folders.Folders');
-        $this->loadModel('Permissions');
+        /** @phpstan-ignore-next-line */
+        $this->foldersTable = TableRegistry::getTableLocator()->get('Passbolt/Folders.Folders');
+        /** @phpstan-ignore-next-line */
+        $this->permissionsTable = TableRegistry::getTableLocator()->get('Permissions');
     }
 
     /**
@@ -71,7 +72,7 @@ class FoldersUpdateService
             return $folder;
         }
 
-        $this->Folders->getConnection()->transactional(function () use (&$folder, $uac, $meta) {
+        $this->foldersTable->getConnection()->transactional(function () use (&$folder, $uac, $meta) {
             $this->updateFolderMeta($uac, $folder, $meta);
         });
 
@@ -94,7 +95,7 @@ class FoldersUpdateService
     private function getFolder(UserAccessControl $uac, string $folderId)
     {
         /** @var \App\Model\Entity\Permission|null $permission */
-        $permission = $this->Permissions
+        $permission = $this->permissionsTable
             ->findHighestByAcoAndAro(PermissionsTable::FOLDER_ACO, $folderId, $uac->getId())
             ->first();
 
@@ -104,7 +105,7 @@ class FoldersUpdateService
             throw new ForbiddenException(__('You are not allowed to update this folder.'));
         }
 
-        return $this->Folders->get($folderId);
+        return $this->foldersTable->get($folderId);
     }
 
     /**
@@ -136,7 +137,7 @@ class FoldersUpdateService
     {
         $this->patchEntity($folder, $data);
         $this->handleValidationErrors($folder);
-        $this->Folders->save($folder);
+        $this->foldersTable->save($folder);
         $this->handleValidationErrors($folder);
 
         return $folder;
@@ -155,7 +156,7 @@ class FoldersUpdateService
             'name' => true,
         ];
 
-        return $this->Folders->patchEntity($folder, $data, ['accessibleFields' => $accessibleFields]);
+        return $this->foldersTable->patchEntity($folder, $data, ['accessibleFields' => $accessibleFields]);
     }
 
     /**
@@ -169,7 +170,7 @@ class FoldersUpdateService
     {
         $errors = $folder->getErrors();
         if (!empty($errors)) {
-            throw new ValidationException(__('Could not validate folder data.'), $folder, $this->Folders);
+            throw new ValidationException(__('Could not validate folder data.'), $folder, $this->foldersTable);
         }
     }
 }
