@@ -24,8 +24,33 @@ use Cake\Routing\Router;
 use Passbolt\MultiFactorAuthentication\Utility\MfaVerifiedCookie;
 use Passbolt\MultiFactorAuthentication\Utility\MfaVerifiedToken;
 
+/**
+ * @property \App\Controller\Component\SanitizeUrlComponent $SanitizeUrl
+ */
 abstract class MfaVerifyController extends MfaController
 {
+    /**
+     * @return void
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('SanitizeUrl');
+    }
+
+    /**
+     * Before render.
+     *
+     * @param \Cake\Event\EventInterface $event Event
+     * @return void
+     */
+    public function beforeRender(\Cake\Event\EventInterface $event): void
+    {
+        parent::beforeRender($event);
+        $redirect = $this->SanitizeUrl->sanitizeRedirect();
+        $this->set('redirect', $redirect);
+    }
+
     /**
      * Trigger a redirect if MFA verification is not required
      *
@@ -105,11 +130,7 @@ abstract class MfaVerifyController extends MfaController
         if ($this->request->is('json')) {
             $this->success(__('The multi-factor authentication was a success.'));
         } else {
-            $redirectLoop = '/mfa/verify';
-            $redirect = $this->request->getQuery('redirect');
-            if (is_null($redirect) || substr($redirect, 0, strlen($redirectLoop)) === $redirectLoop) {
-                $redirect = '/';
-            }
+            $redirect = $this->SanitizeUrl->sanitizeRedirect();
             $this->redirect(Router::url($redirect, true));
         }
     }

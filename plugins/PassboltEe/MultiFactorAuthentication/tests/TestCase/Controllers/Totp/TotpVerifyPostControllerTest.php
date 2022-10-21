@@ -45,13 +45,32 @@ class TotpVerifyPostControllerTest extends MfaIntegrationTestCase
      */
     public function testMfaVerifyPostTotpUriSuccess()
     {
+        $redirect = '/foo';
         $user = $this->logInAsUser();
         [$uri] = $this->loadFixtureScenario(MfaTotpScenario::class, $user);
         $otp = Factory::loadFromProvisioningUri($uri);
-        $this->post('/mfa/verify/totp?redirect=/app/users', [
+        $this->post('/mfa/verify/totp?redirect=' . $redirect, [
             'totp' => $otp->now(),
         ]);
-        $this->assertRedirect('/app/users');
+        $this->assertRedirect($redirect);
+    }
+
+    /**
+     * @group mfa
+     * @group mfaVerify
+     * @group mfaVerifyPost
+     * @group mfaVerifyPostTotp
+     */
+    public function testMfaVerifyPostTotpUriFail()
+    {
+        $redirect = '/foo';
+        $user = $this->logInAsUser();
+        $this->loadFixtureScenario(MfaTotpScenario::class, $user);
+        $this->post('/mfa/verify/totp?redirect=' . $redirect, [
+            'totp' => 'blah',
+        ]);
+        $this->assertResponseOk();
+        $this->assertResponseContains('The OTP should be composed of numbers only.');
     }
 
     /**

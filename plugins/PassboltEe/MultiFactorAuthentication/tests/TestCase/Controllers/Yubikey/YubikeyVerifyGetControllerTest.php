@@ -33,12 +33,16 @@ class YubikeyVerifyGetControllerTest extends MfaIntegrationTestCase
         $this->assertResponseError('You need to login to access this location.');
     }
 
-    public function testMfaVerifyGetDuo_Success()
+    public function testMfaVerifyGetDuo_Success_With_Redirect()
     {
         $user = $this->logInAsUser();
         $this->loadFixtureScenario(MfaYubikeyScenario::class, $user);
         $this->mockValidMfaFormInterface(YubikeyVerifyForm::class, $this->makeUac($user));
-        $this->get('/mfa/verify/yubikey?api-version=v2');
+        $this->get('/mfa/verify/yubikey?api-version=v2&redirect=/app/users');
         $this->assertResponseSuccess();
+        $this->assertResponseContains('<form');
+        $this->assertResponseContains('<input type="password" name="hotp"');
+        $this->assertResponseContains('<input type="checkbox" name="remember"');
+        $this->assertResponseContains('/app/users');
     }
 }

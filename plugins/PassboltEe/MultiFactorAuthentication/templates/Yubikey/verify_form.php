@@ -4,7 +4,6 @@
  * @var mixed $providers
  * @var mixed $verifyForm
  */
-    use Cake\Core\Configure;
     use Cake\Routing\Router;
     use Passbolt\MultiFactorAuthentication\Utility\MfaSettings;
 
@@ -12,7 +11,7 @@
     $this->assign('title', $title);
     $this->assign('pageClass', 'login');
     $formContext = [
-        'url' => Router::url('/mfa/verify/yubikey', true),
+        'url' => Router::url('/mfa/verify/yubikey?redirect=' . $redirect, true),
         'class' => ['yubikey-setup'],
     ];
     ?>
