@@ -210,6 +210,11 @@ return [
             ]
         ],
 
+        // Healthcheck
+        'healthcheck' => [
+            'error' => filter_var(env('PASSBOLT_HEALTHCHECK_ERROR', false), FILTER_VALIDATE_BOOLEAN)
+        ],
+
         // Legal
         'legal' => [
             'privacy_policy' => [
