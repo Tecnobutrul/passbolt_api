@@ -26,6 +26,7 @@ use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemsToUserTreeService;
+use Passbolt\Folders\Test\Factory\FoldersRelationFactory;
 use Passbolt\Folders\Test\Lib\FoldersTestCase;
 use Passbolt\Folders\Test\Lib\Model\FoldersModelTrait;
 use Passbolt\Folders\Test\Lib\Model\FoldersRelationsModelTrait;
@@ -59,6 +60,18 @@ class FoldersRelationsAddItemsToUserTreeServiceTest extends FoldersTestCase
     {
         parent::setUp();
         $this->service = new FoldersRelationsAddItemsToUserTreeService();
+    }
+
+    public function testAddItemsToUserTreeSuccess_NoItemToAdd()
+    {
+        $userAId = UuidFactory::uuid('user.id.ada');
+        $userBId = UuidFactory::uuid('user.id.betty');
+        $uac = new UserAccessControl(Role::USER, $userAId);
+        $items = [];
+
+        $this->service->addItemsToUserTree($uac, $userBId, $items);
+
+        $this->assertSame(0, FoldersRelationFactory::count());
     }
 
     /* ADD A UNIQUE ITEM - FOLDER - FOLDER NO PARENT NO CHILD */

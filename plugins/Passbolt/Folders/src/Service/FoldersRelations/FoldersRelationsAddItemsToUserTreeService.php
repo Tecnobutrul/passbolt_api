@@ -152,6 +152,11 @@ class FoldersRelationsAddItemsToUserTreeService
         // POTENTIAL_PARENTS = The parents of the newly added items in all the users trees
         // R = ITEMS_POTENTIAL_PARENTS ⋂ USERS_FOLDERS
 
+        $foreignIds = Hash::extract($items, '{n}.foreign_id');
+        if (empty($foreignIds)) {
+            return [];
+        }
+
         // USERS_FOLDERS
         $userFolders = $this->permissionsTables->findAllByAro(
             PermissionsTable::FOLDER_ACO,
@@ -161,7 +166,6 @@ class FoldersRelationsAddItemsToUserTreeService
             ->select('aco_foreign_key');
 
         // POTENTIAL_PARENTS
-        $foreignIds = Hash::extract($items, '{n}.foreign_id');
         $query = $this->foldersRelationsTable->find()
             ->where(['foreign_id IN' => $foreignIds]);
 
