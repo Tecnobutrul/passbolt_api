@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\WebInstaller\Test\TestCase\Controller;
 
+use App\Test\Factory\OrganizationSettingFactory;
 use Cake\Datasource\ConnectionManager;
 use Cake\ORM\TableRegistry;
 use Cake\Validation\Validation;
@@ -274,5 +275,8 @@ UZNFZWTIXO4n0jwpTTOt6DvtqeRyjjw2nK3XUSiJu3izvn0791l4tofy
         $this->assertTrue(Validation::uuid($result['user_id']));
         $this->assertTrue(Validation::uuid($result['token']));
         $this->assertInstanceOf(Subscription::class, $this->Subscriptions->getOrFail());
+
+        // Ensure that the SMTP Settings were saved in the DB
+        $this->assertSame(1, OrganizationSettingFactory::count());
     }
 }

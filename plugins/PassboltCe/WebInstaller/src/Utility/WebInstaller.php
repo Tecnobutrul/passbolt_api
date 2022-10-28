@@ -28,6 +28,7 @@ use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 use Migrations\Migrations;
+use Passbolt\SmtpSettings\Service\SmtpSettingsSetService;
 use Passbolt\WebInstaller\Form\DatabaseConfigurationForm;
 
 class WebInstaller
@@ -162,6 +163,7 @@ class WebInstaller
         $this->writePassboltConfigFile();
         $this->installDatabase();
         $this->createFirstUser();
+        $this->saveSmtpSettingsInDb();
         $this->importSubscription(); // Pro Only
         $this->saveSettings();
         $this->deleteTmpFiles();
@@ -309,5 +311,27 @@ class WebInstaller
                 }
             }
         }
+    }
+
+    /**
+     * @return void
+     */
+    public function saveSmtpSettingsInDb(): void
+    {
+        $smtpSettings = $this->getSettings('email');
+        if (empty($smtpSettings)) {
+            return;
+        }
+
+        $userId = $this->getSettings('user.user_id');
+        if (is_null($userId)) {
+            /** @var \App\Model\Table\UsersTable $Users */
+            $Users = TableRegistry::getTableLocator()->get('Users');
+            $admin = $Users->findFirstAdmin();
+            $userId = $admin->get('id');
+        }
+        $uac = new UserAccessControl(Role::ADMIN, $userId);
+        $service = new SmtpSettingsSetService($uac);
+        $service->saveSettings($smtpSettings);
     }
 }
