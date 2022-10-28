@@ -44,6 +44,7 @@ class FoldersRelationsCreateService
      * @param string $foreignId The target foreign instance id
      * @param string $userId The target user id
      * @param string|null $folderParentId (optional) The target folder destination.
+     * @param bool $checkRules (optional) Should the table rules be checked while saving the entity. Default true.
      * @return \Passbolt\Folders\Model\Entity\FoldersRelation
      * @throws \Exception If an unexpected error occurred
      */
@@ -51,13 +52,20 @@ class FoldersRelationsCreateService
         string $foreignModel,
         string $foreignId,
         string $userId,
-        ?string $folderParentId = null
+        ?string $folderParentId = null,
+        ?bool $checkRules = true
     ): FoldersRelation {
         $folderRelation = null;
 
         $this->foldersRelationsTable->getConnection()->transactional(
-            function () use (&$folderRelation, $foreignModel, $foreignId, $userId, $folderParentId) {
-                $folderRelation = $this->createUserFolderRelation($foreignModel, $foreignId, $userId, $folderParentId);
+            function () use (&$folderRelation, $foreignModel, $foreignId, $userId, $folderParentId, $checkRules) {
+                $folderRelation = $this->createUserFolderRelation(
+                    $foreignModel,
+                    $foreignId,
+                    $userId,
+                    $folderParentId,
+                    $checkRules
+                );
             }
         );
 
@@ -71,17 +79,19 @@ class FoldersRelationsCreateService
      * @param string $foreignId The target foreign instance id
      * @param string $userId The target user id
      * @param string|null $folderParentId (optional) The target folder destination.
+     * @param bool $checkRules (optional) Should the table rules be checked while saving the entity. Default true.
      * @return \Passbolt\Folders\Model\Entity\FoldersRelation
      */
     private function createUserFolderRelation(
         string $foreignModel,
         string $foreignId,
         string $userId,
-        ?string $folderParentId = null
+        ?string $folderParentId = null,
+        ?bool $checkRules = true
     ): FoldersRelation {
         $folderRelation = $this->buildFolderRelationEntity($foreignModel, $foreignId, $userId, $folderParentId);
         $this->handleFolderRelationValidationErrors($folderRelation);
-        $this->foldersRelationsTable->save($folderRelation);
+        $this->foldersRelationsTable->save($folderRelation, ['checkRules' => $checkRules]);
         $this->handleFolderRelationValidationErrors($folderRelation);
 
         return $folderRelation;

@@ -29,7 +29,7 @@ use Cake\Utility\Inflector;
 use Cake\Validation\Validator;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 use Passbolt\Folders\Model\Traits\FoldersRelations\FoldersRelationsFindersTrait;
-use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemToUserTreeService;
+use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemsToUserTreeService;
 
 /**
  * FoldersRelations Model
@@ -337,18 +337,20 @@ class FoldersRelationsTable extends Table
     {
         $admin = $this->Users->findFirstAdmin();
         $uac = new UserAccessControl(Role::ADMIN, $admin->id);
-        $addItemToUserTreeService = new FoldersRelationsAddItemToUserTreeService();
+        $addItemsToUserTreeService = new FoldersRelationsAddItemsToUserTreeService();
 
         $missingFoldersRelations = $this->findMissingFoldersRelations($foreignModel)->all();
+        if (!$dryRun) {
+            $items = [];
+            foreach ($missingFoldersRelations as $missingFolderRelation) {
+                $items[$missingFolderRelation['user_id']][] = [
+                    'foreign_model' => $foreignModel,
+                    'foreign_id' => $missingFolderRelation['foreign_id'],
+                ];
+            }
 
-        foreach ($missingFoldersRelations as $missingFolderRelation) {
-            if (!$dryRun) {
-                $addItemToUserTreeService->addItemToUserTree(
-                    $uac,
-                    $foreignModel,
-                    $missingFolderRelation['foreign_id'],
-                    $missingFolderRelation['user_id']
-                );
+            foreach ($items as $userId => $userItems) {
+                $addItemsToUserTreeService->addItemsToUserTree($uac, $userId, $userItems);
             }
         }
 
