@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\DirectorySync\Test\TestCase\Form;
 
+use App\Test\Factory\UserFactory;
 use App\Test\Lib\AppTestCase;
 use App\Test\Lib\Model\FormatValidationTrait;
 use App\Utility\UuidFactory;
@@ -28,12 +29,6 @@ class LdapConfigurationFormTest extends AppTestCase
 {
     use EventDispatcherTrait;
     use FormatValidationTrait;
-
-    public $fixtures = [
-        'app.Base/Users', 'app.Base/Groups', 'app.Base/Secrets', 'app.Base/Roles',
-        'app.Base/GroupsUsers', 'app.Base/Permissions',
-        'app.Base/Favorites',
-    ];
 
     public static function getDummyFormData()
     {
@@ -53,8 +48,8 @@ class LdapConfigurationFormTest extends AppTestCase
             'use_email_prefix_suffix' => true,
             'email_prefix' => 'uid',
             'email_suffix' => '@passbolt.com',
-            'default_user' => UuidFactory::uuid('user.id.admin'),
-            'default_group_admin_user' => UuidFactory::uuid('user.id.ada'),
+            'default_user' => UserFactory::make()->admin()->persist()->get('id'),
+            'default_group_admin_user' => UserFactory::make()->user()->persist()->get('id'),
             'sync_users_create' => true,
             'sync_users_delete' => false,
             'sync_groups_create' => true,
@@ -150,6 +145,8 @@ class LdapConfigurationFormTest extends AppTestCase
 
     public function testDirectoryLdapConfigurationFormValidateError_DefaultUser()
     {
+        $userId = UserFactory::make()->user()->persist()->get('id');
+        $adminId = UserFactory::make()->admin()->persist()->get('id');
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'required' => self::getRequirePresenceTestCases(),
@@ -158,14 +155,14 @@ class LdapConfigurationFormTest extends AppTestCase
                 'rule_name' => 'uuid',
                 'test_cases' => [
                     'aaa00003-c5cd-11e1-a0c5-080027z!6c4c' => false,
-                    UuidFactory::uuid('user.id.admin') => true,
+                    $adminId => true,
                 ],
             ],
             'isValidAdmin' => [
                 'rule_name' => 'isValidAdmin',
                 'test_cases' => [
-                    UuidFactory::uuid('user.id.ada') => false,
-                    UuidFactory::uuid('user.id.admin') => true,
+                    $userId => false,
+                    $adminId => true,
                 ],
             ],
         ];
@@ -174,6 +171,10 @@ class LdapConfigurationFormTest extends AppTestCase
 
     public function testDirectoryLdapConfigurationFormValidateError_DefaultGroupAdminUser()
     {
+        $adminId = UserFactory::make()->admin()->persist()->get('id');
+        $activeUserId = UserFactory::make()->user()->persist()->get('id');
+        $inactiveUserId = UserFactory::make()->inactive()->user()->persist()->get('id');
+
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'required' => self::getRequirePresenceTestCases(),
@@ -182,16 +183,16 @@ class LdapConfigurationFormTest extends AppTestCase
                 'rule_name' => 'uuid',
                 'test_cases' => [
                     'aaa00003-c5cd-11e1-a0c5-080027z!6c4c' => false,
-                    UuidFactory::uuid('user.id.ada') => true,
-                    UuidFactory::uuid('user.id.admin') => true,
+                    $activeUserId => true,
+                    $adminId => true,
                 ],
             ],
             'isValidUser' => [
                 'rule_name' => 'isValidUser',
                 'test_cases' => [
-                    UuidFactory::uuid('user.id.ada') => true,
-                    UuidFactory::uuid('user.id.admin') => true,
-                    UuidFactory::uuid('user.id.ruth') => false,
+                    $activeUserId => true,
+                    $adminId => true,
+                    $inactiveUserId => false,
                 ],
             ],
         ];
