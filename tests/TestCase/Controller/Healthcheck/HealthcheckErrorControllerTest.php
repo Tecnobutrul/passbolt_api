@@ -24,18 +24,6 @@ class HealthcheckErrorControllerTest extends AppIntegrationTestCase
 {
     use IntegrationTestTrait;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-        Configure::clear();
-    }
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        Configure::clear();
-    }
-
     public function testHealthcheckErrorDisabled()
     {
         $og = Configure::read('passbolt.healthcheck.error');
