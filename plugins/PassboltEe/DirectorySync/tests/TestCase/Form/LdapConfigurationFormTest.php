@@ -19,7 +19,6 @@ namespace Passbolt\DirectorySync\Test\TestCase\Form;
 use App\Test\Factory\UserFactory;
 use App\Test\Lib\AppTestCase;
 use App\Test\Lib\Model\FormatValidationTrait;
-use App\Utility\UuidFactory;
 use Cake\Event\EventDispatcherTrait;
 use Cake\Utility\Hash;
 use Passbolt\DirectorySync\Form\LdapConfigurationForm;
