@@ -54,7 +54,7 @@ class DirectorySyncController extends DirectoryController
         try {
             $res = $this->_synchronize(false);
         } catch (\Exception $e) {
-            throw new InternalErrorException('The synchronization failed. ' . $e->getMessage());
+            throw new InternalErrorException('The synchronization failed. ' . $e->getMessage(), 500, $e);
         }
         $this->success(__('The synchronization was done successfully.'), $res);
     }
@@ -69,7 +69,7 @@ class DirectorySyncController extends DirectoryController
         try {
             $res = $this->_synchronize(true);
         } catch (\Exception $e) {
-            throw new InternalErrorException('The simulation failed. ' . $e->getMessage());
+            throw new InternalErrorException('The simulation failed. ' . $e->getMessage(), 500, $e);
         }
         $this->success(__('The simulation was done successfully.'), $res);
     }
