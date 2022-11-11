@@ -210,6 +210,11 @@ return [
             ]
         ],
 
+        // Healthcheck
+        'healthcheck' => [
+            'error' => filter_var(env('PASSBOLT_HEALTHCHECK_ERROR', false), FILTER_VALIDATE_BOOLEAN)
+        ],
+
         // Legal
         'legal' => [
             'privacy_policy' => [
@@ -253,6 +258,9 @@ return [
             ],
             'accountRecovery' => [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_ACCOUNT_RECOVERY_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
+            ],
+            'smtpSettings' => [
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_SMTP_SETTINGS', true), FILTER_VALIDATE_BOOLEAN)
             ],
         ],
 
