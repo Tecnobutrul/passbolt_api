@@ -21,7 +21,7 @@ use App\Error\Exception\ValidationException;
 use App\Model\Traits\Cleanup\TableCleanupTrait;
 use App\Model\Validation\ArmoredMessage\IsParsableMessageValidationRule;
 use App\Utility\UserAccessControl;
-use Cake\Core\Exception\Exception;
+use Cake\Core\Exception\CakeException;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
@@ -180,7 +180,7 @@ class AccountRecoveryResponsesTable extends Table
      *
      * @param \Cake\ORM\Query $query a query instance
      * @param array $options options
-     * @throws \Cake\Core\Exception\Exception if no role is specified
+     * @throws \Cake\Core\Exception\CakeException if no role is specified
      * @return \Cake\ORM\Query
      */
     public function findIndex(Query $query, array $options): Query
@@ -214,14 +214,14 @@ class AccountRecoveryResponsesTable extends Table
      *
      * @param \Cake\ORM\Query $query a query instance
      * @param array $options options
-     * @throws \Cake\Core\Exception\Exception if no id is specified
+     * @throws \Cake\Core\Exception\CakeException if no id is specified
      * @return \Cake\ORM\Query
      */
     public function findView(Query $query, array $options): Query
     {
         // Options must contain an id
         if (!isset($options['id'])) {
-            throw new Exception('An ID must be provided.');
+            throw new CakeException('An ID must be provided.');
         }
 
         // Same rule than index apply
