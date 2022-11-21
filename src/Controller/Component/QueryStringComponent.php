@@ -496,10 +496,10 @@ class QueryStringComponent extends Component
     {
         foreach ($values as $i => $parentId) {
             if (!is_int($i)) {
-                throw new Exception(__('"{0}" is not a valid parent filter.', $i, $filtername));
+                throw new CakeException(__('"{0}" is not a valid parent filter.', $i, $filtername));
             }
             if (!is_string($parentId) && $parentId !== false) {
-                throw new Exception(__('"{0}" is not a valid parent filter.', $i));
+                throw new CakeException(__('"{0}" is not a valid parent filter.', $i));
             }
             self::validateFilterParentFolder($parentId, $filtername);
         }
@@ -573,7 +573,7 @@ class QueryStringComponent extends Component
     public static function validateFilterParentFolder($parentId, string $filtername)
     {
         if (!Validation::uuid($parentId) && $parentId != false) {
-            throw new Exception(__('"{0}" is not a valid parent id for filter {1}.', $parentId, $filtername));
+            throw new CakeException(__('"{0}" is not a valid parent id for filter {1}.', $parentId, $filtername));
         }
 
         return true;
