@@ -184,7 +184,7 @@ class AccountRecoveryRequestGetService
                     ->where(['user_id' => $requestEntity->user_id])
                     ->firstOrFail();
             } catch (RecordNotFoundException $exception) {
-                throw new InternalErrorException($errorMsg);
+                throw new InternalErrorException($errorMsg, 500, $exception);
             }
             $data['account_recovery_private_key']['data'] = $privateKeyEntity->data;
 

@@ -29,7 +29,7 @@ use App\Model\Validation\Fingerprint\IsValidFingerprintValidationRule;
 use App\Utility\UserAccessControl;
 use Cake\Chronos\Chronos;
 use Cake\Collection\CollectionInterface;
-use Cake\Core\Exception\Exception;
+use Cake\Core\Exception\CakeException;
 use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
 use Cake\I18n\FrozenTime;
@@ -256,7 +256,7 @@ class AccountRecoveryRequestsTable extends Table
      * Build the query that fetches all requests
      *
      * @param array $options options
-     * @throws \Cake\Core\Exception\Exception if no role is specified
+     * @throws \Cake\Core\Exception\CakeException if no role is specified
      * @return \Cake\ORM\Query
      */
     public function findIndex(array $options): Query
@@ -381,14 +381,14 @@ class AccountRecoveryRequestsTable extends Table
      * Build the query that fetches one request
      *
      * @param array $options options
-     * @throws \Cake\Core\Exception\Exception if no id is specified
+     * @throws \Cake\Core\Exception\CakeException if no id is specified
      * @return \Cake\ORM\Query
      */
     public function findView(array $options): Query
     {
         // Options must contain an id
         if (!isset($options['id'])) {
-            throw new Exception('An ID must be provided.');
+            throw new CakeException('An ID must be provided.');
         }
 
         // Same rule than index apply
