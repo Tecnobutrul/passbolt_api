@@ -16,6 +16,7 @@ variables:
 
 stages:
   - unit-test
+  - unit-test-parallel
   - package-deps
   - package-build
   - package-tests
@@ -25,6 +26,7 @@ stages:
 include:
   - template: Code-Quality.gitlab-ci.yml
   - local: '/.gitlab-ci/jobs/php_unit_tests/runner.yml'
+  - local: '/.gitlab-ci/jobs/php_unit_tests/sequential/php_unit_tests.yml'
   - local: '/.gitlab-ci/jobs/artifact_build.yml'
   - local: '/.gitlab-ci/jobs/debian_package_build.yml'
   - local: '/.gitlab-ci/jobs/packages_tests.yml'
