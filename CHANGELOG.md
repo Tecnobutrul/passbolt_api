@@ -2,6 +2,44 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.8.1] - 2022-11-17
+### Fixed
+- PB-21478 As an administrator, I should be able to edit SMTP settings having a sender email not being a valid email
+- PB-21438 As an administrator using docker, I should be able to access the SMTP settings of my organization
+- PB-21486 As an administrator, I can define the SMTP authentication method via the SMTP admin workspace
+- PB-21481 As an administrator, I want emails to be sent with the sender settings defined in database, if defined in the database
+- PB-21439 As an anonymous user having a second factor method enabled, I should be able to authenticate without getting a 404
+
+## [3.8.0] - 2022-11-09
+### Added
+- PB-19192: As an administrator, I want to manage SMTP settings in the administration workspace
+- PB-19151: As a user, I want to use passbolt with the Solarized light theme
+- PB-19151: As a user, I want to use passbolt with the Solarized dark theme
+
+### Improved
+- PB-16948: As group manager, I should be able to add users to groups without getting timeout errors
+- PB-19035: TOTP is now deactivated by default and should be activated by an administrator
+- PB-19200: GpgAuthenticator now asserts the message is a valid OpenPGP message prior to decryption on stage 0
+
+### Fixed
+- PB-19312: As a logged-in user, I want to see my first name and last name correctly displayed in email headers
+- PB-18718: As a logged-in user, I want my locale not to be overwritten by the server config on pages served by the server
+- PB-19261: As a logged-in user, I should not get an internal error if no filter is passed to the get resource.json entry point
+- PB-19035: As a logged-in user, I should not get a not found error on MFA authentication if an administrator deactivated MFA
+- PB-18515: As a user, I want to see User Agent and IP in account recovery emails
+
+### Security
+- PB-19204: Sanitize MFA redirection by forbidding redirection to external URI
+- PB-19090: Protect forms from spell-jacking attack
+
+##  # Maintenance
+- PB-19235: Migrate comments controllers logic into services
+- PB-19603: Cover additional “add user to group” case: As group manager I can add a user to a group which have no resources shared with
+- PB-6081: Move enterprise plugins into plugins/PassboltEe
+- PB-6081: Move community plugins into plugins/PassboltCe
+- PB-19621: Stop changing folders permissions in installation tests
+- PB-19255 As an administrator I can trigger 500 errors on demand to test my logs
+
 ## [3.7.3] - 2022-09-27
 ### Security
 - PB-19090 Protect forms from spell-jacking attack
@@ -1165,7 +1203,9 @@ PB-16161 Refactor to split folder, resource and user related logic in respective
 - AP: User with plugin installed
 - AD: Admin
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v3.7.3...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v3.8.1...HEAD
+[3.8.1]: https://github.com/passbolt/passbolt_api/compare/v3.8.0...v3.8.1
+[3.8.0]: https://github.com/passbolt/passbolt_api/compare/v3.7.3...v3.8.0
 [3.7.3]: https://github.com/passbolt/passbolt_api/compare/v3.7.2...v3.7.3
 [3.7.2]: https://github.com/passbolt/passbolt_api/compare/v3.7.1...v3.7.2
 [3.7.1]: https://github.com/passbolt/passbolt_api/compare/v3.7.0...v3.7.1
