@@ -227,7 +227,15 @@ class WebInstaller
         $asciiKey = $this->getSettings('subscription.subscription_key');
         /** @var \Passbolt\Ee\Model\Table\SubscriptionsTable $Subscriptions */
         $Subscriptions = TableRegistry::getTableLocator()->get('Passbolt/Ee.Subscriptions');
-        $uac = new UserAccessControl(Role::ADMIN, $this->getSettings('user.user_id'));
+        $userId = $this->getSettings('user.user_id');
+        if (is_null($userId)) {
+            /** @var \App\Model\Table\UsersTable $Users */
+            $Users = TableRegistry::getTableLocator()->get('Users');
+            $admin = $Users->findFirstAdmin();
+            $userId = $admin->get('id');
+        }
+
+        $uac = new UserAccessControl(Role::ADMIN, $userId);
         $Subscriptions->createOrUpdate($asciiKey, $uac);
     }
 
