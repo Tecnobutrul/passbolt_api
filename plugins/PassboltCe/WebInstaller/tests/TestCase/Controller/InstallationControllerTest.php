@@ -23,15 +23,12 @@ use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\ORM\TableRegistry;
 use Cake\Validation\Validation;
-use CakephpTestSuiteLight\Fixture\TruncateDirtyTables;
 use Passbolt\Ee\Model\Entity\Subscription;
 use Passbolt\WebInstaller\Service\WebInstallerChangeConfigFolderPermissionService;
 use Passbolt\WebInstaller\Test\Lib\WebInstallerIntegrationTestCase;
 
 class InstallationControllerTest extends WebInstallerIntegrationTestCase
 {
-    use TruncateDirtyTables;
-
     public function setUp(): void
     {
         parent::setUp();
