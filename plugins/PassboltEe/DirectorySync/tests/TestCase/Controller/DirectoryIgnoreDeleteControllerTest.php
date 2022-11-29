@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since         2.2.0
  */
 
-namespace App\Test\TestCase\Controller\Favorites;
+namespace Passbolt\DirectorySync\Test\TestCase\Controller;
 
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
