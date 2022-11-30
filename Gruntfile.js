@@ -211,5 +211,5 @@ module.exports = function(grunt) {
         tasks: ['styleguide-update']
       }
     }
-   });
+  });
 };

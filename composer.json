@@ -106,7 +106,6 @@
             "Passbolt\\Locale\\": "./plugins/PassboltCe/Locale/src",
             "Passbolt\\PasswordGenerator\\": "./plugins/PassboltCe/PasswordGenerator/src",
             "Passbolt\\RememberMe\\": "./plugins/PassboltCe/RememberMe/src",
-            "Passbolt\\MultiFactorAuthentication\\": "./plugins/PassboltEe/MultiFactorAuthentication/src",
             "Passbolt\\Tags\\": "./plugins/PassboltEe/Tags/src",
             "Passbolt\\WebInstaller\\": "./plugins/PassboltCe/WebInstaller/src",
             "Passbolt\\Log\\": "./plugins/PassboltCe/Log/src",
@@ -120,8 +119,8 @@
             "Passbolt\\Import\\": "./plugins/PassboltCe/Import/src",
             "Passbolt\\Export\\": "./plugins/PassboltCe/Export/src",
             "Passbolt\\ResourceTypes\\": "./plugins/PassboltCe/ResourceTypes/src",
-            "Passbolt\\SmtpSettings\\": "./plugins/PassboltCe/SmtpSettings/src"
-
+            "Passbolt\\SmtpSettings\\": "./plugins/PassboltCe/SmtpSettings/src",
+            "Passbolt\\MultiFactorAuthentication\\": "./plugins/PassboltCe/MultiFactorAuthentication/src"
         }
     },
     "autoload-dev": {
@@ -134,7 +133,6 @@
             "Passbolt\\Ee\\Test\\": "plugins/PassboltEe/Ee/tests",
             "Passbolt\\InFormIntegration\\Test\\": "./plugins/PassboltCe/InFormIntegration/tests",
             "Passbolt\\Locale\\Test\\": "./plugins/PassboltCe/Locale/tests",
-            "Passbolt\\MultiFactorAuthentication\\Test\\": "./plugins/PassboltEe/MultiFactorAuthentication/tests",
             "Passbolt\\Tags\\Test\\": "./plugins/PassboltEe/Tags/tests",
             "Passbolt\\PasswordGenerator\\Test\\": "./plugins/PassboltCe/PasswordGenerator/tests",
             "Passbolt\\WebInstaller\\Test\\": "./plugins/PassboltCe/WebInstaller/tests",
@@ -146,7 +144,8 @@
             "Passbolt\\Folders\\Test\\": "./plugins/PassboltEe/Folders/tests",
             "Passbolt\\Mobile\\Test\\": "./plugins/PassboltCe/Mobile/tests",
             "Passbolt\\JwtAuthentication\\Test\\": "./plugins/PassboltCe/JwtAuthentication/tests",
-            "Passbolt\\SmtpSettings\\Test\\": "./plugins/PassboltCe/SmtpSettings/tests"
+            "Passbolt\\SmtpSettings\\Test\\": "./plugins/PassboltCe/SmtpSettings/tests",
+            "Passbolt\\MultiFactorAuthentication\\Test\\": "./plugins/PassboltCe/MultiFactorAuthentication/tests"
         }
     },
     "scripts": {
