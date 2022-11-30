@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Passbolt\WebInstaller\Test\TestCase\Controller;
 
 use App\Test\Factory\OrganizationSettingFactory;
+use App\Test\Factory\UserFactory;
 use App\Utility\Filesystem\DirectoryUtility;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
@@ -32,7 +33,6 @@ class InstallationControllerTest extends WebInstallerIntegrationTestCase
     {
         parent::setUp();
         $this->mockPassboltIsNotconfigured();
-        $this->dropAllTables();
         $this->initWebInstallerSession();
         $this->backupConfiguration();
     }
@@ -244,6 +244,7 @@ UZNFZWTIXO4n0jwpTTOt6DvtqeRyjjw2nK3XUSiJu3izvn0791l4tofy
 
     public function testWebInstallerInstallationViewSuccess()
     {
+        $this->dropAllTables();
         $config = $this->getInstallSessionData();
         $this->initWebInstallerSession($config);
         $this->get('/install/installation');
@@ -258,6 +259,7 @@ UZNFZWTIXO4n0jwpTTOt6DvtqeRyjjw2nK3XUSiJu3izvn0791l4tofy
      */
     public function testWebInstallerInstallationDoInstallSuccess()
     {
+        $this->dropAllTables();
         $this->skipTestIfNotWebInstallerFriendly();
         Configure::write('passbolt.gpg.serverKey.fingerprint', null);
         $connection = ConnectionManager::get('default');
@@ -292,6 +294,51 @@ UZNFZWTIXO4n0jwpTTOt6DvtqeRyjjw2nK3XUSiJu3izvn0791l4tofy
         // Ensure that the SMTP Settings were saved in the DB as well as the subscription
         $this->assertSame(2, OrganizationSettingFactory::count());
 
+        $filePermission = substr(sprintf('%o', fileperms($testConfigFile)), -4);
+        $folderPermission = substr(sprintf('%o', fileperms($testConfigDir)), -4);
+        $this->assertEquals('0440', $filePermission);
+        $this->assertEquals('0550', $folderPermission);
+        chmod($testConfigFile, 0775);
+        chmod($testConfigDir, 0775);
+        DirectoryUtility::removeRecursively($testConfigDir);
+    }
+
+    /**
+     * @group triggerFilesystemChanges
+     */
+    public function testWebInstallerInstallationDoInstall_SuccessWhenFirstUserIsEmpty()
+    {
+        $this->skipTestIfNotWebInstallerFriendly();
+        Configure::write('passbolt.gpg.serverKey.fingerprint', null);
+        $connection = ConnectionManager::get('default');
+        $config = $this->getInstallSessionData();
+        /**
+         * Set `first_user` key to empty so first user can't be created.
+         * This will help us test scenario in which session doesn't contain `user`.
+         */
+        $config['first_user'] = [];
+        $this->initWebInstallerSession($config);
+        /** Make sure tables exist */
+        $tables = $connection->getSchemaCollection()->listTables();
+        $this->assertNotEmpty($tables);
+        /** Set test configuration */
+        $testConfigDir = TMP . 'test_config' . DS;
+        mkdir($testConfigDir, 0755);
+        $testConfigFile = $testConfigDir . 'test_file.txt';
+        file_put_contents($testConfigFile, 'blah');
+        $configFolderPermissionService = new WebInstallerChangeConfigFolderPermissionService($testConfigDir);
+        $this->mockService(WebInstallerChangeConfigFolderPermissionService::class, function () use ($configFolderPermissionService) {
+            return $configFolderPermissionService;
+        });
+        /** Create an admin user */
+        UserFactory::make()->admin()->persist();
+
+        $this->get('/install/installation/do_install.json');
+
+        $this->assertInstanceOf(Subscription::class, $this->Subscriptions->getOrFail());
+        // Ensure that the SMTP Settings were saved in the DB as well as the subscription
+        $this->assertSame(2, OrganizationSettingFactory::count());
+        /** Configuration assertions */
         $filePermission = substr(sprintf('%o', fileperms($testConfigFile)), -4);
         $folderPermission = substr(sprintf('%o', fileperms($testConfigDir)), -4);
         $this->assertEquals('0440', $filePermission);
