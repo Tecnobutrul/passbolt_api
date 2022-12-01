@@ -1,3 +1,8 @@
+passbolt-pro-server (3.8.3-1) buster; urgency=medium
+  * PB-21631 Ensure the OpenPGP server key is in the keyring prior to sending any emails
+
+  -- Daniel Del Rio <daniel@passbolt.com>  Thu, 1 Dec 2022 10:5:00 +0000
+
 passbolt-pro-server (3.8.1-1) buster; urgency=medium
   * PB-21478 As an administrator, I should be able to edit SMTP settings having a sender email not being a valid email
   * PB-21438 As an administrator using docker, I should be able to access the SMTP settings of my organization
@@ -5,12 +10,12 @@ passbolt-pro-server (3.8.1-1) buster; urgency=medium
   * PB-21481 As an administrator, I want emails to be sent with the sender settings defined in database, if defined in the database
   * PB-21439 As an anonymous user having a second factor method enabled, I should be able to authenticate without getting a 404
 
- -- Daniel Del Rio <daniel@passbolt.com>  Thu, 17 Nov 2022 18:20:00 +0000
+  -- Daniel Del Rio <daniel@passbolt.com>  Thu, 17 Nov 2022 18:20:00 +0000
 
 passbolt-pro-server (3.8.0-2) buster; urgency=medium
   * PB-21411 remove access_log configuration from location block 
 
- -- Daniel Del Rio <daniel@passbolt.com>  Fri, 11 Nov 2022 13:50:00 +0000
+  -- Daniel Del Rio <daniel@passbolt.com>  Fri, 11 Nov 2022 13:50:00 +0000
 
 passbolt-pro-server (3.8.0-1) buster; urgency=medium
   * PB-19192: As an administrator, I want to manage SMTP settings in the administration workspace
