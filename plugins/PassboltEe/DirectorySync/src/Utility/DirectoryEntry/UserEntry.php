@@ -42,6 +42,11 @@ class UserEntry extends DirectoryEntry
     public $type = LdapObjectType::USER;
 
     /**
+     * @var int|null
+     */
+    public $level = null;
+
+    /**
      * Build user entry from ldap object.
      *
      * @param \LdapTools\Object\LdapObject $ldapObject ldap object.
