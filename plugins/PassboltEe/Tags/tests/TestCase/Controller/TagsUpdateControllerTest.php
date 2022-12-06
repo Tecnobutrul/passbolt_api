@@ -16,8 +16,6 @@ declare(strict_types=1);
  */
 namespace Passbolt\Tags\Test\TestCase\Controller;
 
-use App\Test\Lib\Model\ResourcesModelTrait;
-use App\Test\Lib\Model\SecretsModelTrait;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
@@ -253,9 +251,9 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
     {
         $this->authenticateAs('ada');
         /** @psalm-suppress UndefinedClass trait exists */
-        $resourceData = ResourcesModelTrait::getDummyResourceData();
+        $resourceData = self::getDummyResourceData();
         /** @psalm-suppress UndefinedClass trait exists */
-        $resourceData['secrets'][0] = SecretsModelTrait::getDummySecretData();
+        $resourceData['secrets'][0] = self::getDummySecretData();
         $resource = $this->_addTestResource($resourceData);
         $tags = $this->_addTestTag($resource->id, ['test-tag-1', 'test-tag-2']);
         $this->assertCount(2, $tags);
@@ -357,9 +355,9 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
     {
         $this->authenticateAs('admin');
         /** @psalm-suppress UndefinedClass trait exists */
-        $resourceData = ResourcesModelTrait::getDummyResourceData();
+        $resourceData = self::getDummyResourceData();
         /** @psalm-suppress UndefinedClass trait exists */
-        $resourceData['secrets'][0] = SecretsModelTrait::getDummySecretData();
+        $resourceData['secrets'][0] = self::getDummySecretData();
         $resource = $this->_addTestResource($resourceData);
         $tags = $this->_addTestTag($resource->id, ['admin-personal']);
         $tag = $tags[0];
