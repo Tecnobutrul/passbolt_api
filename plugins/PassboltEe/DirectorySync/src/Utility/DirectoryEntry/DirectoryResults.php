@@ -633,12 +633,16 @@ class DirectoryResults
         $flatTree = [];
         $level = 0;
         $tree = $this->getTree();
+
+        /** @var \Passbolt\DirectorySync\Utility\DirectoryEntry\UserEntry $entity */
         foreach ($tree as $entity) {
             if ($entity->isUser()) {
                 $entity->level = $level;
                 $flatTree[] = clone $entity;
             }
         }
+
+        /** @var \Passbolt\DirectorySync\Utility\DirectoryEntry\GroupEntry $entity */
         foreach ($tree as $entity) {
             if ($entity->isGroup()) {
                 $this->_getFlattenedChildrenRecursive($entity, $flatTree, $level);
