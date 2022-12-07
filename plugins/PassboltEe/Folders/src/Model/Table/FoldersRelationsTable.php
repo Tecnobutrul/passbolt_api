@@ -22,7 +22,6 @@ use App\Model\Rule\IsNotSoftDeletedRule;
 use App\Model\Traits\Cleanup\TableCleanupTrait;
 use App\Utility\UserAccessControl;
 use Cake\Http\Exception\InternalErrorException;
-use Cake\I18n\FrozenTime;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Utility\Inflector;
@@ -472,30 +471,6 @@ class FoldersRelationsTable extends Table
     }
 
     /**
-     * Get the oldest usage of a relation.
-     *
-     * @param string $foreignId The target entity id
-     * @param string|null $folderParentId The target entity parent id
-     * @return \Cake\I18n\FrozenTime|null
-     */
-    public function getRelationOldestCreatedDate(
-        string $foreignId,
-        ?string $folderParentId = FoldersRelation::ROOT
-    ): ?FrozenTime {
-        $conditions = [
-            'foreign_id' => $foreignId,
-            'folder_parent_id' => $folderParentId,
-        ];
-
-        return $this->find()
-            ->where($conditions)
-            ->order('created ')
-            ->select('created')
-            ->first()
-            ->get('created');
-    }
-
-    /**
      * Return a list of users ids having access to a list of items.
      *
      * @param array $foreignIds The list of items to check for.
@@ -520,36 +495,6 @@ class FoldersRelationsTable extends Table
     }
 
     /**
-     * Retrieve the users ids who have access to a target item and a target folder parent but who don't have them organized
-     * like this: target item in target folder parentL
-     *
-     * @param string $foreignId The target item id
-     * @param string $folderParentId The target item folder parent id
-     * @return array An array of users ids
-     */
-    public function getUsersIdsHavingAccessToItemsButNotOrganizedAs(string $foreignId, string $folderParentId): array
-    {
-        $usersIdsHavingAccessToItems = $this->getUsersIdsHavingAccessToMultipleItems([$foreignId, $folderParentId]);
-
-        if (empty($usersIdsHavingAccessToItems)) {
-            return [];
-        }
-
-        return $this->find()
-            ->where([
-                'foreign_id' => $foreignId,
-                'OR' => [
-                    'folder_parent_id !=' => $folderParentId,
-                    'folder_parent_id IS NULL',
-                ],
-                'user_id IN' => $usersIdsHavingAccessToItems,
-            ])
-            ->all()
-            ->extract('user_id')
-            ->toArray();
-    }
-
-    /**
      * Check if an item is personal.
      *
      * @param string|null $foreignId The item id
@@ -563,28 +508,6 @@ class FoldersRelationsTable extends Table
 
         return $this->findByForeignId($foreignId)
                 ->count() === 1;
-    }
-
-    /**
-     * Check if an item is organized in a specified folder for a given user
-     *
-     * @param string $userId The target user
-     * @param string $foreignId The target item id
-     * @param string|null $folderParentId The target folder parent id
-     * @return bool
-     */
-    public function isItemOrganizedInUserTree(
-        string $userId,
-        string $foreignId,
-        ?string $folderParentId = FoldersRelation::ROOT
-    ): bool {
-        $conditions = [
-            'foreign_id' => $foreignId,
-            'folder_parent_id' => $folderParentId,
-            'user_id' => $userId,
-        ];
-
-        return $this->exists($conditions);
     }
 
     /**
