@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.8.4] - 2022-11-12
+### Fixed
+- PB-21618 As an administrator I want to clean up duplicated folders relations located at the root
+- PB-21760 As signed-in user sharing a resource with a user already having access to the resource, it should not create duplicated folders relations
+
 ## [3.8.3] - 2022-11-30
 ### Fixed
 - PB-21631 Ensure the OpenPGP server key is in the keyring prior to sending any emails
@@ -1207,7 +1212,8 @@ PB-16161 Refactor to split folder, resource and user related logic in respective
 - AP: User with plugin installed
 - AD: Admin
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v3.8.3...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v3.8.4...HEAD
+[3.8.4]: https://github.com/passbolt/passbolt_api/compare/v3.8.4...v3.8.4
 [3.8.3]: https://github.com/passbolt/passbolt_api/compare/v3.8.1...v3.8.3
 [3.8.1]: https://github.com/passbolt/passbolt_api/compare/v3.8.0...v3.8.1
 [3.8.0]: https://github.com/passbolt/passbolt_api/compare/v3.7.3...v3.8.0
