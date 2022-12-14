@@ -29,9 +29,9 @@ use Passbolt\Ee\Command\SubscriptionCheckCommand;
 class PassboltCommand extends Command
 {
     /**
-     * @var bool
+     * @var bool|null
      */
-    public static $isUserRoot = false;
+    public static $isUserRoot = null;
 
     /**
      * The Passbolt welcome banner should be shown only once.
@@ -50,7 +50,7 @@ class PassboltCommand extends Command
 
         CommandBootstrap::init();
 
-        if (!isset(self::$isUserRoot)) {
+        if (self::$isUserRoot === null) {
             self::$isUserRoot = (PROCESS_USER === 'root');
         }
     }
