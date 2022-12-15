@@ -52,10 +52,7 @@ class DirectorySyncCommand extends PassboltCommand
      */
     public function execute(Arguments $args, ConsoleIo $io): ?int
     {
-        if (!$this->assertNotRoot($io)) {
-            $this->error(__('aborting'), $io);
-            $this->abort();
-        }
+        $this->assertCurrentProcessUser($io);
 
         $isLdapLoaded = extension_loaded('ldap');
         if (!$isLdapLoaded) {
