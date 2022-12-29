@@ -43,22 +43,6 @@ trait FoldersRelationsFindersTrait
     }
 
     /**
-     * Return a query that retrieves all user's folders relations.
-     *
-     * @param string $userId The user id
-     * @param string $folderId The folder id
-     * @return \Cake\ORM\Query
-     */
-    public function findUserFolderRelation(string $userId, string $folderId)
-    {
-        return $this->find()
-            ->where([
-                'foreign_id' => $folderId,
-                'user_id' => $userId,
-            ]);
-    }
-
-    /**
      * Filter a query by users ids
      *
      * @param \Cake\ORM\Query $query The query to decorate

@@ -244,10 +244,13 @@ class FoldersRelationsCleanupTest extends FoldersTestCase
         $originalFolderRelationToKeepMeta = $originalFolderFolderRelationToKeep->extractOriginal(['foreign_model', 'foreign_id', 'user_id', 'folder_parent_id', 'modified']);
         $originalResourceFolderRelationToKeep = FoldersRelationFactory::make(['modified' => FrozenTime::now()->subDay()])->withForeignModelResource()->withUser()->withFolderParent()->persist();
         $originalResourceRelationToKeepMeta = $originalResourceFolderRelationToKeep->extractOriginal(['foreign_model', 'foreign_id', 'user_id', 'folder_parent_id', 'modified']);
+        $originalResourceFolderRelationAtRootToKeep = FoldersRelationFactory::make(['modified' => FrozenTime::now()->subDay()])->withForeignModelResource()->withUser()->folderParent(FoldersRelation::ROOT)->persist();
+        $originalResourceRelationAtRootMeta = $originalResourceFolderRelationAtRootToKeep->extractOriginal(['foreign_model', 'foreign_id', 'user_id', 'folder_parent_id', 'modified']);
 
         // Duplicated foldersRelations to cleanup.
         FoldersRelationFactory::make($originalFolderRelationToKeepMeta, 2)->setField('modified', FrozenTime::now())->persist();
         FoldersRelationFactory::make($originalResourceRelationToKeepMeta, 2)->setField('modified', FrozenTime::now())->persist();
+        FoldersRelationFactory::make($originalResourceRelationAtRootMeta, 2)->setField('modified', FrozenTime::now())->persist();
 
         // Witness folders relations to not cleanup:
         // - A folder relation including a resource involved in the cleanup
@@ -266,12 +269,13 @@ class FoldersRelationsCleanupTest extends FoldersTestCase
         $rootResourceFolderRelation = FoldersRelationFactory::make()->foreignModelResource()->folderParent(FoldersRelation::ROOT)->persist();
         $subResourceFolderRelation = FoldersRelationFactory::make()->foreignModelResource()->withFolderParent()->persist();
 
-        $this->runCleanupChecks('Passbolt/Folders.FoldersRelations', 'cleanupDuplicatedFoldersRelations', 9, ['cleanupCount' => 4]);
+        $this->runCleanupChecks('Passbolt/Folders.FoldersRelations', 'cleanupDuplicatedFoldersRelations', 10, ['cleanupCount' => 6]);
 
         $foldersRelationsIdsPostCleanup = FoldersRelationFactory::find()->all()->extract('id')->toArray();
-        $this->assertCount(9, $foldersRelationsIdsPostCleanup);
+        $this->assertCount(10, $foldersRelationsIdsPostCleanup);
         $this->assertContains($originalFolderFolderRelationToKeep->id, $foldersRelationsIdsPostCleanup);
         $this->assertContains($originalResourceFolderRelationToKeep->id, $foldersRelationsIdsPostCleanup);
+        $this->assertContains($originalResourceFolderRelationAtRootToKeep->id, $foldersRelationsIdsPostCleanup);
         $this->assertContains($folderRelationInvolvingResourceCleanedUp->id, $foldersRelationsIdsPostCleanup);
         $this->assertContains($folderRelationInvolvingFolderCleanedUp->id, $foldersRelationsIdsPostCleanup);
         $this->assertContains($folderRelationInvolvingUserCleanedUp->id, $foldersRelationsIdsPostCleanup);
