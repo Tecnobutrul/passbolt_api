@@ -41,6 +41,11 @@ class ResourcesAfterAccessGrantedService
     private $resourcesTable;
 
     /**
+     * @var \Passbolt\Folders\Model\Table\FoldersRelationsTable
+     */
+    private $foldersRelationsTable;
+
+    /**
      * @var \Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemsToUserTreeService
      */
     private $foldersRelationsAddItemsToUserTree;
@@ -54,6 +59,8 @@ class ResourcesAfterAccessGrantedService
         $this->groupsUsersTable = TableRegistry::getTableLocator()->get('GroupsUsers');
         /** @phpstan-ignore-next-line */
         $this->resourcesTable = TableRegistry::getTableLocator()->get('Resources');
+        /** @phpstan-ignore-next-line */
+        $this->foldersRelationsTable = TableRegistry::getTableLocator()->get('Passbolt/Folders.FoldersRelations');
 
         $this->foldersRelationsAddItemsToUserTree = new FoldersRelationsAddItemsToUserTreeService();
     }
@@ -108,13 +115,35 @@ class ResourcesAfterAccessGrantedService
      */
     private function addResourceToGroupUsersTrees(UserAccessControl $uac, Resource $resource, string $groupId): void
     {
-        $grousUsersIds = $this->groupsUsersTable->findByGroupId($groupId)
+        $groupUsersIds = $this->findGroupsUsersIdsNotHavingFolderRelation($resource, $groupId);
+        foreach ($groupUsersIds as $groupUserId) {
+            $this->addResourceToUserTree($uac, $resource, $groupUserId);
+        }
+    }
+
+    /**
+     * Find the group users not having access to the
+     *
+     * @param Resource $resource The resource to search for
+     * @param string $groupId The group identifier to search for
+     * @return array<string> An array of user identifiers
+     */
+    private function findGroupsUsersIdsNotHavingFolderRelation(Resource $resource, string $groupId): array
+    {
+        $usersHavingFolderRelationQuery = $this->foldersRelationsTable->find()
+            ->select('user_id')
+            ->where([
+                'foreign_id' => $resource->id,
+            ]);
+
+        return $this->groupsUsersTable->find()
+            ->where([
+                'group_id' => $groupId,
+                'user_id NOT IN' => $usersHavingFolderRelationQuery,
+            ])
             ->all()
             ->extract('user_id')
             ->toArray();
-        foreach ($grousUsersIds as $groupUserId) {
-            $this->addResourceToUserTree($uac, $resource, $groupUserId);
-        }
     }
 
     /**
@@ -128,6 +157,16 @@ class ResourcesAfterAccessGrantedService
      */
     private function addResourceToUserTree(UserAccessControl $uac, Resource $resource, string $userId): void
     {
+        $isResourceInUserTree = $this->foldersRelationsTable->isItemInUserTree(
+            $userId,
+            $resource->id,
+            FoldersRelation::FOREIGN_MODEL_RESOURCE
+        );
+
+        if ($isResourceInUserTree) {
+            return;
+        }
+
         $items = [['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $resource->id]];
         $this->foldersRelationsAddItemsToUserTree->addItemsToUserTree($uac, $userId, $items);
     }

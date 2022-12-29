@@ -90,6 +90,32 @@ class ResourcesAfterAccessGrantedServiceTest extends FoldersTestCase
         return [$r1, $userAId];
     }
 
+    public function testResourceAfterAccessGrantedSuccess_UserPermissionAdded_GroupUserAlreadyHavingAccess()
+    {
+        [$r1, $g1, $userAId] = $this->insertFixture_UserPermissionAdded_GroupUserAlreadyHavingAccess();
+        $uac = new UserAccessControl(Role::USER, $userAId);
+
+        $permission = $this->addPermission(PermissionsTable::RESOURCE_ACO, $r1->id, PermissionsTable::USER_ARO, $userAId);
+        $this->service->afterAccessGranted($uac, $permission);
+
+        $this->assertItemIsInTrees($r1->id, 1);
+        $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userAId, null);
+    }
+
+    public function insertFixture_UserPermissionAdded_GroupUserAlreadyHavingAccess()
+    {
+        // Ada is OWNER of resource R1
+        // R1 (Ada:O)
+        // G1 is OWNER of resource R1
+        $userAId = UuidFactory::uuid('user.id.ada');
+        $g1 = $this->addGroup(['name' => 'G1', 'groups_users' => [
+            ['user_id' => $userAId, 'is_admin' => true],
+        ]]);
+        $r1 = $this->addResourceFor(['name' => 'R1', 'created_by' => $userAId, 'modified_by' => $userAId], [], [$g1->id => Permission::OWNER]);
+
+        return [$r1, $g1, $userAId];
+    }
+
     public function testResourceAfterAccessGrantedSuccess_GroupPermissionAdded()
     {
         [$r1, $g1, $userAId, $userBId, $userCId] = $this->insertFixture_GroupPermissionAdded();
@@ -107,6 +133,7 @@ class ResourcesAfterAccessGrantedServiceTest extends FoldersTestCase
     public function insertFixture_GroupPermissionAdded()
     {
         // Ada is OWNER of resource R1
+        // G1 is OWNER of resource R1
         // R1 (Ada:O)
         $userAId = UuidFactory::uuid('user.id.ada');
         $userBId = UuidFactory::uuid('user.id.betty');
@@ -118,5 +145,34 @@ class ResourcesAfterAccessGrantedServiceTest extends FoldersTestCase
         ]]);
 
         return [$r1, $g1, $userAId, $userBId, $userCId];
+    }
+
+    public function testResourceAfterAccessGrantedSuccess_GroupPermissionAdded_UserAlreadyHaveDirectAccess()
+    {
+        [$r1, $g1, $userAId, $userBId] = $this->insertFixture_GroupPermissionAdded_UserAlreadyHaveDirectAccess();
+        $uac = new UserAccessControl(Role::USER, $userAId);
+
+        $permission = $this->addPermission(PermissionsTable::RESOURCE_ACO, $r1->id, PermissionsTable::GROUP_ARO, $g1->id);
+        $this->service->afterAccessGranted($uac, $permission);
+
+        $this->assertItemIsInTrees($r1->id, 2);
+        $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userAId, null);
+        $this->assertFolderRelation($r1->id, FoldersRelation::FOREIGN_MODEL_RESOURCE, $userBId, null);
+    }
+
+    public function insertFixture_GroupPermissionAdded_UserAlreadyHaveDirectAccess()
+    {
+        // Ada is OWNER of resource R1
+        // G1 is OWNER of resource R1
+        // R1 (Ada:O, G1:O)
+        $userAId = UuidFactory::uuid('user.id.ada');
+        $userBId = UuidFactory::uuid('user.id.betty');
+        $r1 = $this->addResourceFor(['name' => 'R1'], [$userAId => Permission::OWNER]);
+        $g1 = $this->addGroup(['name' => 'G1', 'groups_users' => [
+            ['user_id' => $userAId, 'is_admin' => true],
+            ['user_id' => $userBId, 'is_admin' => true],
+        ]]);
+
+        return [$r1, $g1, $userAId, $userBId];
     }
 }
