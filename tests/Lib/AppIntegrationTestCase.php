@@ -16,10 +16,7 @@ declare(strict_types=1);
  */
 namespace App\Test\Lib;
 
-use App\Authenticator\AbstractSessionIdentificationService;
-use App\Authenticator\SessionIdentificationServiceInterface;
 use App\Middleware\CsrfProtectionMiddleware;
-use App\Model\Entity\User;
 use App\Test\Factory\UserFactory;
 use App\Test\Lib\Model\AvatarsModelTrait;
 use App\Test\Lib\Model\GpgkeysModelTrait;
@@ -30,10 +27,13 @@ use App\Test\Lib\Model\RolesModelTrait;
 use App\Test\Lib\Model\SecretsModelTrait;
 use App\Test\Lib\Model\UsersModelTrait;
 use App\Test\Lib\Utility\ArrayTrait;
+use App\Test\Lib\Utility\CookieTestTrait;
 use App\Test\Lib\Utility\EntityTrait;
 use App\Test\Lib\Utility\ErrorIntegrationTestTrait;
 use App\Test\Lib\Utility\JsonRequestTrait;
+use App\Test\Lib\Utility\LoginTestTrait;
 use App\Test\Lib\Utility\ObjectTrait;
+use App\Test\Lib\Utility\UserAgentTestTrait;
 use App\Utility\Application\FeaturePluginAwareTrait;
 use App\Utility\OpenPGP\OpenPGPBackendFactory;
 use App\Utility\UserAction;
@@ -66,6 +66,9 @@ abstract class AppIntegrationTestCase extends TestCase
     use SecretsModelTrait;
     use TruncateDirtyTables;
     use UsersModelTrait;
+    use LoginTestTrait;
+    use UserAgentTestTrait;
+    use CookieTestTrait;
 
     /**
      * Setup.
@@ -76,11 +79,15 @@ abstract class AppIntegrationTestCase extends TestCase
         $this->cleanup();
         $this->enableCsrfToken();
         $this->loadRoutes();
+
+        // Disable feature plugins listed in default.php
         $this->disableFeaturePlugin('Tags');
-        Configure::write('passbolt.plugins.multiFactorAuthentication.enabled', false);
-        Configure::write('passbolt.plugins.log.enabled', false);
-        Configure::write('passbolt.plugins.folders.enabled', false);
+        $this->disableFeaturePlugin('MultiFactorAuthentication');
+        $this->disableFeaturePlugin('Log');
+        $this->disableFeaturePlugin('Folders');
         $this->disableFeaturePlugin('AccountRecovery');
+//        $this->disableFeaturePlugin('Sso');
+
         Configure::write(CsrfProtectionMiddleware::PASSBOLT_SECURITY_CSRF_PROTECTION_ACTIVE_CONFIG, true);
         OpenPGPBackendFactory::reset();
         UserAction::destroy();
@@ -132,38 +139,6 @@ abstract class AppIntegrationTestCase extends TestCase
         }
 
         $this->logInAs($user);
-    }
-
-    /**
-     * @param User $user
-     */
-    public function logInAs(User $user)
-    {
-        $this->session(['Auth' => compact('user')]);
-    }
-
-    /**
-     * @return User
-     * @throws \Exception
-     */
-    public function logInAsUser()
-    {
-        $user = UserFactory::make()->user()->persist();
-        $this->logInAs($user);
-
-        return $user;
-    }
-
-    /**
-     * @return User
-     * @throws \Exception
-     */
-    public function logInAsAdmin()
-    {
-        $user = UserFactory::make()->admin()->persist();
-        $this->logInAs($user);
-
-        return $user;
     }
 
     /**

@@ -86,7 +86,7 @@ foreach ($body[MfaSettings::ORG_SETTINGS] as $provider => $enabled) {
         </div>
         <div class="col4 last">
             <div class="sidebar-help">
-                <h3><?= __('What is multi-factor authentication?'); ?></h4>
+                <h3><?= __('What is multi-factor authentication?'); ?></h3>
                 <p>
                     <?= __('Multi-factor authentication (MFA) is a method of confirming a user\'s identity that requires presenting two or more pieces of evidence (or factor).'); ?>
                 </p>
