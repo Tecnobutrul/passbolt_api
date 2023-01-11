@@ -138,7 +138,7 @@ class ResourcesTagsAddController extends AppController
                 // @codingStandardsIgnoreEnd
                 unset($data[array_search($existingTag->slug, $data)]);
                 if ($notShared) {
-                    $existingTag->_joinData = new \StdClass();
+                    $existingTag->_joinData = new \stdClass();
                     $existingTag->_joinData = $this->Tags->ResourcesTags->newEntity([
                         'user_id' => $userId,
                     ]);
