@@ -86,7 +86,7 @@ abstract class AppIntegrationTestCase extends TestCase
         $this->disableFeaturePlugin('Log');
         $this->disableFeaturePlugin('Folders');
         $this->disableFeaturePlugin('AccountRecovery');
-//        $this->disableFeaturePlugin('Sso');
+        $this->disableFeaturePlugin('Sso');
 
         Configure::write(CsrfProtectionMiddleware::PASSBOLT_SECURITY_CSRF_PROTECTION_ACTIVE_CONFIG, true);
         OpenPGPBackendFactory::reset();

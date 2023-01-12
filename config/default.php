@@ -16,6 +16,7 @@
 use App\Model\Entity\AuthenticationToken;
 use App\Utility\AuthToken\AuthTokenExpiryConfigValidator;
 use Passbolt\JwtAuthentication\Service\AccessToken\JwtAbstractService;
+use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 
 $authTokenExpiryConfigValidator = new AuthTokenExpiryConfigValidator();
 
@@ -65,6 +66,15 @@ return [
                 ],
                 AuthenticationToken::TYPE_VERIFY_TOKEN => [
                     'expiry' => filter_var(env('PASSBOLT_AUTH_JWT_VERIFY_TOKEN', '1 hour'), FILTER_CALLBACK, ['options' => $authTokenExpiryConfigValidator])
+                ],
+                SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS => [
+                    'expiry' => filter_var(env('PASSBOLT_AUTH_SSO_SET_SETTINGS', '10 minutes'), FILTER_CALLBACK, ['options' => $authTokenExpiryConfigValidator])
+                ],
+                SsoAuthenticationToken::TYPE_SSO_GET_KEY => [
+                    'expiry' => filter_var(env('PASSBOLT_AUTH_SSO_GET_KEY', '10 minutes'), FILTER_CALLBACK, ['options' => $authTokenExpiryConfigValidator])
+                ],
+                SsoAuthenticationToken::TYPE_SSO_STATE => [
+                    'expiry' => filter_var(env('PASSBOLT_AUTH_SSO_STATE', '10 minutes'), FILTER_CALLBACK, ['options' => $authTokenExpiryConfigValidator])
                 ],
             ]
         ],
@@ -272,7 +282,17 @@ return [
         // Activate specific entry points for selenium testing.
         // true will render your installation insecure.
         'selenium' => [
-            'active' => filter_var(env('PASSBOLT_SELENIUM_ACTIVE', false), FILTER_VALIDATE_BOOLEAN)
+            'active' => filter_var(env('PASSBOLT_SELENIUM_ACTIVE', false), FILTER_VALIDATE_BOOLEAN),
+            'sso' => [
+                'active' => filter_var(env('PASSBOLT_SELENIUM_SSO_ACTIVE', false)),
+                'azure' => [
+                    'url' => env('PASSBOLT_SELENIUM_SSO_AZURE_URL', 'https://login.microsoftonline.com'),
+                    'tenantId' => env('PASSBOLT_SELENIUM_SSO_AZURE_TENANT_ID', ''),
+                    'clientId' => env('PASSBOLT_SELENIUM_SSO_AZURE_CLIENT_ID', ''),
+                    'secretId' => env('PASSBOLT_SELENIUM_SSO_AZURE_SECRET_ID', ''),
+                    'secretExpiry' => env('PASSBOLT_SELENIUM_SSO_AZURE_SECRET_EXPIRY', '')
+                ],
+            ],
         ],
 
         // Security.

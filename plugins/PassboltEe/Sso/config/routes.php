@@ -1,0 +1,149 @@
+<?php
+
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         3.8.0
+ */
+use Cake\Routing\RouteBuilder;
+
+/** @var \Cake\Routing\RouteBuilder $routes */
+
+$routes->plugin('Passbolt/Sso', ['path' => '/sso'], function (RouteBuilder $routes) {
+    $routes->setExtensions(['json']);
+
+    // Azure
+
+    $routes->connect('/azure/login', [
+            'prefix' => 'Azure',
+            'controller' => 'SsoAzureStage1',
+            'action' => 'stage1',
+        ])
+        ->setMethods(['POST']);
+
+    $routes->connect('/azure/login/dry-run', [
+            'prefix' => 'Azure',
+            'controller' => 'SsoAzureStage1DryRun',
+            'action' => 'stage1DryRun',
+        ])
+        ->setMethods(['POST']);
+
+    $routes->connect('/azure/redirect', [
+            'prefix' => 'Azure',
+            'controller' => 'SsoAzureStage2',
+            'action' => 'triage',
+        ])
+        ->setMethods(['GET']);
+
+    // Generic success pages
+
+    $routes->connect('/login/success', [
+            'prefix' => 'Success',
+            'controller' => 'SsoSuccess',
+            'action' => 'ssoSuccess',
+        ])
+        ->setMethods(['GET']);
+
+    $routes->connect('/login/dry-run/success', [
+            'prefix' => 'Success',
+            'controller' => 'SsoSuccessDryRun',
+            'action' => 'ssoSuccess',
+        ])
+        ->setMethods(['GET']);
+
+    // Keys
+
+    $routes->connect('/keys', [
+            'prefix' => 'Keys',
+            'controller' => 'SsoKeysCreate',
+            'action' => 'create',
+        ])
+        ->setMethods(['POST']);
+
+    $routes->connect('/keys/{keyId}/{userId}/{token}', [
+            'prefix' => 'Keys',
+            'controller' => 'SsoKeysGet',
+            'action' => 'get',
+        ])
+        ->setPass(['keyId', 'userId', 'token'])
+        ->setMethods(['GET']);
+
+    $routes->connect('/keys/{id}', [
+            'prefix' => 'Keys',
+            'controller' => 'SsoKeysDelete',
+            'action' => 'delete',
+        ])
+        ->setPass(['id'])
+        ->setMethods(['DELETE']);
+
+    // Settings
+
+    $routes->connect('/settings', [
+            'prefix' => 'Settings',
+            'controller' => 'SsoSettingsCreate',
+            'action' => 'create',
+        ])
+        ->setMethods(['POST']);
+
+    $routes->connect('/settings/{id}', [
+            'prefix' => 'Settings',
+            'controller' => 'SsoSettingsView',
+            'action' => 'view',
+        ])
+        ->setPass(['id'])
+        ->setMethods(['GET']);
+
+    $routes->connect('/settings/{id}', [
+            'prefix' => 'Settings',
+            'controller' => 'SsoSettingsDelete',
+            'action' => 'delete',
+        ])
+        ->setPass(['id'])
+        ->setMethods(['DELETE']);
+
+    $routes->connect('/settings/{id}', [
+            'prefix' => 'Settings',
+            'controller' => 'SsoSettingsActivate',
+            'action' => 'activate',
+        ])
+        ->setPass(['id'])
+        ->setMethods(['POST', 'PUT']);
+
+    $routes->connect('/settings/current', [
+            'prefix' => 'Settings',
+            'controller' => 'SsoSettingsViewCurrent',
+            'action' => 'viewCurrent',
+        ])
+        ->setMethods(['GET']);
+
+    $routes->connect('/settings', [
+            'prefix' => 'Settings',
+            'controller' => 'SsoSettingsIndex',
+            'action' => 'index',
+        ])
+        ->setMethods(['GET']);
+
+    // Test endpoints
+
+    $routes->connect('/azure/login', [
+            'prefix' => 'Azure',
+            'controller' => 'SsoAzureStage0',
+            'action' => 'stage0',
+        ])
+        ->setMethods(['GET']);
+
+    $routes->connect('/azure/login/dry-run', [
+            'prefix' => 'Azure',
+            'controller' => 'SsoAzureStage0DryRun',
+            'action' => 'stage0DryRun',
+        ])
+        ->setMethods(['GET']);
+});

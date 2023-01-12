@@ -23,6 +23,7 @@
             <directory name="plugins/PassboltCe/MultiFactorAuthentication/templates/" />
             <directory name="plugins/PassboltEe/Folders/templates/" />
             <directory name="plugins/PassboltEe/AccountRecovery/templates/" />
+            <directory name="plugins/PassboltEe/Sso/templates/" />
         </ignoreFiles>
     </projectFiles>
 </psalm>
