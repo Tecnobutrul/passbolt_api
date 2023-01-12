@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since         3.9.0
  */
 
-namespace PassboltEe\Sso\tests\TestCase\Utility\OpenId;
+namespace Passbolt\Sso\Test\TestCase\Utility\OpenId;
 
 use Cake\Http\Exception\BadRequestException;
 use Cake\TestSuite\TestCase;

@@ -65,8 +65,8 @@ class SsoAzureStage2Controller extends AbstractSsoController
      */
     public function stage2AsAdmin(string $state, string $code): void
     {
-        // Get the settings from the authentication token data
         try {
+            // Get the settings from the authentication token data, we expect draft settings
             $settingsDto = (new SsoSettingsGetService())->getDraftSettingFromTokenOrFail($state);
         } catch (\Exception $exception) {
             throw new BadRequestException($exception->getMessage(), 400, $exception);
@@ -91,9 +91,7 @@ class SsoAzureStage2Controller extends AbstractSsoController
     {
         $this->User->assertNotLoggedIn();
 
-        // Get settings from token id
-        // if settings id in token is draft AND user is logged in as admin create set_settings key if valid
-        // if user is not logged in get default active settings
+        // User is not logged in we use the default active settings
         $service = new SsoAzureService();
         $uac = $service->assertStateCodeAndGetUac($state, $code, $this->User->ip(), $this->User->userAgent());
 

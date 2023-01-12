@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since         3.9.0
  */
 
-namespace PassboltEe\Sso\tests\TestCase\Utility\Azure\ResourceOwner;
+namespace Passbolt\Sso\Test\TestCase\Utility\Azure\ResourceOwner;
 
 use Cake\TestSuite\TestCase;
 
