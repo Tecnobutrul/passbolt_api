@@ -17,9 +17,9 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Test\TestCase\Controller\Settings;
 
-use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
+use App\Test\Lib\AppIntegrationTestCase;
 
-class SettingsIndexControllerTest extends SsoIntegrationTestCase
+class SettingsIndexControllerTest extends AppIntegrationTestCase
 {
     /**
      * Check that feature flag is absent from /settings.json if plugin is disabled
@@ -37,6 +37,7 @@ class SettingsIndexControllerTest extends SsoIntegrationTestCase
      */
     public function testSsoSettingsIndex_GetLUSuccess(): void
     {
+        $this->enableFeaturePlugin('Sso');
         $this->logInAsUser();
         $this->getJson('/settings.json');
         $this->assertSuccess();
@@ -49,6 +50,7 @@ class SettingsIndexControllerTest extends SsoIntegrationTestCase
      */
     public function testSsoSettingsIndex_GetANSuccess(): void
     {
+        $this->enableFeaturePlugin('Sso');
         $this->getJson('/settings.json');
         $this->assertSuccess();
         $this->assertTrue($this->_responseJsonBody->passbolt->plugins->sso->enabled);
