@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 41c2572bd9bd4cc908d3e09e0cbed6e5\n"
-"POT-Creation-Date: 2022-11-04 16:06+0000\n"
-"PO-Revision-Date: 2022-11-04 17:04\n"
+"POT-Creation-Date: 2023-01-17 14:36+0000\n"
+"PO-Revision-Date: 2023-01-17 15:21\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Lithuanian\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgid "You need to login to access this location."
 msgstr "Norėdami pasiekti šią vietą, turite prisijungti."
 
 msgid "The server verify token is missing or invalid."
-msgstr ""
+msgstr "Trūksta serverio patvirtinimo prieigos rakto arba jis neteisingas."
 
 msgid "Decryption failed."
 msgstr "Nepavyko iššifruoti."
@@ -175,6 +175,9 @@ msgstr "neapibrėžtas vartotojo agentas"
 msgid "Access restricted to administrators."
 msgstr "Prieiga suteikta tik administratoriams."
 
+msgid "The user should not be logged in."
+msgstr ""
+
 msgid "This feature is not supported by your version of passbolt."
 msgstr "Šios funkcijos jūsų „passbolt“ versija nepalaiko."
 
@@ -184,26 +187,11 @@ msgstr "Ištekliaus identifikatorius turi būti galiojantis UUID."
 msgid "The resource was marked as favorite."
 msgstr "Išteklius buvo pažymėtas kaip mėgstamiausias."
 
-msgid "The resource does not exist."
-msgstr "Išteklius neegzistuoja."
-
-msgid "This record is already marked as favorite."
-msgstr "Šis įrašas jau pažymėtas kaip mėgstamiausias."
-
-msgid "Could not validate favorite data."
-msgstr "Nepavyko patvirtinti mėgstamiausių duomenų."
-
 msgid "The favorite id is not valid."
 msgstr "Mėgstamiausias ID negalioja."
 
-msgid "The favorite does not exist."
-msgstr "Mėgstamiausias neegzistuoja."
-
 msgid "The favorite was deleted."
 msgstr "Mėgstamiausias buvo ištrintas."
-
-msgid "Could not delete favorite."
-msgstr "Nepavyko ištrinti mėgstamiausio."
 
 msgid "The OpenPGP key identifier should be a valid UUID."
 msgstr "OpenPGP rakto identifikatorius turėtų būti galiojantis UUID."
@@ -249,6 +237,9 @@ msgstr "Gerai"
 
 msgid "The identifier should be a valid UUID."
 msgstr "Identifikatorius turėtų būti galiojantis UUID."
+
+msgid "The resource does not exist."
+msgstr "Išteklius neegzistuoja."
 
 msgid "The resource type does not exist."
 msgstr "Ištekliaus tipas neegzistuoja."
@@ -368,6 +359,9 @@ msgid "The user does not exist."
 msgstr "Vartotojas neegzistuoja."
 
 msgid "No admin were found in the database."
+msgstr "Duomenų bazėje administratoriaus nerasta."
+
+msgid "Invalid expiry time {0}."
 msgstr ""
 
 msgid "The identifier should not be empty."
@@ -1148,7 +1142,7 @@ msgid "Could not validate comment data."
 msgstr "Nepavyko patvirtinti komentaro duomenų."
 
 msgid "The comment userId is not valid."
-msgstr ""
+msgstr "Komentaras userId neteisingas."
 
 msgid "The comment does not exist."
 msgstr "Komentaras neegzistuoja."
@@ -1167,6 +1161,18 @@ msgstr "Jums neleidžiama redaguoti šio komentaro."
 
 msgid "Could not find comments for the requested model."
 msgstr "Nepavyko rasti prašomo modelio komentarų."
+
+msgid "This record is already marked as favorite."
+msgstr "Šis įrašas jau pažymėtas kaip mėgstamiausias."
+
+msgid "Could not validate favorite data."
+msgstr "Nepavyko patvirtinti mėgstamiausių duomenų."
+
+msgid "The favorite does not exist."
+msgstr "Mėgstamiausias neegzistuoja."
+
+msgid "Could not delete favorite."
+msgstr "Nepavyko ištrinti mėgstamiausio."
 
 msgid "Validation failed for favorite {0}. {1}"
 msgstr "Nepavyko patvirtinti mėgstamiausio {0}. {1}"
@@ -1205,7 +1211,7 @@ msgid "Could not validate sub key data."
 msgstr "Nepavyko patvirtinti papildomo rakto duomenų."
 
 msgid "Public key sub key id could not be found."
-msgstr ""
+msgstr "Nepavyko rasti viešojo rakto antrinio rakto id."
 
 msgid "Could not validate message data."
 msgstr "Nepavyko patvirtinti pranešimo duomenų."
@@ -1238,10 +1244,10 @@ msgid "The algorithm is invalid."
 msgstr "Algortimas neteisingas."
 
 msgid "The fingerprint id is invalid."
-msgstr ""
+msgstr "Piršto atspaudo id neteisingas."
 
 msgid "The public key id is invalid."
-msgstr ""
+msgstr "Viešojo rakto id neteisingas."
 
 msgid "The key size is not valid."
 msgstr "Rakto dydis negalioja. "
@@ -1294,8 +1300,8 @@ msgstr "Sėkmingas profilio {0} patvirtinimas"
 msgid "Could not validate resource data."
 msgstr "Nepavyko patvirtinti išteklių duomenų."
 
-msgid "An unexpected error occured, please contact an administrator."
-msgstr "Įvyko netikėta klaida, susisiekite su administratoriumi."
+msgid "An unexpected error occurred, please contact an administrator."
+msgstr ""
 
 msgid "The server returned the following error:"
 msgstr "Serveris grąžino šią klaidą:"
@@ -1400,6 +1406,9 @@ msgid "Validation success for user {0}"
 msgstr "Sėkmingas naudotojo {0} patvirtinimas"
 
 msgid "The directory {0} cannot be deleted"
+msgstr "Katalogas {0} negali buti ištrintas"
+
+msgid "Database connection failed"
 msgstr ""
 
 msgid "Could not connect to github repository"
@@ -1520,7 +1529,7 @@ msgid "The supplied email notification settings are not valid"
 msgstr "Pateikti el. pašto pranešimų nustatymai negalioja"
 
 msgid "The user signature could not be verified."
-msgstr ""
+msgstr "Nepavyko patikrinti vartotojo parašo."
 
 msgid "The challenge cannot be decrypted."
 msgstr "Atpažinimo signalas negali būti iššifruotas."
@@ -1556,7 +1565,7 @@ msgid "The domain is invalid. Expected: {0} and got {1}"
 msgstr "Domenas neteisingas. Numatyta: {0} ir gauta {1}"
 
 msgid "The following file could not be read: {0}."
-msgstr ""
+msgstr "Nepavyko nuskaityti šio failo: {0}."
 
 msgid "The authentication was a success."
 msgstr "Autentifikavimas buvo sėkmingas."
@@ -1577,16 +1586,16 @@ msgid "An internal error occurred."
 msgstr "Įvyko vidinė klaida."
 
 msgid "Authentication security alert"
-msgstr ""
+msgstr "Autentifikavimo saugos įspėjimas"
 
 msgid "No active refresh token matching the request could be found."
 msgstr "Nerasta aktyvaus atnaujinimo prieigos rakto, atitinkančio užklausą."
 
 msgid "The user is deactivated."
-msgstr ""
+msgstr "Vartotojas išjungtas."
 
 msgid "The user is deleted."
-msgstr ""
+msgstr "Vartotojas ištrintas."
 
 msgid "The verify token is invalid."
 msgstr "Patvirtinimo prieigos raktas neteisingas."
@@ -1595,7 +1604,7 @@ msgid "The route {0} is not permitted with JWT authentication."
 msgstr "Kelias {0} neleidžiamas naudojant JWT autentifikavimą."
 
 msgid "The key pair for JWT Authentication is not complete."
-msgstr ""
+msgstr "JWT autentifikavimo raktų pora nėra baigta."
 
 msgid "The JWT public key could not be read or is not valid."
 msgstr "JWT viešasis raktas negali būti nuskaitytas arba jis negalioja."
@@ -1610,7 +1619,7 @@ msgid "The refresh token should be a valid UUID."
 msgstr "Atnaujinimo prieigos raktas turi būti galiojantis UUID."
 
 msgid "The user ID should be a valid UUID."
-msgstr ""
+msgstr "Vartotojo ID turi būti galiojantis UUID."
 
 msgid "The refresh token provided was already used."
 msgstr "Pateiktas atnaujinimo prieigos raktas jau buvo panaudotas."
@@ -1649,7 +1658,7 @@ msgid "An unknown user with IP: {0}  attempted to steal your login data."
 msgstr "Nežinomas naudotojas, kurio IP: {0}, bandė pavogti jūsų prisijungimo duomenis."
 
 msgid "Please get in touch with one of your administrators."
-msgstr ""
+msgstr "Susisiekite su vienu iš savo administratorių."
 
 msgid "This is not a valid locale."
 msgstr "Tai netinkama lokalė."
@@ -1805,7 +1814,7 @@ msgid "The current page cannot be greater than {0}"
 msgstr "Dabartinis puslapis negali būti didesnis nei {0}"
 
 msgid "The total number of pages should be a non negative integer."
-msgstr ""
+msgstr "Bendras puslapių skaičius turi būti ne neigiamas sveikasis skaičius."
 
 msgid "The total number of pages is required."
 msgstr "Būtinas bendras puslapių skaičius."
@@ -1869,6 +1878,291 @@ msgstr "Autentifikavimo prieigos raktas neaktyvus."
 
 msgid "The authentication token is expired."
 msgstr "Baigėsi autentifikavimo prieigos raktas."
+
+msgid "This functionality is not available using AJAX/JSON."
+msgstr "Ši funkcija negalima naudojant AJAX / JSON."
+
+msgid "This authentication provider is not enabled for your organization."
+msgstr "Šis autentifikavimo teikėjas jūsų organizacijoje neįgalintas."
+
+msgid "This authentication provider is already setup. Disable it first"
+msgstr "Šis autentifikavimo teikėjas jau nustatytas. Pirmiausia išjunkite"
+
+msgid "Multi Factor Authentication is configured!"
+msgstr "Sukonfigūruotas kelių faktorių autentifikavimas!"
+
+msgid "MFA authentication is required."
+msgstr "Reikalingas MFA autentifikavimas."
+
+msgid "The multi-factor authentication is not required."
+msgstr "Kelių veiksnių autentifikavimas nereikalingas."
+
+msgid "No valid multi-factor authentication settings found for this provider."
+msgstr "Šiam teikėjui nerasta jokių galiojančių kelių veiksnių autentifikavimo nustatymų."
+
+msgid "The multi-factor authentication was a success."
+msgstr "Daugiafaktoris autentifikavimas buvo sėkmingas."
+
+msgid "The multi factor authentication settings for the organization were updated."
+msgstr "Buvo atnaujinti organizacijos kelių veiksnių autentifikavimo nustatymai."
+
+msgid "Please setup the TOTP application."
+msgstr "Nustatykite TOTP (laiku pagrįstas vienkartinis slaptažodis) programą."
+
+msgid "Please provide the one-time password."
+msgstr "Pateikite vienkartinį slaptažodį."
+
+msgid "The user id is not valid."
+msgstr "Vartotojo ID negalioja."
+
+msgid "No multi-factor authentication settings defined for the user."
+msgstr "Nenustatyti kelių veiksnių autentifikavimo nustatymai vartotojui."
+
+msgid "The multi-factor authentication settings for the user were deleted."
+msgstr "Kelių veiksnių autentifikavimo nustatymai vartotojui buvo ištrinti."
+
+msgid "Please setup the Yubikey settings."
+msgstr "Nustatykite „Yubikey“ nustatymus."
+
+msgid "A signature is required."
+msgstr "Reikalingas parašas."
+
+msgid "The signature should not be empty."
+msgstr "Parašas neturi būti tuščias."
+
+msgid "This is not a valid signature response."
+msgstr "Tai netinkamas parašo atsakymas."
+
+msgid "Something went wrong when validating the one-time password."
+msgstr "Kažkas nepavyko tikrinant vienkartinį slaptažodį."
+
+msgid "This OTP provision uri is not valid."
+msgstr "Šis vienkartinio slaptažodžio nuostatos uri negalioja."
+
+msgid "An OTP is required."
+msgstr "Būtinas vienkartinis slaptažodis."
+
+msgid "The OTP should not be empty."
+msgstr "Vienkartinis slaptažodis neturėtų būti tuščias."
+
+msgid "This OTP is not valid."
+msgstr "Vienkartinis slaptažodis negalioja."
+
+msgid "The OTP should be composed of numbers only."
+msgstr "Vienkartinis slaptažodis turi būti sudarytas tik iš skaičių."
+
+msgid "The OTP should be at least {0} characters long."
+msgstr "Vienkartinis slaptažodis turi būti bent {0} simbolių ilgio."
+
+msgid "This yubikey is not associated with this user."
+msgstr "Šis yubikey nesusietas su šiuo vartotoju."
+
+msgid "Your multi-factor authentication settings were reset by you."
+msgstr "Jūs iš naujo nustatėte kelių veiksnių autentifikavimo nustatymus."
+
+msgid "Multi-factor authentication settings were reset."
+msgstr "Kelių veiksnių autentifikavimo nustatymai buvo nustatyti iš naujo."
+
+msgid "Your multi-factor authentication settings were reset by an administrator."
+msgstr "Administratorius iš naujo nustatė kelių veiksnių autentifikavimo nustatymus."
+
+msgid "The MFA token provided does not exist or is inactive."
+msgstr "Pateiktas MFA prieigos raktas neegzistuoja arba yra neaktyvus."
+
+msgid "No MFA provider set."
+msgstr "Kelių veiksnių autentifikavimo teikėjas nenustatytas."
+
+msgid "MFA verification date is not set for this provider."
+msgstr "Šiam teikėjui kelių veiksnių autentifikavimo patvirtinimo data nenustatyta."
+
+msgid "MFA setting OTP provisioning uri is not set."
+msgstr "MFA nustatymo OTP teikimo uri nenustatytas."
+
+msgid "MFA setting Yubikey Id is not set."
+msgstr "MFA nustatymas Yubikey ID nenustatytas."
+
+msgid "The multi-factor authentication settings data should not be empty."
+msgstr "Kelių veiksnių autentifikavimo nustatymų duomenys neturi būti tušti."
+
+msgid "The multi-factor authentication providers list is missing."
+msgstr "Trūksta kelių veiksnių autentifikavimo teikėjų sąrašo."
+
+msgid "Unknown MFA provider: {0}."
+msgstr "Nežinomas kelių veiksnių autentifikavimoteikėjas: {0}."
+
+msgid "Could not validate multi-factor authentication provider configuration."
+msgstr "Nepavyko patvirtinti kelių veiksnių autentifikavimo teikėjo konfigūracijos."
+
+msgid "No configuration set for Duo integration key."
+msgstr "Nenustatyta „Duo“ integravimo rakto konfigūracija."
+
+msgid "No configuration set for Duo host name."
+msgstr "Nenustatyta konfigūracija „Duo“ pagrindinio kompiuterio pavadinimui."
+
+msgid "No configuration set for Duo secret key."
+msgstr "Nenustatyta „Duo“ slaptojo rakto konfigūracija."
+
+msgid "No configuration set for Duo salt."
+msgstr "\"Duo salt\" konfigūracija nenustatyta.  "
+
+msgid "Duo salt should be between 40 and 128 characters in length."
+msgstr "\"Duo salt\" turi būti nuo 40 iki 128 simbolių ilgio."
+
+msgid "This is not a valid Duo secret key."
+msgstr "Tai nėra galiojantis „Duo“ slaptasis raktas."
+
+msgid "This is not a valid Duo host name."
+msgstr "Tai netinkamas „Duo“ pagrindinio kompiuterio pavadinimas."
+
+msgid "This is not a valid Duo integration key."
+msgstr "Tai nėra galiojantis „Duo“ integravimo raktas."
+
+msgid "Could not validate Duo configuration"
+msgstr "Nepavyko patvirtinti „Duo“ konfigūracijos"
+
+msgid "No configuration set for Yubikey OTP secret key."
+msgstr "Nenustatyta Yubikey OTP slaptojo rakto konfigūracija."
+
+msgid "No configuration set for Yubikey OTP clientId."
+msgstr "Yubikey OTP kliento ID konfigūracija nenustatyta."
+
+msgid "Yubikey OTP clientId should be an integer."
+msgstr "Yubikey OTP kliento ID turi būti sveikasis skaičius."
+
+msgid "Yubikey OTP secret key is not valid."
+msgstr "Yubikey OTP slaptasis raktas negalioja."
+
+msgid "Could not validate Yubikey configuration."
+msgstr "Nepavyko patvirtinti Yubikey konfigūracijos."
+
+msgid "Duo multi-factor authentication"
+msgstr "„Duo“ kelių veiksnių autentifikavimas"
+
+msgid "Duo multi-factor authentication is enabled!"
+msgstr "„Duo“ kelių veiksnių autentifikavimas įjungtas!"
+
+msgid "When logging in you will be asked to perform Duo Authentication."
+msgstr "Prisijungdami būsite paprašyti atlikti Duo autentifikavimą."
+
+msgid "Since"
+msgstr "Nuo"
+
+msgid "Multi factor authentication"
+msgstr "Kelių faktorių autentifikavimas"
+
+msgid "Sorry no multi factor authentication is enabled for this organization."
+msgstr "Atsiprašome, šioje organizacijoje neįjungtas kelių veiksnių autentifikavimas."
+
+msgid "Please contact your administrator to enable multi-factor authentication."
+msgstr "Norėdami įgalinti kelių veiksnių autentifikavimą, susisiekite su administratoriumi."
+
+msgid "Please select a provider"
+msgstr "Pasirinkite teikėją"
+
+msgid "Enabled"
+msgstr "Įjungta"
+
+msgid "Disabled"
+msgstr "Išjungta"
+
+msgid "What is multi-factor authentication?"
+msgstr "Kas yra kelių veiksnių autentifikavimas?"
+
+msgid "Multi-factor authentication (MFA) is a method of confirming a user's identity that requires presenting two or more pieces of evidence (or factor)."
+msgstr "Daugiafaktorinis autentifikavimas yra vartotojo tapatybės patvirtinimo metodas, reikalaujantis pateikti du ar daugiau įrodymų (arba faktorių)."
+
+msgid "learn more"
+msgstr "Sužinokite daugiau"
+
+msgid "Time based One Time Password (TOTP)"
+msgstr "Laiku pagrįstas vienkartinis slaptažodis "
+
+msgid "Scan this bar code"
+msgstr "Nuskaitykite šį brūkšninį kodą"
+
+msgid "Enter the six digit number as presented on your phone or tablet."
+msgstr "Įveskite šešių skaitmenų skaičių, pateiktą telefone arba planšetiniame kompiuteryje."
+
+msgid "Requirements"
+msgstr "Reikalavimai"
+
+msgid "To proceed you need to install an application that supports Time Based One Time Passwords (TOTP) on your phone or tablet such as:"
+msgstr "Norėdami tęsti, telefone ar planšetiniame kompiuteryje turite įdiegti programą, kuri palaiko vienkartinius slaptažodžius, pvz.:"
+
+msgid "or"
+msgstr "arba"
+
+msgid "Getting started with Time based One Time Password (TOTP)"
+msgstr "Darbo su laiku pagrįsto vienkartinio slaptažodžio pradžia"
+
+msgid "How does it work?"
+msgstr "Kaip tai veikia?"
+
+msgid "diagram showing how it works"
+msgstr "diagrama, rodanti, kaip tai veikia"
+
+msgid "You sign in to passbolt just like you normally do."
+msgstr "Prisijungiate prie „Passbolt“ kaip įprastai."
+
+msgid "When using a new browser, you need an additional code from your phone."
+msgstr "Kai naudojate naują naršyklę, jums reikia papildomo kodo iš telefono."
+
+msgid "Once you enter this code, you can log in."
+msgstr "Įvedę šį kodą galite prisijungti."
+
+msgid "cancel"
+msgstr "atšaukti"
+
+msgid "get started!"
+msgstr "pradėti!"
+
+msgid "Time based One Time Password (TOTP) is enabled!"
+msgstr "Laiku pagrįstas vienkartinis slaptažodis įjungtas!"
+
+msgid "When logging in from a new device you will need to enter a unique verification code generated by an app on your mobile."
+msgstr "Prisijungdami iš naujo įrenginio turėsite įvesti unikalų patvirtinimo kodą, kurį sugeneravo programėlė mobiliajame telefone."
+
+msgid "Multi factor authentication verification"
+msgstr "Kelių veiksnių autentifikavimo patvirtinimas"
+
+msgid "Remember this device for a month."
+msgstr "Prisiminkite šį įrenginį mėnesį."
+
+msgid "Yubikey One Time Password"
+msgstr "Yubikey vienkartinis slaptažodis"
+
+msgid "Plug in the yubikey and put your finger on it."
+msgstr "Įjunkite yubikey ir uždėkite pirštą."
+
+msgid "Yubikey One Time Password is enabled!"
+msgstr "Yubikey vienkartinis slaptažodis įjungtas!"
+
+msgid "When logging in from a new device you will need a unique code generated by your yubikey."
+msgstr "Prisijungiant iš naujo įrenginio jums reikės unikalaus kodo, sugeneruoto jūsų yubikey."
+
+msgid "verify"
+msgstr "patikrinti"
+
+msgid "Or try with another provider"
+msgstr "Arba pabandykite su kitu teikėju"
+
+msgid "Manage providers"
+msgstr "Tvarkyti teikėjus"
+
+msgid "Turn off"
+msgstr "Išjungti"
+
+msgid "Your multi-factor authentication is disabled."
+msgstr "Jūsų kelių veiksnių autentifikavimas išjungtas."
+
+msgid "Multi-factor authentication settings were reset for your account by an administrator."
+msgstr "Administratorius iš naujo nustatė kelių veiksnių autentifikavimo nustatymus."
+
+msgid "Please contact your administrator if you didn't request this action."
+msgstr "Jei neprašėte šio veiksmo, susisiekite su administratoriumi."
+
+msgid "Log in passbolt"
+msgstr "Prisijungti \"Passbolt\""
 
 msgid "The password generator value \"{0}\" is not valid."
 msgstr "Slaptažodžio generatoriaus reikšmė „{0}“ neteisinga."
@@ -1948,9 +2242,6 @@ msgstr "Siuntėjo el. paštas neturi būti tuščias."
 msgid "The sender email should be a valid BMP-UTF8 string."
 msgstr "Siuntėjo el. pašto adresas turi būti tinkama BMP-UTF8 eilutė."
 
-msgid "The sender email should be a valid email address."
-msgstr "Siuntėjo el. paštas turi būti galiojantis el.pašto adresas."
-
 msgid "A host name is required."
 msgstr "Būtinas pagrindinio kompiuterio pavadinimas."
 
@@ -1964,7 +2255,7 @@ msgid "A TLS setting is required."
 msgstr "A TLS setting is required."
 
 msgid "The TLS setting should be \"true\" or NULL."
-msgstr ""
+msgstr "TLS nustatymas turi būti „true“ arba NULL."
 
 msgid "A port number is required."
 msgstr "Būtinas praėjimo numeris."
@@ -1987,35 +2278,41 @@ msgstr "Slaptažodis turi būti tinkama BMP-UTF8 eilutė."
 msgid "The test email should be a valid email address."
 msgstr "Bandomasis el. pašto adresas turi būti galiojantis el. paštas."
 
-msgid "Could not validate the smtp settings."
+msgid "The sender email should be a valid email address."
+msgstr "Siuntėjo el. paštas turi būti galiojantis el.pašto adresas."
+
+msgid "A test recipient is required."
+msgstr "Būtinas testo gavėjas."
+
+msgid "SMTP settings endpoints disabled."
 msgstr ""
+
+msgid "Could not validate the smtp settings."
+msgstr "Nepavyko patvirtinti smtp nustatymų."
 
 msgid "Could not validate the smtp settings found in database."
-msgstr ""
+msgstr "Nepavyko patvirtinti duomenų bazėje rastų smtp nustatymų."
 
 msgid "The OpenPGP server key cannot be used to decrypt the SMTP settings stored in database."
-msgstr ""
+msgstr "OpenPGP serverio raktas negali būti naudojamas duomenų bazėje saugomiems SMTP parametrams iššifruoti."
 
 msgid "To fix this problem, you need to configure the SMTP server again."
-msgstr ""
+msgstr "Norėdami išspręsti šią problemą, turite dar kartą sukonfigūruoti SMTP serverį."
 
 msgid "not found"
-msgstr ""
+msgstr "nerasta"
 
 msgid "database"
 msgstr "duomenų bazė"
 
 msgid "env variables"
-msgstr ""
+msgstr "env kintamieji"
 
 msgid "undefined"
-msgstr ""
+msgstr "neapibrėžtas"
 
 msgid "Passbolt test email"
-msgstr ""
-
-msgid "A test recipient is required."
-msgstr ""
+msgstr "Passbol bandomasis el. paštas"
 
 msgid "Congratulations!"
 msgstr "Sveikinimai!"
@@ -2477,28 +2774,28 @@ msgid "The subscription key is a file that was sent to you when you purchased Pa
 msgstr "Prenumeratos raktas yra failas, kuris buvo išsiųstas jums įsigijus \"Passbolt Pro\". Mums reikia prenumeratos rakto, kad galėtume suaktyvinti „Passbolt Pro“ funkcijas."
 
 msgid "The user id is invalid."
-msgstr ""
+msgstr "Vartotojo id neteisingas."
 
 msgid "The authentication token id is invalid."
-msgstr ""
+msgstr "Autentifikavimo prieigos rakto id neteisingas."
 
 msgid "The request data should not be empty."
-msgstr ""
+msgstr "Užklausos duomenys neturi būti tušti."
 
 msgid "Only guests are allowed to create an account recovery request."
-msgstr ""
+msgstr "Tik svečiams leidžiama kurti paskyros atkūrimo užklausą."
 
 msgid "Invalid request. Please provide the required data."
-msgstr ""
+msgstr "Neteisingas prašymas. Pateikite reikiamus duomenis."
 
 msgid "The request id is invalid."
-msgstr ""
+msgstr "Užklausos id neteisingas."
 
 msgid "Please provide a valid request id."
-msgstr ""
+msgstr "Pateikite galiojantį užklausos id."
 
 msgid "Only admin are allowed to create an account recovery request."
-msgstr ""
+msgstr "Tik administratorius gali sukurti paskyros atkūrimo atsakymą."
 
 msgid "A policy is required."
 msgstr ""
@@ -2510,10 +2807,10 @@ msgid "The policy should be one of the following: {0}."
 msgstr ""
 
 msgid "The public key identifier should be a valid UUID."
-msgstr ""
+msgstr "Viešojo rakto identifikatorius turi būti galiojantis UUID."
 
 msgid "The public key identifier should not be empty."
-msgstr ""
+msgstr "Viešojo rakto identifikatorius neturi būti tuščias."
 
 msgid "The identifier of the user who created the organization policy should be a valid UUID."
 msgstr ""
@@ -2537,37 +2834,37 @@ msgid "Could not validate policy data."
 msgstr ""
 
 msgid "The armored key is too big."
-msgstr ""
+msgstr "Šarvuotas raktas per didelis."
 
 msgid "The \"deleted\" field should be a valid date."
-msgstr ""
+msgstr "Lauke „ištrinta“ turi būti nurodyta galiojanti data."
 
 msgid "The identifier of the user who created the organization public key should be a valid UUID."
-msgstr ""
+msgstr "Organizacijos viešąjį raktą sukūrusio naudotojo identifikatorius turi būti galiojantis UUID."
 
 msgid "The identifier of the user who created the organization public key is required."
-msgstr ""
+msgstr "Būtinas vartotojo, sukūrusio organizacijos viešąjį raktą, identifikatorius."
 
 msgid "The identifier of the user who created the organization public key should not be empty."
-msgstr ""
+msgstr "Organizacijos viešąjį raktą sukūrusio vartotojo identifikatorius neturi būti tuščias."
 
 msgid "The identifier of the user who modified the organization public key should be a valid UUID."
-msgstr ""
+msgstr "Organizacijos viešąjį raktą pakeitusio naudotojo identifikatorius turi būti galiojantis UUID."
 
 msgid "The identifier of the user who modified the organization public key is required."
-msgstr ""
+msgstr "Būtinas vartotojo, pakeitusio organizacijos viešąjį raktą, identifikatorius."
 
 msgid "The identifier of the user who modified the organization public key should not be empty."
-msgstr ""
+msgstr "Organizacijos viešąjį raktą pakeitusio naudotojo identifikatorius neturi būti tuščias."
 
 msgid "You cannot reuse the user keys."
-msgstr ""
+msgstr "Negalite pakartotinai naudoti vartotojo raktų."
 
 msgid "You cannot reuse account recovery organization public keys."
-msgstr ""
+msgstr "Negalite pakartotinai naudoti paskyros atkūrimo organizacijos viešųjų raktų."
 
 msgid "Could not validate public key data."
-msgstr ""
+msgstr "Nepavyko patvirtinti viešojo rakto duomenų."
 
 msgid "The recipient_foreign_model should be a valid string."
 msgstr ""
@@ -2582,10 +2879,10 @@ msgid "The recipient_foreign_model must be one of the following: {0}."
 msgstr ""
 
 msgid "The data should be a valid string."
-msgstr ""
+msgstr "Duomenys turi būti tinkama eilutė."
 
 msgid "The data is required."
-msgstr ""
+msgstr "Reikalingi duomenys."
 
 msgid "The data should not be empty."
 msgstr "Duomenys neturi būti tušti."
@@ -2645,40 +2942,40 @@ msgid "The account recovery private key is not valid."
 msgstr "Paskyros atkūrimo privatus raktas negalioja."
 
 msgid "The status should not be a valid string."
-msgstr ""
+msgstr "Būsena neturėtų būti tinkama eilutė."
 
 msgid "This status is not supported."
-msgstr ""
+msgstr "Ši būsena nepalaikoma."
 
 msgid "The status length should be maximum {0} characters."
-msgstr ""
+msgstr "Būsenos ilgis turi būti daugiausia {0} simbolių."
 
 msgid "The identifier of the user who created the request should be a valid UUID."
-msgstr ""
+msgstr "Užklausą sukūrusio vartotojo identifikatorius turi būti galiojantis UUID."
 
 msgid "The identifier of the user who created the request is required."
-msgstr ""
+msgstr "Būtinas užklausą sukūrusio vartotojo identifikatorius."
 
 msgid "The identifier of the user who created the request should not be empty."
-msgstr ""
+msgstr "Užklausą sukūrusio vartotojo identifikatorius neturi būti tuščias."
 
 msgid "The identifier of the user who modified the request should be a valid UUID."
-msgstr ""
+msgstr "Užklausą pakeitusio naudotojo identifikatorius turi būti galiojantis UUID."
 
 msgid "The identifier of the user who modified the request is required."
-msgstr ""
+msgstr "Būtinas užklausą pakeitusio vartotojo identifikatorius."
 
 msgid "The identifier of the user who modified the request should not be empty."
-msgstr ""
+msgstr "Užklausą pakeitusio vartotojo identifikatoriaus laukas neturi būti tuščias."
 
 msgid "The request is invalid."
-msgstr ""
+msgstr "Prašymas negalioja."
 
 msgid "The account request is invalid."
 msgstr ""
 
 msgid "Invalid response status. Not supported."
-msgstr ""
+msgstr "Netinkama atsakymo būsena. Nepalaikoma."
 
 msgid "The responder_foreign_key should not be empty."
 msgstr ""
@@ -2828,10 +3125,10 @@ msgid "Invalid request. Keys are required for this change."
 msgstr ""
 
 msgid "Invalid request. Passwords are required for this change."
-msgstr ""
+msgstr "Neteisingas prašymas. Norint atlikti šį pakeitimą, reikalingi slaptažodžiai."
 
 msgid "An organization public key is required."
-msgstr ""
+msgstr "Būtinas organizacijos viešasis raktas."
 
 msgid "The public_key_id must match current policy public_key_id."
 msgstr ""
@@ -2840,43 +3137,43 @@ msgid "An invalid number of passwords sent. Expected {0} and got {1}."
 msgstr ""
 
 msgid "The message is not encrypted for the right recipient."
-msgstr ""
+msgstr "Žinutė nėra užšifruota tinkamam gavėjui."
 
 msgid "Recovery request cannot be created when organization policy is disabled."
 msgstr ""
 
 msgid "Recovery request cannot be created when user is not enrolled."
-msgstr ""
+msgstr "Atkūrimo užklausa negali būti sukurta, kai vartotojas neužsiregistravęs."
 
 msgid "The authentication token is not valid or has expired."
 msgstr "Autentifikavimo prieigos raktas negalioja arba pasibaigęs."
 
 msgid "The account recovery request could not be found."
-msgstr ""
+msgstr "Nepavyko rasti paskyros atkūrimo užklausos."
 
 msgid "The request is already completed."
-msgstr ""
+msgstr "Prašymas jau įvykdytas."
 
 msgid "Recovery response cannot be created when organization policy is disabled."
 msgstr ""
 
 msgid "Could not validate response data."
-msgstr ""
+msgstr "Nepavyko patvirtinti atsakymo duomenų."
 
 msgid "The account recovery response data is not required."
-msgstr ""
+msgstr "Paskyros atkūrimo atsakymo duomenų nereikia."
 
 msgid "The account recovery response data is required."
-msgstr ""
+msgstr "Reikalingi paskyros atkūrimo atsakymo duomenys."
 
 msgid "The user is not enrolled in the account recovery program."
-msgstr ""
+msgstr "Vartotojas nėra įtrauktas į paskyros atkūrimo programą."
 
 msgid "User account recovery settings cannot be edited."
-msgstr ""
+msgstr "Vartotojo paskyros atkūrimo nustatymų redaguoti negalima."
 
 msgid "The account recovery is mandatory and cannot be rejected."
-msgstr ""
+msgstr "Paskyros atkūrimas yra privalomas ir jo negalima atmesti."
 
 msgid "Invalid request. You cannot opt-out."
 msgstr ""
@@ -3541,290 +3838,236 @@ msgstr "pasidalino aplanku su jumis"
 msgid "{0} updated the folder {1}"
 msgstr "{0} atnaujino aplanką {1}"
 
-msgid "This functionality is not available using AJAX/JSON."
-msgstr "Ši funkcija negalima naudojant AJAX / JSON."
+msgid "CSRF issue. The state in URL and Cookies do not match."
+msgstr ""
 
-msgid "This authentication provider is not enabled for your organization."
-msgstr "Šis autentifikavimo teikėjas jūsų organizacijoje neįgalintas."
+msgid "The state is required in cookie."
+msgstr ""
 
-msgid "This authentication provider is already setup. Disable it first"
-msgstr "Šis autentifikavimo teikėjas jau nustatytas. Pirmiausia išjunkite"
+msgid "The token is required in URL parameters."
+msgstr ""
 
-msgid "Multi Factor Authentication is configured!"
-msgstr "Sukonfigūruotas kelių faktorių autentifikavimas!"
+msgid "The state is required in URL parameters."
+msgstr ""
 
-msgid "MFA authentication is required."
-msgstr "Reikalingas MFA autentifikavimas."
+msgid "The code is required in URL parameters."
+msgstr ""
 
-msgid "The multi-factor authentication is not required."
-msgstr "Kelių veiksnių autentifikavimas nereikalingas."
+msgid "The user id is required in URL parameters."
+msgstr ""
 
-msgid "No valid multi-factor authentication settings found for this provider."
-msgstr "Šiam teikėjui nerasta jokių galiojančių kelių veiksnių autentifikavimo nustatymų."
+msgid "The settings id is required in URL parameters."
+msgstr ""
 
-msgid "The multi-factor authentication was a success."
-msgstr "Daugiafaktoris autentifikavimas buvo sėkmingas."
+msgid "The SSO setting does not exist."
+msgstr ""
 
-msgid "The multi factor authentication settings for the organization were updated."
-msgstr "Buvo atnaujinti organizacijos kelių veiksnių autentifikavimo nustatymai."
+msgid "Information about the key is required."
+msgstr ""
 
-msgid "Please setup the TOTP application."
-msgstr "Nustatykite TOTP (laiku pagrįstas vienkartinis slaptažodis) programą."
+msgid "The SSO key id should be a uuid."
+msgstr ""
 
-msgid "Please provide the one-time password."
-msgstr "Pateikite vienkartinį slaptažodį."
+msgid "The key could not be found"
+msgstr ""
 
-msgid "The user id is not valid."
-msgstr "Vartotojo ID negalioja."
+msgid "The SSO setting id should be a uuid."
+msgstr ""
 
-msgid "No multi-factor authentication settings defined for the user."
-msgstr "Nenustatyti kelių veiksnių autentifikavimo nustatymai vartotojui."
+msgid "The SSO settings were activated."
+msgstr ""
 
-msgid "The multi-factor authentication settings for the user were deleted."
-msgstr "Kelių veiksnių autentifikavimo nustatymai vartotojui buvo ištrinti."
+msgid "The draft setting was saved."
+msgstr ""
 
-msgid "Please setup the Yubikey settings."
-msgstr "Nustatykite „Yubikey“ nustatymus."
+msgid "The SSO settings were deleted."
+msgstr ""
 
-msgid "A signature is required."
-msgstr "Reikalingas parašas."
+msgid "Ajax/Json request not supported."
+msgstr ""
 
-msgid "The signature should not be empty."
-msgstr "Parašas neturi būti tuščias."
+msgid "A provider is required."
+msgstr ""
 
-msgid "This is not a valid signature response."
-msgstr "Tai netinkamas parašo atsakymas."
+msgid "The provider should not be empty."
+msgstr ""
 
-msgid "Something went wrong when validating the one-time password."
-msgstr "Kažkas nepavyko tikrinant vienkartinį slaptažodį."
+msgid "The provider is not supported."
+msgstr ""
 
-msgid "This OTP provision uri is not valid."
-msgstr "Šis vienkartinio slaptažodžio nuostatos uri negalioja."
+msgid "Data is required."
+msgstr ""
 
-msgid "An OTP is required."
-msgstr "Būtinas vienkartinis slaptažodis."
+msgid "Data must be an array of properties."
+msgstr ""
 
-msgid "The OTP should not be empty."
-msgstr "Vienkartinis slaptažodis neturėtų būti tuščias."
+msgid "A URL is required."
+msgstr ""
 
-msgid "This OTP is not valid."
-msgstr "Vienkartinis slaptažodis negalioja."
+msgid "The URL is not supported."
+msgstr ""
 
-msgid "The OTP should be composed of numbers only."
-msgstr "Vienkartinis slaptažodis turi būti sudarytas tik iš skaičių."
+msgid "A tenant id is required."
+msgstr ""
 
-msgid "The OTP should be at least {0} characters long."
-msgstr "Vienkartinis slaptažodis turi būti bent {0} simbolių ilgio."
+msgid "The tenant id should not be empty."
+msgstr ""
 
-msgid "This yubikey is not associated with this user."
-msgstr "Šis yubikey nesusietas su šiuo vartotoju."
+msgid "The tenant id should be a valid UUID."
+msgstr ""
 
-msgid "Your multi-factor authentication settings were reset by you."
-msgstr "Jūs iš naujo nustatėte kelių veiksnių autentifikavimo nustatymus."
+msgid "A client id is required."
+msgstr ""
 
-msgid "Multi-factor authentication settings were reset."
-msgstr "Kelių veiksnių autentifikavimo nustatymai buvo nustatyti iš naujo."
+msgid "The client id should not be empty."
+msgstr ""
 
-msgid "Your multi-factor authentication settings were reset by an administrator."
-msgstr "Administratorius iš naujo nustatė kelių veiksnių autentifikavimo nustatymus."
+msgid "The client id should be a valid UUID."
+msgstr ""
 
-msgid "The MFA token provided does not exist or is inactive."
-msgstr "Pateiktas MFA prieigos raktas neegzistuoja arba yra neaktyvus."
+msgid "A client secret is required."
+msgstr ""
 
-msgid "No MFA provider set."
-msgstr "Kelių veiksnių autentifikavimo teikėjas nenustatytas."
+msgid "The client secret should not be empty."
+msgstr ""
 
-msgid "MFA verification date is not set for this provider."
-msgstr "Šiam teikėjui kelių veiksnių autentifikavimo patvirtinimo data nenustatyta."
+msgid "The client secret should be a valid string."
+msgstr ""
 
-msgid "MFA setting OTP provisioning uri is not set."
-msgstr "MFA nustatymo OTP teikimo uri nenustatytas."
+msgid "The client secret is too large."
+msgstr ""
 
-msgid "MFA setting Yubikey Id is not set."
-msgstr "MFA nustatymas Yubikey ID nenustatytas."
+msgid "A client secret expiry is required."
+msgstr ""
 
-msgid "The multi-factor authentication settings data should not be empty."
-msgstr "Kelių veiksnių autentifikavimo nustatymų duomenys neturi būti tušti."
+msgid "The expiry should not be empty."
+msgstr ""
 
-msgid "The multi-factor authentication providers list is missing."
-msgstr "Trūksta kelių veiksnių autentifikavimo teikėjų sąrašo."
+msgid "The user is not active."
+msgstr ""
 
-msgid "Unknown MFA provider: {0}."
-msgstr "Nežinomas kelių veiksnių autentifikavimoteikėjas: {0}."
+msgid "The data should be a valid ASCII string."
+msgstr ""
 
-msgid "Could not validate multi-factor authentication provider configuration."
-msgstr "Nepavyko patvirtinti kelių veiksnių autentifikavimo teikėjo konfigūracijos."
+msgid "The status length is not supported."
+msgstr ""
 
-msgid "No configuration set for Duo integration key."
-msgstr "Nenustatyta „Duo“ integravimo rakto konfigūracija."
+msgid "The status is not supported."
+msgstr ""
 
-msgid "No configuration set for Duo host name."
-msgstr "Nenustatyta konfigūracija „Duo“ pagrindinio kompiuterio pavadinimui."
+msgid "Single sign-on failed."
+msgstr ""
 
-msgid "No configuration set for Duo secret key."
-msgstr "Nenustatyta „Duo“ slaptojo rakto konfigūracija."
+msgid "Provider error: \"{0}\""
+msgstr ""
 
-msgid "No configuration set for Duo salt."
-msgstr "\"Duo salt\" konfigūracija nenustatyta.  "
+msgid "Email not provided by provider."
+msgstr ""
 
-msgid "Duo salt should be between 40 and 128 characters in length."
-msgstr "\"Duo salt\" turi būti nuo 40 iki 128 simbolių ilgio."
+msgid "Username mismatch."
+msgstr ""
 
-msgid "This is not a valid Duo secret key."
-msgstr "Tai nėra galiojantis „Duo“ slaptasis raktas."
+msgid "No valid SSO settings found."
+msgstr ""
 
-msgid "This is not a valid Duo host name."
-msgstr "Tai netinkamas „Duo“ pagrindinio kompiuterio pavadinimas."
+msgid "The user id should be a valid UUID."
+msgstr ""
 
-msgid "This is not a valid Duo integration key."
-msgstr "Tai nėra galiojantis „Duo“ integravimo raktas."
+msgid "The authentication token does not exist."
+msgstr ""
 
-msgid "Could not validate Duo configuration"
-msgstr "Nepavyko patvirtinti „Duo“ konfigūracijos"
+msgid "The SSO authentication token is invalid."
+msgstr ""
 
-msgid "No configuration set for Yubikey OTP secret key."
-msgstr "Nenustatyta Yubikey OTP slaptojo rakto konfigūracija."
+msgid "Settings id is missing."
+msgstr ""
 
-msgid "No configuration set for Yubikey OTP clientId."
-msgstr "Yubikey OTP kliento ID konfigūracija nenustatyta."
+msgid "User id mismatch."
+msgstr ""
 
-msgid "Yubikey OTP clientId should be an integer."
-msgstr "Yubikey OTP kliento ID turi būti sveikasis skaičius."
+msgid "Token IP is missing."
+msgstr ""
 
-msgid "Yubikey OTP secret key is not valid."
-msgstr "Yubikey OTP slaptasis raktas negalioja."
+msgid "User IP mismatch."
+msgstr ""
 
-msgid "Could not validate Yubikey configuration."
-msgstr "Nepavyko patvirtinti Yubikey konfigūracijos."
+msgid "User agent is missing."
+msgstr ""
 
-msgid "Duo multi-factor authentication"
-msgstr "„Duo“ kelių veiksnių autentifikavimas"
+msgid "User agent mismatch."
+msgstr ""
 
-msgid "Duo multi-factor authentication is enabled!"
-msgstr "„Duo“ kelių veiksnių autentifikavimas įjungtas!"
+msgid "Settings mismatch."
+msgstr ""
 
-msgid "When logging in you will be asked to perform Duo Authentication."
-msgstr "Prisijungdami būsite paprašyti atlikti Duo autentifikavimą."
+msgid "The SSO key could not be saved."
+msgstr ""
 
-msgid "Since"
-msgstr "Nuo"
+msgid "Please try again later."
+msgstr ""
 
-msgid "Multi factor authentication"
-msgstr "Kelių faktorių autentifikavimas"
+msgid "The SSO key does not exist."
+msgstr ""
 
-msgid "Sorry no multi factor authentication is enabled for this organization."
-msgstr "Atsiprašome, šioje organizacijoje neįjungtas kelių veiksnių autentifikavimas."
+msgid "The SSO key could not be deleted."
+msgstr ""
 
-msgid "Please contact your administrator to enable multi-factor authentication."
-msgstr "Norėdami įgalinti kelių veiksnių autentifikavimą, susisiekite su administratoriumi."
+msgid "Could not update the SSO settings."
+msgstr ""
 
-msgid "Please select a provider"
-msgstr "Pasirinkite teikėją"
+msgid "The settings status is invalid."
+msgstr ""
 
-msgid "Enabled"
-msgstr "Įjungta"
+msgid "Invalid status."
+msgstr ""
 
-msgid "Disabled"
-msgstr "Išjungta"
+msgid "Could not delete the SSO settings."
+msgstr ""
 
-msgid "What is multi-factor authentication?"
-msgstr "Kas yra kelių veiksnių autentifikavimas?"
+msgid "Could not delete the draft SSO settings."
+msgstr ""
 
-msgid "Multi-factor authentication (MFA) is a method of confirming a user's identity that requires presenting two or more pieces of evidence (or factor)."
-msgstr "Daugiafaktorinis autentifikavimas yra vartotojo tapatybės patvirtinimo metodas, reikalaujantis pateikti du ar daugiau įrodymų (arba faktorių)."
+msgid "The SSO settings do not exist."
+msgstr ""
 
-msgid "learn more"
-msgstr "Sužinokite daugiau"
+msgid "The SSO setting cannot be decrypted."
+msgstr ""
 
-msgid "Time based One Time Password (TOTP)"
-msgstr "Laiku pagrįstas vienkartinis slaptažodis "
+msgid "The SSO setting cannot be decoded."
+msgstr ""
 
-msgid "Scan this bar code"
-msgstr "Nuskaitykite šį brūkšninį kodą"
+msgid "Only administrators can create SSO settings."
+msgstr ""
 
-msgid "Enter the six digit number as presented on your phone or tablet."
-msgstr "Įveskite šešių skaitmenų skaičių, pateiktą telefone arba planšetiniame kompiuteryje."
+msgid "Something went wrong when validating the Azure single-sign on settings."
+msgstr ""
 
-msgid "Requirements"
-msgstr "Reikalavimai"
+msgid "It is not possible to save the SSO settings."
+msgstr ""
 
-msgid "To proceed you need to install an application that supports Time Based One Time Passwords (TOTP) on your phone or tablet such as:"
-msgstr "Norėdami tęsti, telefone ar planšetiniame kompiuteryje turite įdiegti programą, kuri palaiko vienkartinius slaptažodžius, pvz.:"
+msgid "Cannot parse JWKS endpoint response."
+msgstr ""
 
-msgid "or"
-msgstr "arba"
+msgid "Invalid JWKS endpoint response. Keys missing."
+msgstr ""
 
-msgid "Getting started with Time based One Time Password (TOTP)"
-msgstr "Darbo su laiku pagrįsto vienkartinio slaptažodžio pradžia"
+msgid "Failed to read certificate: {0}"
+msgstr ""
 
-msgid "How does it work?"
-msgstr "Kaip tai veikia?"
+msgid "Failed to read public key from certificate: {0}"
+msgstr ""
 
-msgid "diagram showing how it works"
-msgstr "diagrama, rodanti, kaip tai veikia"
+msgid "Failed to public key properties from certificate: {0}"
+msgstr ""
 
-msgid "You sign in to passbolt just like you normally do."
-msgstr "Prisijungiate prie „Passbolt“ kaip įprastai."
+msgid "Azure JWT token is missing."
+msgstr ""
 
-msgid "When using a new browser, you need an additional code from your phone."
-msgstr "Kai naudojate naują naršyklę, jums reikia papildomo kodo iš telefono."
+msgid "Unable to decode Azure JWT token."
+msgstr ""
 
-msgid "Once you enter this code, you can log in."
-msgstr "Įvedę šį kodą galite prisijungti."
-
-msgid "cancel"
-msgstr "atšaukti"
-
-msgid "get started!"
-msgstr "pradėti!"
-
-msgid "Time based One Time Password (TOTP) is enabled!"
-msgstr "Laiku pagrįstas vienkartinis slaptažodis įjungtas!"
-
-msgid "When logging in from a new device you will need to enter a unique verification code generated by an app on your mobile."
-msgstr "Prisijungdami iš naujo įrenginio turėsite įvesti unikalų patvirtinimo kodą, kurį sugeneravo programėlė mobiliajame telefone."
-
-msgid "Multi factor authentication verification"
-msgstr "Kelių veiksnių autentifikavimo patvirtinimas"
-
-msgid "Remember this device for a month."
-msgstr "Prisiminkite šį įrenginį mėnesį."
-
-msgid "Yubikey One Time Password"
-msgstr "Yubikey vienkartinis slaptažodis"
-
-msgid "Plug in the yubikey and put your finger on it."
-msgstr "Įjunkite yubikey ir uždėkite pirštą."
-
-msgid "Yubikey One Time Password is enabled!"
-msgstr "Yubikey vienkartinis slaptažodis įjungtas!"
-
-msgid "When logging in from a new device you will need a unique code generated by your yubikey."
-msgstr "Prisijungiant iš naujo įrenginio jums reikės unikalaus kodo, sugeneruoto jūsų yubikey."
-
-msgid "verify"
-msgstr "patikrinti"
-
-msgid "Or try with another provider"
-msgstr "Arba pabandykite su kitu teikėju"
-
-msgid "Manage providers"
-msgstr "Tvarkyti teikėjus"
-
-msgid "Turn off"
-msgstr "Išjungti"
-
-msgid "Your multi-factor authentication is disabled."
-msgstr "Jūsų kelių veiksnių autentifikavimas išjungtas."
-
-msgid "Multi-factor authentication settings were reset for your account by an administrator."
-msgstr "Administratorius iš naujo nustatė kelių veiksnių autentifikavimo nustatymus."
-
-msgid "Please contact your administrator if you didn't request this action."
-msgstr "Jei neprašėte šio veiksmo, susisiekite su administratoriumi."
-
-msgid "Log in passbolt"
-msgstr "Prisijungti \"Passbolt\""
+msgid "Single-sign on was a success"
+msgstr ""
 
 msgid "You do not have the permission to edit shared tags on this resource."
 msgstr "Neturite leidimo redaguoti bendrinamų šio šaltinio žymų."

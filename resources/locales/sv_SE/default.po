@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 41c2572bd9bd4cc908d3e09e0cbed6e5\n"
-"POT-Creation-Date: 2022-11-04 16:06+0000\n"
-"PO-Revision-Date: 2022-11-04 17:00\n"
+"POT-Creation-Date: 2023-01-17 14:36+0000\n"
+"PO-Revision-Date: 2023-01-17 15:21\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -175,6 +175,9 @@ msgstr "odefinierad användaragent"
 msgid "Access restricted to administrators."
 msgstr "Åtkomst begränsad till administratörer."
 
+msgid "The user should not be logged in."
+msgstr ""
+
 msgid "This feature is not supported by your version of passbolt."
 msgstr "Denna funktion stöds inte av din version av passbolt."
 
@@ -184,26 +187,11 @@ msgstr "Resursidentifieraren ska vara ett giltigt UUID."
 msgid "The resource was marked as favorite."
 msgstr "Resursen har markerats som favorit."
 
-msgid "The resource does not exist."
-msgstr "Resursen finns inte."
-
-msgid "This record is already marked as favorite."
-msgstr "Denna post är redan markerad som favorit."
-
-msgid "Could not validate favorite data."
-msgstr "Kunde inte validera favoritdata."
-
 msgid "The favorite id is not valid."
 msgstr "Favorit-id är inte giltigt."
 
-msgid "The favorite does not exist."
-msgstr "Favoriten finns inte."
-
 msgid "The favorite was deleted."
 msgstr "Favoriten har tagits bort."
-
-msgid "Could not delete favorite."
-msgstr "Kunde inte ta bort favorit."
 
 msgid "The OpenPGP key identifier should be a valid UUID."
 msgstr "OpenPGP-nyckel-ID bör vara ett giltigt UUID."
@@ -249,6 +237,9 @@ msgstr "OK"
 
 msgid "The identifier should be a valid UUID."
 msgstr "Identifieraren ska vara ett giltigt UUID."
+
+msgid "The resource does not exist."
+msgstr "Resursen finns inte."
 
 msgid "The resource type does not exist."
 msgstr "Resurstypen finns inte."
@@ -368,6 +359,9 @@ msgid "The user does not exist."
 msgstr "Användaren finns inte."
 
 msgid "No admin were found in the database."
+msgstr ""
+
+msgid "Invalid expiry time {0}."
 msgstr ""
 
 msgid "The identifier should not be empty."
@@ -1168,6 +1162,18 @@ msgstr "Du har inte behörighet att redigera den här kommentaren."
 msgid "Could not find comments for the requested model."
 msgstr "Kunde inte hitta kommentarer för den önskade modellen."
 
+msgid "This record is already marked as favorite."
+msgstr "Denna post är redan markerad som favorit."
+
+msgid "Could not validate favorite data."
+msgstr "Kunde inte validera favoritdata."
+
+msgid "The favorite does not exist."
+msgstr "Favoriten finns inte."
+
+msgid "Could not delete favorite."
+msgstr "Kunde inte ta bort favorit."
+
 msgid "Validation failed for favorite {0}. {1}"
 msgstr "Validering misslyckades för favorit {0}. {1}"
 
@@ -1294,8 +1300,8 @@ msgstr "Validering lyckades för profil {0}"
 msgid "Could not validate resource data."
 msgstr "Kunde inte validera resursdata."
 
-msgid "An unexpected error occured, please contact an administrator."
-msgstr "Ett oväntat fel uppstod, kontakta en administratör."
+msgid "An unexpected error occurred, please contact an administrator."
+msgstr ""
 
 msgid "The server returned the following error:"
 msgstr "Servern returnerade följande fel:"
@@ -1400,6 +1406,9 @@ msgid "Validation success for user {0}"
 msgstr "Validering lyckades för användare {0}"
 
 msgid "The directory {0} cannot be deleted"
+msgstr ""
+
+msgid "Database connection failed"
 msgstr ""
 
 msgid "Could not connect to github repository"
@@ -1870,6 +1879,291 @@ msgstr "Autentiseringstoken är inte aktiv."
 msgid "The authentication token is expired."
 msgstr "Autentiseringstoken har gått ut."
 
+msgid "This functionality is not available using AJAX/JSON."
+msgstr "Denna funktion är inte tillgänglig med AJAX/JSON."
+
+msgid "This authentication provider is not enabled for your organization."
+msgstr "Denna autentiseringsleverantör är inte aktiverad för din organisation."
+
+msgid "This authentication provider is already setup. Disable it first"
+msgstr "Denna autentiseringsleverantör är redan inställd. Inaktivera den först"
+
+msgid "Multi Factor Authentication is configured!"
+msgstr "Multifaktor-autentisering har konfigurerats!"
+
+msgid "MFA authentication is required."
+msgstr "MFA autentisering krävs."
+
+msgid "The multi-factor authentication is not required."
+msgstr "Multifaktor-autentisering krävs inte."
+
+msgid "No valid multi-factor authentication settings found for this provider."
+msgstr "Inga giltiga multifaktor-autentiseringsinställningar hittades för denna leverantör."
+
+msgid "The multi-factor authentication was a success."
+msgstr "Multifaktorautentiseringen var en framgång."
+
+msgid "The multi factor authentication settings for the organization were updated."
+msgstr "Multifaktorn-autentiseringsinställningarna för organisationen uppdaterades."
+
+msgid "Please setup the TOTP application."
+msgstr "Vänligen konfigurera TOTP-applikationen."
+
+msgid "Please provide the one-time password."
+msgstr "Ange engångslösenordet."
+
+msgid "The user id is not valid."
+msgstr "Användar-id är inte giltigt."
+
+msgid "No multi-factor authentication settings defined for the user."
+msgstr "Inga multifaktor-autentiseringsinställningar definierade för användaren."
+
+msgid "The multi-factor authentication settings for the user were deleted."
+msgstr "Multifaktorn-autentiseringsinställningarna för användaren raderades."
+
+msgid "Please setup the Yubikey settings."
+msgstr "Konfigurera inställningarna för Yubikey."
+
+msgid "A signature is required."
+msgstr "En signatur krävs."
+
+msgid "The signature should not be empty."
+msgstr "Signaturen får inte vara tom."
+
+msgid "This is not a valid signature response."
+msgstr "Detta är inte ett giltigt signatursvar."
+
+msgid "Something went wrong when validating the one-time password."
+msgstr "Något gick fel när engångslösenordet skulle valideras."
+
+msgid "This OTP provision uri is not valid."
+msgstr "Denna OTP uri är inte giltig."
+
+msgid "An OTP is required."
+msgstr "En OTP krävs."
+
+msgid "The OTP should not be empty."
+msgstr "OTP får inte vara tomt."
+
+msgid "This OTP is not valid."
+msgstr "Denna OTP är inte giltig."
+
+msgid "The OTP should be composed of numbers only."
+msgstr "OTP bör endast bestå av siffror."
+
+msgid "The OTP should be at least {0} characters long."
+msgstr "OTP bör vara minst {0} tecken lång."
+
+msgid "This yubikey is not associated with this user."
+msgstr "Denna yubikey är inte associerad med den här användaren."
+
+msgid "Your multi-factor authentication settings were reset by you."
+msgstr "Dina multifaktor-autentiseringsinställningar har återställts av dig."
+
+msgid "Multi-factor authentication settings were reset."
+msgstr "Multifaktor-autentiseringsinställningarna har återställts."
+
+msgid "Your multi-factor authentication settings were reset by an administrator."
+msgstr "Dina multifaktor-autentiseringsinställningar har återställts av en administratör."
+
+msgid "The MFA token provided does not exist or is inactive."
+msgstr "MFA-token som tillhandahålls existerar inte eller är inaktiv."
+
+msgid "No MFA provider set."
+msgstr "Ingen MFA-leverantör angiven."
+
+msgid "MFA verification date is not set for this provider."
+msgstr "MFA-verifieringsdatum är inte inställt för denna leverantör."
+
+msgid "MFA setting OTP provisioning uri is not set."
+msgstr "MFA-inställning OTP-provisionering uri är inte inställd."
+
+msgid "MFA setting Yubikey Id is not set."
+msgstr "MFA-inställning Yubikey Id är inte inställt."
+
+msgid "The multi-factor authentication settings data should not be empty."
+msgstr "Multifaktor-autentiseringsinställningarnas data får inte vara tom."
+
+msgid "The multi-factor authentication providers list is missing."
+msgstr "Listan över multifaktor-autentiseringsleverantörer saknas."
+
+msgid "Unknown MFA provider: {0}."
+msgstr "Okänd MFA leverantör: {0}."
+
+msgid "Could not validate multi-factor authentication provider configuration."
+msgstr "Det gick inte att validera konfigurationen för multifaktor autentiseringsleverantör."
+
+msgid "No configuration set for Duo integration key."
+msgstr "Ingen konfiguration inställd för integrationsnyckel Duo."
+
+msgid "No configuration set for Duo host name."
+msgstr "Ingen konfiguration inställd för värdnamn Duo."
+
+msgid "No configuration set for Duo secret key."
+msgstr "Ingen konfiguration inställd för hemliga nyckeln för Duo."
+
+msgid "No configuration set for Duo salt."
+msgstr "Ingen konfiguration inställd för salt för Duo."
+
+msgid "Duo salt should be between 40 and 128 characters in length."
+msgstr "Salt för Duo bör vara mellan 40 och 128 tecken långt."
+
+msgid "This is not a valid Duo secret key."
+msgstr "Detta är inte en giltig hemlig nyckel för Duo."
+
+msgid "This is not a valid Duo host name."
+msgstr "Detta är inte ett giltigt värdnamn för Duo."
+
+msgid "This is not a valid Duo integration key."
+msgstr "Detta är inte en giltig integreringsnyckel för Duo."
+
+msgid "Could not validate Duo configuration"
+msgstr "Kunde inte validera konfigurationen för Duo"
+
+msgid "No configuration set for Yubikey OTP secret key."
+msgstr "Ingen konfiguration inställd för OTP-hemlig nyckel för Yubikey."
+
+msgid "No configuration set for Yubikey OTP clientId."
+msgstr "Ingen konfiguration inställd för OTP-klientId för Yubikey."
+
+msgid "Yubikey OTP clientId should be an integer."
+msgstr "Yubikey OTP-klientId bör vara ett heltal."
+
+msgid "Yubikey OTP secret key is not valid."
+msgstr "Yubikey OTP-hemlig nyckel är inte giltig."
+
+msgid "Could not validate Yubikey configuration."
+msgstr "Kunde inte validera konfigurationen för Yubikey."
+
+msgid "Duo multi-factor authentication"
+msgstr "Duo multi-faktor autentisering"
+
+msgid "Duo multi-factor authentication is enabled!"
+msgstr "Duo multi-faktor autentisering är aktiverad!"
+
+msgid "When logging in you will be asked to perform Duo Authentication."
+msgstr "När du loggar in kommer du att bli ombedd att utföra Duo-autentisering."
+
+msgid "Since"
+msgstr "Eftersom"
+
+msgid "Multi factor authentication"
+msgstr "Multi-faktor autentisering"
+
+msgid "Sorry no multi factor authentication is enabled for this organization."
+msgstr "Tyvärr är ingen multi-faktor autentisering aktiverad för denna organisation."
+
+msgid "Please contact your administrator to enable multi-factor authentication."
+msgstr "Kontakta din administratör för att aktivera multi-faktor autentisering."
+
+msgid "Please select a provider"
+msgstr "Välj en leverantör"
+
+msgid "Enabled"
+msgstr "Aktiverad"
+
+msgid "Disabled"
+msgstr "Inaktiverad"
+
+msgid "What is multi-factor authentication?"
+msgstr "Vad är multi-faktor-autentisering?"
+
+msgid "Multi-factor authentication (MFA) is a method of confirming a user's identity that requires presenting two or more pieces of evidence (or factor)."
+msgstr "Multi-faktor autentisering (MFA) är en metod för att bekräfta en användares identitet som kräver att två eller fler bevis(eller faktorer) presenteras."
+
+msgid "learn more"
+msgstr "lär dig mer"
+
+msgid "Time based One Time Password (TOTP)"
+msgstr "Tidsbaserat engångslösenord (TOTP)"
+
+msgid "Scan this bar code"
+msgstr "Skanna den här streckkoden"
+
+msgid "Enter the six digit number as presented on your phone or tablet."
+msgstr "Ange det sexsiffriga numret som visas på din telefon eller surfplatta."
+
+msgid "Requirements"
+msgstr "Krav"
+
+msgid "To proceed you need to install an application that supports Time Based One Time Passwords (TOTP) on your phone or tablet such as:"
+msgstr "För att fortsätta måste du installera ett program som stöder tidsbaserade engångslösenord (TOTP) på din telefon eller surfplatta såsom:"
+
+msgid "or"
+msgstr "eller"
+
+msgid "Getting started with Time based One Time Password (TOTP)"
+msgstr "Komma igång med tidsbaserat engångslösenord (TOTP)"
+
+msgid "How does it work?"
+msgstr "Hur fungerar det?"
+
+msgid "diagram showing how it works"
+msgstr "diagram som visar hur det fungerar"
+
+msgid "You sign in to passbolt just like you normally do."
+msgstr "Du loggar in på passbolt precis som du brukar göra."
+
+msgid "When using a new browser, you need an additional code from your phone."
+msgstr "När du använder en ny webbläsare behöver du ytterligare en kod från telefonen."
+
+msgid "Once you enter this code, you can log in."
+msgstr "När du har angett den här koden kan du logga in."
+
+msgid "cancel"
+msgstr "avbryt"
+
+msgid "get started!"
+msgstr "kom igång!"
+
+msgid "Time based One Time Password (TOTP) is enabled!"
+msgstr "Tidsbaserat engångslösenord (TOTP) är aktiverat!"
+
+msgid "When logging in from a new device you will need to enter a unique verification code generated by an app on your mobile."
+msgstr "När du loggar in från en ny enhet måste du ange en unik verifieringskod som genereras av en app på din mobil."
+
+msgid "Multi factor authentication verification"
+msgstr "Verifiering av flerfaktorsautentisering"
+
+msgid "Remember this device for a month."
+msgstr "Kom ihåg den här enheten en månad."
+
+msgid "Yubikey One Time Password"
+msgstr "Engångslösenord Yubikey"
+
+msgid "Plug in the yubikey and put your finger on it."
+msgstr "Anslut yubikey och sätt fingret på den."
+
+msgid "Yubikey One Time Password is enabled!"
+msgstr "Engångslösenord för Yubikey är aktiverat!"
+
+msgid "When logging in from a new device you will need a unique code generated by your yubikey."
+msgstr "När du loggar in från en ny enhet behöver du en unik kod genererad av din yubikey."
+
+msgid "verify"
+msgstr "verifiera"
+
+msgid "Or try with another provider"
+msgstr "Eller försök med en annan leverantör"
+
+msgid "Manage providers"
+msgstr "Hantera leverantörer"
+
+msgid "Turn off"
+msgstr "Stäng av"
+
+msgid "Your multi-factor authentication is disabled."
+msgstr "Din multifaktor-autentisering är inaktiverad."
+
+msgid "Multi-factor authentication settings were reset for your account by an administrator."
+msgstr "Dina multifaktor-autentiseringsinställningar har återställts för ditt konto av en administratör."
+
+msgid "Please contact your administrator if you didn't request this action."
+msgstr "Kontakta din administratör om du inte begärde denna åtgärd."
+
+msgid "Log in passbolt"
+msgstr "Logga in till passbolt"
+
 msgid "The password generator value \"{0}\" is not valid."
 msgstr "Lösenordsgeneratorns värde \"{0}\" är inte giltigt."
 
@@ -1948,9 +2242,6 @@ msgstr "Avsändarens e-post får inte vara tom."
 msgid "The sender email should be a valid BMP-UTF8 string."
 msgstr "Avsändarens e-post bör vara en giltig BMP-UTF8-sträng."
 
-msgid "The sender email should be a valid email address."
-msgstr "Avsändarens e-postadress bör vara en giltig e-postadress."
-
 msgid "A host name is required."
 msgstr "Ett värdnamn måste anges."
 
@@ -1987,6 +2278,15 @@ msgstr "Lösenordet bör vara en giltig BMP-UTF8-sträng."
 msgid "The test email should be a valid email address."
 msgstr "Testmeddelandet bör vara en giltig e-postadress."
 
+msgid "The sender email should be a valid email address."
+msgstr "Avsändarens e-postadress bör vara en giltig e-postadress."
+
+msgid "A test recipient is required."
+msgstr ""
+
+msgid "SMTP settings endpoints disabled."
+msgstr ""
+
 msgid "Could not validate the smtp settings."
 msgstr ""
 
@@ -2012,9 +2312,6 @@ msgid "undefined"
 msgstr ""
 
 msgid "Passbolt test email"
-msgstr ""
-
-msgid "A test recipient is required."
 msgstr ""
 
 msgid "Congratulations!"
@@ -3541,290 +3838,236 @@ msgstr "delade en mapp med dig"
 msgid "{0} updated the folder {1}"
 msgstr "{0} uppdaterade mappen {1}"
 
-msgid "This functionality is not available using AJAX/JSON."
-msgstr "Denna funktion är inte tillgänglig med AJAX/JSON."
+msgid "CSRF issue. The state in URL and Cookies do not match."
+msgstr ""
 
-msgid "This authentication provider is not enabled for your organization."
-msgstr "Denna autentiseringsleverantör är inte aktiverad för din organisation."
+msgid "The state is required in cookie."
+msgstr ""
 
-msgid "This authentication provider is already setup. Disable it first"
-msgstr "Denna autentiseringsleverantör är redan inställd. Inaktivera den först"
+msgid "The token is required in URL parameters."
+msgstr ""
 
-msgid "Multi Factor Authentication is configured!"
-msgstr "Multifaktor-autentisering har konfigurerats!"
+msgid "The state is required in URL parameters."
+msgstr ""
 
-msgid "MFA authentication is required."
-msgstr "MFA autentisering krävs."
+msgid "The code is required in URL parameters."
+msgstr ""
 
-msgid "The multi-factor authentication is not required."
-msgstr "Multifaktor-autentisering krävs inte."
+msgid "The user id is required in URL parameters."
+msgstr ""
 
-msgid "No valid multi-factor authentication settings found for this provider."
-msgstr "Inga giltiga multifaktor-autentiseringsinställningar hittades för denna leverantör."
+msgid "The settings id is required in URL parameters."
+msgstr ""
 
-msgid "The multi-factor authentication was a success."
-msgstr "Multifaktorautentiseringen var en framgång."
+msgid "The SSO setting does not exist."
+msgstr ""
 
-msgid "The multi factor authentication settings for the organization were updated."
-msgstr "Multifaktorn-autentiseringsinställningarna för organisationen uppdaterades."
+msgid "Information about the key is required."
+msgstr ""
 
-msgid "Please setup the TOTP application."
-msgstr "Vänligen konfigurera TOTP-applikationen."
+msgid "The SSO key id should be a uuid."
+msgstr ""
 
-msgid "Please provide the one-time password."
-msgstr "Ange engångslösenordet."
+msgid "The key could not be found"
+msgstr ""
 
-msgid "The user id is not valid."
-msgstr "Användar-id är inte giltigt."
+msgid "The SSO setting id should be a uuid."
+msgstr ""
 
-msgid "No multi-factor authentication settings defined for the user."
-msgstr "Inga multifaktor-autentiseringsinställningar definierade för användaren."
+msgid "The SSO settings were activated."
+msgstr ""
 
-msgid "The multi-factor authentication settings for the user were deleted."
-msgstr "Multifaktorn-autentiseringsinställningarna för användaren raderades."
+msgid "The draft setting was saved."
+msgstr ""
 
-msgid "Please setup the Yubikey settings."
-msgstr "Konfigurera inställningarna för Yubikey."
+msgid "The SSO settings were deleted."
+msgstr ""
 
-msgid "A signature is required."
-msgstr "En signatur krävs."
+msgid "Ajax/Json request not supported."
+msgstr ""
 
-msgid "The signature should not be empty."
-msgstr "Signaturen får inte vara tom."
+msgid "A provider is required."
+msgstr ""
 
-msgid "This is not a valid signature response."
-msgstr "Detta är inte ett giltigt signatursvar."
+msgid "The provider should not be empty."
+msgstr ""
 
-msgid "Something went wrong when validating the one-time password."
-msgstr "Något gick fel när engångslösenordet skulle valideras."
+msgid "The provider is not supported."
+msgstr ""
 
-msgid "This OTP provision uri is not valid."
-msgstr "Denna OTP uri är inte giltig."
+msgid "Data is required."
+msgstr ""
 
-msgid "An OTP is required."
-msgstr "En OTP krävs."
+msgid "Data must be an array of properties."
+msgstr ""
 
-msgid "The OTP should not be empty."
-msgstr "OTP får inte vara tomt."
+msgid "A URL is required."
+msgstr ""
 
-msgid "This OTP is not valid."
-msgstr "Denna OTP är inte giltig."
+msgid "The URL is not supported."
+msgstr ""
 
-msgid "The OTP should be composed of numbers only."
-msgstr "OTP bör endast bestå av siffror."
+msgid "A tenant id is required."
+msgstr ""
 
-msgid "The OTP should be at least {0} characters long."
-msgstr "OTP bör vara minst {0} tecken lång."
+msgid "The tenant id should not be empty."
+msgstr ""
 
-msgid "This yubikey is not associated with this user."
-msgstr "Denna yubikey är inte associerad med den här användaren."
+msgid "The tenant id should be a valid UUID."
+msgstr ""
 
-msgid "Your multi-factor authentication settings were reset by you."
-msgstr "Dina multifaktor-autentiseringsinställningar har återställts av dig."
+msgid "A client id is required."
+msgstr ""
 
-msgid "Multi-factor authentication settings were reset."
-msgstr "Multifaktor-autentiseringsinställningarna har återställts."
+msgid "The client id should not be empty."
+msgstr ""
 
-msgid "Your multi-factor authentication settings were reset by an administrator."
-msgstr "Dina multifaktor-autentiseringsinställningar har återställts av en administratör."
+msgid "The client id should be a valid UUID."
+msgstr ""
 
-msgid "The MFA token provided does not exist or is inactive."
-msgstr "MFA-token som tillhandahålls existerar inte eller är inaktiv."
+msgid "A client secret is required."
+msgstr ""
 
-msgid "No MFA provider set."
-msgstr "Ingen MFA-leverantör angiven."
+msgid "The client secret should not be empty."
+msgstr ""
 
-msgid "MFA verification date is not set for this provider."
-msgstr "MFA-verifieringsdatum är inte inställt för denna leverantör."
+msgid "The client secret should be a valid string."
+msgstr ""
 
-msgid "MFA setting OTP provisioning uri is not set."
-msgstr "MFA-inställning OTP-provisionering uri är inte inställd."
+msgid "The client secret is too large."
+msgstr ""
 
-msgid "MFA setting Yubikey Id is not set."
-msgstr "MFA-inställning Yubikey Id är inte inställt."
+msgid "A client secret expiry is required."
+msgstr ""
 
-msgid "The multi-factor authentication settings data should not be empty."
-msgstr "Multifaktor-autentiseringsinställningarnas data får inte vara tom."
+msgid "The expiry should not be empty."
+msgstr ""
 
-msgid "The multi-factor authentication providers list is missing."
-msgstr "Listan över multifaktor-autentiseringsleverantörer saknas."
+msgid "The user is not active."
+msgstr ""
 
-msgid "Unknown MFA provider: {0}."
-msgstr "Okänd MFA leverantör: {0}."
+msgid "The data should be a valid ASCII string."
+msgstr ""
 
-msgid "Could not validate multi-factor authentication provider configuration."
-msgstr "Det gick inte att validera konfigurationen för multifaktor autentiseringsleverantör."
+msgid "The status length is not supported."
+msgstr ""
 
-msgid "No configuration set for Duo integration key."
-msgstr "Ingen konfiguration inställd för integrationsnyckel Duo."
+msgid "The status is not supported."
+msgstr ""
 
-msgid "No configuration set for Duo host name."
-msgstr "Ingen konfiguration inställd för värdnamn Duo."
+msgid "Single sign-on failed."
+msgstr ""
 
-msgid "No configuration set for Duo secret key."
-msgstr "Ingen konfiguration inställd för hemliga nyckeln för Duo."
+msgid "Provider error: \"{0}\""
+msgstr ""
 
-msgid "No configuration set for Duo salt."
-msgstr "Ingen konfiguration inställd för salt för Duo."
+msgid "Email not provided by provider."
+msgstr ""
 
-msgid "Duo salt should be between 40 and 128 characters in length."
-msgstr "Salt för Duo bör vara mellan 40 och 128 tecken långt."
+msgid "Username mismatch."
+msgstr ""
 
-msgid "This is not a valid Duo secret key."
-msgstr "Detta är inte en giltig hemlig nyckel för Duo."
+msgid "No valid SSO settings found."
+msgstr ""
 
-msgid "This is not a valid Duo host name."
-msgstr "Detta är inte ett giltigt värdnamn för Duo."
+msgid "The user id should be a valid UUID."
+msgstr ""
 
-msgid "This is not a valid Duo integration key."
-msgstr "Detta är inte en giltig integreringsnyckel för Duo."
+msgid "The authentication token does not exist."
+msgstr ""
 
-msgid "Could not validate Duo configuration"
-msgstr "Kunde inte validera konfigurationen för Duo"
+msgid "The SSO authentication token is invalid."
+msgstr ""
 
-msgid "No configuration set for Yubikey OTP secret key."
-msgstr "Ingen konfiguration inställd för OTP-hemlig nyckel för Yubikey."
+msgid "Settings id is missing."
+msgstr ""
 
-msgid "No configuration set for Yubikey OTP clientId."
-msgstr "Ingen konfiguration inställd för OTP-klientId för Yubikey."
+msgid "User id mismatch."
+msgstr ""
 
-msgid "Yubikey OTP clientId should be an integer."
-msgstr "Yubikey OTP-klientId bör vara ett heltal."
+msgid "Token IP is missing."
+msgstr ""
 
-msgid "Yubikey OTP secret key is not valid."
-msgstr "Yubikey OTP-hemlig nyckel är inte giltig."
+msgid "User IP mismatch."
+msgstr ""
 
-msgid "Could not validate Yubikey configuration."
-msgstr "Kunde inte validera konfigurationen för Yubikey."
+msgid "User agent is missing."
+msgstr ""
 
-msgid "Duo multi-factor authentication"
-msgstr "Duo multi-faktor autentisering"
+msgid "User agent mismatch."
+msgstr ""
 
-msgid "Duo multi-factor authentication is enabled!"
-msgstr "Duo multi-faktor autentisering är aktiverad!"
+msgid "Settings mismatch."
+msgstr ""
 
-msgid "When logging in you will be asked to perform Duo Authentication."
-msgstr "När du loggar in kommer du att bli ombedd att utföra Duo-autentisering."
+msgid "The SSO key could not be saved."
+msgstr ""
 
-msgid "Since"
-msgstr "Eftersom"
+msgid "Please try again later."
+msgstr ""
 
-msgid "Multi factor authentication"
-msgstr "Multi-faktor autentisering"
+msgid "The SSO key does not exist."
+msgstr ""
 
-msgid "Sorry no multi factor authentication is enabled for this organization."
-msgstr "Tyvärr är ingen multi-faktor autentisering aktiverad för denna organisation."
+msgid "The SSO key could not be deleted."
+msgstr ""
 
-msgid "Please contact your administrator to enable multi-factor authentication."
-msgstr "Kontakta din administratör för att aktivera multi-faktor autentisering."
+msgid "Could not update the SSO settings."
+msgstr ""
 
-msgid "Please select a provider"
-msgstr "Välj en leverantör"
+msgid "The settings status is invalid."
+msgstr ""
 
-msgid "Enabled"
-msgstr "Aktiverad"
+msgid "Invalid status."
+msgstr ""
 
-msgid "Disabled"
-msgstr "Inaktiverad"
+msgid "Could not delete the SSO settings."
+msgstr ""
 
-msgid "What is multi-factor authentication?"
-msgstr "Vad är multi-faktor-autentisering?"
+msgid "Could not delete the draft SSO settings."
+msgstr ""
 
-msgid "Multi-factor authentication (MFA) is a method of confirming a user's identity that requires presenting two or more pieces of evidence (or factor)."
-msgstr "Multi-faktor autentisering (MFA) är en metod för att bekräfta en användares identitet som kräver att två eller fler bevis(eller faktorer) presenteras."
+msgid "The SSO settings do not exist."
+msgstr ""
 
-msgid "learn more"
-msgstr "lär dig mer"
+msgid "The SSO setting cannot be decrypted."
+msgstr ""
 
-msgid "Time based One Time Password (TOTP)"
-msgstr "Tidsbaserat engångslösenord (TOTP)"
+msgid "The SSO setting cannot be decoded."
+msgstr ""
 
-msgid "Scan this bar code"
-msgstr "Skanna den här streckkoden"
+msgid "Only administrators can create SSO settings."
+msgstr ""
 
-msgid "Enter the six digit number as presented on your phone or tablet."
-msgstr "Ange det sexsiffriga numret som visas på din telefon eller surfplatta."
+msgid "Something went wrong when validating the Azure single-sign on settings."
+msgstr ""
 
-msgid "Requirements"
-msgstr "Krav"
+msgid "It is not possible to save the SSO settings."
+msgstr ""
 
-msgid "To proceed you need to install an application that supports Time Based One Time Passwords (TOTP) on your phone or tablet such as:"
-msgstr "För att fortsätta måste du installera ett program som stöder tidsbaserade engångslösenord (TOTP) på din telefon eller surfplatta såsom:"
+msgid "Cannot parse JWKS endpoint response."
+msgstr ""
 
-msgid "or"
-msgstr "eller"
+msgid "Invalid JWKS endpoint response. Keys missing."
+msgstr ""
 
-msgid "Getting started with Time based One Time Password (TOTP)"
-msgstr "Komma igång med tidsbaserat engångslösenord (TOTP)"
+msgid "Failed to read certificate: {0}"
+msgstr ""
 
-msgid "How does it work?"
-msgstr "Hur fungerar det?"
+msgid "Failed to read public key from certificate: {0}"
+msgstr ""
 
-msgid "diagram showing how it works"
-msgstr "diagram som visar hur det fungerar"
+msgid "Failed to public key properties from certificate: {0}"
+msgstr ""
 
-msgid "You sign in to passbolt just like you normally do."
-msgstr "Du loggar in på passbolt precis som du brukar göra."
+msgid "Azure JWT token is missing."
+msgstr ""
 
-msgid "When using a new browser, you need an additional code from your phone."
-msgstr "När du använder en ny webbläsare behöver du ytterligare en kod från telefonen."
+msgid "Unable to decode Azure JWT token."
+msgstr ""
 
-msgid "Once you enter this code, you can log in."
-msgstr "När du har angett den här koden kan du logga in."
-
-msgid "cancel"
-msgstr "avbryt"
-
-msgid "get started!"
-msgstr "kom igång!"
-
-msgid "Time based One Time Password (TOTP) is enabled!"
-msgstr "Tidsbaserat engångslösenord (TOTP) är aktiverat!"
-
-msgid "When logging in from a new device you will need to enter a unique verification code generated by an app on your mobile."
-msgstr "När du loggar in från en ny enhet måste du ange en unik verifieringskod som genereras av en app på din mobil."
-
-msgid "Multi factor authentication verification"
-msgstr "Verifiering av flerfaktorsautentisering"
-
-msgid "Remember this device for a month."
-msgstr "Kom ihåg den här enheten en månad."
-
-msgid "Yubikey One Time Password"
-msgstr "Engångslösenord Yubikey"
-
-msgid "Plug in the yubikey and put your finger on it."
-msgstr "Anslut yubikey och sätt fingret på den."
-
-msgid "Yubikey One Time Password is enabled!"
-msgstr "Engångslösenord för Yubikey är aktiverat!"
-
-msgid "When logging in from a new device you will need a unique code generated by your yubikey."
-msgstr "När du loggar in från en ny enhet behöver du en unik kod genererad av din yubikey."
-
-msgid "verify"
-msgstr "verifiera"
-
-msgid "Or try with another provider"
-msgstr "Eller försök med en annan leverantör"
-
-msgid "Manage providers"
-msgstr "Hantera leverantörer"
-
-msgid "Turn off"
-msgstr "Stäng av"
-
-msgid "Your multi-factor authentication is disabled."
-msgstr "Din multifaktor-autentisering är inaktiverad."
-
-msgid "Multi-factor authentication settings were reset for your account by an administrator."
-msgstr "Dina multifaktor-autentiseringsinställningar har återställts för ditt konto av en administratör."
-
-msgid "Please contact your administrator if you didn't request this action."
-msgstr "Kontakta din administratör om du inte begärde denna åtgärd."
-
-msgid "Log in passbolt"
-msgstr "Logga in till passbolt"
+msgid "Single-sign on was a success"
+msgstr ""
 
 msgid "You do not have the permission to edit shared tags on this resource."
 msgstr "Du har inte behörighet att redigera delade taggar för denna resurs."
