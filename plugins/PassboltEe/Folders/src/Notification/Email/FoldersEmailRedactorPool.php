@@ -18,7 +18,6 @@ declare(strict_types=1);
 namespace Passbolt\Folders\Notification\Email;
 
 use App\Notification\Email\AbstractSubscribedEmailRedactorPool;
-use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettings;
 
 class FoldersEmailRedactorPool extends AbstractSubscribedEmailRedactorPool
 {
@@ -48,16 +47,5 @@ class FoldersEmailRedactorPool extends AbstractSubscribedEmailRedactorPool
         }
 
         return $redactors;
-    }
-
-    /**
-     * Return true if the redactor is enabled
-     *
-     * @param string $notificationSettingPath Notification Settings path with dot notation
-     * @return mixed
-     */
-    private function isRedactorEnabled(string $notificationSettingPath)
-    {
-        return EmailNotificationSettings::get($notificationSettingPath);
     }
 }
