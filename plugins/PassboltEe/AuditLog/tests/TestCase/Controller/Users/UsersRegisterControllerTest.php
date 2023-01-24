@@ -22,14 +22,17 @@ use App\Test\Lib\Model\EmailQueueTrait;
 use Passbolt\Log\Model\Entity\EntityHistory;
 use Passbolt\Log\Test\Factory\ActionLogFactory;
 use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
+use Passbolt\SelfRegistration\Test\Lib\SelfRegistrationTestTrait;
 
 class UsersRegisterControllerTest extends LogIntegrationTestCase
 {
     use EmailQueueTrait;
+    use SelfRegistrationTestTrait;
 
     public function testUsersRegisterPostSuccess()
     {
-        $userRole = RoleFactory::make()->user()->persist();
+        $this->setSelfRegistrationSettingsData();
+        RoleFactory::make()->user()->persist();
         $data = [
             'username' => 'ping.fu@passbolt.com',
             'profile' => [
