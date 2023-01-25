@@ -40,6 +40,7 @@ return [
     'passbolt' => [
         // Edition.
         'edition' => 'pro',
+        'featurePluginAdder' => \Passbolt\Ee\EeSolutionBootstrapper::class,
 
         // Authentication & Authorisation.
         'auth' => [
