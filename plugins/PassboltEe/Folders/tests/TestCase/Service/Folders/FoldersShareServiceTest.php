@@ -182,7 +182,7 @@ class FoldersShareServiceTest extends FoldersTestCase
         $uac = new UserAccessControl(Role::USER, $userAId);
 
         $data['permissions'][] = ['aro' => 'User', 'aro_foreign_key' => $userBId, 'type' => Permission::READ];
-        $folder = $this->service->share($uac, $folderA->id, $data);
+        $this->service->share($uac, $folderA->id, $data);
 
         $this->assertItemIsInTrees($folderA->id, 2);
         $this->assertPermission($folderA->id, $userAId, Permission::OWNER);

@@ -25,6 +25,7 @@ use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 use Passbolt\Folders\Model\Behavior\FolderizableBehavior;
+use Passbolt\Folders\Model\Dto\FolderRelationDto;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemsToUserTreeService;
 
@@ -167,7 +168,7 @@ class ResourcesAfterAccessGrantedService
             return;
         }
 
-        $items = [['foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE, 'foreign_id' => $resource->id]];
+        $items = [new FolderRelationDto(FoldersRelation::FOREIGN_MODEL_RESOURCE, $resource->id)];
         $this->foldersRelationsAddItemsToUserTree->addItemsToUserTree($uac, $userId, $items);
     }
 }

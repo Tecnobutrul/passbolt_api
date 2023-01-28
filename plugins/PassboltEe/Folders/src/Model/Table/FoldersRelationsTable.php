@@ -26,6 +26,7 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Utility\Inflector;
 use Cake\Validation\Validator;
+use Passbolt\Folders\Model\Dto\FolderRelationDto;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 use Passbolt\Folders\Model\Traits\FoldersRelations\FoldersRelationsFindersTrait;
 use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemsToUserTreeService;
@@ -342,10 +343,8 @@ class FoldersRelationsTable extends Table
         if (!$dryRun) {
             $items = [];
             foreach ($missingFoldersRelations as $missingFolderRelation) {
-                $items[$missingFolderRelation['user_id']][] = [
-                    'foreign_model' => $foreignModel,
-                    'foreign_id' => $missingFolderRelation['foreign_id'],
-                ];
+                $folderRelationToCreateDto = new FolderRelationDto($foreignModel, $missingFolderRelation['foreign_id']);
+                $items[$missingFolderRelation['user_id']][] = $folderRelationToCreateDto;
             }
 
             foreach ($items as $userId => $userItems) {
