@@ -94,8 +94,10 @@ class FoldersRelationsAddItemsToUserTreeService
         $foldersRelationsChanges = $this->getFoldersRelationsChanges($uac, $userId, $collection);
         if (!empty($foldersRelationsChanges)) {
             $this->applyFoldersRelationsChanges($userId, $foldersRelationsChanges);
-            $this->detectAndRepairSCCs($uac, $userId, $foldersRelationsChanges);
-            $this->detectAndRepairSCCsInUserTree($userId);
+            if ($collection->containsFolder()) {
+                $this->detectAndRepairSCCs($uac, $userId, $foldersRelationsChanges);
+                $this->detectAndRepairSCCsInUserTree($userId);
+            }
         }
     }
 

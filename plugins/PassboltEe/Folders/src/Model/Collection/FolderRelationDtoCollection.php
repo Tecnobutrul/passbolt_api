@@ -44,4 +44,14 @@ class FolderRelationDtoCollection extends Collection
     {
         return $folderRelationDto->foreignModel === FoldersRelation::FOREIGN_MODEL_FOLDER;
     }
+
+    /**
+     * Check if the collection contains an item relative to a folder.
+     *
+     * @return bool
+     */
+    public function containsFolder(): bool
+    {
+        return $this->some([self::class, 'filterByFolder']);
+    }
 }
