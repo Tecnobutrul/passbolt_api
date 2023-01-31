@@ -22,7 +22,7 @@ use App\Utility\UserAccessControl;
 use Cake\Database\Expression\TupleComparison;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\TableRegistry;
-use Cake\Utility\Hash;
+use Passbolt\Folders\Model\Collection\FolderRelationDtoCollection;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 
 class FoldersRelationsAddItemsToUserTreeService
@@ -83,26 +83,21 @@ class FoldersRelationsAddItemsToUserTreeService
      *
      * @param \App\Utility\UserAccessControl $uac The user at the origin of the operation
      * @param string $userId The target user id the items are added for
-     * @param array $items The list of items to add to the tree
-     * [
-     *   [
-     *      foreign_id => UUID,
-     *      foreign_model => Resource|Folder
-     *   ],
-     *   ...
-     * ]
-     * @todo Format of the items parameter is error prone. Review the format and validation.
+     * @param array<\Passbolt\Folders\Model\Dto\FolderRelationDto> $items The collection of folder relation to add to the user tree.
      * @return void
      * @throws \Exception If an unexpected error occurred
      */
     public function addItemsToUserTree(UserAccessControl $uac, string $userId, array $items): void
     {
-        $this->insertItemsInUserRootTree($userId, $items);
-        $foldersRelationsChanges = $this->getFoldersRelationsChanges($uac, $userId, $items);
+        $collection = new FolderRelationDtoCollection($items);
+        $this->insertItemsInUserRootTree($userId, $collection);
+        $foldersRelationsChanges = $this->getFoldersRelationsChanges($uac, $userId, $collection);
         if (!empty($foldersRelationsChanges)) {
             $this->applyFoldersRelationsChanges($userId, $foldersRelationsChanges);
-            $this->detectAndRepairSCCs($uac, $userId, $foldersRelationsChanges);
-            $this->detectAndRepairSCCsInUserTree($userId);
+            if ($collection->containsFolder()) {
+                $this->detectAndRepairSCCs($uac, $userId, $foldersRelationsChanges);
+                $this->detectAndRepairSCCsInUserTree($userId);
+            }
         }
     }
 
@@ -117,11 +112,14 @@ class FoldersRelationsAddItemsToUserTreeService
      *
      * @param \App\Utility\UserAccessControl $uac The user at the origin of the operation
      * @param string $userId The target user id the items are added for
-     * @param array $items The list of items to add to the tree
+     * @param \Passbolt\Folders\Model\Collection\FolderRelationDtoCollection $items The list of items to add to the tree
      * @return array
      */
-    private function getFoldersRelationsChanges(UserAccessControl $uac, string $userId, array $items): array
-    {
+    private function getFoldersRelationsChanges(
+        UserAccessControl $uac,
+        string $userId,
+        FolderRelationDtoCollection $items
+    ): array {
         $parentFoldersRelationsChanges = $this->getParentFoldersRelationsChanges($userId, $items);
         $childrenFoldersRelationsChanges = $this->getChildrenFoldersRelationsChanges(
             $userId,
@@ -139,10 +137,10 @@ class FoldersRelationsAddItemsToUserTreeService
      * items added to the user tree.
      *
      * @param string $userId The target user id the items are added for
-     * @param array $items The items to look for potential parents
+     * @param \Passbolt\Folders\Model\Collection\FolderRelationDtoCollection $items The items to look for potential parents
      * @return array<\Passbolt\Folders\Model\Entity\FoldersRelation>
      */
-    private function getParentFoldersRelationsChanges(string $userId, array $items): array
+    private function getParentFoldersRelationsChanges(string $userId, FolderRelationDtoCollection $items): array
     {
         // R = The folders relations which could represent a potential parent relationship for the list of items added
         //     to the user tree.
@@ -152,7 +150,7 @@ class FoldersRelationsAddItemsToUserTreeService
         // POTENTIAL_PARENTS = The parents of the newly added items in all the users trees
         // R = ITEMS_POTENTIAL_PARENTS ⋂ USERS_FOLDERS
 
-        $foreignIds = Hash::extract($items, '{n}.foreign_id');
+        $foreignIds = $items->map([FolderRelationDtoCollection::class, 'mapForeignId'])->toArray();
         if (empty($foreignIds)) {
             return [];
         }
@@ -183,13 +181,13 @@ class FoldersRelationsAddItemsToUserTreeService
      * added to the user tree.
      *
      * @param string $userId The target user id the items are added for
-     * @param array $items The items to look for potential parents
+     * @param \Passbolt\Folders\Model\Collection\FolderRelationDtoCollection $items The items to look for potential parents
      * @param array $excludeFoldersRelations The folders relations to exclude
      * @return array<\Passbolt\Folders\Model\Entity\FoldersRelation>
      */
     private function getChildrenFoldersRelationsChanges(
         string $userId,
-        array $items,
+        FolderRelationDtoCollection $items,
         array $excludeFoldersRelations
     ): array {
         // R = The folders relations which could represent a potential child relationship for the list of folders added
@@ -201,8 +199,10 @@ class FoldersRelationsAddItemsToUserTreeService
         // R = POTENTIAL_CHILDREN ⋂ USERS_ITEMS
 
         // CHILDREN
-        // @todo Fix this along the format of the list of items.
-        $foreignIds = Hash::extract($items, '{n}[foreign_model=Folder].foreign_id');
+        $foreignIds = $items->filter([FolderRelationDtoCollection::class, 'filterByFolder'])
+            ->map([FolderRelationDtoCollection::class, 'mapForeignId'])
+            ->toArray();
+
         if (empty($foreignIds)) {
             return [];
         }
@@ -262,21 +262,16 @@ class FoldersRelationsAddItemsToUserTreeService
      * Insert the items at the root of the user's tree.
      *
      * @param string $userId The target user id the items are added for
-     * @param array $items The list of items to add to the tree
+     * @param \Passbolt\Folders\Model\Collection\FolderRelationDtoCollection $items The list of items to add to the tree
      * @return void
      * @throws \Exception If a folder relation cannot be created
      */
-    private function insertItemsInUserRootTree(string $userId, array $items)
+    private function insertItemsInUserRootTree(string $userId, FolderRelationDtoCollection $items)
     {
         foreach ($items as $item) {
-            $this->foldersRelationsCreateService
-                ->create(
-                    $item['foreign_model'],
-                    $item['foreign_id'],
-                    $userId,
-                    FoldersRelation::ROOT,
-                    false
-                );
+            $folderRelationToCreate = $item->clone();
+            $folderRelationToCreate->userId = $userId;
+            $this->foldersRelationsCreateService->create($folderRelationToCreate->toArray(), false);
         }
     }
 

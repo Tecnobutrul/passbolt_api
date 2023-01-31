@@ -28,6 +28,7 @@ use Cake\Event\EventDispatcherTrait;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
+use Cake\Validation\Validation;
 use Exception;
 use Passbolt\Folders\Model\Entity\Folder;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
@@ -194,10 +195,15 @@ class FoldersCreateService
             $this->handleValidationErrors($folder);
         }
 
+        $folderRelationData = [
+            'foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER,
+            'foreign_id' => $folder->id,
+            'folder_parent_id' => $folderParentId,
+            'user_id' => $uac->getId(),
+        ];
+
         try {
-            $userId = $uac->getId();
-            $this->foldersRelationsCreateService
-                ->create(FoldersRelation::FOREIGN_MODEL_FOLDER, $folder->id, $userId, $folderParentId);
+            $this->foldersRelationsCreateService->create($folderRelationData);
             $folder->set('folder_parent_id', $folderParentId);
         } catch (Exception $e) {
             throw new InternalErrorException('Could not create the folder, please try again later.', 500, $e);
@@ -216,12 +222,18 @@ class FoldersCreateService
      */
     private function validateParentFolder(UserAccessControl $uac, Folder $folder, string $folderParentId)
     {
+        if (!Validation::uuid($folderParentId)) {
+            $errors = ['uuid' => __('The folder parent id should be a valid UUID.')];
+            $folder->setError('folder_parent_id', $errors);
+
+            return;
+        }
+
         // The provided parent folder must exist.
         try {
             $this->foldersTable->get($folderParentId);
         } catch (RecordNotFoundException $e) {
             $errors = ['folder_exists' => __('The folder parent must exist.')];
-
             $folder->setError('folder_parent_id', $errors);
 
             return;

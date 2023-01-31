@@ -64,7 +64,7 @@ class ResourcesAfterCreateService
      * @param \App\Model\Entity\Resource $resource The created resource.
      * @param array $data The data sent by the user to create the resource.
      * @return void
-     * @throws \Exception
+     * @throws \Cake\Http\Exception\InternalErrorException If an unexpected error occurred while creating the folder relation.
      */
     public function afterCreate(UserAccessControl $uac, Resource $resource, ?array $data = [])
     {
@@ -77,17 +77,22 @@ class ResourcesAfterCreateService
             }
         }
 
+        $folderRelationData = [
+            'foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE,
+            'foreign_id' => $resource->id,
+            'folder_parent_id' => $folderParentId,
+            'user_id' => $uac->getId(),
+        ];
+
         try {
-            $userId = $uac->getId();
-            $this->foldersRelationsCreateService->create(
-                FoldersRelation::FOREIGN_MODEL_RESOURCE,
-                $resource->id,
-                $userId,
-                $folderParentId
-            );
+            $this->foldersRelationsCreateService->create($folderRelationData);
             $resource->set('folder_parent_id', $folderParentId);
         } catch (Exception $e) {
-            throw new InternalErrorException('Could not create the resource, please try again later.', 500, $e);
+            throw new InternalErrorException(
+                'Could not create the resource folder relation, please try again later.',
+                500,
+                $e
+            );
         }
     }
 

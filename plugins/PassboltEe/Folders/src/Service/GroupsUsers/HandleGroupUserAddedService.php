@@ -21,6 +21,7 @@ use App\Model\Entity\GroupsUser;
 use App\Model\Table\PermissionsTable;
 use App\Utility\UserAccessControl;
 use Cake\ORM\TableRegistry;
+use Passbolt\Folders\Model\Dto\FolderRelationDto;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemsToUserTreeService;
 
@@ -67,18 +68,12 @@ class HandleGroupUserAddedService
 
         $missingFoldersRelationsFoldersIds = $this->getMissingFoldersRelationsFoldersIds($groupUser);
         foreach ($missingFoldersRelationsFoldersIds as $missingFolderRelationFolderId) {
-            $items[] = [
-                'foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER,
-                'foreign_id' => $missingFolderRelationFolderId,
-            ];
+            $items[] = new FolderRelationDto(FoldersRelation::FOREIGN_MODEL_FOLDER, $missingFolderRelationFolderId);
         }
 
         $missingFoldersRelationsResourcesIds = $this->getMissingFoldersRelationsResourcesIds($groupUser);
         foreach ($missingFoldersRelationsResourcesIds as $missingFolderRelationResourceId) {
-            $items[] = [
-                'foreign_model' => FoldersRelation::FOREIGN_MODEL_RESOURCE,
-                'foreign_id' => $missingFolderRelationResourceId,
-            ];
+            $items[] = new FolderRelationDto(FoldersRelation::FOREIGN_MODEL_RESOURCE, $missingFolderRelationResourceId);
         }
 
         $this->foldersRelationsAddItemsFromUserTree->addItemsToUserTree($uac, $groupUser->user_id, $items);
