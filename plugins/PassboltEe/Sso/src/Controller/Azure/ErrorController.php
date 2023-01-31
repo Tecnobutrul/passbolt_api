@@ -19,13 +19,14 @@ namespace Passbolt\Sso\Controller\Azure;
 
 use Cake\Event\EventInterface;
 use Passbolt\Sso\Controller\AbstractSsoController;
+use App\Controller\ErrorController as BaseErrorController;
 
 /**
  * Error Handling Controller
  *
  * Controller used by ExceptionRenderer to render error responses.
  */
-class ErrorController extends AbstractSsoController
+class ErrorController extends BaseErrorController
 {
     /**
      * @inheritDoc
