@@ -62,6 +62,7 @@ class EeSolutionBootstrapperTest extends TestCase
 
     public function tearDown(): void
     {
+        $this->clearPlugins();
         unset($this->app);
         parent::tearDown();
     }
