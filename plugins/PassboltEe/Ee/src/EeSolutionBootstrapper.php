@@ -18,6 +18,8 @@ namespace Passbolt\Ee;
 
 use App\Application;
 use App\BaseSolutionBootstrapper;
+use Cake\Core\Configure;
+use Passbolt\WebInstaller\Middleware\WebInstallerMiddleware;
 
 class EeSolutionBootstrapper extends BaseSolutionBootstrapper
 {
@@ -29,24 +31,60 @@ class EeSolutionBootstrapper extends BaseSolutionBootstrapper
      */
     public function addFeaturePlugins(Application $app): void
     {
-        $this->addFeaturePluginIfEnabled($app, 'Ee', [], true);
+        if (Configure::read('debug') && Configure::read('passbolt.selenium.active')) {
+            $app->addPlugin('PassboltSeleniumApi', ['bootstrap' => true, 'routes' => true]);
+            $app->addPlugin('PassboltTestData', ['bootstrap' => true, 'routes' => false]);
+        }
 
-        if ($this->isWebInstallerConfigurationMissing()) {
+        $app->addPlugin('Passbolt/Ee', ['bootstrap' => true, 'routes' => true]);
+
+        // Add tags plugin if not configured.
+        if (!WebInstallerMiddleware::isConfigured()) {
             $app->addPlugin('Passbolt/WebInstaller', ['bootstrap' => true, 'routes' => true]);
 
             return;
         }
 
-        // Add CE plugins
-        parent::addFeaturePlugins($app);
+        // Add Common plugins.
+        $app->addPlugin('Passbolt/AccountSettings', ['bootstrap' => true, 'routes' => true]);
+        $app->addPlugin('Passbolt/Import', ['bootstrap' => true, 'routes' => true]);
+        $app->addPlugin('Passbolt/InFormIntegration', ['bootstrap' => true, 'routes' => false]);
+        $app->addPlugin('Passbolt/Locale', ['bootstrap' => true, 'routes' => true]);
+        $app->addPlugin('Passbolt/Export', ['bootstrap' => true, 'routes' => false]);
+        $app->addPlugin('Passbolt/ResourceTypes', ['bootstrap' => true, 'routes' => false]);
+        $app->addPlugin('Passbolt/RememberMe', ['bootstrap' => true, 'routes' => false]);
+        $app->addPlugin('Passbolt/EmailNotificationSettings', ['bootstrap' => true, 'routes' => true]);
+        $app->addPlugin('Passbolt/EmailDigest', ['bootstrap' => true, 'routes' => true]);
+        $app->addPlugin('Passbolt/Reports', ['bootstrap' => true, 'routes' => true]);
+        $this->addFeaturePluginIfEnabled($app, 'Mobile');
+        $this->addFeaturePluginIfEnabled($app, 'JwtAuthentication');
+        $this->addFeaturePluginIfEnabled($app, 'SelfRegistration');
+        $app->addPlugin('Passbolt/PasswordGenerator', ['routes' => true]);
+        $this->addFeaturePluginIfEnabled($app, 'SmtpSettings');
 
-        // Add EE plugins
-        $this->addFeaturePluginIfEnabled($app, 'DirectorySync', [], true);
-        $this->addFeaturePluginIfEnabled($app, 'Tags', [], true);
-        if ($app->getPlugins()->has('Passbolt/Log')) {
+        $mfaEnabled = Configure::read('passbolt.plugins.multiFactorAuthentication.enabled');
+        if (!isset($mfaEnabled) || $mfaEnabled) {
+            $app->addPlugin('Passbolt/MultiFactorAuthentication', ['bootstrap' => true, 'routes' => true]);
+        }
+
+        $logEnabled = Configure::read('passbolt.plugins.log.enabled');
+        if (!isset($logEnabled) || $logEnabled) {
+            $app->addPlugin('Passbolt/Log', ['bootstrap' => true, 'routes' => false]);
             $app->addPlugin('Passbolt/AuditLog', ['bootstrap' => true, 'routes' => true]);
         }
-        $this->addFeaturePluginIfEnabled($app, 'Folders', [], true);
+
+        $ldapEnabled = Configure::read('passbolt.plugins.directorySync.enabled');
+        if (!isset($ldapEnabled) || $ldapEnabled) {
+            $app->addPlugin('Passbolt/DirectorySync', ['bootstrap' => true, 'routes' => true]);
+        }
+
+        $this->addFeaturePluginIfEnabled($app, 'Tags', [], true);
+
+        $folderEnabled = Configure::read('passbolt.plugins.folders.enabled');
+        if (!isset($folderEnabled) || $folderEnabled) {
+            $app->addPlugin('Passbolt/Folders', ['bootstrap' => true, 'routes' => true]);
+        }
+
         $this->addFeaturePluginIfEnabled($app, 'AccountRecovery', [], true);
         $this->addFeaturePluginIfEnabled($app, 'Sso');
     }
