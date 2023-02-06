@@ -131,20 +131,4 @@ $routes->plugin('Passbolt/Sso', ['path' => '/sso'], function (RouteBuilder $rout
             'action' => 'index',
         ])
         ->setMethods(['GET']);
-
-    // Test endpoints
-
-    $routes->connect('/azure/login', [
-            'prefix' => 'Azure',
-            'controller' => 'SsoAzureStage0',
-            'action' => 'stage0',
-        ])
-        ->setMethods(['GET']);
-
-    $routes->connect('/azure/login/dry-run', [
-            'prefix' => 'Azure',
-            'controller' => 'SsoAzureStage0DryRun',
-            'action' => 'stage0DryRun',
-        ])
-        ->setMethods(['GET']);
 });
