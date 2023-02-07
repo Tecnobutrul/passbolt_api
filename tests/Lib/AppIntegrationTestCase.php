@@ -16,6 +16,8 @@ declare(strict_types=1);
  */
 namespace App\Test\Lib;
 
+use App\Authenticator\AbstractSessionIdentificationService;
+use App\Authenticator\SessionIdentificationServiceInterface;
 use App\Middleware\CsrfProtectionMiddleware;
 use App\Test\Factory\UserFactory;
 use App\Test\Lib\Model\AvatarsModelTrait;
