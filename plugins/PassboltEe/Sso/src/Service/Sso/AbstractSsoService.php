@@ -246,10 +246,11 @@ abstract class AbstractSsoService
      * @param \Passbolt\Sso\Utility\OpenId\ResourceOwnerWithEmailInterface $resourceOwner user
      * @param \App\Model\Entity\User $user user
      * @return void
+     * @throws \Cake\Http\Exception\BadRequestException if the assertion failed
      */
     public function assertResourceOwnerAgainstUser(ResourceOwnerWithEmailInterface $resourceOwner, User $user): void
     {
-        if ($resourceOwner->getEmail() !== $user->username) {
+        if (mb_strtolower($resourceOwner->getEmail()) !== mb_strtolower($user->username)) {
             $msg = __('Single sign-on failed.') . ' ' . __('Username mismatch.');
             throw new BadRequestException($msg);
         }
