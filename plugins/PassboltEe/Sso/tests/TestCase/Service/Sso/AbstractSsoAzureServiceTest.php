@@ -19,7 +19,9 @@ namespace Passbolt\Sso\Test\TestCase\Service\Sso;
 
 use App\Test\Factory\UserFactory;
 use App\Utility\ExtendedUserAccessControl;
+use Cake\Http\Exception\BadRequestException;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
+use Passbolt\Sso\Utility\OpenId\ResourceOwnerWithEmailInterface;
 
 class AbstractSsoAzureServiceTest extends SsoTestCase
 {
@@ -32,5 +34,32 @@ class AbstractSsoAzureServiceTest extends SsoTestCase
 
         $this->assertTrue($cookie->isHttpOnly());
         $this->assertTrue($cookie->isSecure());
+    }
+
+    public function testSsoAbstractSsoAzureService_assertResourceOwnerAgainstUser_Success()
+    {
+        $username = 'email@test.test';
+        $user = UserFactory::make()->setField('username', $username)->getEntity();
+        $mixedCases = ['email@test.test', 'email@TEST.TEST', 'EMAIL@TEST.TEST'];
+        $sut = new TestableSsoService();
+        foreach ($mixedCases as $case) {
+            $resourceOwner = $this->getMockBuilder(ResourceOwnerWithEmailInterface::class)->getMock();
+            $resourceOwner->method('getEmail')->willReturn($case);
+            $sut->assertResourceOwnerAgainstUser($resourceOwner, $user);
+            $this->assertTrue(true);
+        }
+    }
+
+    public function testSsoAbstractSsoAzureService_assertResourceOwnerAgainstUser_Comparison_Fail()
+    {
+        $username = 'email@test.test';
+        $user = UserFactory::make()->setField('username', $username)->getEntity();
+        $sut = new TestableSsoService();
+        $resourceOwner = $this->getMockBuilder(ResourceOwnerWithEmailInterface::class)->getMock();
+        $resourceOwner->method('getEmail')->willReturn('different@test.test');
+
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage('Single sign-on failed. Username mismatch.');
+        $sut->assertResourceOwnerAgainstUser($resourceOwner, $user);
     }
 }
