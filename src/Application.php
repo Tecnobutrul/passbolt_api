@@ -294,6 +294,8 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         $this->addFeaturePluginIfEnabled($this, 'AccountRecovery', [], true);
         $this->addFeaturePluginIfEnabled($this, 'Sso');
 
+        $this->addFeaturePluginIfEnabled($this, 'MfaPolicies');
+
         return $this;
     }
 
