@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2023-01-17 14:36+0000\n"
+"POT-Creation-Date: 2023-02-08 11:37+0000\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -2435,12 +2435,6 @@ msgstr ""
 msgid "The full base url should be a valid BMP-UTF8 string."
 msgstr ""
 
-msgid "A public registration setting is required."
-msgstr ""
-
-msgid "The public registration setting should be a valid boolean."
-msgstr ""
-
 msgid "A force ssl status is required."
 msgstr ""
 
@@ -2582,6 +2576,12 @@ msgstr ""
 msgid "Port"
 msgstr ""
 
+msgid "client"
+msgstr ""
+
+msgid "Client"
+msgstr ""
+
 msgid "Passbolt is not configured."
 msgstr ""
 
@@ -2649,12 +2649,6 @@ msgid "Full base url"
 msgstr ""
 
 msgid "This is the url where passbolt will be accessible. This url will be used for places where the passbolt url cannot be guessed automatically, such as links in emails. No trailing slash."
-msgstr ""
-
-msgid "Allow public registration?"
-msgstr ""
-
-msgid "Allowing public registration means that any visitor can create himself an account on your passbolt. Unless your instance of passbolt is not reachable by the outside world, it is usually a bad idea."
 msgstr ""
 
 msgid "Force SSL?"
@@ -3779,6 +3773,9 @@ msgstr ""
 msgid "Could not validate folder data."
 msgstr ""
 
+msgid "The folder parent id should be a valid UUID."
+msgstr ""
+
 msgid "The folder parent must exist."
 msgstr ""
 
@@ -4158,9 +4155,6 @@ msgid "home"
 msgstr ""
 
 msgid "login"
-msgstr ""
-
-msgid "register"
 msgstr ""
 
 msgid "{0} ({1}) just completed an account recovery. Feel free to get in touch with this user if you feel this action looks suspicious."
