@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 41c2572bd9bd4cc908d3e09e0cbed6e5\n"
-"POT-Creation-Date: 2023-01-17 14:36+0000\n"
-"PO-Revision-Date: 2023-01-17 15:21\n"
+"POT-Creation-Date: 2023-02-08 11:37+0000\n"
+"PO-Revision-Date: 2023-02-08 12:41\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Polish\n"
 "MIME-Version: 1.0\n"
@@ -176,7 +176,7 @@ msgid "Access restricted to administrators."
 msgstr "Dostęp zastrzeżony dla administratorów."
 
 msgid "The user should not be logged in."
-msgstr ""
+msgstr "Użytkownik nie powinien być zalogowany."
 
 msgid "This feature is not supported by your version of passbolt."
 msgstr "Te funkcja nie jest obsługiwana w Twojej wersji usługi passbolt."
@@ -362,7 +362,7 @@ msgid "No admin were found in the database."
 msgstr "W bazie danych nie znaleziono administratora."
 
 msgid "Invalid expiry time {0}."
-msgstr ""
+msgstr "Nieprawidłowy czas wygaśnięcia {0}."
 
 msgid "The identifier should not be empty."
 msgstr "Identyfikator nie powinien być pusty."
@@ -1301,7 +1301,7 @@ msgid "Could not validate resource data."
 msgstr "Nie udało się zweryfikować danych zasobu."
 
 msgid "An unexpected error occurred, please contact an administrator."
-msgstr ""
+msgstr "Wystąpił nieoczekiwany błąd, skontaktuj się z administratorem."
 
 msgid "The server returned the following error:"
 msgstr "Serwer zwrócił następujący błąd:"
@@ -1409,7 +1409,7 @@ msgid "The directory {0} cannot be deleted"
 msgstr "Katalog {0} nie może zostać usunięty"
 
 msgid "Database connection failed"
-msgstr ""
+msgstr "Połączenie z bazą danych nie powiodło się"
 
 msgid "Could not connect to github repository"
 msgstr "Nie udało się połączyć z repozytorium githud"
@@ -2285,7 +2285,7 @@ msgid "A test recipient is required."
 msgstr "Wymagany jest odbiorca testowy."
 
 msgid "SMTP settings endpoints disabled."
-msgstr ""
+msgstr "Wyłączono endpointy ustawień SMTP."
 
 msgid "Could not validate the smtp settings."
 msgstr "Nie można zweryfikować ustawień smtp."
@@ -2312,7 +2312,7 @@ msgid "undefined"
 msgstr "niezdefiniowany"
 
 msgid "Passbolt test email"
-msgstr ""
+msgstr "Wiadomość testowa z passbolt"
 
 msgid "Congratulations!"
 msgstr "Gratulacje!"
@@ -2436,12 +2436,6 @@ msgstr "Pełen bazowy adres URL nie powinien być pusty"
 
 msgid "The full base url should be a valid BMP-UTF8 string."
 msgstr "Pełen bazowy adres URL powinien być prawidłowym ciągiem BMP-UTF8."
-
-msgid "A public registration setting is required."
-msgstr "Publiczne ustawienie rejestracji jest wymagane."
-
-msgid "The public registration setting should be a valid boolean."
-msgstr "Ustawienie publicznej rejestracji powinno być prawidłową wartością logiczną."
 
 msgid "A force ssl status is required."
 msgstr "Status wymuszania SSL jest wymagany."
@@ -2584,6 +2578,12 @@ msgstr "port"
 msgid "Port"
 msgstr "Port"
 
+msgid "client"
+msgstr ""
+
+msgid "Client"
+msgstr ""
+
 msgid "Passbolt is not configured."
 msgstr "Passbolt nie jest skonfigurowany."
 
@@ -2652,12 +2652,6 @@ msgstr "Pełny bazowy adres URL"
 
 msgid "This is the url where passbolt will be accessible. This url will be used for places where the passbolt url cannot be guessed automatically, such as links in emails. No trailing slash."
 msgstr "To adres URL, pod którym znajdziesz dostęp do passbolt. Ten adres zostanie użyty tam, gdzie adresu URL usługi passbolt nie da się odgadnąć automatycznie - na przykład w przypadku linków w e-mailach. Bez ukośnika."
-
-msgid "Allow public registration?"
-msgstr "Umożliwić publiczną rejestrację?"
-
-msgid "Allowing public registration means that any visitor can create himself an account on your passbolt. Unless your instance of passbolt is not reachable by the outside world, it is usually a bad idea."
-msgstr "Umożliwienie publicznej rejestracji oznacza, że każdy odwiedzający może stworzyć sobie konto na Twoim koncie passbolt. To zwykle kiepski pomysł, jeśli Twoja instancja passbolta jest niedostępna dla ogółu użytkowników."
 
 msgid "Force SSL?"
 msgstr "Wymusić SSL?"
@@ -3781,6 +3775,9 @@ msgstr "Użytkownik {0} edytował folder {1}"
 msgid "Could not validate folder data."
 msgstr "Nie udało się zweryfikować danych folderu."
 
+msgid "The folder parent id should be a valid UUID."
+msgstr ""
+
 msgid "The folder parent must exist."
 msgstr "Folder nadrzędny musi istnieć."
 
@@ -3839,73 +3836,73 @@ msgid "{0} updated the folder {1}"
 msgstr "Użytkownik {0} zaktualizował folder {1}"
 
 msgid "CSRF issue. The state in URL and Cookies do not match."
-msgstr ""
+msgstr "Problem z CSRF. Stan w adresie URL i ciasteczkach nie pasuje."
 
 msgid "The state is required in cookie."
-msgstr ""
+msgstr "Stan jest wymagany w ciasteczku."
 
 msgid "The token is required in URL parameters."
-msgstr ""
+msgstr "Token jest wymagany w parametrach adresu URL."
 
 msgid "The state is required in URL parameters."
-msgstr ""
+msgstr "Stan jest wymagany w parametrach adresu URL."
 
 msgid "The code is required in URL parameters."
-msgstr ""
+msgstr "Kod jest wymagany w parametrach adresu URL."
 
 msgid "The user id is required in URL parameters."
-msgstr ""
+msgstr "ID użytkownika jest wymagane w parametrach adresu URL."
 
 msgid "The settings id is required in URL parameters."
-msgstr ""
+msgstr "ID ustawień jest wymagane w parametrach adresu URL."
 
 msgid "The SSO setting does not exist."
-msgstr ""
+msgstr "Ustawienie SSO nie istnieje."
 
 msgid "Information about the key is required."
-msgstr ""
+msgstr "Informacje o kluczu są niezbędne."
 
 msgid "The SSO key id should be a uuid."
-msgstr ""
+msgstr "ID klucza SSO powinno być sygnaturą UUID."
 
 msgid "The key could not be found"
-msgstr ""
+msgstr "Nie znaleziono klucza"
 
 msgid "The SSO setting id should be a uuid."
-msgstr ""
+msgstr "ID ustawienia SSO powinno być sygnaturą UUID."
 
 msgid "The SSO settings were activated."
-msgstr ""
+msgstr "Aktywowano ustawienia SSO."
 
 msgid "The draft setting was saved."
-msgstr ""
+msgstr "Zapisano ustawienia szkicu."
 
 msgid "The SSO settings were deleted."
-msgstr ""
+msgstr "Usunięto ustawienia SSO."
 
 msgid "Ajax/Json request not supported."
-msgstr ""
+msgstr "Żądanie Ajax/Json nie jest obsługiwane."
 
 msgid "A provider is required."
-msgstr ""
+msgstr "Dostawca jest wymagany."
 
 msgid "The provider should not be empty."
-msgstr ""
+msgstr "Dostawca nie powinien być pusty."
 
 msgid "The provider is not supported."
-msgstr ""
+msgstr "Ten dostawca nie jest obsługiwany."
 
 msgid "Data is required."
-msgstr ""
+msgstr "Dane są wymagane."
 
 msgid "Data must be an array of properties."
-msgstr ""
+msgstr "Dane muszą być szeregiem właściwości."
 
 msgid "A URL is required."
-msgstr ""
+msgstr "Adres URL jest wymagany."
 
 msgid "The URL is not supported."
-msgstr ""
+msgstr "Ten adres URL nie jest obsługiwany."
 
 msgid "A tenant id is required."
 msgstr ""
@@ -3917,157 +3914,157 @@ msgid "The tenant id should be a valid UUID."
 msgstr ""
 
 msgid "A client id is required."
-msgstr ""
+msgstr "ID klienta jest wymagane."
 
 msgid "The client id should not be empty."
-msgstr ""
+msgstr "ID klienta nie powinno być puste."
 
 msgid "The client id should be a valid UUID."
-msgstr ""
+msgstr "ID klienta powinien być prawidłowym UUID."
 
 msgid "A client secret is required."
-msgstr ""
+msgstr "Sekret klienta jest wymagany."
 
 msgid "The client secret should not be empty."
-msgstr ""
+msgstr "Sekret klienta nie powinien być pusty."
 
 msgid "The client secret should be a valid string."
-msgstr ""
+msgstr "Sekret klienta powinien być prawidłowym ciągiem."
 
 msgid "The client secret is too large."
-msgstr ""
+msgstr "Sekret klienta jest za duży."
 
 msgid "A client secret expiry is required."
-msgstr ""
+msgstr "Data ważności sekretu klienta jest wymagana."
 
 msgid "The expiry should not be empty."
-msgstr ""
+msgstr "Data ważności nie powinna być pusta."
 
 msgid "The user is not active."
-msgstr ""
+msgstr "Ten użytkownik nie jest aktywny."
 
 msgid "The data should be a valid ASCII string."
-msgstr ""
+msgstr "Dane powinny być prawidłowym ciągiem ASCII."
 
 msgid "The status length is not supported."
-msgstr ""
+msgstr "Długość statusu nie jest obsługiwana."
 
 msgid "The status is not supported."
-msgstr ""
+msgstr "Ten status nie jest obsługiwany."
 
 msgid "Single sign-on failed."
-msgstr ""
+msgstr "Pojedyncze logowanie nie powiodło się."
 
 msgid "Provider error: \"{0}\""
-msgstr ""
+msgstr "Błąd dostawcy: \"{0}\""
 
 msgid "Email not provided by provider."
-msgstr ""
+msgstr "Dostawca nie podał adresu e-mail."
 
 msgid "Username mismatch."
-msgstr ""
+msgstr "Niezgodność nazwy użytkownika."
 
 msgid "No valid SSO settings found."
-msgstr ""
+msgstr "Nie znaleziono prawidłowych ustawień SSO."
 
 msgid "The user id should be a valid UUID."
-msgstr ""
+msgstr "ID użytkownika powinno być prawidłowym UUID."
 
 msgid "The authentication token does not exist."
-msgstr ""
+msgstr "Token uwierzytelniania nie istnieje."
 
 msgid "The SSO authentication token is invalid."
-msgstr ""
+msgstr "Token uwierzytelniania SSO jest nieprawidłowy."
 
 msgid "Settings id is missing."
-msgstr ""
+msgstr "Brakuje ID ustawień."
 
 msgid "User id mismatch."
-msgstr ""
+msgstr "Niezgodność ID użytkownika."
 
 msgid "Token IP is missing."
-msgstr ""
+msgstr "Brakuje tokena IP."
 
 msgid "User IP mismatch."
-msgstr ""
+msgstr "Niezgodność IP użytkownika."
 
 msgid "User agent is missing."
-msgstr ""
+msgstr "Brakuje agenta użytkownika."
 
 msgid "User agent mismatch."
-msgstr ""
+msgstr "Niezgodność agenta użytkownika."
 
 msgid "Settings mismatch."
-msgstr ""
+msgstr "Niezgodność ustawień."
 
 msgid "The SSO key could not be saved."
-msgstr ""
+msgstr "Nie udało się zapisać klucza SSO."
 
 msgid "Please try again later."
-msgstr ""
+msgstr "Spróbuj ponownie później."
 
 msgid "The SSO key does not exist."
-msgstr ""
+msgstr "Klucz SSO nie istnieje."
 
 msgid "The SSO key could not be deleted."
-msgstr ""
+msgstr "Nie udało się usunąć klucza SSO."
 
 msgid "Could not update the SSO settings."
-msgstr ""
+msgstr "Nie udało się zaktualizować ustawień SSO."
 
 msgid "The settings status is invalid."
-msgstr ""
+msgstr "Status ustawień jest nieprawidłowy."
 
 msgid "Invalid status."
-msgstr ""
+msgstr "Nieprawidłowy status."
 
 msgid "Could not delete the SSO settings."
-msgstr ""
+msgstr "Nie udało się usunąć ustawień SSO."
 
 msgid "Could not delete the draft SSO settings."
-msgstr ""
+msgstr "Nie udało się usunąć ustawień szkicu SSO."
 
 msgid "The SSO settings do not exist."
-msgstr ""
+msgstr "Ustawienia SSO nie istnieją."
 
 msgid "The SSO setting cannot be decrypted."
-msgstr ""
+msgstr "Nie można odszyfrować ustawienia SSO."
 
 msgid "The SSO setting cannot be decoded."
-msgstr ""
+msgstr "Nie można zdekodować ustawienia SSO."
 
 msgid "Only administrators can create SSO settings."
-msgstr ""
+msgstr "Tylko administratorzy mogą tworzyć ustawienia SSO."
 
 msgid "Something went wrong when validating the Azure single-sign on settings."
-msgstr ""
+msgstr "Coś poszło nie tak podczas walidacji ustawień pojedynczego logowoania Azure."
 
 msgid "It is not possible to save the SSO settings."
-msgstr ""
+msgstr "Zapisanie ustawień SSO nie jest możliwe."
 
 msgid "Cannot parse JWKS endpoint response."
-msgstr ""
+msgstr "Nie można sparsować odpowiedzi endpointu JWKS."
 
 msgid "Invalid JWKS endpoint response. Keys missing."
-msgstr ""
+msgstr "Nieprawidłowa odpowiedź endpointu JWKS. Brakuje kluczy."
 
 msgid "Failed to read certificate: {0}"
-msgstr ""
+msgstr "Nie udało się odczytać certyfikatu: {0}"
 
 msgid "Failed to read public key from certificate: {0}"
-msgstr ""
+msgstr "Nie udało się odczytać klucza publicznego z certyfikatu: {0}"
 
 msgid "Failed to public key properties from certificate: {0}"
-msgstr ""
+msgstr "Nie udało się opublikować właściwości klucza z certyfikatu: {0}"
 
 msgid "Azure JWT token is missing."
-msgstr ""
+msgstr "Brakuje tokena Azure JWT."
 
 msgid "Unable to decode Azure JWT token."
-msgstr ""
+msgstr "Nie można zdekodować tokena Azure JWT."
 
 msgid "Single-sign on was a success"
-msgstr ""
+msgstr "Pojedyncze logowanie powiodło się"
 
 msgid "You do not have the permission to edit shared tags on this resource."
 msgstr "Nie masz uprawnień do edytowania udostępnionych tagów w tym zasobie."
@@ -4161,9 +4158,6 @@ msgstr "strona główna"
 
 msgid "login"
 msgstr "logowanie"
-
-msgid "register"
-msgstr "rejestracja"
 
 msgid "{0} ({1}) just completed an account recovery. Feel free to get in touch with this user if you feel this action looks suspicious."
 msgstr "Użytkownik {0} ({1}) zakończył proces odzyskiwania konta. Skontaktuj się z administratorem, jeśli uważasz, że to działanie jest podejrzane."
