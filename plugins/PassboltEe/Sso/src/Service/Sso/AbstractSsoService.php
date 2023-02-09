@@ -31,6 +31,7 @@ use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Service\SsoStates\SsoStatesAssertService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesSetService;
 use Passbolt\Sso\Utility\OpenId\ResourceOwnerWithEmailInterface;
@@ -182,9 +183,7 @@ abstract class AbstractSsoService
 
         // Check the token against extended user info and consume it
         $uac = new ExtendedUserAccessControl($user->role->name, $user->id, $user->username, $ip, $userAgent);
-        // TODO: Uncomment assertAndConsume
-//        (new SsoAuthenticationTokenGetService())
-//            ->assertAndConsume($ssoState, $uac, $this->getSettings()->id);
+        (new SsoStatesAssertService())->assertAndConsume($ssoState, $this->getSettings()->id, $uac);
 
         // Assert access request and if it matches current suer
         $this->getResourceOwnerAndAssertAgainstUser($code, $user);

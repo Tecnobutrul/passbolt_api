@@ -144,6 +144,13 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
             ->ssoSettingsId($settings->id)
             ->userAgent('something else')
             ->persist();
+        /**
+         * Note: Can't use `mockUserIp()` because this test doesn't extend AppIntegrationTestCase.
+         * TODO: Discuss this.
+         */
+        $this->configRequest([
+            'environment' => ['REMOTE_ADDR' => $ssoState->ip],
+        ]);
 
         $this->logInAs($admin);
 
