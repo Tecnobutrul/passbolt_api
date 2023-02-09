@@ -17,6 +17,9 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Model\Entity;
 
+use Cake\Core\Configure;
+use Cake\Http\Exception\InternalErrorException;
+use Cake\I18n\FrozenTime;
 use Cake\ORM\Entity;
 
 /**
@@ -44,6 +47,17 @@ class SsoState extends Entity
     public const TYPE_SSO_STATE = 'sso_state';
 
     /**
+     * Default length
+     */
+    public const DEFAULT_LENGTH_STATE = 32;
+    public const DEFAULT_LENGTH_NONCE = 32;
+
+    /**
+     * Default expiry duration
+     */
+    public const DEFAULT_EXPIRY_DURATION_STATE = '10 minutes';
+
+    /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
      * Note that when '*' is set to true, this allows all unspecified fields to
@@ -65,4 +79,50 @@ class SsoState extends Entity
         'sso_setting' => false,
         'user' => false,
     ];
+
+    /**
+     * Returns random string value to be used as state, nonce, etc.
+     *
+     * @param int $length Length of the random string to be generated.
+     * @return string
+     * @throws \Exception
+     */
+    public static function generate(int $length = 32): string
+    {
+        return bin2hex(random_bytes($length / 2));
+    }
+
+    /**
+     * @return \Cake\I18n\FrozenTime
+     */
+    public function getExpiryTime(): FrozenTime
+    {
+        $expiryTime = (new FrozenTime($this->created))->modify('+' . $this->getExpiryDuration());
+
+        /** @phpstan-ignore-next-line */
+        if ($expiryTime === false) {
+            throw new InternalErrorException(__('Invalid expiry time {0}.', $this->getExpiryDuration()));
+        }
+
+        return $expiryTime;
+    }
+
+    /**
+     * Returns state expiry duration.
+     *
+     * @return string
+     */
+    public function getExpiryDuration(): string
+    {
+        $expiryDuration = Configure::read(
+            sprintf('passbolt.auth.token.%s.expiry', self::TYPE_SSO_STATE)
+        );
+
+        // Fallback to safe default if value is not present in config
+        if ($expiryDuration === null) {
+            $expiryDuration = self::DEFAULT_EXPIRY_DURATION_STATE;
+        }
+
+        return $expiryDuration;
+    }
 }

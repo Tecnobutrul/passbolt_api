@@ -17,9 +17,16 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Model\Table;
 
+use App\Model\Rule\IsNotSoftDeletedRule;
+use App\Model\Validation\User\IsValidIpValidationRule;
+use App\Model\Validation\User\IsValidUserAgentValidationRule;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Model\Validation\IsValidNonceValidationRule;
+use Passbolt\Sso\Model\Validation\IsValidStateValidationRule;
+use Passbolt\Sso\Model\Validation\IsValidTypeValidationRule;
 
 /**
  * SsoStates Model
@@ -62,7 +69,7 @@ class SsoStatesTable extends Table
         $this->belongsTo('SsoSettings', [
             'foreignKey' => 'sso_settings_id',
             'joinType' => 'INNER',
-            'className' => 'PassboltEe/Sso.SsoSettings',
+            'className' => 'Passbolt/Sso.SsoSettings',
         ]);
         $this->belongsTo('Users', [
             'foreignKey' => 'user_id',
@@ -79,48 +86,60 @@ class SsoStatesTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
-            ->scalar('nonce')
-            ->maxLength('nonce', 64)
-            ->requirePresence('nonce', 'create')
-            ->notEmptyString('nonce')
-            ->add('nonce', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+            ->uuid('id', __('The identifier should be a valid UUID.'))
+            ->allowEmptyString('id', __('The identifier should not be empty.'), 'create');
 
         $validator
-            ->scalar('type')
-            ->maxLength('type', 16)
-            ->requirePresence('type', 'create')
-            ->notEmptyString('type');
+            ->ascii('nonce', __('The nonce should be a valid ASCII string.'))
+            ->maxLength(
+                'nonce',
+                SsoState::DEFAULT_LENGTH_NONCE,
+                __('The nonce length should be maximum {0} characters.', SsoState::DEFAULT_LENGTH_NONCE)
+            )
+            ->requirePresence('nonce', 'create', __('A nonce is required.'))
+            ->notEmptyString('nonce', __('The nonce should not be empty.'))
+            ->add('nonce', 'isValidNonce', new IsValidNonceValidationRule());
 
         $validator
-            ->scalar('state')
-            ->maxLength('state', 64)
-            ->requirePresence('state', 'create')
-            ->notEmptyString('state')
-            ->add('state', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+            ->ascii('type', __('The type should be a valid ASCII string.'))
+            ->maxLength('type', 16, __('The type length should be maximum {0} characters.', 16))
+            ->requirePresence('type', 'create', __('A type is required.'))
+            ->notEmptyString('type', __('The type should not be empty.'))
+            ->add('type', 'isValidType', new IsValidTypeValidationRule());
 
         $validator
-            ->uuid('sso_settings_id')
-            ->notEmptyString('sso_settings_id');
+            ->ascii('state', __('The state should be a valid ASCII string.'))
+            ->maxLength(
+                'state',
+                SsoState::DEFAULT_LENGTH_STATE,
+                __('The state length should be maximum {0} characters.', SsoState::DEFAULT_LENGTH_STATE)
+            )
+            ->requirePresence('state', 'create', __('A state is required.'))
+            ->notEmptyString('state', __('The state should not be empty.'))
+            ->add('state', 'isValidState', new IsValidStateValidationRule());
 
         $validator
-            ->uuid('user_id')
-            ->allowEmptyString('user_id');
+            ->uuid('sso_settings_id', __('The SSO settings identifier should be a valid UUID.'))
+            ->notEmptyString('sso_settings_id', __('The SSO settings identifier should not be empty.'));
 
         $validator
-            ->scalar('user_agent')
-            ->maxLength('user_agent', 255)
-            ->requirePresence('user_agent', 'create')
-            ->notEmptyString('user_agent');
+            ->uuid('user_id', __('The user identifier should be a valid UUID.'))
+            ->allowEmptyString('user_id', __('The user identifier should not be empty.'), false);
 
         $validator
-            ->scalar('ip')
-            ->maxLength('ip', 45)
-            ->requirePresence('ip', 'create')
-            ->notEmptyString('ip');
+            ->ascii('user_agent', __('The user agent should be a valid ASCII string.'))
+            ->maxLength('user_agent', 255, __('The user agent length should be maximum {0} characters.', 255))
+            ->requirePresence('user_agent', 'create', __('A user agent is required.'))
+            ->notEmptyString('user_agent', __('The user agent should not be empty.'))
+            ->add('user_agent', 'isValidUserAgent', new IsValidUserAgentValidationRule());
 
         $validator
-            ->dateTime('deleted')
-            ->allowEmptyDateTime('deleted');
+            ->maxLength('ip', 45, __('The IP length should be maximum {0} characters.', 45))
+            ->requirePresence('ip', 'create', __('An IP is required.'))
+            ->notEmptyString('ip', __('The IP should not be empty.'))
+            ->add('ip', 'isValidIp', new IsValidIpValidationRule());
+
+        $validator->allowEmptyDateTime('deleted');
 
         return $validator;
     }
@@ -134,10 +153,33 @@ class SsoStatesTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->isUnique(['nonce']), ['errorField' => 'nonce']);
-        $rules->add($rules->isUnique(['state']), ['errorField' => 'state']);
-        $rules->add($rules->existsIn('sso_settings_id', 'SsoSettings'), ['errorField' => 'sso_settings_id']);
-        $rules->add($rules->existsIn('user_id', 'Users'), ['errorField' => 'user_id']);
+        $rules->add(
+            $rules->isUnique(['nonce'], __('This nonce is already in use.')),
+            ['errorField' => 'nonce']
+        );
+        $rules->add(
+            $rules->isUnique(['state'], __('This state is already in use.')),
+            ['errorField' => 'state']
+        );
+
+        $rules->add(
+            $rules->existsIn(
+                'sso_settings_id',
+                'SsoSettings',
+                __('The SSO setting identifier does not exist.')
+            ),
+            ['errorField' => 'sso_settings_id']
+        );
+        $rules->add(
+            $rules->existsIn('user_id', 'Users', __('The user identifier does not exist.')),
+            ['errorField' => 'user_id']
+        );
+
+        $rules->addCreate(new IsNotSoftDeletedRule(), 'user_is_soft_deleted', [
+            'table' => 'Users',
+            'errorField' => 'user_id',
+            'message' => __('The user must be active.'),
+        ]);
 
         return $rules;
     }

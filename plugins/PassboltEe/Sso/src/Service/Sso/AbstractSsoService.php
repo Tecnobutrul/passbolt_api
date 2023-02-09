@@ -30,7 +30,9 @@ use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
+use Passbolt\Sso\Service\SsoStates\SsoStatesSetService;
 use Passbolt\Sso\Utility\OpenId\ResourceOwnerWithEmailInterface;
 
 abstract class AbstractSsoService
@@ -111,11 +113,11 @@ abstract class AbstractSsoService
             throw new InternalErrorException('Invalid use. State not set.');
         }
 
-        // Store the OAuth state in authentication token
-        $token = $this->createSsoAuthStateToken($this->provider->getState(), $uac, $this->settings->id);
+        // Store the OAuth state in sso state
+        $ssoState = $this->createSsoAuthStateToken($this->provider->getState(), $uac, $this->settings->id);
 
         // Build cookie that matches the OAuth state
-        return $this->createHttpOnlySecureCookie($token);
+        return $this->createHttpOnlySecureCookie($ssoState);
     }
 
     /**
@@ -134,17 +136,17 @@ abstract class AbstractSsoService
     }
 
     /**
-     * @param \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $token token
+     * @param \Passbolt\Sso\Model\Entity\SsoState $ssoState SSO state.
      * @return \Cake\Http\Cookie\Cookie
      */
-    protected function createHttpOnlySecureCookie(SsoAuthenticationToken $token): Cookie
+    protected function createHttpOnlySecureCookie(SsoState $ssoState): Cookie
     {
         return (new Cookie(self::SSO_STATE_COOKIE))
             ->withPath('/sso')
-            ->withValue($token->token)
+            ->withValue($ssoState->state)
             ->withSecure(true)
             ->withHttpOnly(true)
-            ->withExpiry($token->getExpiryTime());
+            ->withExpiry($ssoState->getExpiryTime());
     }
 
     /**
@@ -260,14 +262,14 @@ abstract class AbstractSsoService
      * @param string $state uuid
      * @param \App\Utility\ExtendedUserAccessControl $uac extend user access control
      * @param string $settingsId uuid
-     * @return \Passbolt\Sso\Model\Entity\SsoAuthenticationToken token
+     * @return \Passbolt\Sso\Model\Entity\SsoState
      */
     public function createSsoAuthStateToken(
         string $state,
         ExtendedUserAccessControl $uac,
         string $settingsId
-    ): SsoAuthenticationToken {
-        return $this->createSsoAuthToken($state, SsoAuthenticationToken::TYPE_SSO_STATE, $uac, $settingsId);
+    ): SsoState {
+        return (new SsoStatesSetService())->create($state, $settingsId, $uac);
     }
 
     /**

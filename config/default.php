@@ -17,6 +17,7 @@ use App\Model\Entity\AuthenticationToken;
 use App\Utility\AuthToken\AuthTokenExpiryConfigValidator;
 use Passbolt\JwtAuthentication\Service\AccessToken\JwtAbstractService;
 use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\Sso\Model\Entity\SsoState;
 
 $authTokenExpiryConfigValidator = new AuthTokenExpiryConfigValidator();
 
@@ -72,7 +73,7 @@ return [
                 SsoAuthenticationToken::TYPE_SSO_GET_KEY => [
                     'expiry' => filter_var(env('PASSBOLT_AUTH_SSO_GET_KEY', '10 minutes'), FILTER_CALLBACK, ['options' => $authTokenExpiryConfigValidator])
                 ],
-                SsoAuthenticationToken::TYPE_SSO_STATE => [
+                SsoState::TYPE_SSO_STATE => [
                     'expiry' => filter_var(env('PASSBOLT_AUTH_SSO_STATE', '10 minutes'), FILTER_CALLBACK, ['options' => $authTokenExpiryConfigValidator])
                 ],
             ]

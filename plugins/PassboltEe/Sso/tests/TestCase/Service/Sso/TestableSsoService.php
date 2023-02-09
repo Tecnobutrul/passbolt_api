@@ -23,16 +23,16 @@ use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\GenericProvider;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Service\Sso\AbstractSsoService;
-use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
+use Passbolt\Sso\Test\Factory\SsoStateFactory;
 
 class TestableSsoService extends AbstractSsoService
 {
     public function createStateCookie(ExtendedUserAccessControl $uac): Cookie
     {
-        $token = SsoAuthenticationTokenFactory::make()->persist();
+        $ssoState = SsoStateFactory::make()->persist();
 
-        return $this->createHttpOnlySecureCookie($token);
+        return $this->createHttpOnlySecureCookie($ssoState);
     }
 
     public function getAuthorizationUrl(ExtendedUserAccessControl $uac): string

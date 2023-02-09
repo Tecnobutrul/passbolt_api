@@ -19,7 +19,9 @@ namespace Passbolt\Sso\Test\TestCase\Service\Sso;
 
 use App\Test\Factory\UserFactory;
 use App\Utility\ExtendedUserAccessControl;
+use Cake\Core\Configure;
 use Cake\Http\Exception\BadRequestException;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 use Passbolt\Sso\Utility\OpenId\ResourceOwnerWithEmailInterface;
 
@@ -27,6 +29,10 @@ class AbstractSsoAzureServiceTest extends SsoTestCase
 {
     public function testSsoAbstractSsoAzureService_createHttpOnlySecureCookie(): void
     {
+        Configure::write(
+            sprintf('passbolt.plugins.sso.expiry.%s', SsoState::TYPE_SSO_STATE),
+            '10 minutes'
+        );
         $user = UserFactory::make()->active()->persist();
         $uac = new ExtendedUserAccessControl($user->role->name, $user->id, $user->username, '127.0.0.1', 'phpunit');
         $sut = new TestableSsoService();
