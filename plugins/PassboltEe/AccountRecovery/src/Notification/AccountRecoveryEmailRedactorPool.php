@@ -28,7 +28,6 @@ use Passbolt\AccountRecovery\Notification\Response\AccountRecoveryResponseApprov
 use Passbolt\AccountRecovery\Notification\Response\AccountRecoveryResponseCreatedAdminEmailRedactor;
 use Passbolt\AccountRecovery\Notification\Response\AccountRecoveryResponseCreatedAllAdminsEmailRedactor;
 use Passbolt\AccountRecovery\Notification\Response\AccountRecoveryResponseRejectedUserEmailRedactor;
-use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettings;
 
 class AccountRecoveryEmailRedactorPool extends AbstractSubscribedEmailRedactorPool
 {
@@ -74,16 +73,5 @@ class AccountRecoveryEmailRedactorPool extends AbstractSubscribedEmailRedactorPo
         }
 
         return $redactors;
-    }
-
-    /**
-     * Return true if the redactor is enabled
-     *
-     * @param string $notificationSettingPath Notification Settings path with dot notation
-     * @return mixed
-     */
-    private function isRedactorEnabled(string $notificationSettingPath)
-    {
-        return EmailNotificationSettings::get($notificationSettingPath);
     }
 }

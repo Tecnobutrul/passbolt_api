@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 41c2572bd9bd4cc908d3e09e0cbed6e5\n"
-"POT-Creation-Date: 2023-01-17 14:36+0000\n"
-"PO-Revision-Date: 2023-01-17 15:21\n"
+"POT-Creation-Date: 2023-02-08 11:37+0000\n"
+"PO-Revision-Date: 2023-02-08 12:41\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Swedish\n"
 "MIME-Version: 1.0\n"
@@ -2437,12 +2437,6 @@ msgstr "Den fullständiga bas-URL: en får inte vara tom"
 msgid "The full base url should be a valid BMP-UTF8 string."
 msgstr "Den fullständiga bas-URL: en bör vara en giltig BMP-UTF8-sträng."
 
-msgid "A public registration setting is required."
-msgstr "En offentlig registreringsinställning krävs."
-
-msgid "The public registration setting should be a valid boolean."
-msgstr "Inställningen för offentlig registrering ska vara en giltig boolean."
-
 msgid "A force ssl status is required."
 msgstr "En tvingande ssl status krävs."
 
@@ -2584,6 +2578,12 @@ msgstr "port"
 msgid "Port"
 msgstr "Port"
 
+msgid "client"
+msgstr ""
+
+msgid "Client"
+msgstr ""
+
 msgid "Passbolt is not configured."
 msgstr "Passbolt har inte konfigurerats."
 
@@ -2652,12 +2652,6 @@ msgstr "Fullständig bas-URL"
 
 msgid "This is the url where passbolt will be accessible. This url will be used for places where the passbolt url cannot be guessed automatically, such as links in emails. No trailing slash."
 msgstr "Detta är URL: en där passbolt kommer att vara tillgänglig. Denna url kommer att användas för platser där passbolts URL inte kan gissas automatiskt, till exempel länkar i e-postmeddelanden. Inget avslutande snedstreck."
-
-msgid "Allow public registration?"
-msgstr "Tillåt offentlig registrering?"
-
-msgid "Allowing public registration means that any visitor can create himself an account on your passbolt. Unless your instance of passbolt is not reachable by the outside world, it is usually a bad idea."
-msgstr "Att tillåta offentlig registrering innebär att alla besökare kan skapa sig ett konto på din passbolt. Om inte din instans av passbolt inte kan nås av omvärlden, är det oftast en dålig idé."
 
 msgid "Force SSL?"
 msgstr "Tvinga SSL?"
@@ -3781,6 +3775,9 @@ msgstr "{0} redigerade mappen {1}"
 msgid "Could not validate folder data."
 msgstr "Kunde inte validera mappdata."
 
+msgid "The folder parent id should be a valid UUID."
+msgstr ""
+
 msgid "The folder parent must exist."
 msgstr "Mappens överordnade måste finnas."
 
@@ -4161,9 +4158,6 @@ msgstr "hem"
 
 msgid "login"
 msgstr "logga in"
-
-msgid "register"
-msgstr "registrera"
 
 msgid "{0} ({1}) just completed an account recovery. Feel free to get in touch with this user if you feel this action looks suspicious."
 msgstr ""

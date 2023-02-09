@@ -16,6 +16,8 @@ declare(strict_types=1);
  */
 namespace App\Test\Lib;
 
+use App\Authenticator\AbstractSessionIdentificationService;
+use App\Authenticator\SessionIdentificationServiceInterface;
 use App\Middleware\CsrfProtectionMiddleware;
 use App\Test\Factory\UserFactory;
 use App\Test\Lib\Model\AvatarsModelTrait;
@@ -191,5 +193,18 @@ abstract class AppIntegrationTestCase extends TestCase
     public function mockUserAgent(string $agent = 'foo')
     {
         $this->_request['headers']['USER_AGENT'] = $agent;
+    }
+
+    /**
+     * Sets given IP address to server request object.
+     *
+     * @param string $ip IP address to mock.
+     * @return void
+     */
+    public function mockUserIp(string $ip = '127.0.0.1')
+    {
+        $this->configRequest([
+            'environment' => ['REMOTE_ADDR' => $ip],
+        ]);
     }
 }

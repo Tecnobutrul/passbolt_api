@@ -18,11 +18,13 @@ declare(strict_types=1);
 namespace Passbolt\Folders\Service\FoldersRelations;
 
 use App\Error\Exception\ValidationException;
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 
 class FoldersRelationsCreateService
 {
+    use LocatorAwareTrait;
+
     /**
      * @var \Passbolt\Folders\Model\Table\FoldersRelationsTable
      */
@@ -34,62 +36,20 @@ class FoldersRelationsCreateService
     public function __construct()
     {
         /** @phpstan-ignore-next-line */
-        $this->foldersRelationsTable = TableRegistry::getTableLocator()->get('Passbolt/Folders.FoldersRelations');
+        $this->foldersRelationsTable = $this->fetchTable('Passbolt/Folders.FoldersRelations');
     }
 
     /**
-     * Create a folder relation for the current user.
+     * Create a folder relation.
      *
-     * @param string $foreignModel The target foreign model
-     * @param string $foreignId The target foreign instance id
-     * @param string $userId The target user id
-     * @param string|null $folderParentId (optional) The target folder destination.
+     * @param array $folderRelationData The folder relation data
      * @param bool $checkRules (optional) Should the table rules be checked while saving the entity. Default true.
      * @return \Passbolt\Folders\Model\Entity\FoldersRelation
      * @throws \Exception If an unexpected error occurred
      */
-    public function create(
-        string $foreignModel,
-        string $foreignId,
-        string $userId,
-        ?string $folderParentId = null,
-        ?bool $checkRules = true
-    ): FoldersRelation {
-        $folderRelation = null;
-
-        $this->foldersRelationsTable->getConnection()->transactional(
-            function () use (&$folderRelation, $foreignModel, $foreignId, $userId, $folderParentId, $checkRules) {
-                $folderRelation = $this->createUserFolderRelation(
-                    $foreignModel,
-                    $foreignId,
-                    $userId,
-                    $folderParentId,
-                    $checkRules
-                );
-            }
-        );
-
-        return $folderRelation;
-    }
-
-    /**
-     * Create and save the folder relation in database.
-     *
-     * @param string $foreignModel The target foreign model
-     * @param string $foreignId The target foreign instance id
-     * @param string $userId The target user id
-     * @param string|null $folderParentId (optional) The target folder destination.
-     * @param bool $checkRules (optional) Should the table rules be checked while saving the entity. Default true.
-     * @return \Passbolt\Folders\Model\Entity\FoldersRelation
-     */
-    private function createUserFolderRelation(
-        string $foreignModel,
-        string $foreignId,
-        string $userId,
-        ?string $folderParentId = null,
-        ?bool $checkRules = true
-    ): FoldersRelation {
-        $folderRelation = $this->buildFolderRelationEntity($foreignModel, $foreignId, $userId, $folderParentId);
+    public function create(array $folderRelationData, ?bool $checkRules = true): FoldersRelation
+    {
+        $folderRelation = $this->buildFolderRelationEntity($folderRelationData);
         $this->handleFolderRelationValidationErrors($folderRelation);
         $this->foldersRelationsTable->save($folderRelation, ['checkRules' => $checkRules]);
         $this->handleFolderRelationValidationErrors($folderRelation);
@@ -100,24 +60,11 @@ class FoldersRelationsCreateService
     /**
      * Build the folder relation entity.
      *
-     * @param string $foreignModel The target foreign model
-     * @param string $foreignId The target foreign instance id
-     * @param string $userId The target user id
-     * @param string|null $folderParentId (optional) The target folder destination.
+     * @param array $folderRelationData The folder relation data
      * @return \Passbolt\Folders\Model\Entity\FoldersRelation
      */
-    private function buildFolderRelationEntity(
-        string $foreignModel,
-        string $foreignId,
-        string $userId,
-        ?string $folderParentId = null
-    ): FoldersRelation {
-        $data = [
-            'foreign_model' => $foreignModel,
-            'foreign_id' => $foreignId,
-            'user_id' => $userId,
-            'folder_parent_id' => $folderParentId,
-        ];
+    private function buildFolderRelationEntity(array $folderRelationData): FoldersRelation
+    {
         $accessibleFields = [
             'foreign_model' => true,
             'foreign_id' => true,
@@ -125,7 +72,7 @@ class FoldersRelationsCreateService
             'folder_parent_id' => true,
         ];
 
-        return $this->foldersRelationsTable->newEntity($data, ['accessibleFields' => $accessibleFields]);
+        return $this->foldersRelationsTable->newEntity($folderRelationData, ['accessibleFields' => $accessibleFields]);
     }
 
     /**

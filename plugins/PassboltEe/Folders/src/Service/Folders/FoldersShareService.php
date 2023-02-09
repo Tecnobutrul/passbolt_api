@@ -30,6 +30,7 @@ use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 use Passbolt\Folders\Model\Behavior\FolderizableBehavior;
+use Passbolt\Folders\Model\Dto\FolderRelationDto;
 use Passbolt\Folders\Model\Entity\Folder;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 use Passbolt\Folders\Service\FoldersRelations\FoldersRelationsAddItemsToUserTreeService;
@@ -345,7 +346,7 @@ class FoldersShareService
             return;
         }
 
-        $items = [['foreign_model' => FoldersRelation::FOREIGN_MODEL_FOLDER, 'foreign_id' => $folder->id]];
+        $items = [new FolderRelationDto(FoldersRelation::FOREIGN_MODEL_FOLDER, $folder->id)];
         $this->foldersRelationsAddItemsToUserTreeService->addItemsToUserTree($uac, $userId, $items);
         $this->dispatchEvent(self::FOLDERS_SHARE_FOLDER_EVENT, [
             'uac' => $uac,
