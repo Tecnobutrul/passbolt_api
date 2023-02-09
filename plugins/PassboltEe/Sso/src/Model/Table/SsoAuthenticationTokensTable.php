@@ -36,7 +36,6 @@ class SsoAuthenticationTokensTable extends AuthenticationTokensTable
     public const SSO_ALLOWED_TYPES = [
         SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS,
         SsoAuthenticationToken::TYPE_SSO_GET_KEY,
-        SsoAuthenticationToken::TYPE_SSO_STATE,
     ];
 
     /**

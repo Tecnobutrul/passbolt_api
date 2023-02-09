@@ -35,16 +35,6 @@ class IsValidStateValidationRule extends PassboltValidationRule
      */
     public function rule($value, $context): bool
     {
-        if (!is_string($value)) {
-            return false;
-        }
-        if (!mb_check_encoding($value, 'ASCII')) {
-            return false;
-        }
-        if (strlen($value) !== SsoState::DEFAULT_LENGTH_STATE) {
-            return false;
-        }
-
-        return true;
+        return SsoState::isValidState($value);
     }
 }

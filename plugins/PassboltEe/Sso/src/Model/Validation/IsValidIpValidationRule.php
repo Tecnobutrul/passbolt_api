@@ -12,22 +12,29 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.9.0
+ * @since         3.11.0
  */
-namespace Passbolt\Sso\Utility\Validation;
 
+namespace Passbolt\Sso\Model\Validation;
+
+use App\Model\Validation\PassboltValidationRule;
 use Cake\Validation\Validation;
 
-class OAuthStateValidation
+class IsValidIpValidationRule extends PassboltValidationRule
 {
     /**
-     * TODO: Replace this method call with SsoState::isValidState()
-     *
-     * @param mixed $state expects uuid
-     * @return bool true if validate
+     * @inheritDoc
      */
-    public static function state($state): bool
+    public function defaultErrorMessage($value, $context): string
     {
-        return isset($state) && is_string($state) && Validation::uuid($state);
+        return __('The provided IP is invalid.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function rule($value, $context): bool
+    {
+        return Validation::ip($value);
     }
 }

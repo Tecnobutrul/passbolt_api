@@ -21,6 +21,7 @@ use Cake\Core\Configure;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\Entity;
+use Passbolt\Sso\Utility\AuthToken\SsoStateExpiry;
 
 /**
  * SsoState Entity
@@ -90,6 +91,19 @@ class SsoState extends Entity
     public static function generate(int $length = 32): string
     {
         return bin2hex(random_bytes($length / 2));
+    }
+
+    /**
+     * @param string $state State value to check.
+     * @return bool
+     */
+    public static function isValidState(string $state): bool
+    {
+        if (mb_strlen($state) !== 32) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

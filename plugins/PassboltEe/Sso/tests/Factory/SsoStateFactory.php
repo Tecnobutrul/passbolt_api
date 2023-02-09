@@ -83,6 +83,14 @@ class SsoStateFactory extends CakephpBaseFactory
     /**
      * @return $this
      */
+    public function userAgent(string $userAgent)
+    {
+        return $this->setField('user_agent', $userAgent);
+    }
+
+    /**
+     * @return $this
+     */
     public function deleted()
     {
         return $this->setField('deleted', Chronos::now());
