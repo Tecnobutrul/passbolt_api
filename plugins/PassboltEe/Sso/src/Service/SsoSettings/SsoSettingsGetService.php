@@ -27,25 +27,23 @@ use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Dto\AbstractSsoSettingsDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDefaultDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoSetting;
-use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
+use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
 
 class SsoSettingsGetService
 {
     /**
-     * @param string $token uuid
+     * @param string $state SSO State.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException if setting cannot be found
      * @throws \Cake\Http\Exception\InternalErrorException if there is an issue with settings data decryption
-     * @throws \App\Error\Exception\AuthenticationTokenDataPropertyException if setting id is missing in SsoAuthToken props
+     * @throws \App\Error\Exception\AuthenticationTokenDataPropertyException if setting id is missing in SsoState props
      * @return \Passbolt\Sso\Model\Dto\SsoSettingsDto
      */
-    public function getDraftSettingFromTokenOrFail(string $token): SsoSettingsDto
+    public function getDraftSettingFromStateOrFail(string $state): SsoSettingsDto
     {
-        $token = (new SsoAuthenticationTokenGetService())->getOrFail($token, SsoAuthenticationToken::TYPE_SSO_STATE);
-        $settingsId = $token->getDataProperty(SsoAuthenticationToken::DATA_SSO_SETTING_ID);
+        $ssoState = (new SsoStatesGetService())->getOrFail($state);
 
-        return $this->getDraftByIdOrFail($settingsId, true);
+        return $this->getDraftByIdOrFail($ssoState->sso_settings_id, true);
     }
 
     /**

@@ -66,8 +66,8 @@ class SsoAzureStage2Controller extends AbstractSsoController
     public function stage2AsAdmin(string $state, string $code): void
     {
         try {
-            // Get the settings from the authentication token data, we expect draft settings
-            $settingsDto = (new SsoSettingsGetService())->getDraftSettingFromTokenOrFail($state);
+            // Get the settings from the state, we expect draft settings
+            $settingsDto = (new SsoSettingsGetService())->getDraftSettingFromStateOrFail($state);
         } catch (\Exception $exception) {
             throw new BadRequestException($exception->getMessage(), 400, $exception);
         }

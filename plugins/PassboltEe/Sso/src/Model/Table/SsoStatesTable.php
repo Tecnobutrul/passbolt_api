@@ -20,6 +20,7 @@ namespace Passbolt\Sso\Model\Table;
 use App\Model\Rule\IsNotSoftDeletedRule;
 use App\Model\Validation\User\IsValidIpValidationRule;
 use App\Model\Validation\User\IsValidUserAgentValidationRule;
+use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
@@ -182,5 +183,17 @@ class SsoStatesTable extends Table
         ]);
 
         return $rules;
+    }
+
+    /**
+     * Applies active filter on query.
+     *
+     * @param \Cake\ORM\Query $query Query.
+     * @param array $options Options.
+     * @return \Cake\ORM\Query
+     */
+    public function findActive(Query $query, array $options)
+    {
+        return $query->where(['deleted IS' => null]);
     }
 }

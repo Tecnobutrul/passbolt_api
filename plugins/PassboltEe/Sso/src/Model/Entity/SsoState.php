@@ -21,6 +21,7 @@ use Cake\Core\Configure;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\Entity;
+use Passbolt\Sso\Utility\AuthToken\SsoStateExpiry;
 
 /**
  * SsoState Entity
@@ -93,6 +94,19 @@ class SsoState extends Entity
     }
 
     /**
+     * @param string $state State value to check.
+     * @return bool
+     */
+    public static function isValidState(string $state): bool
+    {
+        if (mb_strlen($state) !== 32) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @return \Cake\I18n\FrozenTime
      */
     public function getExpiryTime(): FrozenTime
@@ -124,5 +138,15 @@ class SsoState extends Entity
         }
 
         return $expiryDuration;
+    }
+
+    /**
+     * Checks if this SSO state is expired or not.
+     *
+     * @return bool
+     */
+    public function isExpired(): bool
+    {
+        return !$this->created->wasWithinLast($this->getExpiryDuration());
     }
 }

@@ -24,11 +24,11 @@ use Cake\Http\Exception\InternalErrorException;
 use Passbolt\Sso\Model\Dto\AbstractSsoSettingsDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDefaultDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
-use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
+use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 
 class SsoSettingsGetServiceTest extends SsoTestCase
@@ -157,18 +157,9 @@ class SsoSettingsGetServiceTest extends SsoTestCase
     {
         $settings = SsoSettingsFactory::make()->azure()->draft()->persist();
         $user = UserFactory::make()->admin()->active()->persist();
-        $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_STATE)
-            ->userId($user->id)
-            ->active()
-            ->data([
-                'sso_setting_id' => $settings->id,
-                'ip' => '127.0.0.1',
-                'user_agent' => 'phpunit',
-            ])
-            ->persist();
+        $ssoState = SsoStateFactory::make()->userId($user->id)->ssoSettingsId($settings->id)->persist();
 
-        $result = (new SsoSettingsGetService())->getDraftSettingFromTokenOrFail($token->token);
+        $result = (new SsoSettingsGetService())->getDraftSettingFromStateOrFail($ssoState->state);
         $this->assertEquals(SsoSetting::STATUS_DRAFT, $result->status);
         $this->assertTrue(isset($result->data));
     }
@@ -176,6 +167,7 @@ class SsoSettingsGetServiceTest extends SsoTestCase
     public function testSsoSettingsGetService_getDraftSettingFromTokenOrFail_Error(): void
     {
         $this->expectException(RecordNotFoundException::class);
-        (new SsoSettingsGetService())->getDraftSettingFromTokenOrFail(UuidFactory::uuid());
+
+        (new SsoSettingsGetService())->getDraftSettingFromStateOrFail(SsoState::generate());
     }
 }

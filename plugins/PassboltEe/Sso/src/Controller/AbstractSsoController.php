@@ -24,6 +24,7 @@ use App\Utility\ExtendedUserAccessControl;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Validation\Validation;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\AbstractSsoService;
 use Passbolt\Sso\Utility\Validation\OAuthStateValidation;
 
@@ -53,7 +54,7 @@ abstract class AbstractSsoController extends AppController
     public function getStateFromCookie(): string
     {
         $state = $this->request->getCookie(AbstractSsoService::SSO_STATE_COOKIE);
-        if (!is_string($state) || !OAuthStateValidation::state($state)) {
+        if (!is_string($state) || !SsoState::isValidState($state)) {
             throw new BadRequestException(__('The state is required in cookie.'));
         }
 
@@ -96,7 +97,7 @@ abstract class AbstractSsoController extends AppController
     public function getStateFromUrlQuery(): string
     {
         $state = $this->request->getQuery('state');
-        if (!is_string($state) || !OAuthStateValidation::state($state)) {
+        if (!is_string($state) || !SsoState::isValidState($state)) {
             throw new BadRequestException(__('The state is required in URL parameters.'));
         }
 
