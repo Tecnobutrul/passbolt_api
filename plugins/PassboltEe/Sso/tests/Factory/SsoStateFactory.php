@@ -13,10 +13,10 @@ use Passbolt\Sso\Model\Table\SsoStatesTable;
 /**
  * SsoStateFactory
  *
- * @method \Cake\ORM\Entity getEntity()
- * @method \Cake\ORM\Entity[] getEntities()
- * @method \Cake\ORM\Entity|\Cake\ORM\Entity[] persist()
- * @method static \Cake\ORM\Entity get(mixed $primaryKey, array $options = [])
+ * @method \Passbolt\Sso\Model\Entity\SsoState getEntity()
+ * @method \Passbolt\Sso\Model\Entity\SsoState[] getEntities()
+ * @method \Passbolt\Sso\Model\Entity\SsoState|\Passbolt\Sso\Model\Entity\SsoState[] persist()
+ * @method static \Passbolt\Sso\Model\Entity\SsoState get(mixed $primaryKey, array $options = [])
  */
 class SsoStateFactory extends CakephpBaseFactory
 {
@@ -40,9 +40,9 @@ class SsoStateFactory extends CakephpBaseFactory
     {
         $this->setDefaultData(function (Generator $faker) {
             return [
-                'nonce' => UuidFactory::uuid(),
+                'nonce' => SsoState::generate(),
+                'state' => SsoState::generate(),
                 'type' => SsoState::TYPE_SSO_STATE,
-                'state' => UuidFactory::uuid(),
                 'sso_settings_id' => UuidFactory::uuid(),
                 'user_id' => UuidFactory::uuid(),
                 'user_agent' => $faker->userAgent(),

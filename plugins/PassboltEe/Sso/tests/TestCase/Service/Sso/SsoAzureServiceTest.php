@@ -19,9 +19,9 @@ namespace Passbolt\Sso\Test\TestCase\Service\Sso;
 
 use App\Test\Factory\UserFactory;
 use App\Utility\ExtendedUserAccessControl;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Azure\SsoAzureService;
-use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
+use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
 class SsoAzureServiceTest extends SsoIntegrationTestCase
@@ -40,19 +40,14 @@ class SsoAzureServiceTest extends SsoIntegrationTestCase
         $url = $sut->getAuthorizationUrl($uac);
         $cookie = $sut->createStateCookie($uac);
 
-        // Check token props
-        /** @var SsoAuthenticationToken $token */
-        $token = SsoAuthenticationTokenFactory::find()->firstOrFail();
-
-        /**
-         * @psalm-suppress RedundantCondition needed to avoid SsoAuthenticationToken is not used in this file sniff
-         */
-        $this->assertTrue($token instanceof SsoAuthenticationToken);
-
-        $this->assertEquals($user->id, $token->user_id);
-        $this->assertEquals('127.0.0.1', $token->getDataProperty('ip'));
-        $this->assertEquals('phpunit', $token->getDataProperty('user_agent'));
-        $this->assertEquals($setting->id, $token->getDataProperty('sso_setting_id'));
+        // Check SSO state props
+        /** @var \Passbolt\Sso\Model\Entity\SsoState $ssoState */
+        $ssoState = SsoStateFactory::find()->firstOrFail();
+        $this->assertInstanceOf(SsoState::class, $ssoState);
+        $this->assertEquals($user->id, $ssoState->user_id);
+        $this->assertEquals('127.0.0.1', $ssoState->ip);
+        $this->assertEquals('phpunit', $ssoState->user_agent);
+        $this->assertEquals($setting->id, $ssoState->sso_settings_id);
 
         // Check URL props
         $data = $setting->getData();
@@ -64,14 +59,14 @@ class SsoAzureServiceTest extends SsoIntegrationTestCase
         $this->assertStringContainsString($data['url'] . '/', $url);
         $this->assertStringContainsString('/' . $data['tenant_id'] . '/', $url);
         $this->assertStringContainsString('client_id=' . $data['client_id'], $url);
-        $this->assertStringContainsString('state=' . $token->token, $url);
+        $this->assertStringContainsString('state=' . $ssoState->state, $url);
         $this->assertStringContainsString('prompt=login', $url);
         $this->assertStringContainsString('login_hint=' . urlencode($user->username), $url);
 
         // Check cookie props
         $this->assertTrue($cookie->isHttpOnly());
         $this->assertTrue($cookie->isSecure());
-        $this->assertEquals($token->token, $cookie->getValue());
+        $this->assertEquals($ssoState->state, $cookie->getValue());
     }
 
     public function testSsoAzureService_Error(): void

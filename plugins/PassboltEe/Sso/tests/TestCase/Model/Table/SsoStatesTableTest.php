@@ -3,7 +3,11 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Test\TestCase\Model\Table;
 
+use App\Test\Factory\UserFactory;
+use App\Utility\UuidFactory;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 
 /**
@@ -27,7 +31,7 @@ class SsoStatesTableTest extends SsoTestCase
     {
         parent::setUp();
 
-        $this->SsoStates = $this->fetchTable('PassboltEe/Sso.SsoStates');
+        $this->SsoStates = $this->fetchTable('Passbolt/Sso.SsoStates');
     }
 
     /**
@@ -41,24 +45,151 @@ class SsoStatesTableTest extends SsoTestCase
     }
 
     /**
-     * Test validationDefault method
-     *
-     * @return void
      * @uses \Passbolt\Sso\Model\Table\SsoStatesTable::validationDefault()
      */
-    public function testValidationDefault(): void
+    public function testSsoStatesTableValidationDefault_Success(): void
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $user = UserFactory::make()->admin()->persist();
+        $ssoSetting = SsoSettingsFactory::make()->persist();
+        $ssoState = $this->SsoStates->newEntity([
+            'nonce' => SsoState::generate(),
+            'state' => SsoState::generate(),
+            'type' => SsoState::TYPE_SSO_STATE,
+            'sso_settings_id' => $ssoSetting->id,
+            'user_id' => $user->id,
+            'ip' => '127.0.0.1',
+            'user_agent' => 'Foo user agent',
+        ]);
+
+        $this->assertEmpty($ssoState->getErrors());
     }
 
     /**
-     * Test buildRules method
-     *
-     * @return void
+     * @uses \Passbolt\Sso\Model\Table\SsoStatesTable::validationDefault()
+     */
+    public function testSsoStatesTableValidationDefault_ErrorEmptyValue(): void
+    {
+        $ssoState = $this->SsoStates->newEntity([]);
+
+        $errors = $ssoState->getErrors();
+        $keys = ['nonce', 'state', 'type', 'ip', 'user_agent'];
+        $this->assertNotEmpty($errors);
+        $this->assertArrayHasAttributes($keys, $errors);
+        foreach ($keys as $key) {
+            $this->assertArrayHasAttributes(['_required'], $errors[$key]);
+        }
+    }
+
+    /**
+     * @uses \Passbolt\Sso\Model\Table\SsoStatesTable::validationDefault()
+     */
+    public function testSsoStatesTableValidationDefault_ErrorInvalidValues(): void
+    {
+        $ssoState = $this->SsoStates->newEntity([
+            'nonce' => '123456',
+            'state' => '123456',
+            'type' => 'not-valid',
+            'sso_settings_id' => 1,
+            'user_id' => 1,
+            'ip' => 'foo',
+            'user_agent' => 1,
+        ]);
+
+        $errors = $ssoState->getErrors();
+        $this->assertNotEmpty($errors);
+        $this->assertArrayHasAttributes(
+            ['nonce', 'state', 'sso_settings_id', 'user_id', 'type', 'ip', 'user_agent'],
+            $errors
+        );
+        $this->assertArrayHasAttributes(['isValidNonce'], $errors['nonce']);
+        $this->assertArrayHasAttributes(['isValidState'], $errors['state']);
+        $this->assertArrayHasAttributes(['isValidType'], $errors['type']);
+        $this->assertArrayHasAttributes(['ascii', 'isValidUserAgent'], $errors['user_agent']);
+        $this->assertArrayHasAttributes(['isValidIp'], $errors['ip']);
+        $this->assertArrayHasAttributes(['uuid'], $errors['sso_settings_id']);
+        $this->assertArrayHasAttributes(['uuid'], $errors['user_id']);
+    }
+
+    /**
      * @uses \Passbolt\Sso\Model\Table\SsoStatesTable::buildRules()
      */
-    public function testBuildRules(): void
+    public function testSsoStatesTableBuildRules_ErrorExistsIn(): void
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $ssoState = $this->SsoStates->newEntity(
+            [
+                'nonce' => SsoState::generate(),
+                'state' => SsoState::generate(),
+                'type' => SsoState::TYPE_SSO_STATE,
+                'sso_settings_id' => UuidFactory::uuid(),
+                'user_id' => UuidFactory::uuid(),
+                'ip' => '127.0.0.1',
+                'user_agent' => 'Foo user agent',
+            ],
+            [
+                'accessibleFields' => [
+                    'nonce' => true,
+                    'state' => true,
+                    'type' => true,
+                    'sso_settings_id' => true,
+                    'user_id' => true,
+                    'ip' => true,
+                    'user_agent' => true,
+                ],
+            ],
+        );
+        $this->SsoStates->save($ssoState);
+
+        $errors = $ssoState->getErrors();
+        $this->assertCount(2, $errors);
+        $this->assertArrayHasAttributes(['_existsIn'], $errors['sso_settings_id']);
+        $this->assertArrayHasAttributes(['_existsIn'], $errors['user_id']);
+    }
+
+    /**
+     * @uses \Passbolt\Sso\Model\Table\SsoStatesTable::buildRules()
+     */
+    public function testSsoStatesTableBuildRules_ErrorUnique(): void
+    {
+        $user = UserFactory::make()->admin()->persist();
+        $ssoSetting = SsoSettingsFactory::make()->persist();
+        $state = SsoState::generate();
+        $nonce = SsoState::generate();
+        $accessibleFields = [
+            'accessibleFields' => [
+                'nonce' => true,
+                'state' => true,
+                'type' => true,
+                'sso_settings_id' => true,
+                'user_id' => true,
+                'ip' => true,
+                'user_agent' => true,
+            ],
+        ];
+        $this->SsoStates->save($this->SsoStates->newEntity([
+            'nonce' => $state,
+            'state' => $nonce,
+            'type' => SsoState::TYPE_SSO_STATE,
+            'sso_settings_id' => $ssoSetting->id,
+            'user_id' => $user->id,
+            'ip' => '127.0.0.1',
+            'user_agent' => 'Foo user agent',
+        ], $accessibleFields));
+
+        // Create duplicate entry
+        $ssoState = $this->SsoStates->newEntity([
+            'nonce' => $state,
+            'state' => $nonce,
+            'type' => SsoState::TYPE_SSO_STATE,
+            'sso_settings_id' => $ssoSetting->id,
+            'user_id' => $user->id,
+            'ip' => '127.0.0.1',
+            'user_agent' => 'Foo user agent',
+        ], $accessibleFields);
+        $this->SsoStates->save($ssoState);
+
+        $errors = $ssoState->getErrors();
+        $this->assertCount(2, $errors);
+        $this->assertArrayHasAttributes(['_isUnique'], $errors['nonce']);
+        $this->assertArrayHasAttributes(['_isUnique'], $errors['state']);
     }
 }
