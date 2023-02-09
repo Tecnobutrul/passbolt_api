@@ -20,7 +20,7 @@ use Cake\ORM\Locator\LocatorAwareTrait;
 use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 
 /**
- * Use in 20230206055150_V3110RefactorSsoStates migration.
+ * Used in 20230206055150_V3110RefactorSsoStates migration.
  */
 class DeleteSsoStateAuthenticationTokenService
 {

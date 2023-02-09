@@ -17,10 +17,10 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Service\SsoStates;
 
 use App\Utility\ExtendedUserAccessControl;
-use Cake\Chronos\Chronos;
 use Cake\Core\Configure;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
+use Cake\I18n\FrozenTime;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Entity\SsoState;
@@ -66,9 +66,9 @@ class SsoStatesAssertService
             throw new BadRequestException(trim($errorMsg));
         }
 
-//        if ($ssoState->isExpired()) {
-//            throw new BadRequestException($errorMsg . __('The SSO state is expired.'));
-//        }
+        if ($ssoState->isExpired()) {
+            throw new BadRequestException($errorMsg . __('The SSO state is expired.'));
+        }
 
         if ($ssoState->user_id !== $uac->getId() || !Validation::uuid($ssoState->user_id)) {
             throw new BadRequestException($errorMsg . __('User id mismatch.'));
@@ -103,7 +103,7 @@ class SsoStatesAssertService
         /** @var \Passbolt\Sso\Model\Table\SsoStatesTable $ssoStatesTable */
         $ssoStatesTable = $this->fetchTable('Passbolt/Sso.SsoStates');
 
-        $ssoState->deleted = Chronos::now();
+        $ssoState->deleted = FrozenTime::now();
 
         if (!$ssoStatesTable->save($ssoState)) {
             throw new InternalErrorException(__('The SSO state could not be saved.'));

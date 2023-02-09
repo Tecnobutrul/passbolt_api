@@ -21,8 +21,6 @@ use Cake\Validation\Validation;
 class OAuthStateValidation
 {
     /**
-     * TODO: Replace this method call with SsoState::isValidState()
-     *
      * @param mixed $state expects uuid
      * @return bool true if validate
      */

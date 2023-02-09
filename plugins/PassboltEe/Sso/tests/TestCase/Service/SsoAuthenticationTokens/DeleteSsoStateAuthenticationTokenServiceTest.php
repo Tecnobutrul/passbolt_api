@@ -47,9 +47,9 @@ class DeleteSsoStateAuthenticationTokenServiceTest extends SsoTestCase
      */
     public function tearDown(): void
     {
-        parent::tearDown();
-
         unset($this->service);
+
+        parent::tearDown();
     }
 
     public function testDeleteSsoStateAuthenticationTokenService_AllSsoStateRecordsDeleted(): void

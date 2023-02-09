@@ -82,8 +82,6 @@ class SsoStatesAssertServiceTest extends SsoTestCase
 
     public function testSsoStatesAssertService_ErrorStateExpired(): void
     {
-        $this->markTestSkipped('WIP');
-
         $user = UserFactory::make()->admin()->persist();
         $ssoSettingId = SsoSettingsFactory::make()->persist()->get('id');
         $ssoState = SsoStateFactory::make(['created' => Chronos::now()->subDay(1)])
@@ -99,7 +97,7 @@ class SsoStatesAssertServiceTest extends SsoTestCase
         );
 
         $this->expectException(BadRequestException::class);
-        // $this->expectErrorMessage('The SSO state is expired.');
+        $this->expectErrorMessage('The SSO state is expired.');
 
         $this->service->assertAndConsume($ssoState, $ssoSettingId, $uac);
     }
