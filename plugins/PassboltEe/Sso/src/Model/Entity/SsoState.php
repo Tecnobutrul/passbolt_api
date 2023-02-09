@@ -21,7 +21,6 @@ use Cake\Core\Configure;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\Entity;
-use Passbolt\Sso\Utility\AuthToken\SsoStateExpiry;
 
 /**
  * SsoState Entity
