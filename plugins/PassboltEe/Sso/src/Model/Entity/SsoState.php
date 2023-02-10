@@ -18,7 +18,6 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Model\Entity;
 
 use Cake\Core\Configure;
-use Cake\Http\Exception\InternalErrorException;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\Entity;
 
@@ -34,7 +33,7 @@ use Cake\ORM\Entity;
  * @property string $user_agent
  * @property string $ip
  * @property \Cake\I18n\FrozenTime $created
- * @property \Cake\I18n\FrozenTime|null $deleted
+ * @property \Cake\I18n\FrozenTime $deleted
  *
  * @property \Passbolt\Sso\Model\Entity\SsoSetting $sso_setting
  * @property \App\Model\Entity\User $user
@@ -113,14 +112,7 @@ class SsoState extends Entity
      */
     public function getExpiryTime(): FrozenTime
     {
-        $expiryTime = (new FrozenTime($this->created))->modify('+' . $this->getExpiryDuration());
-
-        /** @phpstan-ignore-next-line */
-        if ($expiryTime === false) {
-            throw new InternalErrorException(__('Invalid expiry time {0}.', $this->getExpiryDuration()));
-        }
-
-        return $expiryTime;
+        return $this->deleted;
     }
 
     /**
@@ -128,7 +120,7 @@ class SsoState extends Entity
      *
      * @return string
      */
-    public function getExpiryDuration(): string
+    public static function getExpiryDuration(): string
     {
         $expiryDuration = Configure::read(
             sprintf('passbolt.auth.token.%s.expiry', self::TYPE_SSO_STATE)
@@ -149,6 +141,6 @@ class SsoState extends Entity
      */
     public function isExpired(): bool
     {
-        return !$this->created->wasWithinLast($this->getExpiryDuration());
+        return $this->deleted->isPast();
     }
 }

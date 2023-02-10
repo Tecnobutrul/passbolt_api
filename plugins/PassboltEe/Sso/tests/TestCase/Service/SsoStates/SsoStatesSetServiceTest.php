@@ -75,7 +75,7 @@ class SsoStatesSetServiceTest extends SsoTestCase
         $this->assertEquals($uac->getId(), $result->user_id);
         $this->assertEquals($uac->getUserIp(), $result->ip);
         $this->assertEquals($uac->getUserAgent(), $result->user_agent);
-        $this->assertNull($result->deleted);
+        $this->assertTrue($result->deleted->isFuture());
     }
 
     public function testSsoStatesSetService_Error_InvalidState(): void

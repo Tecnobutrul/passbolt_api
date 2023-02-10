@@ -18,9 +18,11 @@ namespace Passbolt\Sso\Test\TestCase\Model\Table;
 
 use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
+use Cake\Chronos\Chronos;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
+use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 
 /**
@@ -202,5 +204,22 @@ class SsoStatesTableTest extends SsoTestCase
         $this->assertCount(2, $errors);
         $this->assertArrayHasAttributes(['_isUnique'], $errors['nonce']);
         $this->assertArrayHasAttributes(['_isUnique'], $errors['state']);
+    }
+
+    /**
+     * @uses \Passbolt\Sso\Model\Table\SsoStatesTable::findActive()
+     */
+    public function testSsoStatesTableFindActive(): void
+    {
+        // Active
+        $ssoState = SsoStateFactory::make()->persist();
+        $result = SsoStateFactory::find('active')->where(['state' => $ssoState->state])->first();
+        $this->assertNotNull($result);
+        $this->assertInstanceOf(SsoState::class, $result);
+
+        // Deleted
+        $ssoState = SsoStateFactory::make(['deleted' => Chronos::now()->subMinute(1)])->persist();
+        $result = SsoStateFactory::find('active')->where(['state' => $ssoState->state])->first();
+        $this->assertNull($result);
     }
 }

@@ -19,6 +19,7 @@ namespace Passbolt\Sso\Service\SsoStates;
 use App\Utility\ExtendedUserAccessControl;
 use Cake\Core\Exception\CakeException;
 use Cake\Http\Exception\InternalErrorException;
+use Cake\I18n\FrozenTime;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Passbolt\Sso\Model\Entity\SsoState;
 
@@ -48,6 +49,7 @@ class SsoStatesSetService
                     'user_id' => $uac->getId(),
                     'ip' => $uac->getUserIp(),
                     'user_agent' => $uac->getUserAgent(),
+                    'deleted' => FrozenTime::now()->modify('+' . SsoState::getExpiryDuration()),
                 ],
                 [
                     'accessibleFields' => [
@@ -58,6 +60,7 @@ class SsoStatesSetService
                         'user_id' => true,
                         'ip' => true,
                         'user_agent' => true,
+                        'deleted' => true,
                     ],
                 ],
             );

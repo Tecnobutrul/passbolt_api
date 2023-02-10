@@ -21,7 +21,6 @@ use App\Model\Entity\Role;
 use App\Test\Factory\UserFactory;
 use App\Utility\ExtendedUserAccessControl;
 use App\Utility\UuidFactory;
-use Cake\Chronos\Chronos;
 use Cake\Http\Exception\BadRequestException;
 use Passbolt\Sso\Service\SsoStates\SsoStatesAssertService;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
@@ -84,9 +83,10 @@ class SsoStatesAssertServiceTest extends SsoTestCase
     {
         $user = UserFactory::make()->admin()->persist();
         $ssoSettingId = SsoSettingsFactory::make()->persist()->get('id');
-        $ssoState = SsoStateFactory::make(['created' => Chronos::now()->subDay(1)])
+        $ssoState = SsoStateFactory::make()
             ->ssoSettingsId($ssoSettingId)
             ->userId($user->id)
+            ->deleted()
             ->persist();
         $uac = new ExtendedUserAccessControl(
             $user->role->id,
@@ -208,14 +208,13 @@ class SsoStatesAssertServiceTest extends SsoTestCase
             $ssoState->user_agent
         );
         // Make sure state is active
-        $this->assertNull($ssoState->deleted);
+        $this->assertTrue($ssoState->deleted->isFuture());
 
         $this->service->assertAndConsume($ssoState, $ssoSettingId, $uac);
 
         /** @var \Passbolt\Sso\Model\Entity\SsoState $result */
         $result = SsoStateFactory::find()->where(['state' => $ssoState->state])->firstOrFail();
         // Assert state consumed/deleted
-        $this->assertNotNull($result->deleted);
-        $this->assertInstanceOf(Chronos::class, $result->deleted);
+        $this->assertTrue($result->deleted->isPast());
     }
 }

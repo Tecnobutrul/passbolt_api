@@ -107,6 +107,6 @@ class SsoStatesGetServiceTest extends SsoTestCase
         $this->assertEquals($ssoState->user_id, $result->user_id);
         $this->assertEquals($ssoState->ip, $result->ip);
         $this->assertEquals($ssoState->user_agent, $result->user_agent);
-        $this->assertNull($result->deleted);
+        $this->assertTrue($result->deleted->isFuture());
     }
 }
