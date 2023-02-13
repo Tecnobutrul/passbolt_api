@@ -36,6 +36,7 @@ class DirectoryOrgSettingsTest extends AppTestCase
     public static function getDummySettings()
     {
         return [
+            'enabled' => true,
             'userPath' => 'CN=Operations',
             'defaultUser' => 'admin@passbolt.com',
             'defaultGroupAdminUser' => 'ada@passbolt.com',
@@ -57,7 +58,7 @@ class DirectoryOrgSettingsTest extends AppTestCase
                         'username' => 'root',
                         'password' => 'password',
                         'base_dn' => 'OU=PassboltUsers,DC=passbolt,DC=local',
-                        'servers' => ['127.0.0.1'],
+                        'hosts' => ['127.0.0.1'],
                         'port' => 636,
                         'use_ssl' => true,
                         'use_tls' => false,

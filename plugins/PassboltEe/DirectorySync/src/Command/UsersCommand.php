@@ -72,6 +72,11 @@ class UsersCommand extends DirectorySyncCommand
                 'help' => 'Don\'t save the changes',
                 'default' => 'false',
                 'boolean' => true,
+            ])
+            ->addOption('persist', [
+                'help' => 'Persist data, otherwise it won\'t save the changes',
+                'default' => false,
+                'boolean' => true,
             ]);
 
         return $parser;
@@ -85,7 +90,8 @@ class UsersCommand extends DirectorySyncCommand
         parent::execute($args, $io);
 
         try {
-            $dryRun = $args->getOption('dry-run');
+            $dryRun = $args->getOption('dry-run') || !$args->getOption('persist');
+
             $action = new UserSyncAction();
             $action->setDryRun($dryRun);
             $reports = $action->execute();
@@ -95,6 +101,8 @@ class UsersCommand extends DirectorySyncCommand
 
             return $this->errorCode();
         }
+
+        $this->warnPersist($args, $io);
 
         return $this->successCode();
     }

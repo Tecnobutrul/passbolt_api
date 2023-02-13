@@ -25,6 +25,7 @@ use Cake\Utility\Hash;
 use Cake\Validation\Validation;
 use Cake\Validation\Validator;
 use Passbolt\DirectorySync\Utility\DirectoryFactory;
+use Passbolt\DirectorySync\Utility\DirectoryInterface;
 use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 class LdapConfigurationForm extends Form
@@ -32,7 +33,7 @@ class LdapConfigurationForm extends Form
     public const CONNECTION_TYPE_PLAIN = 'plain';
     public const CONNECTION_TYPE_SSL = 'ssl';
     public const CONNECTION_TYPE_TLS = 'tls';
-    public const SUPPORTED_DIRECTORY_TYPE = ['ad', 'openldap'];
+    public const SUPPORTED_DIRECTORY_TYPE = [DirectoryInterface::TYPE_AD, DirectoryInterface::TYPE_OPENLDAP];
 
     /**
      * @var string[]
@@ -50,13 +51,14 @@ class LdapConfigurationForm extends Form
      * @var array
      */
     private static $configurationMapping = [
+        'enabled' => 'enabled',
         'source' => 'source',
         'directory_type' => 'ldap.domains.org_domain.ldap_type',
         'domain_name' => 'ldap.domains.org_domain.domain_name',
         'username' => 'ldap.domains.org_domain.username',
         'password' => 'ldap.domains.org_domain.password',
         'base_dn' => 'ldap.domains.org_domain.base_dn',
-        'server' => 'ldap.domains.org_domain.servers.0',
+        'server' => 'ldap.domains.org_domain.hosts.0',
         'port' => 'ldap.domains.org_domain.port',
         'group_object_class' => 'groupObjectClass',
         'user_object_class' => 'userObjectClass',
@@ -86,6 +88,7 @@ class LdapConfigurationForm extends Form
     protected function _buildSchema(Schema $schema): \Cake\Form\Schema
     {
         return $schema
+            ->addField('enabled', 'boolean')
             ->addField('directory_type', ['type' => 'string'])
             ->addField('domain_name', 'string')
             ->addField('username', ['type' => 'string'])
