@@ -18,6 +18,7 @@ namespace Passbolt\Sso\Service\SsoStates;
 
 use App\Utility\ExtendedUserAccessControl;
 use Cake\Core\Exception\CakeException;
+use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -28,6 +29,7 @@ class SsoStatesSetService
     use LocatorAwareTrait;
 
     /**
+     * @param string $nonce Nonce to store
      * @param string $state State to store
      * @param string $type Type of SSO state.
      * @param string $ssoSettingsId SSO settings ID.
@@ -35,15 +37,24 @@ class SsoStatesSetService
      * @return \Passbolt\Sso\Model\Entity\SsoState
      * @throws \Cake\Http\Exception\InternalErrorException When unable to create the sso state.
      */
-    public function create(string $state, string $type, string $ssoSettingsId, ExtendedUserAccessControl $uac): SsoState
-    {
+    public function create(
+        string $nonce,
+        string $state,
+        string $type,
+        string $ssoSettingsId,
+        ExtendedUserAccessControl $uac
+    ): SsoState {
         /** @var \Passbolt\Sso\Model\Table\SsoStatesTable $ssoStatesTable */
         $ssoStatesTable = $this->fetchTable('Passbolt/Sso.SsoStates');
+
+        if (!SsoState::isValidState($nonce)) {
+            throw new BadRequestException(__('Could not save the SSO state, invalid nonce.'));
+        }
 
         try {
             $ssoState = $ssoStatesTable->newEntity(
                 [
-                    'nonce' => SsoState::generate(),
+                    'nonce' => $nonce,
                     'state' => $state,
                     'type' => $type,
                     'sso_settings_id' => $ssoSettingsId,

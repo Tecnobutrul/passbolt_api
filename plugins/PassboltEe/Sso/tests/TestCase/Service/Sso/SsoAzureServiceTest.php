@@ -40,6 +40,10 @@ class SsoAzureServiceTest extends SsoIntegrationTestCase
         $url = $sut->getAuthorizationUrl($uac);
         $cookie = $sut->createStateCookie($uac);
 
+        // Check state & nonce values are present
+        $this->assertStringContainsString('state=', $url);
+        $this->assertStringContainsString('nonce=', $url);
+
         // Check SSO state props
         /** @var \Passbolt\Sso\Model\Entity\SsoState $ssoState */
         $ssoState = SsoStateFactory::find()->firstOrFail();

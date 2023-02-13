@@ -20,6 +20,7 @@ namespace Passbolt\Sso\Test\TestCase\Service\SsoStates;
 use App\Model\Entity\Role;
 use App\Test\Factory\UserFactory;
 use App\Utility\ExtendedUserAccessControl;
+use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoStates\SsoStatesSetService;
@@ -56,6 +57,7 @@ class SsoStatesSetServiceTest extends SsoTestCase
     public function testSsoStatesSetService_Success(): void
     {
         $user = UserFactory::make()->admin()->persist();
+        $nonce = SsoState::generate();
         $state = SsoState::generate();
         $ssoSettingId = SsoSettingsFactory::make()->persist()->get('id');
         $uac = new ExtendedUserAccessControl(
@@ -66,7 +68,7 @@ class SsoStatesSetServiceTest extends SsoTestCase
             'PHPUnit User Agent'
         );
 
-        $result = $this->service->create($state, SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
+        $result = $this->service->create($nonce, $state, SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
 
         $this->assertInstanceOf(SsoState::class, $result);
         $this->assertEquals($state, $result->state);
@@ -81,6 +83,7 @@ class SsoStatesSetServiceTest extends SsoTestCase
     public function testSsoStatesSetService_Error_InvalidState(): void
     {
         $user = UserFactory::make()->admin()->persist();
+        $nonce = SsoState::generate();
         $state = 'some-random-value';
         $ssoSettingId = SsoSettingsFactory::make()->persist()->get('id');
         $uac = new ExtendedUserAccessControl(
@@ -94,6 +97,26 @@ class SsoStatesSetServiceTest extends SsoTestCase
         $this->expectException(InternalErrorException::class);
         $this->expectErrorMessage('Could not save the SSO state, please try again later.');
 
-        $this->service->create($state, SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
+        $this->service->create($nonce, $state, SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
+    }
+
+    public function testSsoStatesSetService_Error_InvalidNonce(): void
+    {
+        $user = UserFactory::make()->admin()->persist();
+        $nonce = 'some-random-value';
+        $state = SsoState::generate();
+        $ssoSettingId = SsoSettingsFactory::make()->persist()->get('id');
+        $uac = new ExtendedUserAccessControl(
+            Role::ADMIN,
+            $user->id,
+            $user->username,
+            '127.0.0.1',
+            'PHPUnit User Agent'
+        );
+
+        $this->expectException(BadRequestException::class);
+        $this->expectErrorMessage('invalid nonce');
+
+        $this->service->create($nonce, $state, SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
     }
 }
