@@ -66,7 +66,7 @@ class SsoStatesSetServiceTest extends SsoTestCase
             'PHPUnit User Agent'
         );
 
-        $result = $this->service->create($state, $ssoSettingId, $uac);
+        $result = $this->service->create($state, SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
 
         $this->assertInstanceOf(SsoState::class, $result);
         $this->assertEquals($state, $result->state);
@@ -94,6 +94,6 @@ class SsoStatesSetServiceTest extends SsoTestCase
         $this->expectException(InternalErrorException::class);
         $this->expectErrorMessage('Could not save the SSO state, please try again later.');
 
-        $this->service->create($state, $ssoSettingId, $uac);
+        $this->service->create($state, SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
     }
 }

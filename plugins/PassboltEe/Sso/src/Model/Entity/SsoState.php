@@ -80,7 +80,8 @@ class SsoState extends Entity
     ];
 
     /**
-     * Returns random string value to be used as state, nonce, etc.
+     * Returns random ASCII string containing the hexadecimal representation of string value to be used as state, nonce, etc.
+     * It provides 16 bytes of entropy (128bits) by default (32 hex string length).
      *
      * @param int $length Length of the random string to be generated.
      * @return string
@@ -92,15 +93,15 @@ class SsoState extends Entity
     }
 
     /**
-     * @param string $state State value to check.
+     * @param string $value State/nonce value to check.
      * @return bool
      */
-    public static function isValidState(string $state): bool
+    public static function isValidState(string $value): bool
     {
-        if (strlen($state) !== SsoState::DEFAULT_LENGTH_STATE) {
+        if (strlen($value) !== SsoState::DEFAULT_LENGTH_STATE) {
             return false;
         }
-        if (!mb_check_encoding($state, 'ASCII')) {
+        if (!mb_check_encoding($value, 'ASCII') || !ctype_xdigit($value)) {
             return false;
         }
 

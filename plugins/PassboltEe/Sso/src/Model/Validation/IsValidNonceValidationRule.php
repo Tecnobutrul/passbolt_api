@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Model\Validation;
 
 use App\Model\Validation\PassboltValidationRule;
+use Passbolt\Sso\Model\Entity\SsoState;
 
 class IsValidNonceValidationRule extends PassboltValidationRule
 {
@@ -34,13 +35,6 @@ class IsValidNonceValidationRule extends PassboltValidationRule
      */
     public function rule($value, $context): bool
     {
-        if (!is_string($value)) {
-            return false;
-        }
-        if (mb_strlen($value) !== 32) {
-            return false;
-        }
-
-        return true;
+        return SsoState::isValidState($value);
     }
 }

@@ -29,12 +29,13 @@ class SsoStatesSetService
 
     /**
      * @param string $state State to store
+     * @param string $type Type of SSO state.
      * @param string $ssoSettingsId SSO settings ID.
      * @param \App\Utility\ExtendedUserAccessControl $uac UAC object.
      * @return \Passbolt\Sso\Model\Entity\SsoState
      * @throws \Cake\Http\Exception\InternalErrorException When unable to create the sso state.
      */
-    public function create(string $state, string $ssoSettingsId, ExtendedUserAccessControl $uac): SsoState
+    public function create(string $state, string $type, string $ssoSettingsId, ExtendedUserAccessControl $uac): SsoState
     {
         /** @var \Passbolt\Sso\Model\Table\SsoStatesTable $ssoStatesTable */
         $ssoStatesTable = $this->fetchTable('Passbolt/Sso.SsoStates');
@@ -44,7 +45,7 @@ class SsoStatesSetService
                 [
                     'nonce' => SsoState::generate(),
                     'state' => $state,
-                    'type' => SsoState::TYPE_SSO_STATE,
+                    'type' => $type,
                     'sso_settings_id' => $ssoSettingsId,
                     'user_id' => $uac->getId(),
                     'ip' => $uac->getUserIp(),

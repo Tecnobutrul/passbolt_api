@@ -29,6 +29,7 @@ class SsoStatesGetService
      * @param string $state State to find.
      * @return \Passbolt\Sso\Model\Entity\SsoState
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When given state doesn't exist or not active.
+     * @throws \Cake\Http\Exception\BadRequestException If given SSO state is invalid.
      */
     public function getOrFail(string $state): SsoState
     {

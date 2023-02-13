@@ -20,6 +20,7 @@ namespace Passbolt\Sso\Service\Sso;
 use App\Model\Entity\User;
 use App\Service\Users\UserGetService;
 use App\Utility\ExtendedUserAccessControl;
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Cookie\Cookie;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
@@ -194,10 +195,15 @@ abstract class AbstractSsoService
     /**
      * @param string $state uuid
      * @return \Passbolt\Sso\Model\Entity\SsoState
+     * @throws \Cake\Http\Exception\BadRequestException When given state doesn't exist or not active.
      */
     public function getSsoState(string $state): SsoState
     {
-        return (new SsoStatesGetService())->getOrFail($state);
+        try {
+            return (new SsoStatesGetService())->getOrFail($state);
+        } catch (RecordNotFoundException $e) {
+            throw new BadRequestException(__('The SSO state does not exist.'), 400, $e);
+        }
     }
 
     /**
@@ -274,7 +280,7 @@ abstract class AbstractSsoService
         ExtendedUserAccessControl $uac,
         string $settingsId
     ): SsoState {
-        return (new SsoStatesSetService())->create($state, $settingsId, $uac);
+        return (new SsoStatesSetService())->create($state, SsoState::TYPE_SSO_STATE, $settingsId, $uac);
     }
 
     /**

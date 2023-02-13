@@ -124,6 +124,31 @@ class SsoStatesTableTest extends SsoTestCase
     }
 
     /**
+     * @uses \Passbolt\Sso\Model\Table\SsoStatesTable::validationDefault()
+     */
+    public function testSsoStatesTableValidationDefault_ErrorMinimumLength(): void
+    {
+        $user = UserFactory::make()->admin()->persist();
+        $ssoSetting = SsoSettingsFactory::make()->persist();
+        $ssoState = $this->SsoStates->newEntity([
+            'nonce' => '123456',
+            'state' => '123456',
+            'type' => SsoState::TYPE_SSO_STATE,
+            'sso_settings_id' => $ssoSetting->id,
+            'user_id' => $user->id,
+            'ip' => '127.0.0.1',
+            'user_agent' => 'PHPUnit',
+        ]);
+
+        $errors = $ssoState->getErrors();
+        $this->assertNotEmpty($errors);
+        $this->assertCount(2, $errors);
+        $this->assertArrayHasAttributes(['nonce', 'state'], $errors);
+        $this->assertArrayHasAttributes(['minLength'], $errors['state']);
+        $this->assertArrayHasAttributes(['minLength'], $errors['nonce']);
+    }
+
+    /**
      * @uses \Passbolt\Sso\Model\Table\SsoStatesTable::buildRules()
      */
     public function testSsoStatesTableBuildRules_ErrorExistsIn(): void

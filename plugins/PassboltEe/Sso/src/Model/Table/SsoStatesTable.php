@@ -94,6 +94,11 @@ class SsoStatesTable extends Table
 
         $validator
             ->ascii('nonce', __('The nonce should be a valid ASCII string.'))
+            ->minLength(
+                'nonce',
+                SsoState::DEFAULT_LENGTH_NONCE,
+                __('The nonce length should be minimum {0} characters.', SsoState::DEFAULT_LENGTH_NONCE)
+            )
             ->maxLength(
                 'nonce',
                 SsoState::DEFAULT_LENGTH_NONCE,
@@ -112,6 +117,11 @@ class SsoStatesTable extends Table
 
         $validator
             ->ascii('state', __('The state should be a valid ASCII string.'))
+            ->minLength(
+                'state',
+                SsoState::DEFAULT_LENGTH_STATE,
+                __('The state length should be minimum {0} characters.', SsoState::DEFAULT_LENGTH_STATE)
+            )
             ->maxLength(
                 'state',
                 SsoState::DEFAULT_LENGTH_STATE,
