@@ -97,9 +97,8 @@ class SsoAuthenticationTokensTableTest extends SsoTestCase
         $data = ['ip' => '127.0.0.1', 'user_agent' => 'cakephp tests', 'sso_setting_id' => UuidFactory::uuid()];
         $this->SsoAuthenticationTokens->generate($user->id, SsoAuthenticationToken::TYPE_SSO_GET_KEY, $token, $data);
         $this->SsoAuthenticationTokens->generate($user->id, SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS, $token, $data);
-        $this->SsoAuthenticationTokens->generate($user->id, SsoAuthenticationToken::TYPE_SSO_STATE, $token, $data);
 
-        $this->assertEquals(3, SsoAuthenticationTokenFactory::count());
+        $this->assertEquals(2, SsoAuthenticationTokenFactory::count());
     }
 
     /**

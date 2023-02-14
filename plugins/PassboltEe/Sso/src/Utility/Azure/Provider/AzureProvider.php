@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Utility\Azure\Provider;
 
-use App\Utility\UuidFactory;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Http\Exception\NotImplementedException;
 use Cake\Validation\Validation;
@@ -88,21 +87,6 @@ class AzureProvider extends AbstractProvider
      * ABSTRACT METHODS
      * See. AbstractProvider
      */
-
-    /**
-     * Returns a UUID v4, e.g. 122 bits of entropy
-     *
-     * @param int $length - NOT SUPPORTED, will trigger InternalErrorException
-     * @return string
-     */
-    protected function getRandomState($length = 32)
-    {
-        if (!empty(func_get_args())) {
-            throw new InternalErrorException('Not supported.');
-        }
-
-        return UuidFactory::uuid();
-    }
 
     /**
      * @inheritDoc

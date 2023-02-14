@@ -20,6 +20,7 @@ namespace Passbolt\Sso\Service\Sso;
 use App\Model\Entity\User;
 use App\Service\Users\UserGetService;
 use App\Utility\ExtendedUserAccessControl;
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Cookie\Cookie;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
@@ -30,7 +31,10 @@ use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
-use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
+use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Service\SsoStates\SsoStatesAssertService;
+use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
+use Passbolt\Sso\Service\SsoStates\SsoStatesSetService;
 use Passbolt\Sso\Utility\OpenId\ResourceOwnerWithEmailInterface;
 
 abstract class AbstractSsoService
@@ -111,11 +115,11 @@ abstract class AbstractSsoService
             throw new InternalErrorException('Invalid use. State not set.');
         }
 
-        // Store the OAuth state in authentication token
-        $token = $this->createSsoAuthStateToken($this->provider->getState(), $uac, $this->settings->id);
+        // Store the OAuth state in sso state
+        $ssoState = $this->createSsoAuthStateToken($this->provider->getState(), $uac, $this->settings->id);
 
         // Build cookie that matches the OAuth state
-        return $this->createHttpOnlySecureCookie($token);
+        return $this->createHttpOnlySecureCookie($ssoState);
     }
 
     /**
@@ -134,17 +138,17 @@ abstract class AbstractSsoService
     }
 
     /**
-     * @param \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $token token
+     * @param \Passbolt\Sso\Model\Entity\SsoState $ssoState SSO state.
      * @return \Cake\Http\Cookie\Cookie
      */
-    protected function createHttpOnlySecureCookie(SsoAuthenticationToken $token): Cookie
+    protected function createHttpOnlySecureCookie(SsoState $ssoState): Cookie
     {
         return (new Cookie(self::SSO_STATE_COOKIE))
             ->withPath('/sso')
-            ->withValue($token->token)
+            ->withValue($ssoState->state)
             ->withSecure(true)
             ->withHttpOnly(true)
-            ->withExpiry($token->getExpiryTime());
+            ->withExpiry($ssoState->getExpiryTime());
     }
 
     /**
@@ -154,6 +158,7 @@ abstract class AbstractSsoService
      * @param string $code client ip
      * @param string $ip user agent
      * @param string $userAgent user agent
+     * @throws \Cake\Http\Exception\BadRequestException If the user_id in SSO state is `null`.
      * @throws \Cake\Http\Exception\BadRequestException if the user does not exist or is inactive
      * @throws \Cake\Http\Exception\BadRequestException if resource owner username is not provider or does not match user entity
      * @return \App\Utility\ExtendedUserAccessControl
@@ -164,18 +169,22 @@ abstract class AbstractSsoService
         string $ip,
         string $userAgent
     ): ExtendedUserAccessControl {
-        // Get the token and the user
-        $tokenEntity = $this->getTokenFromState($state);
+        // Get the SSO state and the user
+        $ssoState = $this->getSsoState($state);
+
+        if ($ssoState->user_id === null) {
+            throw new BadRequestException(__('The user is missing for the SSO state.'));
+        }
+
         try {
-            $user = (new UserGetService())->getActiveNotDeletedOrFail($tokenEntity->user_id);
+            $user = (new UserGetService())->getActiveNotDeletedOrFail($ssoState->user_id);
         } catch (NotFoundException $exception) {
             throw new BadRequestException(__('The user does not exist or is not active.'), 400, $exception);
         }
 
         // Check the token against extended user info and consume it
         $uac = new ExtendedUserAccessControl($user->role->name, $user->id, $user->username, $ip, $userAgent);
-        (new SsoAuthenticationTokenGetService())
-            ->assertAndConsume($tokenEntity, $uac, $this->getSettings()->id);
+        (new SsoStatesAssertService())->assertAndConsume($ssoState, $this->getSettings()->id, $uac);
 
         // Assert access request and if it matches current suer
         $this->getResourceOwnerAndAssertAgainstUser($code, $user);
@@ -185,12 +194,16 @@ abstract class AbstractSsoService
 
     /**
      * @param string $state uuid
-     * @return \Passbolt\Sso\Model\Entity\SsoAuthenticationToken
+     * @return \Passbolt\Sso\Model\Entity\SsoState
+     * @throws \Cake\Http\Exception\BadRequestException When given state doesn't exist or not active.
      */
-    public function getTokenFromState(string $state): SsoAuthenticationToken
+    public function getSsoState(string $state): SsoState
     {
-        return (new SsoAuthenticationTokenGetService())
-            ->getOrFail($state, SsoAuthenticationToken::TYPE_SSO_STATE);
+        try {
+            return (new SsoStatesGetService())->getOrFail($state);
+        } catch (RecordNotFoundException $e) {
+            throw new BadRequestException(__('The SSO state does not exist.'), 400, $e);
+        }
     }
 
     /**
@@ -260,14 +273,14 @@ abstract class AbstractSsoService
      * @param string $state uuid
      * @param \App\Utility\ExtendedUserAccessControl $uac extend user access control
      * @param string $settingsId uuid
-     * @return \Passbolt\Sso\Model\Entity\SsoAuthenticationToken token
+     * @return \Passbolt\Sso\Model\Entity\SsoState
      */
     public function createSsoAuthStateToken(
         string $state,
         ExtendedUserAccessControl $uac,
         string $settingsId
-    ): SsoAuthenticationToken {
-        return $this->createSsoAuthToken($state, SsoAuthenticationToken::TYPE_SSO_STATE, $uac, $settingsId);
+    ): SsoState {
+        return (new SsoStatesSetService())->create($state, SsoState::TYPE_SSO_STATE, $settingsId, $uac);
     }
 
     /**

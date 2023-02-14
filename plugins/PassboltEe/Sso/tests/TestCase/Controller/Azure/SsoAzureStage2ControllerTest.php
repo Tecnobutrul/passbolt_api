@@ -19,9 +19,9 @@ namespace Passbolt\Sso\Test\TestCase\Controller\Azure;
 
 use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
-use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
+use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
 class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
@@ -58,7 +58,7 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
     public function testSsoAzureStage2Controller_Common_ErrorStateFromCookieInvalid(): void
     {
         $this->cookie('passbolt_sso_state', 'nope');
-        $this->get('/sso/azure/redirect?state=' . UuidFactory::uuid());
+        $this->get('/sso/azure/redirect?state=' . SsoState::generate());
         $this->assertResponseCode(400);
         $this->assertResponseContains('The state is required in cookie.');
     }
@@ -68,8 +68,8 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
      */
     public function testSsoAzureStage2Controller_Common_ErrorStateMismatch(): void
     {
-        $this->cookie('passbolt_sso_state', UuidFactory::uuid());
-        $this->get('/sso/azure/redirect?state=' . UuidFactory::uuid());
+        $this->cookie('passbolt_sso_state', SsoState::generate());
+        $this->get('/sso/azure/redirect?state=' . SsoState::generate());
         $this->assertResponseCode(400);
         $this->assertResponseContains('CSRF issue');
     }
@@ -79,9 +79,9 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
      */
     public function testSsoAzureStage2Controller_Common_ErrorCodeMissing(): void
     {
-        $uuid = UuidFactory::uuid();
-        $this->cookie('passbolt_sso_state', $uuid);
-        $this->get('/sso/azure/redirect?state=' . $uuid);
+        $state = SsoState::generate();
+        $this->cookie('passbolt_sso_state', $state);
+        $this->get('/sso/azure/redirect?state=' . $state);
         $this->assertResponseCode(400);
         $this->assertResponseContains('The code is required in URL parameters.');
     }
@@ -91,9 +91,9 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
      */
     public function testSsoAzureStage2Controller_Common_ErrorCodeInvalid(): void
     {
-        $uuid = UuidFactory::uuid();
-        $this->cookie('passbolt_sso_state', $uuid);
-        $this->get('/sso/azure/redirect?state=' . $uuid . '&code[not]=string');
+        $state = SsoState::generate();
+        $this->cookie('passbolt_sso_state', $state);
+        $this->get('/sso/azure/redirect?state=' . $state . '&code[not]=string');
         $this->assertResponseCode(400);
         $this->assertResponseContains('The code is required in URL parameters.');
     }
@@ -108,11 +108,11 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $admin = UserFactory::make()->admin()->active()->persist();
         $this->logInAs($admin);
 
-        $uuid = UuidFactory::uuid();
-        $this->cookie('passbolt_sso_state', $uuid);
-        $this->get('/sso/azure/redirect?state=' . $uuid . '&code=' . $uuid);
+        $state = SsoState::generate();
+        $this->cookie('passbolt_sso_state', $state);
+        $this->get('/sso/azure/redirect?state=' . $state . '&code=' . UuidFactory::uuid());
         $this->assertResponseCode(400);
-        $this->assertResponseContains('The authentication token does not exist.');
+        $this->assertResponseContains('The SSO state does not exist.');
     }
 
     /**
@@ -122,21 +122,12 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
     {
         $admin = UserFactory::make()->admin()->active()->persist();
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
-        $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_STATE)
-            ->userId($admin->id)
-            ->active()
-            ->data([
-                'sso_setting_id' => $settings->id,
-                'ip' => SsoIntegrationTestCase::IP_ADDRESS,
-                'user_agent' => 'phpunit',
-            ])
-            ->persist();
+        $ssoState = SsoStateFactory::make()->userId($admin->id)->ssoSettingsId($settings->id)->persist();
 
         $this->logInAs($admin);
 
-        $this->cookie('passbolt_sso_state', $token->token);
-        $this->get('/sso/azure/redirect?state=' . $token->token . '&code=' . UuidFactory::uuid());
+        $this->cookie('passbolt_sso_state', $ssoState->state);
+        $this->get('/sso/azure/redirect?state=' . $ssoState->state . '&code=' . UuidFactory::uuid());
         $this->assertResponseCode(400);
         $this->assertResponseContains('The SSO settings do not exist.');
     }
@@ -148,23 +139,25 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
     {
         $admin = UserFactory::make()->admin()->active()->persist();
         $settings = SsoSettingsFactory::make()->azure()->draft()->persist();
-        $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_STATE)
+        $ssoState = SsoStateFactory::make()
             ->userId($admin->id)
-            ->active()
-            ->data([
-                'sso_setting_id' => $settings->id,
-                'ip' => SsoIntegrationTestCase::IP_ADDRESS,
-                'user_agent' => 'something else',
-            ])
+            ->ssoSettingsId($settings->id)
+            ->userAgent('something else')
             ->persist();
+        /**
+         * Note: Can't use `mockUserIp()` because this test doesn't extend AppIntegrationTestCase.
+         * TODO: Discuss this.
+         */
+        $this->configRequest([
+            'environment' => ['REMOTE_ADDR' => $ssoState->ip],
+        ]);
 
         $this->logInAs($admin);
 
-        $this->cookie('passbolt_sso_state', $token->token);
-        $this->get('/sso/azure/redirect?state=' . $token->token . '&code=' . UuidFactory::uuid());
+        $this->cookie('passbolt_sso_state', $ssoState->state);
+        $this->get('/sso/azure/redirect?state=' . $ssoState->state . '&code=' . UuidFactory::uuid());
         $this->assertResponseCode(400);
-        $this->assertResponseContains('The SSO authentication token is invalid. User agent mismatch.');
+        $this->assertResponseContains('The SSO state is invalid. User agent mismatch.');
     }
 
     // USERS TESTS
@@ -177,9 +170,9 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $user = UserFactory::make()->user()->active()->persist();
         $this->logInAs($user);
 
-        $uuid = UuidFactory::uuid();
-        $this->cookie('passbolt_sso_state', $uuid);
-        $this->get('/sso/azure/redirect?state=' . $uuid . '&code=' . UuidFactory::uuid());
+        $state = SsoState::generate();
+        $this->cookie('passbolt_sso_state', $state);
+        $this->get('/sso/azure/redirect?state=' . $state . '&code=' . UuidFactory::uuid());
         $this->assertResponseCode(403);
         $this->assertResponseContains('The user should not be logged in.');
     }
