@@ -54,7 +54,7 @@ class SsoStatesSetServiceTest extends SsoTestCase
         parent::tearDown();
     }
 
-    public function testSsoStatesSetService_Success(): void
+    public function testSsoStatesSetService_Success_TypeSsoState(): void
     {
         $user = UserFactory::make()->admin()->persist();
         $nonce = SsoState::generate();
@@ -73,6 +73,32 @@ class SsoStatesSetServiceTest extends SsoTestCase
         $this->assertInstanceOf(SsoState::class, $result);
         $this->assertEquals($state, $result->state);
         $this->assertEquals(SsoState::TYPE_SSO_STATE, $result->type);
+        $this->assertEquals($ssoSettingId, $result->sso_settings_id);
+        $this->assertEquals($uac->getId(), $result->user_id);
+        $this->assertEquals($uac->getUserIp(), $result->ip);
+        $this->assertEquals($uac->getUserAgent(), $result->user_agent);
+        $this->assertTrue($result->deleted->isFuture());
+    }
+
+    public function testSsoStatesSetService_Success_TypeSsoSetSettings(): void
+    {
+        $user = UserFactory::make()->admin()->persist();
+        $nonce = SsoState::generate();
+        $state = SsoState::generate();
+        $ssoSettingId = SsoSettingsFactory::make()->persist()->get('id');
+        $uac = new ExtendedUserAccessControl(
+            Role::ADMIN,
+            $user->id,
+            $user->username,
+            '127.0.0.1',
+            'PHPUnit User Agent'
+        );
+
+        $result = $this->service->create($nonce, $state, SsoState::TYPE_SSO_SET_SETTINGS, $ssoSettingId, $uac);
+
+        $this->assertInstanceOf(SsoState::class, $result);
+        $this->assertEquals($state, $result->state);
+        $this->assertEquals(SsoState::TYPE_SSO_SET_SETTINGS, $result->type);
         $this->assertEquals($ssoSettingId, $result->sso_settings_id);
         $this->assertEquals($uac->getId(), $result->user_id);
         $this->assertEquals($uac->getUserIp(), $result->ip);

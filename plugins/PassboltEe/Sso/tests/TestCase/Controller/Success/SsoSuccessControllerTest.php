@@ -35,17 +35,18 @@ class SsoSuccessControllerTest extends SsoIntegrationTestCase
         $this->assertResponseContains('The user should not be logged in.');
     }
 
-    public function testSsoSuccessController_ErrorNoToken(): void
+    public function testSsoSuccessController_ErrorNoState(): void
     {
         $this->get('/sso/login/success');
+
         $this->assertResponseCode(400);
-        $this->assertResponseContains('The token is required in URL parameters.');
+        $this->assertResponseContains('The state is required in URL parameters.');
     }
 
-    public function testSsoSuccessController_ErrorInvalidToken(): void
+    public function testSsoSuccessController_ErrorInvalidState(): void
     {
-        $this->get('/sso/login/success?token=nope');
+        $this->get('/sso/login/success?state=nope');
         $this->assertResponseCode(400);
-        $this->assertResponseContains('The token is required in URL parameters.');
+        $this->assertResponseContains('The state is required in URL parameters.');
     }
 }

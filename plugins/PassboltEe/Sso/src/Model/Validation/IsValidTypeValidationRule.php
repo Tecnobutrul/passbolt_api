@@ -35,6 +35,6 @@ class IsValidTypeValidationRule extends PassboltValidationRule
      */
     public function rule($value, $context): bool
     {
-        return $value === SsoState::TYPE_SSO_STATE;
+        return in_array($value, SsoState::ALLOWED_TYPES);
     }
 }

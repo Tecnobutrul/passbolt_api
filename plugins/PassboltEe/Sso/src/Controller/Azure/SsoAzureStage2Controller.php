@@ -75,11 +75,11 @@ class SsoAzureStage2Controller extends AbstractSsoController
         $service = new SsoAzureService($settingsDto);
         $uac = $service->assertStateCodeAndGetUac($state, $code, $this->User->ip(), $this->User->userAgent());
 
-        // Create token for next step, e.g. activate settings
-        $token = $service->createSsoAuthTokenToActiveSettings($uac, $service->getSettings()->id);
+        // Create SSO state for next step, e.g. activate settings
+        $ssoState = $service->createSsoStateToActiveSettings($uac, $service->getSettings()->id);
 
         $this->response = $this->getResponse()->withCookie($service->clearStateCookie());
-        $this->redirect(Router::url('/sso/login/dry-run/success?token=') . $token->token);
+        $this->redirect(Router::url('/sso/login/dry-run/success?state=') . $ssoState->state);
     }
 
     /**
@@ -96,7 +96,7 @@ class SsoAzureStage2Controller extends AbstractSsoController
         $uac = $service->assertStateCodeAndGetUac($state, $code, $this->User->ip(), $this->User->userAgent());
 
         // Create token for next step, e.g. get keys
-        $token = $service->createSsoAuthTokenToGetKey($uac, $service->getSettings()->id);
+        $token = $service->createSsoStateToGetKey($uac, $service->getSettings()->id);
 
         $this->response = $this->getResponse()->withCookie($service->clearStateCookie());
         $this->redirect(Router::url('/sso/login/success?token=') . $token->token);

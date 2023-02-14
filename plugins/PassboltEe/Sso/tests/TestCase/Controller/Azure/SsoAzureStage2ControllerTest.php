@@ -122,7 +122,11 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
     {
         $admin = UserFactory::make()->admin()->active()->persist();
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
-        $ssoState = SsoStateFactory::make()->userId($admin->id)->ssoSettingsId($settings->id)->persist();
+        $ssoState = SsoStateFactory::make()
+            ->withTypeSsoState()
+            ->userId($admin->id)
+            ->ssoSettingsId($settings->id)
+            ->persist();
 
         $this->logInAs($admin);
 
@@ -140,6 +144,7 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $admin = UserFactory::make()->admin()->active()->persist();
         $settings = SsoSettingsFactory::make()->azure()->draft()->persist();
         $ssoState = SsoStateFactory::make()
+            ->withTypeSsoState()
             ->userId($admin->id)
             ->ssoSettingsId($settings->id)
             ->userAgent('something else')

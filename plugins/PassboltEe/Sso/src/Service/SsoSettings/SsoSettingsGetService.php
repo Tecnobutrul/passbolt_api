@@ -28,6 +28,7 @@ use Passbolt\Sso\Model\Dto\AbstractSsoSettingsDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDefaultDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
 
 class SsoSettingsGetService
@@ -41,7 +42,7 @@ class SsoSettingsGetService
      */
     public function getDraftSettingFromStateOrFail(string $state): SsoSettingsDto
     {
-        $ssoState = (new SsoStatesGetService())->getOrFail($state);
+        $ssoState = (new SsoStatesGetService())->getOrFail($state, SsoState::TYPE_SSO_STATE);
 
         return $this->getDraftByIdOrFail($ssoState->sso_settings_id, true);
     }

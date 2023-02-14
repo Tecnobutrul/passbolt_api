@@ -44,6 +44,14 @@ class SsoState extends Entity
      * Types
      */
     public const TYPE_SSO_STATE = 'sso_state';
+    public const TYPE_SSO_SET_SETTINGS = 'sso_set_settings';
+
+    /**
+     * Allowed types.
+     *
+     * @var array
+     */
+    public const ALLOWED_TYPES = [self::TYPE_SSO_STATE, self::TYPE_SSO_SET_SETTINGS];
 
     /**
      * Default length

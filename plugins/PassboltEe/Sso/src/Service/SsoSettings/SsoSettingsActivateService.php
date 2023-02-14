@@ -25,9 +25,11 @@ use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Dto\AbstractSsoSettingsDto;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
+use Passbolt\Sso\Service\SsoStates\SsoStatesAssertService;
+use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
 
 class SsoSettingsActivateService
 {
@@ -72,19 +74,15 @@ class SsoSettingsActivateService
         // Status must in draft status
         $ssoSettingEntity = $this->assertAndGetSettings($id, SsoSetting::STATUS_DRAFT);
 
-        // Token must be provided and matching the settings, user id, ip, user agent, etc.
-        $authTokenService = new SsoAuthenticationTokenGetService();
-        $type = SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS;
-
-        // If token is not found remap error, not found in this context is reserved for settings
+        // If token/state is not found remap error, not found in this context is reserved for settings
         try {
-            $tokenEntity = $authTokenService->getOrFail($data['token'] ?? '', $type);
+            $ssoState = (new SsoStatesGetService())->getOrFail($data['token'] ?? '', SsoState::TYPE_SSO_SET_SETTINGS);
         } catch (RecordNotFoundException $exception) {
             throw new BadRequestException($exception->getMessage(), 400, $exception);
         }
 
         // Consume or be consumed
-        $authTokenService->assertAndConsume($tokenEntity, $uac, $ssoSettingEntity->id);
+        (new SsoStatesAssertService())->assertAndConsume($ssoState, $ssoSettingEntity->id, $uac);
 
         // Activate
         try {

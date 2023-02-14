@@ -27,11 +27,12 @@ class SsoStatesGetService
 
     /**
      * @param string $state State to find.
+     * @param string $type Type to find.
      * @return \Passbolt\Sso\Model\Entity\SsoState
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When given state doesn't exist or not active.
      * @throws \Cake\Http\Exception\BadRequestException If given SSO state is invalid.
      */
-    public function getOrFail(string $state): SsoState
+    public function getOrFail(string $state, string $type): SsoState
     {
         if (!SsoState::isValidState($state)) {
             throw new BadRequestException(__('The SSO state is invalid.'));
@@ -44,7 +45,7 @@ class SsoStatesGetService
             /** @var \Passbolt\Sso\Model\Entity\SsoState $ssoState */
             $ssoState = $ssoStatesTable
                 ->find('active')
-                ->where(['state' => $state, 'type' => SsoState::TYPE_SSO_STATE])
+                ->where(['state' => $state, 'type' => $type])
                 ->firstOrFail();
         } catch (RecordNotFoundException $e) {
             throw new RecordNotFoundException(__('The SSO state does not exist.'), 400, $e);

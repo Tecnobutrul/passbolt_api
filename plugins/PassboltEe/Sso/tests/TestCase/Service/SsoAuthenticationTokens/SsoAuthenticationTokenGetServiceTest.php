@@ -36,14 +36,14 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
     {
         $service = new SsoAuthenticationTokenGetService();
         $this->expectException(BadRequestException::class);
-        $service->getOrFail('nope', SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS, UuidFactory::uuid());
+        $service->getOrFail('nope', SsoAuthenticationToken::TYPE_SSO_GET_KEY, UuidFactory::uuid());
     }
 
     public function testSsoAuthenticationTokenGetService_ErrorUserId(): void
     {
         $service = new SsoAuthenticationTokenGetService();
         $this->expectException(BadRequestException::class);
-        $service->getOrFail(UuidFactory::uuid(), SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS, 'nope');
+        $service->getOrFail(UuidFactory::uuid(), SsoAuthenticationToken::TYPE_SSO_GET_KEY, 'nope');
     }
 
     public function testSsoAuthenticationTokenGetService_Success(): void
@@ -56,7 +56,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
 
         /** @var SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->data([
@@ -69,7 +69,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $service = new SsoAuthenticationTokenGetService();
 
         // Part 1 - Get or fail
-        $authToken = $service->getOrFail($token->token, SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS, $user->id);
+        $authToken = $service->getOrFail($token->token, SsoAuthenticationToken::TYPE_SSO_GET_KEY, $user->id);
         $this->assertEquals($token->id, $authToken->id);
         $this->assertTrue($token->isActive());
         $this->assertFalse($token->isExpired());
@@ -87,7 +87,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
 
         /** @var SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId(UuidFactory::uuid())
             ->active()
             ->data([
@@ -99,7 +99,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
 
         $service = new SsoAuthenticationTokenGetService();
 
-        $authToken = $service->getOrFail($token->token, SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS);
+        $authToken = $service->getOrFail($token->token, SsoAuthenticationToken::TYPE_SSO_GET_KEY);
         $this->assertEquals($token->id, $authToken->id);
     }
 
@@ -116,7 +116,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
 
         /** @var SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->data([
@@ -150,7 +150,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
 
         /** @var SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->data([
@@ -181,7 +181,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
 
         /** @var SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->expired()
@@ -214,7 +214,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
 
         /** @var SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->data([
@@ -244,7 +244,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
 
         /** @var SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId(UuidFactory::uuid())
             ->active()
             ->data([
@@ -274,7 +274,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         try {
             /** @var SsoAuthenticationToken $token */
             $token = SsoAuthenticationTokenFactory::make()
-                ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+                ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
                 ->userId('nope')
                 ->active()
                 ->data([
@@ -310,7 +310,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->data([
@@ -342,7 +342,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->data([
@@ -375,7 +375,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->data([
@@ -408,7 +408,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->data([
@@ -438,7 +438,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->data([

@@ -80,20 +80,6 @@ abstract class AbstractSsoController extends AppController
      * @throws \Cake\Http\Exception\BadRequestException if the state is not provided in URL query
      * @return string state
      */
-    public function getTokenFromUrlQuery(): string
-    {
-        $token = $this->request->getQuery('token');
-        if (!is_string($token) || !OAuthStateValidation::state($token)) {
-            throw new BadRequestException(__('The token is required in URL parameters.'));
-        }
-
-        return $token;
-    }
-
-    /**
-     * @throws \Cake\Http\Exception\BadRequestException if the state is not provided in URL query
-     * @return string state
-     */
     public function getStateFromUrlQuery(): string
     {
         $state = $this->request->getQuery('state');

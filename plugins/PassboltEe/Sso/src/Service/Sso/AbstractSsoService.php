@@ -217,7 +217,7 @@ abstract class AbstractSsoService
     public function getSsoState(string $state): SsoState
     {
         try {
-            return (new SsoStatesGetService())->getOrFail($state);
+            return (new SsoStatesGetService())->getOrFail($state, SsoState::TYPE_SSO_STATE);
         } catch (RecordNotFoundException $e) {
             throw new BadRequestException(__('The SSO state does not exist.'), 400, $e);
         }
@@ -336,7 +336,7 @@ abstract class AbstractSsoService
      * @param string $settingsId uuid
      * @return \Passbolt\Sso\Model\Entity\SsoAuthenticationToken
      */
-    public function createSsoAuthTokenToGetKey(
+    public function createSsoStateToGetKey(
         ExtendedUserAccessControl $uac,
         string $settingsId
     ): SsoAuthenticationToken {
@@ -346,13 +346,17 @@ abstract class AbstractSsoService
     /**
      * @param \App\Utility\ExtendedUserAccessControl $uac extend user access control
      * @param string $settingsId uuid
-     * @return \Passbolt\Sso\Model\Entity\SsoAuthenticationToken
+     * @return \Passbolt\Sso\Model\Entity\SsoState
      */
-    public function createSsoAuthTokenToActiveSettings(
-        ExtendedUserAccessControl $uac,
-        string $settingsId
-    ): SsoAuthenticationToken {
-        return $this->createSsoAuthToken(null, SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS, $uac, $settingsId);
+    public function createSsoStateToActiveSettings(ExtendedUserAccessControl $uac, string $settingsId): SsoState
+    {
+        return (new SsoStatesSetService())->create(
+            $this->generateNonce(),
+            SsoState::generate(),
+            SsoState::TYPE_SSO_SET_SETTINGS,
+            $settingsId,
+            $uac
+        );
     }
 
     /**

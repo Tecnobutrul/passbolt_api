@@ -33,7 +33,7 @@ class SsoSuccessDryRunController extends AbstractSsoController
         }
 
         $this->User->assertIsAdmin();
-        $this->getTokenFromUrlQuery();
+        $this->getStateFromUrlQuery();
 
         // Not much to do
         $this->viewBuilder()

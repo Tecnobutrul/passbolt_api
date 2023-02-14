@@ -26,9 +26,11 @@ use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
 use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsActivateService;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
+use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 
 class SsoSettingsActivateServiceTest extends SsoTestCase
@@ -42,31 +44,26 @@ class SsoSettingsActivateServiceTest extends SsoTestCase
         $ip = '127.0.0.1';
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
-        $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+        $ssoState = SsoStateFactory::make(['ip' => $ip, 'user_agent' => $ua])
+            ->withTypeSsoSetSettings()
             ->userId($user->id)
-            ->active()
-            ->data([
-                'sso_setting_id' => $settings->id,
-                'ip' => $ip,
-                'user_agent' => $ua,
-            ])
+            ->ssoSettingsId($settings->id)
             ->persist();
 
         $sut = new SsoSettingsActivateService();
         $activeSetting = $sut->activate($uac, $settings->id, [
             'status' => SsoSetting::STATUS_ACTIVE,
-            'token' => $token->token,
+            'token' => $ssoState->state,
         ]);
 
         /** @var SsoSetting $result */
         $result = SsoSettingsFactory::find()->firstOrFail();
         $this->assertEquals($activeSetting->id, $result->id);
 
-        /** @var SsoAuthenticationToken $updatedToken */
-        $updatedToken = SsoAuthenticationTokenFactory::find()->firstOrFail();
-        $this->assertEquals(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS, $updatedToken->type);
-        $this->assertFalse($updatedToken->active);
+        /** @var \Passbolt\Sso\Model\Entity\SsoState $updatedSsoState */
+        $updatedSsoState = SsoStateFactory::find()->firstOrFail();
+        $this->assertEquals(SsoState::TYPE_SSO_SET_SETTINGS, $updatedSsoState->type);
+        $this->assertTrue($updatedSsoState->isExpired());
 
         $this->assertEquals(1, SsoSettingsFactory::count());
     }

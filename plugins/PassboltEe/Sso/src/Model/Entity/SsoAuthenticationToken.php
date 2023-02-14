@@ -35,11 +35,13 @@ use Passbolt\Sso\Utility\AuthToken\SsoAuthTokenExpiry;
  */
 class SsoAuthenticationToken extends AuthenticationToken
 {
+    // AUTH TOKEN TYPES
     /**
-     * @deprecated Use \Passbolt\Sso\Model\Entity\SsoState::TYPE_SSO_STATE
+     * @deprecated
+     * Use
+     * - \Passbolt\Sso\Model\Entity\SsoState::TYPE_SSO_STATE
      */
     public const TYPE_SSO_STATE = 'sso_state';
-    // AUTH TOKEN TYPES
     public const TYPE_SSO_GET_KEY = 'sso_get_key';
     public const TYPE_SSO_SET_SETTINGS = 'sso_set_settings';
 

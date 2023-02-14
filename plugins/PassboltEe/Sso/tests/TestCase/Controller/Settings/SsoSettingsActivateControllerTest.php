@@ -18,10 +18,9 @@ namespace Passbolt\Sso\Test\TestCase\Controller\Settings;
 
 use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoSetting;
-use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
+use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
 class SsoSettingsActivateControllerTest extends SsoIntegrationTestCase
@@ -30,24 +29,18 @@ class SsoSettingsActivateControllerTest extends SsoIntegrationTestCase
     {
         $settings = SsoSettingsFactory::make()->azure()->persist();
         $user = UserFactory::make()->admin()->active()->persist();
-        $ip = '127.0.0.1';
-        $ua = 'phpunit';
-        $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+        $ssoState = SsoStateFactory::make(['ip' => '127.0.0.1', 'user_agent' => 'phpunit'])
+            ->withTypeSsoSetSettings()
             ->userId($user->id)
-            ->active()
-            ->data([
-                'sso_setting_id' => $settings->id,
-                'ip' => $ip,
-                'user_agent' => $ua,
-            ])
+            ->ssoSettingsId($settings->id)
             ->persist();
-
         $this->logInAs($user);
+
         $this->postJson('/sso/settings/' . $settings->id . '.json', [
             'status' => SsoSetting::STATUS_ACTIVE,
-            'token' => $token->token,
+            'token' => $ssoState->state,
         ]);
+
         $this->assertSuccess();
         $settingDto = $this->_responseJsonBody;
         $this->assertEquals($settingDto->id, $settings->id);
