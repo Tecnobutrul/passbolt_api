@@ -26,7 +26,6 @@ use Cake\Http\Exception\NotFoundException;
 use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\AbstractSsoService;
-use Passbolt\Sso\Utility\Validation\OAuthStateValidation;
 
 abstract class AbstractSsoController extends AppController
 {

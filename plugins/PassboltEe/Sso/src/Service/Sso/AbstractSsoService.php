@@ -26,12 +26,10 @@ use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Log\Log;
-use Cake\ORM\TableRegistry;
 use Cake\Validation\Validation;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoStates\SsoStatesAssertService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
@@ -334,13 +332,17 @@ abstract class AbstractSsoService
     /**
      * @param \App\Utility\ExtendedUserAccessControl $uac extend user access control
      * @param string $settingsId uuid
-     * @return \Passbolt\Sso\Model\Entity\SsoAuthenticationToken
+     * @return \Passbolt\Sso\Model\Entity\SsoState
      */
-    public function createSsoStateToGetKey(
-        ExtendedUserAccessControl $uac,
-        string $settingsId
-    ): SsoAuthenticationToken {
-        return $this->createSsoAuthToken(null, SsoAuthenticationToken::TYPE_SSO_GET_KEY, $uac, $settingsId);
+    public function createSsoStateToGetKey(ExtendedUserAccessControl $uac, string $settingsId): SsoState
+    {
+        return (new SsoStatesSetService())->create(
+            $this->generateNonce(),
+            SsoState::generate(),
+            SsoState::TYPE_SSO_GET_KEY,
+            $settingsId,
+            $uac
+        );
     }
 
     /**
@@ -357,36 +359,6 @@ abstract class AbstractSsoService
             $settingsId,
             $uac
         );
-    }
-
-    /**
-     * @param string|null $token token, empty will be generated
-     * @param string $type type
-     * @param \App\Utility\ExtendedUserAccessControl $uac user access control
-     * @param string $settingsId uuid
-     * @return \Passbolt\Sso\Model\Entity\SsoAuthenticationToken
-     */
-    protected function createSsoAuthToken(
-        ?string $token,
-        string $type,
-        ExtendedUserAccessControl $uac,
-        string $settingsId
-    ): SsoAuthenticationToken {
-        /** @var \Passbolt\Sso\Model\Table\SsoAuthenticationTokensTable $ssoAuthTokens */
-        $ssoAuthTokens = TableRegistry::getTableLocator()->get('Passbolt/Sso.SsoAuthenticationTokens');
-        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $tokenEntity $token */
-        $tokenEntity = $ssoAuthTokens->generate(
-            $uac->getId(),
-            $type,
-            $token,
-            [
-                'ip' => $uac->getUserIp(),
-                'user_agent' => $uac->getUserAgent(),
-                'sso_setting_id' => $settingsId,
-            ]
-        );
-
-        return $tokenEntity;
     }
 
     /**

@@ -19,10 +19,10 @@ namespace Passbolt\Sso\Test\TestCase\Controller\Keys;
 
 use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
-use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Factory\SsoKeysFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
+use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
 class SsoKeysGetControllerTest extends SsoIntegrationTestCase
@@ -35,21 +35,14 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
         $user = UserFactory::make()->active()->persist();
         $key = SsoKeysFactory::make()->userId($user->id)->persist();
-        $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
-            ->userId($user->id)
-            ->active()
-            ->data([
-                'sso_setting_id' => $settings->id,
-                'ip' => SsoIntegrationTestCase::IP_ADDRESS,
-                'user_agent' => SsoIntegrationTestCase::USER_AGENT,
-            ])
-            ->persist();
+        $ssoState = SsoStateFactory::make([
+            'ip' => SsoIntegrationTestCase::IP_ADDRESS, 'user_agent' => SsoIntegrationTestCase::USER_AGENT,
+        ])->withTypeSsoGetKey()->userId($user->id)->ssoSettingsId($settings->id)->persist();
 
-        $this->getJson('/sso/keys/' . $key->id . '/' . $user->id . '/' . $token->token . '.json');
+        $this->getJson('/sso/keys/' . $key->id . '/' . $user->id . '/' . $ssoState->state . '.json');
+
         $this->assertSuccess();
         $result = $this->_responseJson->body;
-
         $this->assertEquals($key->id, $result->id);
         $this->assertEquals($key->user_id, $result->user_id);
         $this->assertEquals($key->data, $result->data);
@@ -57,10 +50,10 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
         $this->assertEquals($key->modified_by, $result->modified_by);
         $this->assertNotEmpty($result->created);
         $this->assertNotEmpty($result->modified);
-
-        /** @var SsoAuthenticationToken $tokenUpdated */
-        $tokenUpdated = SsoAuthenticationTokenFactory::find()->firstOrFail();
-        $this->assertFalse($tokenUpdated->active);
+        /** @var \Passbolt\Sso\Model\Entity\SsoState $updatedSsoState */
+        $updatedSsoState = SsoStateFactory::find()->firstOrFail();
+        $this->assertEquals(SsoState::TYPE_SSO_GET_KEY, $updatedSsoState->type);
+        $this->assertTrue($updatedSsoState->isExpired());
     }
 
     /**
@@ -105,25 +98,19 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
     }
 
     /**
-     * 404 user and token ok but key was deleted
+     * 404 user and state ok but key was deleted
      */
     public function testSsoKeysGetController_ErrorKeyNotFound(): void
     {
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
         $user = UserFactory::make()->active()->persist();
         $keyId = UuidFactory::uuid();
-        $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
-            ->userId($user->id)
-            ->active()
-            ->data([
-                'sso_setting_id' => $settings->id,
-                'ip' => SsoIntegrationTestCase::IP_ADDRESS,
-                'user_agent' => SsoIntegrationTestCase::USER_AGENT,
-            ])
-            ->persist();
+        $ssoState = SsoStateFactory::make([
+            'ip' => SsoIntegrationTestCase::IP_ADDRESS, 'user_agent' => SsoIntegrationTestCase::USER_AGENT,
+        ])->withTypeSsoGetKey()->userId($user->id)->ssoSettingsId($settings->id)->persist();
 
-        $this->getJson('/sso/keys/' . $keyId . '/' . $user->id . '/' . $token->token . '.json');
+        $this->getJson('/sso/keys/' . $keyId . '/' . $user->id . '/' . $ssoState->state . '.json');
+
         $this->assertError(404);
     }
 }

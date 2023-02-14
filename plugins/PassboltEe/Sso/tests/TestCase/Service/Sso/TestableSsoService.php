@@ -30,7 +30,7 @@ class TestableSsoService extends AbstractSsoService
 {
     public function createStateCookie(ExtendedUserAccessControl $uac): Cookie
     {
-        $ssoState = SsoStateFactory::make()->persist();
+        $ssoState = SsoStateFactory::make()->withTypeSsoState()->persist();
 
         return $this->createHttpOnlySecureCookie($ssoState);
     }

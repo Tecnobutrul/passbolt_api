@@ -95,10 +95,10 @@ class SsoAzureStage2Controller extends AbstractSsoController
         $service = new SsoAzureService();
         $uac = $service->assertStateCodeAndGetUac($state, $code, $this->User->ip(), $this->User->userAgent());
 
-        // Create token for next step, e.g. get keys
-        $token = $service->createSsoStateToGetKey($uac, $service->getSettings()->id);
+        // Create SSO state for next step, e.g. get keys
+        $ssoState = $service->createSsoStateToGetKey($uac, $service->getSettings()->id);
 
         $this->response = $this->getResponse()->withCookie($service->clearStateCookie());
-        $this->redirect(Router::url('/sso/login/success?token=') . $token->token);
+        $this->redirect(Router::url('/sso/login/success?token=') . $ssoState->state);
     }
 }

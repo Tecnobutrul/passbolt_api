@@ -22,7 +22,6 @@ use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
 use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
-use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 
 /**
@@ -55,49 +54,6 @@ class SsoAuthenticationTokensTableTest extends SsoTestCase
     {
         unset($this->SsoAuthenticationTokens);
         parent::tearDown();
-    }
-
-    /**
-     * New entity success
-     *
-     * @return void
-     */
-    public function testSsoAuthenticationTokensTable_NewEntitySuccess(): void
-    {
-        $user = UserFactory::make()->user()->persist();
-        $token = $this->SsoAuthenticationTokens->newEntity(
-            [
-                'user_id' => $user->id,
-                'token' => UuidFactory::uuid(),
-                'active' => true,
-                'type' => SsoAuthenticationToken::TYPE_SSO_GET_KEY,
-                'data' => null,
-            ],
-            ['accessibleFields' => [
-                'user_id' => true,
-                'token' => true,
-                'active' => true,
-                'type' => true,
-                'data' => true,
-            ]]
-        );
-
-        $this->assertEmpty($token->getErrors());
-    }
-
-    /**
-     * Generate success
-     *
-     * @return void
-     */
-    public function testSsoAuthenticationTokensTable_GenerateSuccess(): void
-    {
-        $user = UserFactory::make()->user()->persist();
-        $token = null;
-        $data = ['ip' => '127.0.0.1', 'user_agent' => 'cakephp tests', 'sso_setting_id' => UuidFactory::uuid()];
-        $this->SsoAuthenticationTokens->generate($user->id, SsoAuthenticationToken::TYPE_SSO_GET_KEY, $token, $data);
-
-        $this->assertEquals(1, SsoAuthenticationTokenFactory::count());
     }
 
     /**

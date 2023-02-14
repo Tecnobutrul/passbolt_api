@@ -56,7 +56,11 @@ class SsoStateFactory extends CakephpBaseFactory
             return [
                 'nonce' => SsoState::generate(),
                 'state' => SsoState::generate(),
-                'type' => $faker->randomElement([SsoState::TYPE_SSO_STATE, SsoState::TYPE_SSO_SET_SETTINGS]),
+                'type' => $faker->randomElement([
+                    SsoState::TYPE_SSO_STATE,
+                    SsoState::TYPE_SSO_SET_SETTINGS,
+                    SsoState::TYPE_SSO_GET_KEY,
+                ]),
                 'sso_settings_id' => UuidFactory::uuid(),
                 'user_id' => UuidFactory::uuid(),
                 'user_agent' => $faker->userAgent(),
@@ -85,6 +89,16 @@ class SsoStateFactory extends CakephpBaseFactory
     public function withTypeSsoSetSettings()
     {
         return $this->patchData(['type' => SsoState::TYPE_SSO_SET_SETTINGS]);
+    }
+
+    /**
+     * Sets "sso_get_key" type
+     *
+     * @return $this
+     */
+    public function withTypeSsoGetKey()
+    {
+        return $this->patchData(['type' => SsoState::TYPE_SSO_GET_KEY]);
     }
 
     /**

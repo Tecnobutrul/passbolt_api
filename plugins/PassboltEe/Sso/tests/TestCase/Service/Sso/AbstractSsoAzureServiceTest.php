@@ -66,7 +66,7 @@ class AbstractSsoAzureServiceTest extends SsoTestCase
 
     public function testSsoAbstractSsoAzureService_assertResourceOwnerAgainstSsoState_Success()
     {
-        $ssoState = SsoStateFactory::make()->persist();
+        $ssoState = SsoStateFactory::make()->withTypeSsoState()->persist();
         $resourceOwner = $this->getMockBuilder(SsoResourceOwnerInterface::class)->getMock();
         $resourceOwner->method('getNonce')->willReturn($ssoState->nonce);
 
@@ -77,7 +77,7 @@ class AbstractSsoAzureServiceTest extends SsoTestCase
 
     public function testSsoAbstractSsoAzureService_assertResourceOwnerAgainstSsoState_Error()
     {
-        $ssoState = SsoStateFactory::make()->persist();
+        $ssoState = SsoStateFactory::make()->withTypeSsoState()->persist();
         $resourceOwner = $this->getMockBuilder(SsoResourceOwnerInterface::class)->getMock();
         $resourceOwner->method('getNonce')->willReturn('foo');
 

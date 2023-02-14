@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Test\TestCase\Service\SsoAuthenticationTokens;
 
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoAuthenticationTokens\DeleteSsoStateAuthenticationTokenService;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
@@ -54,21 +54,21 @@ class DeleteSsoStateAuthenticationTokenServiceTest extends SsoTestCase
 
     public function testDeleteSsoStateAuthenticationTokenService_AllSsoStateRecordsDeleted(): void
     {
-        SsoAuthenticationTokenFactory::make(5)->type(SsoAuthenticationToken::TYPE_SSO_STATE)->persist();
+        SsoAuthenticationTokenFactory::make(5)->type(SsoState::TYPE_SSO_STATE)->persist();
 
         $this->service->delete();
 
         $tokens = SsoAuthenticationTokenFactory::find()
-            ->where(['type' => SsoAuthenticationToken::TYPE_SSO_STATE])
+            ->where(['type' => SsoState::TYPE_SSO_STATE])
             ->toArray();
         $this->assertCount(0, $tokens);
     }
 
     public function testDeleteSsoStateAuthenticationTokenService_OnlySsoStateRecordsDeleted(): void
     {
-        SsoAuthenticationTokenFactory::make(5)->type(SsoAuthenticationToken::TYPE_SSO_STATE)->persist();
-        SsoAuthenticationTokenFactory::make()->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)->persist();
-        SsoAuthenticationTokenFactory::make()->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)->persist();
+        SsoAuthenticationTokenFactory::make(5)->type(SsoState::TYPE_SSO_STATE)->persist();
+        SsoAuthenticationTokenFactory::make()->type(SsoState::TYPE_SSO_SET_SETTINGS)->persist();
+        SsoAuthenticationTokenFactory::make()->type(SsoState::TYPE_SSO_GET_KEY)->persist();
 
         $this->service->delete();
 
@@ -78,7 +78,7 @@ class DeleteSsoStateAuthenticationTokenServiceTest extends SsoTestCase
 
     public function testDeleteSsoStateAuthenticationTokenService_NoSsoStateRecords(): void
     {
-        SsoAuthenticationTokenFactory::make()->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)->persist();
+        SsoAuthenticationTokenFactory::make()->type(SsoState::TYPE_SSO_GET_KEY)->persist();
 
         $this->service->delete();
 

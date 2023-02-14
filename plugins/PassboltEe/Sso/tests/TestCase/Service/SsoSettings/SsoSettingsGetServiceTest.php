@@ -157,7 +157,11 @@ class SsoSettingsGetServiceTest extends SsoTestCase
     {
         $settings = SsoSettingsFactory::make()->azure()->draft()->persist();
         $user = UserFactory::make()->admin()->active()->persist();
-        $ssoState = SsoStateFactory::make()->userId($user->id)->ssoSettingsId($settings->id)->persist();
+        $ssoState = SsoStateFactory::make()
+            ->withTypeSsoState()
+            ->userId($user->id)
+            ->ssoSettingsId($settings->id)
+            ->persist();
 
         $result = (new SsoSettingsGetService())->getDraftSettingFromStateOrFail($ssoState->state);
         $this->assertEquals(SsoSetting::STATUS_DRAFT, $result->status);

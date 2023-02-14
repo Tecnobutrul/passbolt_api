@@ -27,7 +27,6 @@ use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Dto\AbstractSsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Entity\SsoState;
-use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesAssertService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
 
