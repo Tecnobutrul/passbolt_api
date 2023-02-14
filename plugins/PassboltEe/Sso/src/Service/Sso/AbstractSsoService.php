@@ -25,6 +25,7 @@ use Cake\Http\Cookie\Cookie;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Http\Exception\NotFoundException;
+use Cake\Log\Log;
 use Cake\ORM\TableRegistry;
 use Cake\Validation\Validation;
 use League\OAuth2\Client\Provider\AbstractProvider;
@@ -191,10 +192,19 @@ abstract class AbstractSsoService
         $uac = new ExtendedUserAccessControl($user->role->name, $user->id, $user->username, $ip, $userAgent);
         (new SsoStatesAssertService())->assertAndConsume($ssoState, $this->getSettings()->id, $uac);
 
-        // Assert access request and if it matches current suer
-        $resourceOwner = $this->getResourceOwnerAndAssertAgainstUser($code, $user);
+        try {
+            // Assert access request and if it matches current suer
+            $resourceOwner = $this->getResourceOwnerAndAssertAgainstUser($code, $user);
 
-        $this->assertResourceOwnerAgainstSsoState($resourceOwner, $ssoState);
+            $this->assertResourceOwnerAgainstSsoState($resourceOwner, $ssoState);
+        } catch (\Exception $e) {
+            $msg = 'There was an error while asserting user against resource owner. ';
+            $msg .= "Message: {$e->getMessage()}, State ID: {$ssoState->state}, User ID: {$user->id}";
+
+            Log::error($msg);
+
+            throw $e;
+        }
 
         return $uac;
     }
