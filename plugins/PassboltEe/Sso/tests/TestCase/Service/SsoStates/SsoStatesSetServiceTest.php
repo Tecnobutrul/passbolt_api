@@ -119,4 +119,48 @@ class SsoStatesSetServiceTest extends SsoTestCase
 
         $this->service->create($nonce, $state, SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
     }
+
+    public function testSsoStatesSetService_Error_UniqueNonce(): void
+    {
+        $user = UserFactory::make()->admin()->persist();
+        $nonce = SsoState::generate();
+        $ssoSettingId = SsoSettingsFactory::make()->persist()->get('id');
+        $uac = new ExtendedUserAccessControl(
+            Role::ADMIN,
+            $user->id,
+            $user->username,
+            '127.0.0.1',
+            'PHPUnit User Agent'
+        );
+
+        $this->service->create($nonce, SsoState::generate(), SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
+
+        $this->expectException(InternalErrorException::class);
+        $this->expectErrorMessage('Could not save the SSO state');
+
+        // Storing state with the nonce value that is already present should throw error
+        $this->service->create($nonce, SsoState::generate(), SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
+    }
+
+    public function testSsoStatesSetService_Error_UniqueState(): void
+    {
+        $user = UserFactory::make()->admin()->persist();
+        $state = SsoState::generate();
+        $ssoSettingId = SsoSettingsFactory::make()->persist()->get('id');
+        $uac = new ExtendedUserAccessControl(
+            Role::ADMIN,
+            $user->id,
+            $user->username,
+            '127.0.0.1',
+            'PHPUnit User Agent'
+        );
+
+        $this->service->create(SsoState::generate(), $state, SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
+
+        $this->expectException(InternalErrorException::class);
+        $this->expectErrorMessage('Could not save the SSO state');
+
+        // Storing state with the state value that is already present should throw error
+        $this->service->create(SsoState::generate(), $state, SsoState::TYPE_SSO_STATE, $ssoSettingId, $uac);
+    }
 }
