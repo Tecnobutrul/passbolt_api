@@ -35,7 +35,7 @@ use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoStates\SsoStatesAssertService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesSetService;
-use Passbolt\Sso\Utility\OpenId\ResourceOwnerWithEmailInterface;
+use Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface;
 
 abstract class AbstractSsoService
 {
@@ -48,6 +48,11 @@ abstract class AbstractSsoService
      * @var \Passbolt\Sso\Model\Dto\SsoSettingsDto $settings
      */
     protected $settings;
+
+    /**
+     * @var string|null
+     */
+    protected $nonce = null;
 
     /**
      * Cookie name used to store the state
@@ -187,7 +192,9 @@ abstract class AbstractSsoService
         (new SsoStatesAssertService())->assertAndConsume($ssoState, $this->getSettings()->id, $uac);
 
         // Assert access request and if it matches current suer
-        $this->getResourceOwnerAndAssertAgainstUser($code, $user);
+        $resourceOwner = $this->getResourceOwnerAndAssertAgainstUser($code, $user);
+
+        $this->assertResourceOwnerAgainstSsoState($resourceOwner, $ssoState);
 
         return $uac;
     }
@@ -209,10 +216,10 @@ abstract class AbstractSsoService
     /**
      * @param string $code JWT access request
      * @param \App\Model\Entity\User $user entity
-     * @return \Passbolt\Sso\Utility\OpenId\ResourceOwnerWithEmailInterface
+     * @return \Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface
      * @throws \Cake\Http\Exception\BadRequestException if resource owner username is not provider or does not match user entity
      */
-    public function getResourceOwnerAndAssertAgainstUser(string $code, User $user): ResourceOwnerWithEmailInterface
+    public function getResourceOwnerAndAssertAgainstUser(string $code, User $user): SsoResourceOwnerInterface
     {
         $resourceOwner = $this->getResourceOwner($code);
         $this->assertResourceOwnerAgainstUser($resourceOwner, $user);
@@ -222,11 +229,11 @@ abstract class AbstractSsoService
 
     /**
      * @param string $code authorization code to call OIDC endpoint
-     * @return \Passbolt\Sso\Utility\OpenId\ResourceOwnerWithEmailInterface
+     * @return \Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface
      * @throws \Cake\Http\Exception\InternalErrorException if resource owner does not implement ResourceOwnerWithEmailInterface
      * @throws \Cake\Http\Exception\BadRequestException if resource owner returned an error
      */
-    public function getResourceOwner(string $code): ResourceOwnerWithEmailInterface
+    public function getResourceOwner(string $code): SsoResourceOwnerInterface
     {
         try {
             // Try to get an access token using the authorization code grant.
@@ -241,7 +248,7 @@ abstract class AbstractSsoService
         }
 
         // Helper for developers working on new providers
-        if (!($resourceOwner instanceof ResourceOwnerWithEmailInterface)) {
+        if (!($resourceOwner instanceof SsoResourceOwnerInterface)) {
             $msg = 'Provider must return a ResourceOwner that implements ResourceOwnerWithEmailInterface.';
             throw new InternalErrorException($msg);
         }
@@ -256,15 +263,31 @@ abstract class AbstractSsoService
     }
 
     /**
-     * @param \Passbolt\Sso\Utility\OpenId\ResourceOwnerWithEmailInterface $resourceOwner user
+     * @param \Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface $resourceOwner user
      * @param \App\Model\Entity\User $user user
      * @return void
      * @throws \Cake\Http\Exception\BadRequestException if the assertion failed
      */
-    public function assertResourceOwnerAgainstUser(ResourceOwnerWithEmailInterface $resourceOwner, User $user): void
+    public function assertResourceOwnerAgainstUser(SsoResourceOwnerInterface $resourceOwner, User $user): void
     {
         if (mb_strtolower($resourceOwner->getEmail()) !== mb_strtolower($user->username)) {
             $msg = __('Single sign-on failed.') . ' ' . __('Username mismatch.');
+            throw new BadRequestException($msg);
+        }
+    }
+
+    /**
+     * @param \Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface $resourceOwner Resource owner.
+     * @param \Passbolt\Sso\Model\Entity\SsoState $ssoState SSO state.
+     * @return void
+     * @throws \Cake\Http\Exception\BadRequestException if the assertion failed
+     */
+    public function assertResourceOwnerAgainstSsoState(
+        SsoResourceOwnerInterface $resourceOwner,
+        SsoState $ssoState
+    ): void {
+        if ($ssoState->nonce !== $resourceOwner->getNonce()) {
+            $msg = __('Single sign-on failed.') . ' ' . __('Invalid nonce.');
             throw new BadRequestException($msg);
         }
     }
@@ -280,7 +303,13 @@ abstract class AbstractSsoService
         ExtendedUserAccessControl $uac,
         string $settingsId
     ): SsoState {
-        return (new SsoStatesSetService())->create($state, SsoState::TYPE_SSO_STATE, $settingsId, $uac);
+        return (new SsoStatesSetService())->create(
+            $this->nonce,
+            $state,
+            SsoState::TYPE_SSO_STATE,
+            $settingsId,
+            $uac
+        );
     }
 
     /**
@@ -335,5 +364,18 @@ abstract class AbstractSsoService
         );
 
         return $tokenEntity;
+    }
+
+    /**
+     * Returns random ASCII string containing the hexadecimal representation of string value.
+     *
+     * @return string
+     * @throws \Exception
+     */
+    protected function generateNonce(): string
+    {
+        $this->nonce = SsoState::generate();
+
+        return $this->nonce;
     }
 }

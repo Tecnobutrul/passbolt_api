@@ -16,7 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\Sso\Utility\OpenId;
 
-interface ResourceOwnerWithEmailInterface
+interface SsoResourceOwnerInterface
 {
     /**
      * Returns the email of the authorized resource owner.
@@ -24,4 +24,11 @@ interface ResourceOwnerWithEmailInterface
      * @return mixed
      */
     public function getEmail();
+
+    /**
+     * Returns nonce if present in data.
+     *
+     * @return string|null
+     */
+    public function getNonce(): ?string;
 }

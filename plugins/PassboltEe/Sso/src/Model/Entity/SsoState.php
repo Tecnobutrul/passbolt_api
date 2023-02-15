@@ -93,6 +93,8 @@ class SsoState extends Entity
     }
 
     /**
+     * Checks if given state/nonce is valid.
+     *
      * @param string $value State/nonce value to check.
      * @return bool
      */
