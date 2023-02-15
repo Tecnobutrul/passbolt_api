@@ -159,4 +159,14 @@ class SsoState extends Entity
     {
         return $this->deleted->isPast();
     }
+
+    /**
+     * Checks if user_id field should be mandatory or not.
+     *
+     * @return bool
+     */
+    public function isUserIdMandatory(): bool
+    {
+        return in_array($this->type, [SsoState::TYPE_SSO_SET_SETTINGS, SsoState::TYPE_SSO_GET_KEY]);
+    }
 }

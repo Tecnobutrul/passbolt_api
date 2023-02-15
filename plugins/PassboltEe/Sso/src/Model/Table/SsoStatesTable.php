@@ -184,15 +184,46 @@ class SsoStatesTable extends Table
             ['errorField' => 'sso_settings_id']
         );
         $rules->add(
-            $rules->existsIn('user_id', 'Users', __('The user identifier does not exist.')),
+            /**
+             * Conditionally make `user_id` field mandatory.
+             *
+             * @param \Passbolt\Sso\Model\Entity\SsoState $entity
+             */
+            function ($entity, $options) use ($rules) {
+                if ($entity->isUserIdMandatory()) {
+                    $rule = $rules->existsIn(
+                        'user_id',
+                        'Users',
+                        __('The user identifier does not exist.')
+                    );
+
+                    return $rule($entity, $options);
+                }
+
+                return true;
+            },
+            '_existsIn',
             ['errorField' => 'user_id']
         );
 
-        $rules->addCreate(new IsNotSoftDeletedRule(), 'user_is_soft_deleted', [
-            'table' => 'Users',
-            'errorField' => 'user_id',
-            'message' => __('The user must be active.'),
-        ]);
+        $rules->addCreate(
+            /** @param \Passbolt\Sso\Model\Entity\SsoState $entity */
+            function ($entity, $options) {
+                if ($entity->isUserIdMandatory()) {
+                    $rule = new IsNotSoftDeletedRule();
+
+                    return $rule($entity, $options);
+                }
+
+                return true;
+            },
+            'user_is_soft_deleted',
+            [
+                'table' => 'Users',
+                'errorField' => 'user_id',
+                'message' => __('The user must be active.'),
+            ]
+        );
 
         return $rules;
     }
