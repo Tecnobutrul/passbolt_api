@@ -253,6 +253,15 @@ abstract class AbstractSsoService
             // Using the access token id_token, we may look up details about the resource owner.
             $resourceOwner = $this->provider->getResourceOwner($accessToken);
         } catch (IdentityProviderException $exception) {
+            $msg = "Error while getting access token. Message: {$exception->getMessage()}, ";
+            if (!is_string($exception->getResponseBody())) {
+                $msg .= 'Response: ' . json_encode($exception->getResponseBody());
+            } else {
+                $msg .= "Response: {$exception->getResponseBody()}";
+            }
+
+            Log::error($msg);
+
             $msg = __('Single sign-on failed.') . ' ' . __('Provider error: "{0}"', $exception->getMessage());
             throw new BadRequestException($msg, 400, $exception);
         }
