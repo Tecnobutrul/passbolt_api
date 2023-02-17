@@ -17,7 +17,7 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Service\SsoAuthenticationTokens;
 
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\Sso\Model\Entity\SsoState;
 
 /**
  * Used in 20230206055150_V3110RefactorSsoStates migration.
@@ -36,6 +36,6 @@ class DeleteSsoStateAuthenticationTokenService
         /** @var \Passbolt\Sso\Model\Table\SsoAuthenticationTokensTable $ssoAuthenticationTokensTable */
         $ssoAuthenticationTokensTable = $this->fetchTable('Passbolt/Sso.SsoAuthenticationTokens');
 
-        $ssoAuthenticationTokensTable->deleteAll(['type' => SsoAuthenticationToken::TYPE_SSO_STATE]);
+        $ssoAuthenticationTokensTable->deleteAll(['type' => SsoState::TYPE_SSO_STATE]);
     }
 }

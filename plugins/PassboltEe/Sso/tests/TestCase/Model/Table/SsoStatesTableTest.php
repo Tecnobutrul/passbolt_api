@@ -64,7 +64,7 @@ class SsoStatesTableTest extends SsoTestCase
         $ssoState = $this->SsoStates->newEntity([
             'nonce' => SsoState::generate(),
             'state' => SsoState::generate(),
-            'type' => SsoState::TYPE_SSO_STATE,
+            'type' => SsoState::TYPE_SSO_SET_SETTINGS,
             'sso_settings_id' => $ssoSetting->id,
             'user_id' => $user->id,
             'ip' => '127.0.0.1',
@@ -81,7 +81,7 @@ class SsoStatesTableTest extends SsoTestCase
             [
                 'nonce' => SsoState::generate(),
                 'state' => SsoState::generate(),
-                'type' => SsoState::TYPE_SSO_STATE,
+                'type' => SsoState::TYPE_SSO_RECOVER,
                 'sso_settings_id' => $ssoSetting->id,
                 'ip' => '127.0.0.1',
                 'user_agent' => 'Foo user agent',
@@ -159,7 +159,7 @@ class SsoStatesTableTest extends SsoTestCase
         $ssoState = $this->SsoStates->newEntity([
             'nonce' => '123456',
             'state' => '123456',
-            'type' => SsoState::TYPE_SSO_STATE,
+            'type' => SsoState::TYPE_SSO_SET_SETTINGS,
             'sso_settings_id' => $ssoSetting->id,
             'user_id' => $user->id,
             'ip' => '127.0.0.1',
@@ -183,7 +183,7 @@ class SsoStatesTableTest extends SsoTestCase
             [
                 'nonce' => SsoState::generate(),
                 'state' => SsoState::generate(),
-                'type' => SsoState::TYPE_SSO_GET_KEY,
+                'type' => SsoState::TYPE_SSO_SET_SETTINGS,
                 'sso_settings_id' => UuidFactory::uuid(),
                 'user_id' => UuidFactory::uuid(),
                 'ip' => '127.0.0.1',
@@ -232,7 +232,7 @@ class SsoStatesTableTest extends SsoTestCase
         $this->SsoStates->save($this->SsoStates->newEntity([
             'nonce' => $state,
             'state' => $nonce,
-            'type' => SsoState::TYPE_SSO_STATE,
+            'type' => SsoState::TYPE_SSO_SET_SETTINGS,
             'sso_settings_id' => $ssoSetting->id,
             'user_id' => $user->id,
             'ip' => '127.0.0.1',
@@ -243,7 +243,7 @@ class SsoStatesTableTest extends SsoTestCase
         $ssoState = $this->SsoStates->newEntity([
             'nonce' => $state,
             'state' => $nonce,
-            'type' => SsoState::TYPE_SSO_STATE,
+            'type' => SsoState::TYPE_SSO_SET_SETTINGS,
             'sso_settings_id' => $ssoSetting->id,
             'user_id' => $user->id,
             'ip' => '127.0.0.1',
@@ -258,6 +258,8 @@ class SsoStatesTableTest extends SsoTestCase
     }
 
     /**
+     * For certain types like sso_set_settings, sso_get_key, etc. user is mandatory
+     *
      * @uses \Passbolt\Sso\Model\Table\SsoStatesTable::buildRules()
      */
     public function testSsoStatesTableBuildRules_ErrorUserIdMandatory(): void

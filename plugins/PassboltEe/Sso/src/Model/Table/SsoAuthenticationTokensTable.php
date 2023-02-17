@@ -26,6 +26,7 @@ use Cake\Core\Configure;
 use Cake\ORM\RulesChecker;
 use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Utility\AuthToken\SsoAuthTokenExpiry;
 
 /**
@@ -33,7 +34,11 @@ use Passbolt\Sso\Utility\AuthToken\SsoAuthTokenExpiry;
  */
 class SsoAuthenticationTokensTable extends AuthenticationTokensTable
 {
-    public const SSO_ALLOWED_TYPES = [SsoAuthenticationToken::TYPE_SSO_GET_KEY];
+    public const SSO_ALLOWED_TYPES = [
+        SsoState::TYPE_SSO_SET_SETTINGS,
+        SsoState::TYPE_SSO_GET_KEY,
+        SsoState::TYPE_SSO_RECOVER,
+    ];
 
     /**
      * @return array self::SSO_ALLOWED_TYPES

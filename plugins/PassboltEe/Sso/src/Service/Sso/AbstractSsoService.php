@@ -20,7 +20,6 @@ namespace Passbolt\Sso\Service\Sso;
 use App\Model\Entity\User;
 use App\Service\Users\UserGetService;
 use App\Utility\ExtendedUserAccessControl;
-use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Cookie\Cookie;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
@@ -30,9 +29,10 @@ use Cake\Validation\Validation;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
+use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenSetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesAssertService;
-use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesSetService;
 use Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface;
 
@@ -109,9 +109,10 @@ abstract class AbstractSsoService
      * that matches the state
      *
      * @param \App\Utility\ExtendedUserAccessControl $uac user access control
+     * @param string $type Type of state.
      * @return \Cake\Http\Cookie\Cookie
      */
-    public function createStateCookie(ExtendedUserAccessControl $uac): Cookie
+    public function createStateCookie(ExtendedUserAccessControl $uac, string $type): Cookie
     {
         /** @phpstan-ignore-next-line  */
         if ($this->provider->getState() === null) {
@@ -120,7 +121,7 @@ abstract class AbstractSsoService
         }
 
         // Store the OAuth state in sso state
-        $ssoState = $this->createSsoAuthStateToken($this->provider->getState(), $uac, $this->settings->id);
+        $ssoState = $this->createSsoState($this->provider->getState(), $uac, $this->settings->id, $type);
 
         // Build cookie that matches the OAuth state
         return $this->createHttpOnlySecureCookie($ssoState);
@@ -158,7 +159,7 @@ abstract class AbstractSsoService
     /**
      * Check a given state against authentication token and extended user info
      *
-     * @param string $state uuid
+     * @param \Passbolt\Sso\Model\Entity\SsoState $ssoState SSO state entity
      * @param string $code client ip
      * @param string $ip user agent
      * @param string $userAgent user agent
@@ -168,14 +169,11 @@ abstract class AbstractSsoService
      * @return \App\Utility\ExtendedUserAccessControl
      */
     public function assertStateCodeAndGetUac(
-        string $state,
+        SsoState $ssoState,
         string $code,
         string $ip,
         string $userAgent
     ): ExtendedUserAccessControl {
-        // Get the SSO state and the user
-        $ssoState = $this->getSsoState($state);
-
         if ($ssoState->user_id === null) {
             throw new BadRequestException(__('The user is missing for the SSO state.'));
         }
@@ -205,20 +203,6 @@ abstract class AbstractSsoService
         }
 
         return $uac;
-    }
-
-    /**
-     * @param string $state uuid
-     * @return \Passbolt\Sso\Model\Entity\SsoState
-     * @throws \Cake\Http\Exception\BadRequestException When given state doesn't exist or not active.
-     */
-    public function getSsoState(string $state): SsoState
-    {
-        try {
-            return (new SsoStatesGetService())->getOrFail($state, SsoState::TYPE_SSO_STATE);
-        } catch (RecordNotFoundException $e) {
-            throw new BadRequestException(__('The SSO state does not exist.'), 400, $e);
-        }
     }
 
     /**
@@ -313,17 +297,19 @@ abstract class AbstractSsoService
      * @param string $state uuid
      * @param \App\Utility\ExtendedUserAccessControl $uac extend user access control
      * @param string $settingsId uuid
+     * @param string $type Type of state.
      * @return \Passbolt\Sso\Model\Entity\SsoState
      */
-    public function createSsoAuthStateToken(
+    public function createSsoState(
         string $state,
         ExtendedUserAccessControl $uac,
-        string $settingsId
+        string $settingsId,
+        string $type
     ): SsoState {
         return (new SsoStatesSetService())->create(
             $this->nonce,
             $state,
-            SsoState::TYPE_SSO_STATE,
+            $type,
             $settingsId,
             $uac
         );
@@ -332,32 +318,30 @@ abstract class AbstractSsoService
     /**
      * @param \App\Utility\ExtendedUserAccessControl $uac extend user access control
      * @param string $settingsId uuid
-     * @return \Passbolt\Sso\Model\Entity\SsoState
+     * @return \Passbolt\Sso\Model\Entity\SsoAuthenticationToken
      */
-    public function createSsoStateToGetKey(ExtendedUserAccessControl $uac, string $settingsId): SsoState
+    public function createAuthTokenToGetKey(ExtendedUserAccessControl $uac, string $settingsId): SsoAuthenticationToken
     {
-        return (new SsoStatesSetService())->create(
-            $this->generateNonce(),
-            SsoState::generate(),
+        return (new SsoAuthenticationTokenSetService())->createOrFail(
+            $uac,
             SsoState::TYPE_SSO_GET_KEY,
-            $settingsId,
-            $uac
+            $settingsId
         );
     }
 
     /**
      * @param \App\Utility\ExtendedUserAccessControl $uac extend user access control
      * @param string $settingsId uuid
-     * @return \Passbolt\Sso\Model\Entity\SsoState
+     * @return \Passbolt\Sso\Model\Entity\SsoAuthenticationToken
      */
-    public function createSsoStateToActiveSettings(ExtendedUserAccessControl $uac, string $settingsId): SsoState
-    {
-        return (new SsoStatesSetService())->create(
-            $this->generateNonce(),
-            SsoState::generate(),
+    public function createAuthTokenToActiveSettings(
+        ExtendedUserAccessControl $uac,
+        string $settingsId
+    ): SsoAuthenticationToken {
+        return (new SsoAuthenticationTokenSetService())->createOrFail(
+            $uac,
             SsoState::TYPE_SSO_SET_SETTINGS,
-            $settingsId,
-            $uac
+            $settingsId
         );
     }
 

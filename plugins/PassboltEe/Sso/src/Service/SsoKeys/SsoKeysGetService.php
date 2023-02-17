@@ -22,9 +22,8 @@ use Cake\Http\Exception\BadRequestException;
 use Cake\ORM\TableRegistry;
 use Passbolt\Sso\Model\Entity\SsoKey;
 use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
-use Passbolt\Sso\Service\SsoStates\SsoStatesAssertService;
-use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
 
 class SsoKeysGetService
 {
@@ -39,12 +38,14 @@ class SsoKeysGetService
     public function get(ExtendedUserAccessControl $uac, string $token, string $keyId): SsoKey
     {
         try {
-            /**
-             * SSO state must be provided and matching the settings, user id, ip, user agent, etc.
-             */
             $ssoSettingEntity = (new SsoSettingsGetService())->getActiveOrFail();
-            $ssoState = (new SsoStatesGetService())->getOrFail($token, SsoState::TYPE_SSO_GET_KEY);
-            (new SsoStatesAssertService())->assertAndConsume($ssoState, $ssoSettingEntity->id, $uac);
+            // Token must be provided and matching the settings, user id, ip, user agent, etc.
+            $ssoAuthTokenGetService = new SsoAuthenticationTokenGetService();
+            $ssoAuthToken = $ssoAuthTokenGetService->getOrFail(
+                $token,
+                SsoState::TYPE_SSO_GET_KEY
+            );
+            $ssoAuthTokenGetService->assertAndConsume($ssoAuthToken, $uac, $ssoSettingEntity->id);
         } catch (RecordNotFoundException $exception) {
             throw new BadRequestException($exception->getMessage(), 400, $exception);
         }

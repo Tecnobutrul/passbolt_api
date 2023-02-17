@@ -57,7 +57,6 @@ class SsoStateFactory extends CakephpBaseFactory
                 'nonce' => SsoState::generate(),
                 'state' => SsoState::generate(),
                 'type' => $faker->randomElement([
-                    SsoState::TYPE_SSO_STATE,
                     SsoState::TYPE_SSO_SET_SETTINGS,
                     SsoState::TYPE_SSO_GET_KEY,
                 ]),
@@ -69,16 +68,6 @@ class SsoStateFactory extends CakephpBaseFactory
                 'deleted' => FrozenTime::now()->addMinutes(5),
             ];
         });
-    }
-
-    /**
-     * Sets "sso_state" type
-     *
-     * @return $this
-     */
-    public function withTypeSsoState()
-    {
-        return $this->patchData(['type' => SsoState::TYPE_SSO_STATE]);
     }
 
     /**

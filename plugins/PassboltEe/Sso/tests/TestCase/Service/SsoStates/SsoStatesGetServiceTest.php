@@ -61,7 +61,7 @@ class SsoStatesGetServiceTest extends SsoTestCase
         $this->expectException(RecordNotFoundException::class);
         $this->expectErrorMessage('The SSO state does not exist.');
 
-        $this->service->getOrFail(SsoState::generate(), SsoState::TYPE_SSO_STATE);
+        $this->service->getOrFail(SsoState::generate());
     }
 
     public function testSsoStatesGetService_ErrorRecordDeleted(): void
@@ -77,7 +77,7 @@ class SsoStatesGetServiceTest extends SsoTestCase
         $this->expectException(RecordNotFoundException::class);
         $this->expectErrorMessage('The SSO state does not exist.');
 
-        $this->service->getOrFail($ssoState->state, SsoState::TYPE_SSO_SET_SETTINGS);
+        $this->service->getOrFail($ssoState->state);
     }
 
     public function testSsoStatesGetService_ErrorInvalidState(): void
@@ -85,24 +85,24 @@ class SsoStatesGetServiceTest extends SsoTestCase
         $this->expectException(BadRequestException::class);
         $this->expectErrorMessage('The SSO state is invalid.');
 
-        $this->service->getOrFail('123456', SsoState::TYPE_SSO_STATE);
+        $this->service->getOrFail('123456');
     }
 
     public function testSsoStatesGetService_Success(): void
     {
         $userId = UserFactory::make()->admin()->persist()->get('id');
         $ssoSettingId = SsoSettingsFactory::make()->persist()->get('id');
-        $ssoState = SsoStateFactory::make(['type' => SsoState::TYPE_SSO_STATE])
+        $ssoState = SsoStateFactory::make(['type' => SsoState::TYPE_SSO_GET_KEY])
             ->ssoSettingsId($ssoSettingId)
             ->userId($userId)
             ->persist();
 
-        $result = $this->service->getOrFail($ssoState->state, SsoState::TYPE_SSO_STATE);
+        $result = $this->service->getOrFail($ssoState->state);
 
         $this->assertInstanceOf(SsoState::class, $result);
         $this->assertEquals($ssoState->id, $result->id);
         $this->assertEquals($ssoState->state, $result->state);
-        $this->assertEquals(SsoState::TYPE_SSO_STATE, $result->type);
+        $this->assertEquals(SsoState::TYPE_SSO_GET_KEY, $result->type);
         $this->assertEquals($ssoState->sso_settings_id, $result->sso_settings_id);
         $this->assertEquals($ssoState->user_id, $result->user_id);
         $this->assertEquals($ssoState->ip, $result->ip);

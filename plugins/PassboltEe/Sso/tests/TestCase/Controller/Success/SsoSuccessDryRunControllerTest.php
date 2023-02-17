@@ -21,8 +21,38 @@ use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
 class SsoSuccessDryRunControllerTest extends SsoIntegrationTestCase
 {
-    public function testSsoSuccessDryRunController(): void
+    public function testSsoSuccessDryRunController_ErrorNoAuth(): void
     {
-        $this->markTestIncomplete();
+        $this->get('/sso/login/dry-run/success');
+        $this->assertResponseCode(302);
+        $this->assertRedirectContains('/auth/login');
+    }
+
+    public function testSsoSuccessDryRunController_ErrorJson(): void
+    {
+        $this->logInAsAdmin();
+
+        $this->getJson('/sso/login/dry-run/success.json');
+        $this->assertError(400, 'not supported');
+    }
+
+    public function testSsoSuccessDryRunController_ErrorNoToken(): void
+    {
+        $this->logInAsAdmin();
+
+        $this->get('/sso/login/dry-run/success');
+
+        $this->assertResponseCode(400);
+        $this->assertResponseContains('The token is required in URL parameters.');
+    }
+
+    public function testSsoSuccessDryRunController_ErrorInvalidToken(): void
+    {
+        $this->logInAsAdmin();
+
+        $this->get('/sso/login/dry-run/success?token=nope');
+
+        $this->assertResponseCode(400);
+        $this->assertResponseContains('The token is required in URL parameters.');
     }
 }

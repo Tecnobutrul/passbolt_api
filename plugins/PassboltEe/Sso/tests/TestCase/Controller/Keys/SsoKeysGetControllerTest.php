@@ -20,9 +20,9 @@ namespace Passbolt\Sso\Test\TestCase\Controller\Keys;
 use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
 use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoKeysFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
-use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
 class SsoKeysGetControllerTest extends SsoIntegrationTestCase
@@ -35,11 +35,18 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
         $user = UserFactory::make()->active()->persist();
         $key = SsoKeysFactory::make()->userId($user->id)->persist();
-        $ssoState = SsoStateFactory::make([
-            'ip' => SsoIntegrationTestCase::IP_ADDRESS, 'user_agent' => SsoIntegrationTestCase::USER_AGENT,
-        ])->withTypeSsoGetKey()->userId($user->id)->ssoSettingsId($settings->id)->persist();
+        $ssoAuthToken = SsoAuthenticationTokenFactory::make()
+            ->type(SsoState::TYPE_SSO_GET_KEY)
+            ->userId($user->id)
+            ->active()
+            ->data([
+                'sso_setting_id' => $settings->id,
+                'ip' => SsoIntegrationTestCase::IP_ADDRESS,
+                'user_agent' => SsoIntegrationTestCase::USER_AGENT,
+            ])
+            ->persist();
 
-        $this->getJson('/sso/keys/' . $key->id . '/' . $user->id . '/' . $ssoState->state . '.json');
+        $this->getJson('/sso/keys/' . $key->id . '/' . $user->id . '/' . $ssoAuthToken->token . '.json');
 
         $this->assertSuccess();
         $result = $this->_responseJson->body;
@@ -50,10 +57,9 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
         $this->assertEquals($key->modified_by, $result->modified_by);
         $this->assertNotEmpty($result->created);
         $this->assertNotEmpty($result->modified);
-        /** @var \Passbolt\Sso\Model\Entity\SsoState $updatedSsoState */
-        $updatedSsoState = SsoStateFactory::find()->firstOrFail();
-        $this->assertEquals(SsoState::TYPE_SSO_GET_KEY, $updatedSsoState->type);
-        $this->assertTrue($updatedSsoState->isExpired());
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $updateSsoAuthToken */
+        $updateSsoAuthToken = SsoAuthenticationTokenFactory::find()->firstOrFail();
+        $this->assertFalse($updateSsoAuthToken->active);
     }
 
     /**
@@ -105,11 +111,18 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
         $user = UserFactory::make()->active()->persist();
         $keyId = UuidFactory::uuid();
-        $ssoState = SsoStateFactory::make([
-            'ip' => SsoIntegrationTestCase::IP_ADDRESS, 'user_agent' => SsoIntegrationTestCase::USER_AGENT,
-        ])->withTypeSsoGetKey()->userId($user->id)->ssoSettingsId($settings->id)->persist();
+        $token = SsoAuthenticationTokenFactory::make()
+            ->type(SsoState::TYPE_SSO_GET_KEY)
+            ->userId($user->id)
+            ->active()
+            ->data([
+                'sso_setting_id' => $settings->id,
+                'ip' => SsoIntegrationTestCase::IP_ADDRESS,
+                'user_agent' => SsoIntegrationTestCase::USER_AGENT,
+            ])
+            ->persist();
 
-        $this->getJson('/sso/keys/' . $keyId . '/' . $user->id . '/' . $ssoState->state . '.json');
+        $this->getJson('/sso/keys/' . $keyId . '/' . $user->id . '/' . $token->token . '.json');
 
         $this->assertError(404);
     }

@@ -20,6 +20,7 @@ namespace Passbolt\Sso\Controller\Azure;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\NotFoundException;
 use Passbolt\Sso\Controller\AbstractSsoController;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Azure\SsoAzureService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
 
@@ -47,7 +48,11 @@ class SsoAzureStage1DryRunController extends AbstractSsoController
         }
 
         // Redirect to provider
-        $url = $this->getSsoUrlWithCookie(new SsoAzureService($settingsDto), $uac);
+        $url = $this->getSsoUrlWithCookie(
+            new SsoAzureService($settingsDto),
+            $uac,
+            SsoState::TYPE_SSO_SET_SETTINGS
+        );
         $this->success(__('The operation was successful.'), ['url' => $url]);
     }
 }

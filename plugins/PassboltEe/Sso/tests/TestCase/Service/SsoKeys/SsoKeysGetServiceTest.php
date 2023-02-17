@@ -24,10 +24,11 @@ use App\Utility\UuidFactory;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Validation\Validation;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoKeys\SsoKeysGetService;
+use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoKeysFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
-use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 
 class SsoKeysGetServiceTest extends SsoTestCase
@@ -39,14 +40,19 @@ class SsoKeysGetServiceTest extends SsoTestCase
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
         $user = UserFactory::make()->active()->persist();
         $key = SsoKeysFactory::make()->userId($user->id)->persist();
-        $ssoState = SsoStateFactory::make(['ip' => $ip, 'user_agent' => $ua])
-            ->withTypeSsoGetKey()
+        $ssoAuthToken = SsoAuthenticationTokenFactory::make()
+            ->type(SsoState::TYPE_SSO_GET_KEY)
             ->userId($user->id)
-            ->ssoSettingsId($settings->id)
+            ->active()
+            ->data([
+                'sso_setting_id' => $settings->id,
+                'ip' => $ip,
+                'user_agent' => $ua,
+            ])
             ->persist();
 
         $uac = new ExtendedUserAccessControl(Role::GUEST, $user->id, $user->username, $ip, $ua);
-        $result = (new SsoKeysGetService())->get($uac, $ssoState->state, $key->id);
+        $result = (new SsoKeysGetService())->get($uac, $ssoAuthToken->token, $key->id);
 
         $this->assertEquals($key->id, $result->id);
         $this->assertEquals($key->user_id, $result->user_id);
@@ -55,9 +61,9 @@ class SsoKeysGetServiceTest extends SsoTestCase
         $this->assertEquals($key->modified_by, $result->modified_by);
         $this->assertTrue(Validation::datetime($result->created));
         $this->assertTrue(Validation::datetime($result->modified));
-        /** @var \Passbolt\Sso\Model\Entity\SsoState $updatedSsoState */
-        $updatedSsoState = SsoStateFactory::find()->firstOrFail();
-        $this->assertTrue($updatedSsoState->isExpired());
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $updateSsoAuthToken */
+        $updateSsoAuthToken = SsoAuthenticationTokenFactory::find()->firstOrFail();
+        $this->assertFalse($updateSsoAuthToken->active);
     }
 
     public function testSsoKeysGetServiceTest_Error_NotActiveSettings(): void

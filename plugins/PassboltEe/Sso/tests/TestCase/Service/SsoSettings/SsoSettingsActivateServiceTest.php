@@ -27,8 +27,8 @@ use Cake\Http\Exception\NotFoundException;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsActivateService;
+use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
-use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 
 class SsoSettingsActivateServiceTest extends SsoTestCase
@@ -42,27 +42,30 @@ class SsoSettingsActivateServiceTest extends SsoTestCase
         $ip = '127.0.0.1';
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
-        $ssoState = SsoStateFactory::make(['ip' => $ip, 'user_agent' => $ua])
-            ->withTypeSsoSetSettings()
+        $ssoAuthToken = SsoAuthenticationTokenFactory::make()
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
-            ->ssoSettingsId($settings->id)
+            ->active()
+            ->data([
+                'sso_setting_id' => $settings->id,
+                'ip' => $ip,
+                'user_agent' => $ua,
+            ])
             ->persist();
 
         $sut = new SsoSettingsActivateService();
         $activeSetting = $sut->activate($uac, $settings->id, [
             'status' => SsoSetting::STATUS_ACTIVE,
-            'token' => $ssoState->state,
+            'token' => $ssoAuthToken->token,
         ]);
 
         /** @var SsoSetting $result */
         $result = SsoSettingsFactory::find()->firstOrFail();
         $this->assertEquals($activeSetting->id, $result->id);
-
-        /** @var \Passbolt\Sso\Model\Entity\SsoState $updatedSsoState */
-        $updatedSsoState = SsoStateFactory::find()->firstOrFail();
-        $this->assertEquals(SsoState::TYPE_SSO_SET_SETTINGS, $updatedSsoState->type);
-        $this->assertTrue($updatedSsoState->isExpired());
-
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $updatedToken */
+        $updatedToken = SsoAuthenticationTokenFactory::find()->firstOrFail();
+        $this->assertEquals(SsoState::TYPE_SSO_SET_SETTINGS, $updatedToken->type);
+        $this->assertFalse($updatedToken->active);
         $this->assertEquals(1, SsoSettingsFactory::count());
     }
 
@@ -125,17 +128,23 @@ class SsoSettingsActivateServiceTest extends SsoTestCase
         $ip = '127.0.0.1';
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
-        $ssoState = SsoStateFactory::make(['ip' => $ip, 'user_agent' => $ua])
-            ->withTypeSsoSetSettings()
+        $ssoAuthToken = SsoAuthenticationTokenFactory::make()
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
-            ->ssoSettingsId($settings->id)
+            ->active()
+            ->data([
+                'sso_setting_id' => $settings->id,
+                'ip' => $ip,
+                'user_agent' => $ua,
+            ])
             ->persist();
 
-        $sut = new SsoSettingsActivateService();
         $this->expectException(BadRequestException::class);
+
+        $sut = new SsoSettingsActivateService();
         $sut->activate($uac, $settings->id, [
             'status' => SsoSetting::STATUS_ACTIVE,
-            'token' => $ssoState->state,
+            'token' => $ssoAuthToken->token,
         ]);
     }
 

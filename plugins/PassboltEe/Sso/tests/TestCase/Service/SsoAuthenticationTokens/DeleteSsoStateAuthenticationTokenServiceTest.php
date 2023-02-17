@@ -54,7 +54,9 @@ class DeleteSsoStateAuthenticationTokenServiceTest extends SsoTestCase
 
     public function testDeleteSsoStateAuthenticationTokenService_AllSsoStateRecordsDeleted(): void
     {
-        SsoAuthenticationTokenFactory::make(5)->type(SsoState::TYPE_SSO_STATE)->persist();
+        SsoAuthenticationTokenFactory::make(5)
+            ->type(SsoState::TYPE_SSO_STATE)
+            ->persist();
 
         $this->service->delete();
 
@@ -66,7 +68,9 @@ class DeleteSsoStateAuthenticationTokenServiceTest extends SsoTestCase
 
     public function testDeleteSsoStateAuthenticationTokenService_OnlySsoStateRecordsDeleted(): void
     {
-        SsoAuthenticationTokenFactory::make(5)->type(SsoState::TYPE_SSO_STATE)->persist();
+        SsoAuthenticationTokenFactory::make(5)
+            ->type(SsoState::TYPE_SSO_STATE)
+            ->persist();
         SsoAuthenticationTokenFactory::make()->type(SsoState::TYPE_SSO_SET_SETTINGS)->persist();
         SsoAuthenticationTokenFactory::make()->type(SsoState::TYPE_SSO_GET_KEY)->persist();
 

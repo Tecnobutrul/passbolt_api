@@ -43,7 +43,7 @@ class SsoSuccessController extends AbstractSsoController
         }
 
         $this->User->assertNotLoggedIn();
-        $this->getStateFromUrlQuery();
+        $this->getTokenFromUrlQuery();
 
         // Not much to do
         $this->viewBuilder()

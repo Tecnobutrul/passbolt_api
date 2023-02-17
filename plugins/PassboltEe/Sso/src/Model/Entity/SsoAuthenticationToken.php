@@ -35,20 +35,6 @@ use Passbolt\Sso\Utility\AuthToken\SsoAuthTokenExpiry;
  */
 class SsoAuthenticationToken extends AuthenticationToken
 {
-    // AUTH TOKEN TYPES
-    /**
-     * @deprecated Use \Passbolt\Sso\Model\Entity\SsoState::TYPE_SSO_STATE
-     */
-    public const TYPE_SSO_STATE = 'sso_state';
-    /**
-     * @deprecated Use \Passbolt\Sso\Model\Entity\SsoState::TYPE_SSO_GET_KEY
-     */
-    public const TYPE_SSO_GET_KEY = 'sso_get_key';
-    /**
-     * @deprecated Use \Passbolt\Sso\Model\Entity\SsoState::TYPE_SSO_SET_SETTINGS
-     */
-    public const TYPE_SSO_SET_SETTINGS = 'sso_set_settings';
-
     // AUTH TOKEN DATA PROPERTIES
     public const DATA_IP = 'ip';
     public const DATA_USER_AGENT = 'user_agent';
