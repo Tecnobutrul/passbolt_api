@@ -34,13 +34,19 @@ class SystemCheckControllerTest extends WebInstallerIntegrationTestCase
     public function testWebInstallerSystemCheckViewSuccess()
     {
         $this->get('/install/system_check');
+
         $data = $this->_getBodyAsString();
+
         $this->assertResponseOk();
-        $this->assertStringContainsString('. Database', $data);
-        $this->assertStringContainsString('Nice one! Your environment is ready for passbolt.', $data);
-        $this->assertStringContainsString('Environment is configured correctly.', $data);
-        $this->assertStringContainsString('GPG is configured correctly.', $data);
-        $this->assertStringContainsString('Start configuration', $data);
+        if (version_compare(PHP_VERSION, '7.4', '<')) {
+            $this->assertStringContainsString('PHP version is too low', $data);
+        } else {
+            $this->assertStringContainsString('. Database', $data);
+            $this->assertStringContainsString('Nice one! Your environment is ready for passbolt.', $data);
+            $this->assertStringContainsString('Environment is configured correctly.', $data);
+            $this->assertStringContainsString('GPG is configured correctly.', $data);
+            $this->assertStringContainsString('Start configuration', $data);
+        }
     }
 
     /**
@@ -51,7 +57,11 @@ class SystemCheckControllerTest extends WebInstallerIntegrationTestCase
         $this->get('/install/system_check');
         $data = $this->_getBodyAsString();
         $this->assertResponseOk();
-        $this->assertStringContainsString('. Subscription key', $data);
-        $this->assertStringContainsString('Start configuration', $data);
+        if (version_compare(PHP_VERSION, '7.4', '<')) {
+            $this->assertStringContainsString('PHP version is too low', $data);
+        } else {
+            $this->assertStringContainsString('. Subscription key', $data);
+            $this->assertStringContainsString('Start configuration', $data);
+        }
     }
 }
