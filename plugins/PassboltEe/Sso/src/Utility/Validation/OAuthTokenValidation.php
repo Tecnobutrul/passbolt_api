@@ -18,14 +18,14 @@ namespace Passbolt\Sso\Utility\Validation;
 
 use Cake\Validation\Validation;
 
-class OAuthStateValidation
+class OAuthTokenValidation
 {
     /**
-     * @param mixed $state expects uuid
+     * @param mixed $token expects uuid
      * @return bool true if validate
      */
-    public static function state($state): bool
+    public static function token($token): bool
     {
-        return isset($state) && is_string($state) && Validation::uuid($state);
+        return isset($token) && is_string($token) && Validation::uuid($token);
     }
 }

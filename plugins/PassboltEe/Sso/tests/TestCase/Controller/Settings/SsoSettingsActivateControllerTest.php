@@ -18,8 +18,8 @@ namespace Passbolt\Sso\Test\TestCase\Controller\Settings;
 
 use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
@@ -30,24 +30,23 @@ class SsoSettingsActivateControllerTest extends SsoIntegrationTestCase
     {
         $settings = SsoSettingsFactory::make()->azure()->persist();
         $user = UserFactory::make()->admin()->active()->persist();
-        $ip = '127.0.0.1';
-        $ua = 'phpunit';
-        $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+        $ssoAuthToken = SsoAuthenticationTokenFactory::make()
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
             ->active()
             ->data([
                 'sso_setting_id' => $settings->id,
-                'ip' => $ip,
-                'user_agent' => $ua,
+                'ip' => SsoIntegrationTestCase::IP_ADDRESS,
+                'user_agent' => SsoIntegrationTestCase::USER_AGENT,
             ])
             ->persist();
-
         $this->logInAs($user);
+
         $this->postJson('/sso/settings/' . $settings->id . '.json', [
             'status' => SsoSetting::STATUS_ACTIVE,
-            'token' => $token->token,
+            'token' => $ssoAuthToken->token,
         ]);
+
         $this->assertSuccess();
         $settingDto = $this->_responseJsonBody;
         $this->assertEquals($settingDto->id, $settings->id);
@@ -90,7 +89,8 @@ class SsoSettingsActivateControllerTest extends SsoIntegrationTestCase
         $settingsId = UuidFactory::uuid();
         $this->postJson('/sso/settings/' . $settingsId . '.json', [
             'status' => SsoSetting::STATUS_DRAFT,
-            'token' => UuidFactory::uuid()]);
+            'token' => UuidFactory::uuid(),
+        ]);
         $this->assertError(400);
     }
 
@@ -100,7 +100,8 @@ class SsoSettingsActivateControllerTest extends SsoIntegrationTestCase
         $this->logInAsAdmin();
         $this->postJson('/sso/settings/' . $settings->id . '.json', [
             'status' => SsoSetting::STATUS_ACTIVE,
-            'token' => UuidFactory::uuid()]);
+            'token' => UuidFactory::uuid(),
+        ]);
         $this->assertError(400);
     }
 }

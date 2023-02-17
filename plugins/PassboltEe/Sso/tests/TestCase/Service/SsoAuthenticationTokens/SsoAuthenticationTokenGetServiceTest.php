@@ -24,7 +24,7 @@ use App\Utility\UuidFactory;
 use Cake\Core\Configure;
 use Cake\Http\Exception\BadRequestException;
 use CakephpFixtureFactories\Error\PersistenceException;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
@@ -36,14 +36,14 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
     {
         $service = new SsoAuthenticationTokenGetService();
         $this->expectException(BadRequestException::class);
-        $service->getOrFail('nope', SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS, UuidFactory::uuid());
+        $service->getOrFail('nope', SsoState::TYPE_SSO_SET_SETTINGS, UuidFactory::uuid());
     }
 
     public function testSsoAuthenticationTokenGetService_ErrorUserId(): void
     {
         $service = new SsoAuthenticationTokenGetService();
         $this->expectException(BadRequestException::class);
-        $service->getOrFail(UuidFactory::uuid(), SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS, 'nope');
+        $service->getOrFail(UuidFactory::uuid(), SsoState::TYPE_SSO_SET_SETTINGS, 'nope');
     }
 
     public function testSsoAuthenticationTokenGetService_Success(): void
@@ -54,9 +54,9 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
 
-        /** @var SsoAuthenticationToken $token */
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
             ->active()
             ->data([
@@ -69,14 +69,14 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $service = new SsoAuthenticationTokenGetService();
 
         // Part 1 - Get or fail
-        $authToken = $service->getOrFail($token->token, SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS, $user->id);
+        $authToken = $service->getOrFail($token->token, SsoState::TYPE_SSO_SET_SETTINGS, $user->id);
         $this->assertEquals($token->id, $authToken->id);
         $this->assertTrue($token->isActive());
         $this->assertFalse($token->isExpired());
 
         // Part 2 - Consume
         $service->assertAndConsume($authToken, $uac, $settings->id);
-        /** @var SsoAuthenticationToken $updatedAuthToken */
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $updatedAuthToken */
         $updatedAuthToken = SsoAuthenticationTokenFactory::get($token->id);
         $this->assertFalse($updatedAuthToken->isActive());
     }
@@ -85,9 +85,9 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
     {
         $settings = SsoSettingsFactory::make()->azure()->persist();
 
-        /** @var SsoAuthenticationToken $token */
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId(UuidFactory::uuid())
             ->active()
             ->data([
@@ -99,7 +99,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
 
         $service = new SsoAuthenticationTokenGetService();
 
-        $authToken = $service->getOrFail($token->token, SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS);
+        $authToken = $service->getOrFail($token->token, SsoState::TYPE_SSO_SET_SETTINGS);
         $this->assertEquals($token->id, $authToken->id);
     }
 
@@ -114,9 +114,9 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
 
-        /** @var SsoAuthenticationToken $token */
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
             ->active()
             ->data([
@@ -130,7 +130,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
 
         $service->assertAndConsume($token, $uac, $settings->id);
 
-        /** @var SsoAuthenticationToken $updatedAuthToken */
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $updatedAuthToken */
         $updatedAuthToken = SsoAuthenticationTokenFactory::get($token->id);
         $this->assertFalse($updatedAuthToken->isActive());
 
@@ -148,9 +148,9 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
 
-        /** @var SsoAuthenticationToken $token */
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
             ->active()
             ->data([
@@ -164,7 +164,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
 
         $service->assertAndConsume($token, $uac, $settings->id);
 
-        /** @var SsoAuthenticationToken $updatedAuthToken */
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $updatedAuthToken */
         $updatedAuthToken = SsoAuthenticationTokenFactory::get($token->id);
         $this->assertFalse($updatedAuthToken->isActive());
 
@@ -179,9 +179,9 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
 
-        /** @var SsoAuthenticationToken $token */
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
             ->active()
             ->expired()
@@ -199,7 +199,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $service->assertAndConsume($token, $uac, $settings->id);
 
         // Check tha the token is Consumed even if assert failed
-        /** @var SsoAuthenticationToken $updatedAuthToken */
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $updatedAuthToken */
         $updatedAuthToken = SsoAuthenticationTokenFactory::get($token->id);
         $this->assertFalse($updatedAuthToken->isActive());
     }
@@ -212,9 +212,9 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
 
-        /** @var SsoAuthenticationToken $token */
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
             ->active()
             ->data([
@@ -242,9 +242,9 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
 
-        /** @var SsoAuthenticationToken $token */
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $token */
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId(UuidFactory::uuid())
             ->active()
             ->data([
@@ -272,9 +272,9 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
         try {
-            /** @var SsoAuthenticationToken $token */
+            /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $token */
             $token = SsoAuthenticationTokenFactory::make()
-                ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+                ->type(SsoState::TYPE_SSO_SET_SETTINGS)
                 ->userId('nope')
                 ->active()
                 ->data([
@@ -310,7 +310,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
             ->active()
             ->data([
@@ -342,7 +342,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
             ->active()
             ->data([
@@ -375,7 +375,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
             ->active()
             ->data([
@@ -408,7 +408,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
             ->active()
             ->data([
@@ -438,7 +438,7 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         $ua = 'phpunit';
         $uac = new ExtendedUserAccessControl(Role::ADMIN, $user->id, $user->username, $ip, $ua);
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS)
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
             ->userId($user->id)
             ->active()
             ->data([

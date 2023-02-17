@@ -26,7 +26,7 @@ use Cake\Http\Exception\NotFoundException;
 use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\AbstractSsoService;
-use Passbolt\Sso\Utility\Validation\OAuthStateValidation;
+use Passbolt\Sso\Utility\Validation\OAuthTokenValidation;
 
 abstract class AbstractSsoController extends AppController
 {
@@ -77,13 +77,13 @@ abstract class AbstractSsoController extends AppController
     }
 
     /**
-     * @throws \Cake\Http\Exception\BadRequestException if the state is not provided in URL query
+     * @throws \Cake\Http\Exception\BadRequestException if the token is not provided in URL query
      * @return string state
      */
     public function getTokenFromUrlQuery(): string
     {
         $token = $this->request->getQuery('token');
-        if (!is_string($token) || !OAuthStateValidation::state($token)) {
+        if (!is_string($token) || !OAuthTokenValidation::token($token)) {
             throw new BadRequestException(__('The token is required in URL parameters.'));
         }
 
@@ -177,12 +177,16 @@ abstract class AbstractSsoController extends AppController
     /**
      * @param \Passbolt\Sso\Service\Sso\AbstractSsoService $ssoService service
      * @param \App\Utility\ExtendedUserAccessControl $uac user access control
+     * @param string $type Type of state
      * @return string url
      */
-    protected function getSsoUrlWithCookie(AbstractSsoService $ssoService, ExtendedUserAccessControl $uac): string
-    {
+    protected function getSsoUrlWithCookie(
+        AbstractSsoService $ssoService,
+        ExtendedUserAccessControl $uac,
+        string $type
+    ): string {
         $url = $ssoService->getAuthorizationUrl($uac); // generates state
-        $cookie = $ssoService->createStateCookie($uac);
+        $cookie = $ssoService->createStateCookie($uac, $type);
 
         // Redirect user to the provider with the cookie set
         $this->response = $this->getResponse()->withCookie($cookie);

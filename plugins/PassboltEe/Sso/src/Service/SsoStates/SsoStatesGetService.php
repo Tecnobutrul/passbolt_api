@@ -44,7 +44,7 @@ class SsoStatesGetService
             /** @var \Passbolt\Sso\Model\Entity\SsoState $ssoState */
             $ssoState = $ssoStatesTable
                 ->find('active')
-                ->where(['state' => $state, 'type' => SsoState::TYPE_SSO_STATE])
+                ->where(['state' => $state])
                 ->firstOrFail();
         } catch (RecordNotFoundException $e) {
             throw new RecordNotFoundException(__('The SSO state does not exist.'), 400, $e);

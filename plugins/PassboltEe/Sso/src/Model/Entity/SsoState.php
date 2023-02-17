@@ -41,9 +41,13 @@ use Cake\ORM\Entity;
 class SsoState extends Entity
 {
     /**
-     * Types
+     * Types.
      */
+    // @deprecated
     public const TYPE_SSO_STATE = 'sso_state';
+    public const TYPE_SSO_GET_KEY = 'sso_get_key';
+    public const TYPE_SSO_SET_SETTINGS = 'sso_set_settings';
+    public const TYPE_SSO_RECOVER = 'sso_recover';
 
     /**
      * Default length
@@ -126,7 +130,7 @@ class SsoState extends Entity
     public static function getExpiryDuration(): string
     {
         $expiryDuration = Configure::read(
-            sprintf('passbolt.auth.token.%s.expiry', self::TYPE_SSO_STATE)
+            sprintf('passbolt.auth.token.%s.expiry', SsoState::TYPE_SSO_STATE)
         );
 
         // Fallback to safe default if value is not present in config
@@ -145,5 +149,18 @@ class SsoState extends Entity
     public function isExpired(): bool
     {
         return $this->deleted->isPast();
+    }
+
+    /**
+     * Checks if user_id field should be mandatory or not.
+     *
+     * @return bool
+     */
+    public function isUserIdMandatory(): bool
+    {
+        return in_array(
+            $this->type,
+            [SsoState::TYPE_SSO_SET_SETTINGS, SsoState::TYPE_SSO_GET_KEY]
+        );
     }
 }

@@ -22,7 +22,7 @@ use Cake\Chronos\ChronosInterface;
 use Cake\I18n\FrozenDate;
 use CakephpFixtureFactories\Factory\BaseFactory as CakephpBaseFactory;
 use Faker\Generator;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Model\Table\SsoAuthenticationTokensTable;
 
 /**
@@ -54,7 +54,10 @@ class SsoAuthenticationTokenFactory extends CakephpBaseFactory
             return [
                 'user_id' => $faker->uuid(),
                 'token' => UuidFactory::uuid(),
-                'type' => SsoAuthenticationToken::TYPE_SSO_STATE,
+                'type' => $faker->randomElement([
+                    SsoState::TYPE_SSO_GET_KEY,
+                    SsoState::TYPE_SSO_SET_SETTINGS,
+                ]),
                 'data' => null,
                 'created_by' => $faker->uuid(),
                 'modified_by' => $faker->uuid(),

@@ -20,6 +20,7 @@ namespace Passbolt\Sso\Test\TestCase\Service\Sso;
 use App\Test\Factory\UserFactory;
 use App\Utility\ExtendedUserAccessControl;
 use Cake\Http\Exception\BadRequestException;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 use Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface;
@@ -29,9 +30,15 @@ class AbstractSsoAzureServiceTest extends SsoTestCase
     public function testSsoAbstractSsoAzureService_createHttpOnlySecureCookie(): void
     {
         $user = UserFactory::make()->active()->persist();
-        $uac = new ExtendedUserAccessControl($user->role->name, $user->id, $user->username, '127.0.0.1', 'phpunit');
+        $uac = new ExtendedUserAccessControl(
+            $user->role->name,
+            $user->id,
+            $user->username,
+            '127.0.0.1',
+            'phpunit'
+        );
         $sut = new TestableSsoService();
-        $cookie = $sut->createStateCookie($uac);
+        $cookie = $sut->createStateCookie($uac, SsoState::TYPE_SSO_SET_SETTINGS);
 
         $this->assertTrue($cookie->isHttpOnly());
         $this->assertTrue($cookie->isSecure());
@@ -66,7 +73,7 @@ class AbstractSsoAzureServiceTest extends SsoTestCase
 
     public function testSsoAbstractSsoAzureService_assertResourceOwnerAgainstSsoState_Success()
     {
-        $ssoState = SsoStateFactory::make()->persist();
+        $ssoState = SsoStateFactory::make()->withTypeSsoSetSettings()->persist();
         $resourceOwner = $this->getMockBuilder(SsoResourceOwnerInterface::class)->getMock();
         $resourceOwner->method('getNonce')->willReturn($ssoState->nonce);
 
@@ -77,7 +84,7 @@ class AbstractSsoAzureServiceTest extends SsoTestCase
 
     public function testSsoAbstractSsoAzureService_assertResourceOwnerAgainstSsoState_Error()
     {
-        $ssoState = SsoStateFactory::make()->persist();
+        $ssoState = SsoStateFactory::make()->withTypeSsoSetSettings()->persist();
         $resourceOwner = $this->getMockBuilder(SsoResourceOwnerInterface::class)->getMock();
         $resourceOwner->method('getNonce')->willReturn('foo');
 

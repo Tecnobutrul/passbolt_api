@@ -28,24 +28,9 @@ use Passbolt\Sso\Model\Dto\AbstractSsoSettingsDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDefaultDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoSetting;
-use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
 
 class SsoSettingsGetService
 {
-    /**
-     * @param string $state SSO State.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException if setting cannot be found
-     * @throws \Cake\Http\Exception\InternalErrorException if there is an issue with settings data decryption
-     * @throws \App\Error\Exception\AuthenticationTokenDataPropertyException if setting id is missing in SsoState props
-     * @return \Passbolt\Sso\Model\Dto\SsoSettingsDto
-     */
-    public function getDraftSettingFromStateOrFail(string $state): SsoSettingsDto
-    {
-        $ssoState = (new SsoStatesGetService())->getOrFail($state);
-
-        return $this->getDraftByIdOrFail($ssoState->sso_settings_id, true);
-    }
-
     /**
      * Return a setting identified with its id
      *

@@ -21,7 +21,7 @@ use App\Error\Exception\ValidationException;
 use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 
@@ -70,7 +70,7 @@ class SsoAuthenticationTokensTableTest extends SsoTestCase
                 'user_id' => $user->id,
                 'token' => UuidFactory::uuid(),
                 'active' => true,
-                'type' => SsoAuthenticationToken::TYPE_SSO_GET_KEY,
+                'type' => SsoState::TYPE_SSO_GET_KEY,
                 'data' => null,
             ],
             ['accessibleFields' => [
@@ -95,8 +95,8 @@ class SsoAuthenticationTokensTableTest extends SsoTestCase
         $user = UserFactory::make()->user()->persist();
         $token = null;
         $data = ['ip' => '127.0.0.1', 'user_agent' => 'cakephp tests', 'sso_setting_id' => UuidFactory::uuid()];
-        $this->SsoAuthenticationTokens->generate($user->id, SsoAuthenticationToken::TYPE_SSO_GET_KEY, $token, $data);
-        $this->SsoAuthenticationTokens->generate($user->id, SsoAuthenticationToken::TYPE_SSO_SET_SETTINGS, $token, $data);
+        $this->SsoAuthenticationTokens->generate($user->id, SsoState::TYPE_SSO_GET_KEY, $token, $data);
+        $this->SsoAuthenticationTokens->generate($user->id, SsoState::TYPE_SSO_SET_SETTINGS, $token, $data);
 
         $this->assertEquals(2, SsoAuthenticationTokenFactory::count());
     }
@@ -109,7 +109,7 @@ class SsoAuthenticationTokensTableTest extends SsoTestCase
         $token = null;
         $data = ['ip' => '127.0.0.1', 'user_agent' => 'cakephp tests', 'sso_setting_id' => UuidFactory::uuid()];
         $this->expectException(ValidationException::class);
-        $this->SsoAuthenticationTokens->generate(UuidFactory::uuid(), SsoAuthenticationToken::TYPE_SSO_GET_KEY, $token, $data);
+        $this->SsoAuthenticationTokens->generate(UuidFactory::uuid(), SsoState::TYPE_SSO_GET_KEY, $token, $data);
     }
 
     /**
@@ -121,7 +121,7 @@ class SsoAuthenticationTokensTableTest extends SsoTestCase
         $token = null;
         $data = ['ip' => '127.0.0.1', 'user_agent' => 'cakephp tests', 'sso_setting_id' => UuidFactory::uuid()];
         $this->expectException(ValidationException::class);
-        $this->SsoAuthenticationTokens->generate($user->id, SsoAuthenticationToken::TYPE_SSO_GET_KEY, $token, $data);
+        $this->SsoAuthenticationTokens->generate($user->id, SsoState::TYPE_SSO_GET_KEY, $token, $data);
     }
 
     /**
@@ -133,7 +133,7 @@ class SsoAuthenticationTokensTableTest extends SsoTestCase
         $token = null;
         $data = ['ip' => '127.0.0.1', 'user_agent' => 'cakephp tests', 'sso_setting_id' => UuidFactory::uuid()];
         $this->expectException(ValidationException::class);
-        $this->SsoAuthenticationTokens->generate($user->id, SsoAuthenticationToken::TYPE_SSO_GET_KEY, $token, $data);
+        $this->SsoAuthenticationTokens->generate($user->id, SsoState::TYPE_SSO_GET_KEY, $token, $data);
     }
 
     /**
@@ -145,7 +145,7 @@ class SsoAuthenticationTokensTableTest extends SsoTestCase
         $token = null;
         $data = ['ip' => '127.0.0.1', 'user_agent' => 'cakephp tests', 'sso_setting_id' => 'nope'];
         $this->expectException(ValidationException::class);
-        $this->SsoAuthenticationTokens->generate($user->id, SsoAuthenticationToken::TYPE_SSO_GET_KEY, $token, $data);
+        $this->SsoAuthenticationTokens->generate($user->id, SsoState::TYPE_SSO_GET_KEY, $token, $data);
     }
 
     /**
@@ -157,6 +157,6 @@ class SsoAuthenticationTokensTableTest extends SsoTestCase
         $token = null;
         $data = ['ip' => '127.0.0.1', 'user_agent' => 'cakephp tests'];
         $this->expectException(ValidationException::class);
-        $this->SsoAuthenticationTokens->generate($user->id, SsoAuthenticationToken::TYPE_SSO_GET_KEY, $token, $data);
+        $this->SsoAuthenticationTokens->generate($user->id, SsoState::TYPE_SSO_GET_KEY, $token, $data);
     }
 }

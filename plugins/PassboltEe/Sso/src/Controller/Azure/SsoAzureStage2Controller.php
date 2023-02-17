@@ -21,8 +21,10 @@ use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Routing\Router;
 use Passbolt\Sso\Controller\AbstractSsoController;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Azure\SsoAzureService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
+use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
 
 class SsoAzureStage2Controller extends AbstractSsoController
 {
@@ -51,54 +53,61 @@ class SsoAzureStage2Controller extends AbstractSsoController
         // Check that there is a code in the URL query
         $code = $this->getCodeFromUrlQuery();
 
+        try {
+            $ssoState = (new SsoStatesGetService())->getOrFail($state);
+        } catch (\Exception $e) {
+            // Remap status code 404 with 400
+            throw new BadRequestException($e->getMessage(), 400, $e);
+        }
+
         if ($this->User->isAdmin()) {
-            $this->stage2AsAdmin($state, $code);
+            $this->stage2AsAdmin($ssoState, $code);
         } else {
-            $this->stage2($state, $code);
+            $this->stage2($ssoState, $code);
         }
     }
 
     /**
-     * @param string $state uuid
+     * @param \Passbolt\Sso\Model\Entity\SsoState $ssoState SSO state.
      * @param string $code jwt
      * @return void
      */
-    public function stage2AsAdmin(string $state, string $code): void
+    public function stage2AsAdmin(SsoState $ssoState, string $code): void
     {
         try {
-            // Get the settings from the state, we expect draft settings
-            $settingsDto = (new SsoSettingsGetService())->getDraftSettingFromStateOrFail($state);
+            // Get the draft settings
+            $settingsDto = (new SsoSettingsGetService())->getDraftByIdOrFail($ssoState->sso_settings_id, true);
         } catch (\Exception $exception) {
             throw new BadRequestException($exception->getMessage(), 400, $exception);
         }
 
         $service = new SsoAzureService($settingsDto);
-        $uac = $service->assertStateCodeAndGetUac($state, $code, $this->User->ip(), $this->User->userAgent());
+        $uac = $service->assertStateCodeAndGetUac($ssoState, $code, $this->User->ip(), $this->User->userAgent());
 
-        // Create token for next step, e.g. activate settings
-        $token = $service->createSsoAuthTokenToActiveSettings($uac, $service->getSettings()->id);
+        // Create authentication token for next step, e.g. activate settings
+        $ssoAuthToken = $service->createAuthTokenToActiveSettings($uac, $service->getSettings()->id);
 
         $this->response = $this->getResponse()->withCookie($service->clearStateCookie());
-        $this->redirect(Router::url('/sso/login/dry-run/success?token=') . $token->token);
+        $this->redirect(Router::url('/sso/login/dry-run/success?token=') . $ssoAuthToken->token);
     }
 
     /**
-     * @param string $state uuid
+     * @param \Passbolt\Sso\Model\Entity\SsoState $ssoState SSO state.
      * @param string $code jwt
      * @return void
      */
-    public function stage2(string $state, string $code): void
+    public function stage2(SsoState $ssoState, string $code): void
     {
         $this->User->assertNotLoggedIn();
 
         // User is not logged in we use the default active settings
         $service = new SsoAzureService();
-        $uac = $service->assertStateCodeAndGetUac($state, $code, $this->User->ip(), $this->User->userAgent());
+        $uac = $service->assertStateCodeAndGetUac($ssoState, $code, $this->User->ip(), $this->User->userAgent());
 
-        // Create token for next step, e.g. get keys
-        $token = $service->createSsoAuthTokenToGetKey($uac, $service->getSettings()->id);
+        // Create SSO auth token for next step, e.g. get keys
+        $ssoAuthToken = $service->createAuthTokenToGetKey($uac, $service->getSettings()->id);
 
         $this->response = $this->getResponse()->withCookie($service->clearStateCookie());
-        $this->redirect(Router::url('/sso/login/success?token=') . $token->token);
+        $this->redirect(Router::url('/sso/login/success?token=') . $ssoAuthToken->token);
     }
 }

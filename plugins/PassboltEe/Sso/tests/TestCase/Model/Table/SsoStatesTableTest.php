@@ -57,9 +57,6 @@ class SsoStatesTableTest extends SsoTestCase
         parent::tearDown();
     }
 
-    /**
-     * @uses \Passbolt\Sso\Model\Table\SsoStatesTable::validationDefault()
-     */
     public function testSsoStatesTableValidationDefault_Success(): void
     {
         $user = UserFactory::make()->admin()->persist();
@@ -67,12 +64,41 @@ class SsoStatesTableTest extends SsoTestCase
         $ssoState = $this->SsoStates->newEntity([
             'nonce' => SsoState::generate(),
             'state' => SsoState::generate(),
-            'type' => SsoState::TYPE_SSO_STATE,
+            'type' => SsoState::TYPE_SSO_SET_SETTINGS,
             'sso_settings_id' => $ssoSetting->id,
             'user_id' => $user->id,
             'ip' => '127.0.0.1',
             'user_agent' => 'Foo user agent',
         ]);
+
+        $this->assertEmpty($ssoState->getErrors());
+    }
+
+    public function testSsoStatesTableValidationDefault_Success_WithUserIdOptional(): void
+    {
+        $ssoSetting = SsoSettingsFactory::make()->persist();
+        $ssoState = $this->SsoStates->newEntity(
+            [
+                'nonce' => SsoState::generate(),
+                'state' => SsoState::generate(),
+                'type' => SsoState::TYPE_SSO_RECOVER,
+                'sso_settings_id' => $ssoSetting->id,
+                'ip' => '127.0.0.1',
+                'user_agent' => 'Foo user agent',
+            ],
+            [
+                'accessibleFields' => [
+                    'nonce' => true,
+                    'state' => true,
+                    'type' => true,
+                    'sso_settings_id' => true,
+                    'ip' => true,
+                    'user_agent' => true,
+                ],
+            ],
+        );
+
+        $this->SsoStates->save($ssoState);
 
         $this->assertEmpty($ssoState->getErrors());
     }
@@ -133,7 +159,7 @@ class SsoStatesTableTest extends SsoTestCase
         $ssoState = $this->SsoStates->newEntity([
             'nonce' => '123456',
             'state' => '123456',
-            'type' => SsoState::TYPE_SSO_STATE,
+            'type' => SsoState::TYPE_SSO_SET_SETTINGS,
             'sso_settings_id' => $ssoSetting->id,
             'user_id' => $user->id,
             'ip' => '127.0.0.1',
@@ -157,7 +183,7 @@ class SsoStatesTableTest extends SsoTestCase
             [
                 'nonce' => SsoState::generate(),
                 'state' => SsoState::generate(),
-                'type' => SsoState::TYPE_SSO_STATE,
+                'type' => SsoState::TYPE_SSO_SET_SETTINGS,
                 'sso_settings_id' => UuidFactory::uuid(),
                 'user_id' => UuidFactory::uuid(),
                 'ip' => '127.0.0.1',
@@ -206,7 +232,7 @@ class SsoStatesTableTest extends SsoTestCase
         $this->SsoStates->save($this->SsoStates->newEntity([
             'nonce' => $state,
             'state' => $nonce,
-            'type' => SsoState::TYPE_SSO_STATE,
+            'type' => SsoState::TYPE_SSO_SET_SETTINGS,
             'sso_settings_id' => $ssoSetting->id,
             'user_id' => $user->id,
             'ip' => '127.0.0.1',
@@ -217,7 +243,7 @@ class SsoStatesTableTest extends SsoTestCase
         $ssoState = $this->SsoStates->newEntity([
             'nonce' => $state,
             'state' => $nonce,
-            'type' => SsoState::TYPE_SSO_STATE,
+            'type' => SsoState::TYPE_SSO_SET_SETTINGS,
             'sso_settings_id' => $ssoSetting->id,
             'user_id' => $user->id,
             'ip' => '127.0.0.1',
@@ -229,6 +255,44 @@ class SsoStatesTableTest extends SsoTestCase
         $this->assertCount(2, $errors);
         $this->assertArrayHasAttributes(['_isUnique'], $errors['nonce']);
         $this->assertArrayHasAttributes(['_isUnique'], $errors['state']);
+    }
+
+    /**
+     * For certain types like sso_set_settings, sso_get_key, etc. user is mandatory
+     *
+     * @uses \Passbolt\Sso\Model\Table\SsoStatesTable::buildRules()
+     */
+    public function testSsoStatesTableBuildRules_ErrorUserIdMandatory(): void
+    {
+        $ssoSetting = SsoSettingsFactory::make()->persist();
+        $state = SsoState::generate();
+        $nonce = SsoState::generate();
+        $accessibleFields = [
+            'accessibleFields' => [
+                'nonce' => true,
+                'state' => true,
+                'type' => true,
+                'sso_settings_id' => true,
+                'user_id' => true,
+                'ip' => true,
+                'user_agent' => true,
+            ],
+        ];
+
+        $ssoState = $this->SsoStates->newEntity([
+            // `user_id` is not set intentionally
+            'nonce' => $state,
+            'state' => $nonce,
+            'type' => SsoState::TYPE_SSO_SET_SETTINGS,
+            'sso_settings_id' => $ssoSetting->id,
+            'ip' => '127.0.0.1',
+            'user_agent' => 'Foo user agent',
+        ], $accessibleFields);
+        $this->SsoStates->save($ssoState);
+
+        $errors = $ssoState->getErrors();
+        $this->assertCount(1, $errors);
+        $this->assertArrayHasAttributes(['user_is_soft_deleted'], $errors['user_id']);
     }
 
     /**

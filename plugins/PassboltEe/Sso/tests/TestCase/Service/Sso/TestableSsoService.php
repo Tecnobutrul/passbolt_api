@@ -28,9 +28,9 @@ use Passbolt\Sso\Test\Factory\SsoStateFactory;
 
 class TestableSsoService extends AbstractSsoService
 {
-    public function createStateCookie(ExtendedUserAccessControl $uac): Cookie
+    public function createStateCookie(ExtendedUserAccessControl $uac, string $type): Cookie
     {
-        $ssoState = SsoStateFactory::make()->persist();
+        $ssoState = SsoStateFactory::make()->withTypeSsoSetSettings()->persist();
 
         return $this->createHttpOnlySecureCookie($ssoState);
     }

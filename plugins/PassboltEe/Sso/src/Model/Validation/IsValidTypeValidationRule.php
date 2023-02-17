@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Model\Validation;
 
 use App\Model\Validation\PassboltValidationRule;
-use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Model\Table\SsoAuthenticationTokensTable;
 
 class IsValidTypeValidationRule extends PassboltValidationRule
 {
@@ -35,6 +35,6 @@ class IsValidTypeValidationRule extends PassboltValidationRule
      */
     public function rule($value, $context): bool
     {
-        return $value === SsoState::TYPE_SSO_STATE;
+        return in_array($value, SsoAuthenticationTokensTable::SSO_ALLOWED_TYPES);
     }
 }

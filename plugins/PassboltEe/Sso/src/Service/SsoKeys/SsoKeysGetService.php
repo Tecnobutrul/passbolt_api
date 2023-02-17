@@ -20,8 +20,8 @@ use App\Utility\ExtendedUserAccessControl;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\BadRequestException;
 use Cake\ORM\TableRegistry;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoKey;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
 
@@ -40,10 +40,12 @@ class SsoKeysGetService
         try {
             $ssoSettingEntity = (new SsoSettingsGetService())->getActiveOrFail();
             // Token must be provided and matching the settings, user id, ip, user agent, etc.
-            $authTokenService = new SsoAuthenticationTokenGetService();
-            $type = SsoAuthenticationToken::TYPE_SSO_GET_KEY;
-            $tokenEntity = $authTokenService->getOrFail($token, $type);
-            $authTokenService->assertAndConsume($tokenEntity, $uac, $ssoSettingEntity->id);
+            $ssoAuthTokenGetService = new SsoAuthenticationTokenGetService();
+            $ssoAuthToken = $ssoAuthTokenGetService->getOrFail(
+                $token,
+                SsoState::TYPE_SSO_GET_KEY
+            );
+            $ssoAuthTokenGetService->assertAndConsume($ssoAuthToken, $uac, $ssoSettingEntity->id);
         } catch (RecordNotFoundException $exception) {
             throw new BadRequestException($exception->getMessage(), 400, $exception);
         }

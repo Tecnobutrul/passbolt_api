@@ -68,7 +68,7 @@ class SsoStatesGetServiceTest extends SsoTestCase
     {
         $userId = UserFactory::make()->admin()->persist()->get('id');
         $ssoSettingId = SsoSettingsFactory::make()->persist()->get('id');
-        $ssoState = SsoStateFactory::make()
+        $ssoState = SsoStateFactory::make(['type' => SsoState::TYPE_SSO_SET_SETTINGS])
             ->ssoSettingsId($ssoSettingId)
             ->userId($userId)
             ->deleted()
@@ -92,7 +92,7 @@ class SsoStatesGetServiceTest extends SsoTestCase
     {
         $userId = UserFactory::make()->admin()->persist()->get('id');
         $ssoSettingId = SsoSettingsFactory::make()->persist()->get('id');
-        $ssoState = SsoStateFactory::make()
+        $ssoState = SsoStateFactory::make(['type' => SsoState::TYPE_SSO_GET_KEY])
             ->ssoSettingsId($ssoSettingId)
             ->userId($userId)
             ->persist();
@@ -102,7 +102,7 @@ class SsoStatesGetServiceTest extends SsoTestCase
         $this->assertInstanceOf(SsoState::class, $result);
         $this->assertEquals($ssoState->id, $result->id);
         $this->assertEquals($ssoState->state, $result->state);
-        $this->assertEquals(SsoState::TYPE_SSO_STATE, $result->type);
+        $this->assertEquals(SsoState::TYPE_SSO_GET_KEY, $result->type);
         $this->assertEquals($ssoState->sso_settings_id, $result->sso_settings_id);
         $this->assertEquals($ssoState->user_id, $result->user_id);
         $this->assertEquals($ssoState->ip, $result->ip);

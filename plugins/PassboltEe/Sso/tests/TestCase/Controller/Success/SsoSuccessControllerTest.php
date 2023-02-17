@@ -38,6 +38,7 @@ class SsoSuccessControllerTest extends SsoIntegrationTestCase
     public function testSsoSuccessController_ErrorNoToken(): void
     {
         $this->get('/sso/login/success');
+
         $this->assertResponseCode(400);
         $this->assertResponseContains('The token is required in URL parameters.');
     }

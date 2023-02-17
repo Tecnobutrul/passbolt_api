@@ -122,12 +122,16 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
     {
         $admin = UserFactory::make()->admin()->active()->persist();
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
-        $ssoState = SsoStateFactory::make()->userId($admin->id)->ssoSettingsId($settings->id)->persist();
-
+        $ssoState = SsoStateFactory::make()
+            ->withTypeSsoSetSettings()
+            ->userId($admin->id)
+            ->ssoSettingsId($settings->id)
+            ->persist();
         $this->logInAs($admin);
-
         $this->cookie('passbolt_sso_state', $ssoState->state);
+
         $this->get('/sso/azure/redirect?state=' . $ssoState->state . '&code=' . UuidFactory::uuid());
+
         $this->assertResponseCode(400);
         $this->assertResponseContains('The SSO settings do not exist.');
     }
@@ -140,22 +144,20 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $admin = UserFactory::make()->admin()->active()->persist();
         $settings = SsoSettingsFactory::make()->azure()->draft()->persist();
         $ssoState = SsoStateFactory::make()
+            ->withTypeSsoSetSettings()
             ->userId($admin->id)
             ->ssoSettingsId($settings->id)
             ->userAgent('something else')
             ->persist();
-        /**
-         * Note: Can't use `mockUserIp()` because this test doesn't extend AppIntegrationTestCase.
-         * TODO: Discuss this.
-         */
+        /** Note: Can't use `mockUserIp()` because this test doesn't extend AppIntegrationTestCase. */
         $this->configRequest([
             'environment' => ['REMOTE_ADDR' => $ssoState->ip],
         ]);
-
         $this->logInAs($admin);
-
         $this->cookie('passbolt_sso_state', $ssoState->state);
+
         $this->get('/sso/azure/redirect?state=' . $ssoState->state . '&code=' . UuidFactory::uuid());
+
         $this->assertResponseCode(400);
         $this->assertResponseContains('The SSO state is invalid. User agent mismatch.');
     }
@@ -163,16 +165,23 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
     // USERS TESTS
 
     /**
-     * 400 if
+     * 403 if
      */
     public function testSsoAzureStage2Controller_User_ErrorIsLoggedIn(): void
     {
         $user = UserFactory::make()->user()->active()->persist();
+        $settings = SsoSettingsFactory::make()->azure()->draft()->persist();
+        $admin = UserFactory::make()->admin()->active()->persist();
+        $ssoState = SsoStateFactory::make()
+            ->withTypeSsoSetSettings()
+            ->userId($admin->id)
+            ->ssoSettingsId($settings->id)
+            ->userAgent('something else')
+            ->persist();
         $this->logInAs($user);
 
-        $state = SsoState::generate();
-        $this->cookie('passbolt_sso_state', $state);
-        $this->get('/sso/azure/redirect?state=' . $state . '&code=' . UuidFactory::uuid());
+        $this->cookie('passbolt_sso_state', $ssoState->state);
+        $this->get('/sso/azure/redirect?state=' . $ssoState->state . '&code=' . UuidFactory::uuid());
         $this->assertResponseCode(403);
         $this->assertResponseContains('The user should not be logged in.');
     }

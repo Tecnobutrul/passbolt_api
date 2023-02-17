@@ -38,7 +38,7 @@ class SsoAzureServiceTest extends SsoIntegrationTestCase
         // Main service features = generate url + cookie
         $sut = new SsoAzureService();
         $url = $sut->getAuthorizationUrl($uac);
-        $cookie = $sut->createStateCookie($uac);
+        $cookie = $sut->createStateCookie($uac, SsoState::TYPE_SSO_SET_SETTINGS);
 
         // Check state & nonce values are present
         $this->assertStringContainsString('state=', $url);
