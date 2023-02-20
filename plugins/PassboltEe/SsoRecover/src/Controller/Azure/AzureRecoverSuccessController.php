@@ -1,0 +1,54 @@
+<?php
+declare(strict_types=1);
+
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         3.11.0
+ */
+
+namespace Passbolt\SsoRecover\Controller\Azure;
+
+use Cake\Event\EventInterface;
+use Cake\Http\Exception\BadRequestException;
+use Passbolt\Sso\Controller\AbstractSsoController;
+
+class AzureRecoverSuccessController extends AbstractSsoController
+{
+    /**
+     * @inheritDoc
+     */
+    public function beforeFilter(EventInterface $event)
+    {
+        parent::beforeFilter($event);
+
+        $this->Authentication->allowUnauthenticated(['ssoRecoverSuccess']);
+    }
+
+    /**
+     * @return void
+     * @throws \League\OAuth2\Client\Provider\Exception\IdentityProviderException
+     */
+    public function ssoRecoverSuccess(): void
+    {
+        if ($this->request->is('json')) {
+            throw new BadRequestException(__('Ajax/Json request not supported.'));
+        }
+
+        $this->User->assertNotLoggedIn();
+        $this->getTokenFromUrlQuery();
+
+        $this->viewBuilder()
+            ->setLayout('default')
+            ->setTemplatePath('azure')
+            ->setTemplate('recover_success');
+    }
+}

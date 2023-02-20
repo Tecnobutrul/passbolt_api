@@ -205,4 +205,21 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $this->assertResponseContains('/js/app/api-feedback.js');
         $this->assertResponseContains('id="api-error-details"');
     }
+
+    public function testSsoAzureStage2Controller_User_ErrorSsoRecoverDisabled(): void
+    {
+        $this->disableFeaturePlugin('SsoRecover');
+        $settings = SsoSettingsFactory::make()->azure()->active()->persist();
+        $admin = UserFactory::make()->admin()->active()->persist();
+        $ssoState = SsoStateFactory::make()
+            ->withTypeSsoRecover()
+            ->userId($admin->id)
+            ->ssoSettingsId($settings->id)
+            ->persist();
+        $this->cookie('passbolt_sso_state', $ssoState->state);
+
+        $this->get('/sso/azure/redirect?state=' . $ssoState->state . '&code=' . UuidFactory::uuid());
+
+        $this->assertResponseCode(400, 'SsoRecover plugin is disabled');
+    }
 }

@@ -137,7 +137,7 @@ class SsoStatesTable extends Table
 
         $validator
             ->uuid('user_id', __('The user identifier should be a valid UUID.'))
-            ->allowEmptyString('user_id', __('The user identifier should not be empty.'), false);
+            ->allowEmptyString('user_id', __('The user identifier should not be empty.'));
 
         $validator
             ->ascii('user_agent', __('The user agent should be a valid ASCII string.'))

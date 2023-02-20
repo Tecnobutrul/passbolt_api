@@ -50,6 +50,29 @@ class SsoStatesAssertService
     }
 
     /**
+     * @param \Passbolt\Sso\Model\Entity\SsoState $ssoState SSO state entity.
+     * @param string $ssoSettingsId SSO Settings ID.
+     * @param \App\Utility\ExtendedUserAccessControl $uac UAC object.
+     * @return void
+     * @throws \Cake\Http\Exception\BadRequestException When any assertions are failed.
+     */
+    public function assertAndConsumeWithoutUser(
+        SsoState $ssoState,
+        string $ssoSettingsId,
+        ExtendedUserAccessControl $uac
+    ): void {
+        try {
+            $this->assertWithoutUser($ssoState, $ssoSettingsId, $uac);
+        } catch (BadRequestException $exception) {
+            $this->consume($ssoState);
+
+            throw $exception;
+        }
+
+        $this->consume($ssoState);
+    }
+
+    /**
      * Makes assertions against the SSO state entity, current user, and settings ID.
      * This is used to ensure data integrity between request user/client, settings.
      *
@@ -72,6 +95,43 @@ class SsoStatesAssertService
 
         if ($ssoState->user_id !== $uac->getId() || !Validation::uuid($ssoState->user_id)) {
             throw new BadRequestException($errorMsg . __('User id mismatch.'));
+        }
+
+        if (Configure::read('passbolt.security.userIp')) {
+            if ($ssoState->ip !== $uac->getUserIp()) {
+                throw new BadRequestException($errorMsg . __('User IP mismatch.'));
+            }
+        }
+
+        if (Configure::read('passbolt.security.userAgent')) {
+            if ($ssoState->user_agent !== $uac->getUserAgent()) {
+                throw new BadRequestException($errorMsg . __('User agent mismatch.'));
+            }
+        }
+
+        if ($ssoState->sso_settings_id !== $ssoSettingsId || !Validation::uuid($ssoState->sso_settings_id)) {
+            throw new BadRequestException($errorMsg . __('Settings mismatch.'));
+        }
+    }
+
+    /**
+     * Same assertions but without user ID.
+     *
+     * @param \Passbolt\Sso\Model\Entity\SsoState $ssoState SSO state entity.
+     * @param string $ssoSettingsId SSO Settings ID.
+     * @param \App\Utility\ExtendedUserAccessControl $uac UAC object.
+     * @return void
+     */
+    private function assertWithoutUser(SsoState $ssoState, string $ssoSettingsId, ExtendedUserAccessControl $uac): void
+    {
+        $errorMsg = __('The SSO state is invalid.') . ' ';
+
+        if (! SsoState::isValidState($ssoState->state)) {
+            throw new BadRequestException(trim($errorMsg));
+        }
+
+        if ($ssoState->isExpired()) {
+            throw new BadRequestException($errorMsg . __('The SSO state is expired.'));
         }
 
         if (Configure::read('passbolt.security.userIp')) {

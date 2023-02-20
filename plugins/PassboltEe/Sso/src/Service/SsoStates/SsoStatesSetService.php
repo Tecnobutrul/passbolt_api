@@ -58,7 +58,7 @@ class SsoStatesSetService
                     'state' => $state,
                     'type' => $type,
                     'sso_settings_id' => $ssoSettingsId,
-                    'user_id' => $uac->getId(),
+                    'user_id' => $uac->getId() ?? null,
                     'ip' => $uac->getUserIp(),
                     'user_agent' => $uac->getUserAgent(),
                     'deleted' => FrozenTime::now()->modify('+' . SsoState::getExpiryDuration()),

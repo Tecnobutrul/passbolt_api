@@ -284,6 +284,9 @@ return [
             'mfaPolicies' => [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_MFA_POLICIES_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
             ],
+            'ssoRecover' => [
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_SSO_RECOVER_ENABLED', false), FILTER_VALIDATE_BOOLEAN)
+            ],
         ],
 
         // Activate specific entry points for selenium testing.

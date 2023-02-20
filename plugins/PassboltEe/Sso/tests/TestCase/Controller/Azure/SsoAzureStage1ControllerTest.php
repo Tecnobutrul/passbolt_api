@@ -33,7 +33,9 @@ class SsoAzureStage1ControllerTest extends SsoIntegrationTestCase
 
         $this->postJson('/sso/azure/login.json', ['user_id' => $user->id]);
         $this->assertSuccess();
-        $this->assertStringContainsString('microsoft', $this->_responseJsonBody->url);
+        $url = $this->_responseJsonBody->url;
+        $this->assertStringContainsString('microsoft', $url);
+        $this->assertStringContainsString('login_hint', $url);
     }
 
     /**
