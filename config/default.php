@@ -145,7 +145,7 @@ return [
                 ],
                 // PRO EDITION ONLY
                 'folder' => [
-                    'create' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_CREATE', true), FILTER_VALIDATE_BOOLEAN),
+                    'create' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_CREATE', false), FILTER_VALIDATE_BOOLEAN),
                     'update' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_UPDATE', true), FILTER_VALIDATE_BOOLEAN),
                     'delete' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_DELETE', true), FILTER_VALIDATE_BOOLEAN),
                     'share' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_SHARE', true), FILTER_VALIDATE_BOOLEAN),
