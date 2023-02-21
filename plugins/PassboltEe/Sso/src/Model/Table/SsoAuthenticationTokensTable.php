@@ -18,7 +18,6 @@ namespace Passbolt\Sso\Model\Table;
 
 use App\Error\Exception\ValidationException;
 use App\Model\Entity\AuthenticationToken;
-use App\Model\Rule\IsActiveRule;
 use App\Model\Table\AuthenticationTokensTable;
 use App\Utility\AuthToken\AuthTokenExpiry;
 use App\Utility\Validation\UserAgentValidation;
@@ -27,6 +26,7 @@ use Cake\ORM\RulesChecker;
 use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Model\Rule\IsUserActiveRule;
 use Passbolt\Sso\Utility\AuthToken\SsoAuthTokenExpiry;
 
 /**
@@ -67,7 +67,7 @@ class SsoAuthenticationTokensTable extends AuthenticationTokensTable
     {
         $rules = parent::buildRules($rules);
 
-        $rules->addCreate(new IsActiveRule(), 'user_is_active', [
+        $rules->addCreate(new IsUserActiveRule(), 'user_is_active', [
             'table' => 'Users',
             'errorField' => 'user_id',
             'message' => __('The user is not active.'),

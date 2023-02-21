@@ -159,4 +159,15 @@ class SsoAuthenticationTokensTableTest extends SsoTestCase
         $this->expectException(ValidationException::class);
         $this->SsoAuthenticationTokens->generate($user->id, SsoState::TYPE_SSO_GET_KEY, $token, $data);
     }
+
+    public function testSsoAuthenticationTokensTable_GenerateSuccess_TypeSsoRecover(): void
+    {
+        $user = UserFactory::make()->user()->inactive()->persist();
+        $token = UuidFactory::uuid();
+        $data = ['ip' => '127.0.0.1', 'user_agent' => 'cakephp tests', 'sso_setting_id' => UuidFactory::uuid()];
+
+        $this->SsoAuthenticationTokens->generate($user->id, SsoState::TYPE_SSO_RECOVER, $token, $data);
+
+        $this->assertEquals(1, SsoAuthenticationTokenFactory::count());
+    }
 }
