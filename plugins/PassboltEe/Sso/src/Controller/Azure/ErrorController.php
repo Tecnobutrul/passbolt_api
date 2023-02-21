@@ -12,14 +12,13 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.9.0
+ * @since         3.11.0
  */
 
 namespace Passbolt\Sso\Controller\Azure;
 
-use Cake\Event\EventInterface;
-use Passbolt\Sso\Controller\AbstractSsoController;
 use App\Controller\ErrorController as BaseErrorController;
+use Cake\Event\EventInterface;
 
 /**
  * Error Handling Controller
@@ -29,13 +28,20 @@ use App\Controller\ErrorController as BaseErrorController;
 class ErrorController extends BaseErrorController
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @psalm-suppress InvalidReturnType
      */
     public function beforeRender(EventInterface $event)
     {
-        parent::beforeRender($event);
+        if ($this->request->is('json')) {
+            parent::beforeRender($event);
+
+            return;
+        }
+
         $this->viewBuilder()
-             ->setTemplatePath('Error')
-             ->setTemplate('error');
+            ->setTemplatePath('Error')
+            ->setTemplate('error');
     }
 }

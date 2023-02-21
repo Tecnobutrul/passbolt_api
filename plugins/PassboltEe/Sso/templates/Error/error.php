@@ -10,11 +10,13 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.9.0
+ * @since         3.11.0
+ *
+ * @var \Exception $error
  */
 use Cake\Core\Configure;
 
-$this->assign('title', $title);
+$this->assign('title', __('Single sign-on failed.'));
 $version = Configure::read('passbolt.version');
 // See. fetch('scriptBottom')
 $this->start('scriptBottom');
@@ -29,10 +31,11 @@ echo $this->Html->script('/js/app/stylesheet.js?v=' . $version, [
     'id' => 'stylesheet-manager',
     'fullBase' => true,
     'data-file' => 'api_main.min.css',
-    'cache-version' => $version]);
+    'cache-version' => $version,
+]);
 
 $this->end();
 ?>
 <div id="api-error-details" class="visually-hidden">
-<?php echo $error->getMessage();?>
+    <?= $error->getMessage() ?>
 </div>
