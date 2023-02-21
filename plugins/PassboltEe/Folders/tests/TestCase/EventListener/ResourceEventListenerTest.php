@@ -40,6 +40,7 @@ use App\Test\Lib\Model\SecretsModelTrait;
 use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
+use Passbolt\EmailNotificationSettings\Test\Lib\EmailNotificationSettingsTestTrait;
 use Passbolt\Folders\Model\Entity\FoldersRelation;
 use Passbolt\Folders\Test\Factory\FolderFactory;
 use Passbolt\Folders\Test\Lib\FoldersIntegrationTestCase;
@@ -58,6 +59,7 @@ class ResourceEventListenerTest extends FoldersIntegrationTestCase
     use FoldersRelationsModelTrait;
     use ResourcesModelTrait;
     use SecretsModelTrait;
+    use EmailNotificationSettingsTestTrait;
 
     public $fixtures = [
         GpgkeysFixture::class,
@@ -86,6 +88,9 @@ class ResourceEventListenerTest extends FoldersIntegrationTestCase
 
     public function testFoldersResourcesEventListenerSuccess_AfterResourceAdded()
     {
+        $this->loadNotificationSettings();
+        $this->setEmailNotificationSetting('send.password.create', true);
+
         [$userId, $folder] = $this->insertFixture_AfterResourceAdded();
         $data = [
             'name' => 'R1',
@@ -105,10 +110,14 @@ class ResourceEventListenerTest extends FoldersIntegrationTestCase
             'template' => ResourceCreateEmailRedactor::TEMPLATE,
         ]);
         $this->assertEmailQueueCount(1);
+        $this->unloadNotificationSettings();
     }
 
     public function testFoldersResourcesEventListenerError_AfterResourceAdded()
     {
+        $this->loadNotificationSettings();
+        $this->setEmailNotificationSetting('send.password.create', true);
+
         $nResources = ResourceFactory::count();
         $nPermissions = PermissionFactory::count();
         $nSecrets = SecretFactory::count();
@@ -130,6 +139,7 @@ class ResourceEventListenerTest extends FoldersIntegrationTestCase
         $this->assertSame($nSecrets, SecretFactory::count());
         $this->assertSame($nFolders, FolderFactory::count());
         $this->assertEmailQueueIsEmpty();
+        $this->unloadNotificationSettings();
     }
 
     public function insertFixture_AfterResourceAdded()
