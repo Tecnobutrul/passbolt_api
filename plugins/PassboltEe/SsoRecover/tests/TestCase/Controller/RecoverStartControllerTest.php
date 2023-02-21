@@ -21,6 +21,7 @@ use App\Model\Entity\AuthenticationToken;
 use App\Service\Users\UserRecoverServiceInterface;
 use App\Test\Factory\AuthenticationTokenFactory;
 use App\Test\Factory\UserFactory;
+use Cake\Core\Configure;
 use Cake\Routing\Exception\MissingRouteException;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
@@ -124,6 +125,7 @@ class RecoverStartControllerTest extends SsoRecoverIntegrationTestCase
 
     public function testRecoverStartController_SuccessRecovery(): void
     {
+        Configure::write('App.fullBaseUrl', 'https://passbolt.local');
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
         $user = UserFactory::make()->user()->active()->persist();
         $ssoAuthToken = SsoAuthenticationTokenFactory::make()
@@ -157,13 +159,14 @@ class RecoverStartControllerTest extends SsoRecoverIntegrationTestCase
         // Assert URL
         $this->assertObjectHasAttribute('url', $response);
         $this->assertStringContainsString(
-            "/setup/recover/{$user->id}/{$recoverAuthToken->token}",
+            "https://passbolt.local/setup/recover/{$user->id}/{$recoverAuthToken->token}",
             $response->url
         );
     }
 
     public function testRecoverStartController_SuccessSetup(): void
     {
+        Configure::write('App.fullBaseUrl', 'https://passbolt.local');
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
         $user = UserFactory::make()->user()->inactive()->persist();
         $ssoAuthToken = SsoAuthenticationTokenFactory::make()
@@ -198,7 +201,7 @@ class RecoverStartControllerTest extends SsoRecoverIntegrationTestCase
         // Assert URL
         $this->assertObjectHasAttribute('url', $response);
         $this->assertStringContainsString(
-            "/setup/install/{$user->id}/{$registerAuthToken->token}",
+            "https://passbolt.local/setup/install/{$user->id}/{$registerAuthToken->token}",
             $response->url
         );
     }

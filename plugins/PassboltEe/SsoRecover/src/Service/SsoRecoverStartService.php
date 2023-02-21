@@ -46,9 +46,9 @@ class SsoRecoverStartService
          * Note: Here we are using v1 URLs as new ones(with the "start" e.g. "/setup/start") is not implemented in BExt.
          */
         if ($type === AuthenticationToken::TYPE_RECOVER) {
-            $url = Router::url("/setup/recover/{$user->id}/{$authToken->token}");
+            $url = Router::url("/setup/recover/{$user->id}/{$authToken->token}", true);
         } else {
-            $url = Router::url("/setup/install/{$user->id}/{$authToken->token}");
+            $url = Router::url("/setup/install/{$user->id}/{$authToken->token}", true);
         }
 
         return $url;
