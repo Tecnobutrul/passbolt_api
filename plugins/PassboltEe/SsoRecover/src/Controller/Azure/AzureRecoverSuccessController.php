@@ -20,6 +20,7 @@ namespace Passbolt\SsoRecover\Controller\Azure;
 use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
 use Passbolt\Sso\Controller\AbstractSsoController;
+use Passbolt\Sso\Model\Entity\SsoState;
 
 class AzureRecoverSuccessController extends AbstractSsoController
 {
@@ -44,7 +45,9 @@ class AzureRecoverSuccessController extends AbstractSsoController
         }
 
         $this->User->assertNotLoggedIn();
-        $this->getTokenFromUrlQuery();
+        $token = $this->getTokenFromUrlQuery();
+
+        $this->assertAuthToken($token, SsoState::TYPE_SSO_RECOVER);
 
         $this->viewBuilder()
             ->setLayout('default')

@@ -26,7 +26,7 @@ use Cake\ORM\RulesChecker;
 use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoState;
-use Passbolt\Sso\Model\Rule\IsUserActiveRule;
+use Passbolt\Sso\Model\Rule\IsStateUserActiveRule;
 use Passbolt\Sso\Utility\AuthToken\SsoAuthTokenExpiry;
 
 /**
@@ -67,7 +67,7 @@ class SsoAuthenticationTokensTable extends AuthenticationTokensTable
     {
         $rules = parent::buildRules($rules);
 
-        $rules->addCreate(new IsUserActiveRule(), 'user_is_active', [
+        $rules->addCreate(new IsStateUserActiveRule(), 'user_is_active', [
             'table' => 'Users',
             'errorField' => 'user_id',
             'message' => __('The user is not active.'),

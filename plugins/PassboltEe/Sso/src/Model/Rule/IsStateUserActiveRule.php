@@ -21,7 +21,7 @@ use App\Model\Rule\IsActiveRule;
 use Cake\Datasource\EntityInterface;
 use Passbolt\Sso\Model\Entity\SsoState;
 
-class IsUserActiveRule extends IsActiveRule
+class IsStateUserActiveRule extends IsActiveRule
 {
     /**
      * @inheritDoc

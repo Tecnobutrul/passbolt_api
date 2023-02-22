@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since         3.11.0
  */
 
-namespace PassboltEe\SsoRecover\tests\TestCase\Controller\Azure;
+namespace Passbolt\SsoRecover\Test\TestCase\Controller\Azure;
 
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
@@ -54,6 +54,29 @@ class AzureRecoverSuccessControllerTest extends SsoRecoverIntegrationTestCase
         $this->get('/sso/recover/azure/success?token=nope');
         $this->assertResponseCode(400);
         $this->assertResponseContains('The token is required in URL parameters.');
+    }
+
+    public function testAzureRecoverSuccessController_ErrorTokenDeleted(): void
+    {
+        $authToken = SsoAuthenticationTokenFactory::make()
+            ->type(SsoState::TYPE_SSO_RECOVER)
+            ->inactive()
+            ->persist();
+
+        $this->get('/sso/recover/azure/success?token=' . $authToken->token);
+
+        $this->assertResponseCode(400);
+        $this->assertResponseContains('The authentication token does not exist or has been deleted.');
+    }
+
+    public function testAzureRecoverSuccessController_ErrorTokenExpired(): void
+    {
+        $authToken = SsoAuthenticationTokenFactory::make()->type(SsoState::TYPE_SSO_RECOVER)->expired()->persist();
+
+        $this->get('/sso/recover/azure/success?token=' . $authToken->token);
+
+        $this->assertResponseCode(400);
+        $this->assertResponseContains('The authentication token has been expired.');
     }
 
     public function testAzureRecoverSuccessController_Success(): void
