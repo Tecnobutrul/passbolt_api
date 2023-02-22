@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\AccountRecovery\Test\TestCase\Controller\AccountRecoveryPrivateKeyPasswords;
 
+use App\Test\Lib\Utility\PaginationTestTrait;
 use Cake\Chronos\Chronos;
 use Cake\Validation\Validation;
 use Passbolt\AccountRecovery\Test\Factory\AccountRecoveryPrivateKeyPasswordFactory;
@@ -24,6 +25,8 @@ use Passbolt\AccountRecovery\Test\Lib\AccountRecoveryIntegrationTestCase;
 
 class AccountRecoveryPrivateKeyPasswordsIndexControllerTest extends AccountRecoveryIntegrationTestCase
 {
+    use PaginationTestTrait;
+
     public function testAccountRecoveryPrivateKeyPasswordsIndexController_SuccessEmpty()
     {
         $this->logInAsAdmin();
@@ -38,7 +41,7 @@ class AccountRecoveryPrivateKeyPasswordsIndexControllerTest extends AccountRecov
     {
         $this->logInAsAdmin();
 
-        AccountRecoveryPrivateKeyPasswordFactory::make(5)->persist();
+        AccountRecoveryPrivateKeyPasswordFactory::make($this->getArrayOfDistinctRandomPastDates(5, 'modified'))->persist();
 
         $options = 'limit=3&sort=AccountRecoveryPrivateKeyPasswords.modified&direction=desc';
         $this->getJson('/account-recovery/private-key-passwords.json?' . $options);
