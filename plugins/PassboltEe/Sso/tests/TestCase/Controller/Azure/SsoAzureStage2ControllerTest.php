@@ -40,6 +40,8 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $this->get('/sso/azure/redirect');
         $this->assertResponseCode(400);
         $this->assertResponseContains('The state is required in URL parameters.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     /**
@@ -50,6 +52,8 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $this->get('/sso/azure/redirect?state=nope');
         $this->assertResponseCode(400);
         $this->assertResponseContains('The state is required in URL parameters.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     /**
@@ -61,6 +65,8 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $this->get('/sso/azure/redirect?state=' . SsoState::generate());
         $this->assertResponseCode(400);
         $this->assertResponseContains('The state is required in cookie.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     /**
@@ -72,6 +78,8 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $this->get('/sso/azure/redirect?state=' . SsoState::generate());
         $this->assertResponseCode(400);
         $this->assertResponseContains('CSRF issue');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     /**
@@ -84,6 +92,8 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $this->get('/sso/azure/redirect?state=' . $state);
         $this->assertResponseCode(400);
         $this->assertResponseContains('The code is required in URL parameters.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     /**
@@ -96,6 +106,8 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $this->get('/sso/azure/redirect?state=' . $state . '&code[not]=string');
         $this->assertResponseCode(400);
         $this->assertResponseContains('The code is required in URL parameters.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     // ADMIN TESTS
@@ -113,6 +125,8 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $this->get('/sso/azure/redirect?state=' . $state . '&code=' . UuidFactory::uuid());
         $this->assertResponseCode(400);
         $this->assertResponseContains('The SSO state does not exist.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     /**
@@ -134,6 +148,8 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
 
         $this->assertResponseCode(400);
         $this->assertResponseContains('The SSO settings do not exist.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     /**
@@ -160,6 +176,8 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
 
         $this->assertResponseCode(400);
         $this->assertResponseContains('The SSO state is invalid. User agent mismatch.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     // USERS TESTS
@@ -184,5 +202,7 @@ class SsoAzureStage2ControllerTest extends SsoIntegrationTestCase
         $this->get('/sso/azure/redirect?state=' . $ssoState->state . '&code=' . UuidFactory::uuid());
         $this->assertResponseCode(403);
         $this->assertResponseContains('The user should not be logged in.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 }

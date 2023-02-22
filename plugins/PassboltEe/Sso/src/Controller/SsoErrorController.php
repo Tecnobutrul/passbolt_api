@@ -15,19 +15,31 @@ declare(strict_types=1);
  * @since         3.11.0
  */
 
-namespace Passbolt\Sso\Controller\Azure;
+namespace Passbolt\Sso\Controller;
 
-use Passbolt\Sso\Controller\SsoErrorController;
+use App\Controller\ErrorController;
+use Cake\Event\EventInterface;
 
 /**
- * @see \Passbolt\Sso\Controller\SsoErrorController For actual code.
- *
- * This is because CakePHP works on convention. When an error is thrown from prefix controller,
- * it needs to have ErrorController class present inside prefix folder.
- * @link https://book.cakephp.org/4/en/development/errors.html#custom-errorcontroller
- * @link https://github.com/cakephp/cakephp/issues/17025
+ * Sso error controller to show the error feedback template.
  */
-class ErrorController extends SsoErrorController
+class SsoErrorController extends ErrorController
 {
-    // nothing to do here
+    /**
+     * {@inheritDoc}
+     *
+     * @psalm-suppress InvalidReturnType
+     */
+    public function beforeRender(EventInterface $event)
+    {
+        if ($this->request->is('json')) {
+            parent::beforeRender($event);
+
+            return;
+        }
+
+        $this->viewBuilder()
+            ->setTemplatePath('Error')
+            ->setTemplate('error');
+    }
 }

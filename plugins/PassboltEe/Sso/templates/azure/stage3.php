@@ -10,12 +10,16 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.10.0
+ * @since         3.11.0
+ *
+ * @var \App\View\AppView $this
  */
 use Cake\Core\Configure;
 $title = __('Single-sign on was a success');
+
 $this->assign('title', $title);
 $version = Configure::read('passbolt.version');
+
 // See. fetch('scriptBottom')
 $this->start('scriptBottom');
 // Load the javascript application.
@@ -24,13 +28,12 @@ echo $this->Html->script('/js/app/api-feedback.js?v=' . $version, ['fullBase' =>
 $this->end();
 
 $this->start('scriptTop');
-
 echo $this->Html->script('/js/app/stylesheet.js?v=' . $version, [
     'id' => 'stylesheet-manager',
     'fullBase' => true,
     'data-file' => 'api_main.min.css',
-    'cache-version' => $version]);
-
+    'cache-version' => $version
+]);
 $this->end();
 ?>
 <div id="api-success" class="visually-hidden">
