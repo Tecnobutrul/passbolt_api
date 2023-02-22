@@ -17,10 +17,13 @@ declare(strict_types=1);
 
 namespace Passbolt\SsoRecover\Controller\Azure;
 
+use App\Error\Exception\CustomValidationException;
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
 use Passbolt\Sso\Controller\AbstractSsoController;
 use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
 
 class AzureRecoverSuccessController extends AbstractSsoController
 {
@@ -47,7 +50,21 @@ class AzureRecoverSuccessController extends AbstractSsoController
         $this->User->assertNotLoggedIn();
         $token = $this->getTokenFromUrlQuery();
 
-        $this->assertAuthToken($token, SsoState::TYPE_SSO_RECOVER);
+        try {
+            (new SsoAuthenticationTokenGetService())->getActiveNotExpiredOrFail($token, SsoState::TYPE_SSO_RECOVER);
+        } catch (RecordNotFoundException $e) {
+            throw new BadRequestException(
+                __('The authentication token does not exist or has been deleted.'),
+                null,
+                $e
+            );
+        } catch (CustomValidationException $e) {
+            throw new BadRequestException(
+                __('The authentication token has been expired.'),
+                null,
+                $e
+            );
+        }
 
         $this->viewBuilder()
             ->setLayout('default')

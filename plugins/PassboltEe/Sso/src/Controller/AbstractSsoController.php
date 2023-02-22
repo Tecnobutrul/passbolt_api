@@ -21,13 +21,11 @@ use App\Controller\AppController;
 use App\Model\Entity\Role;
 use App\Service\Users\UserGetService;
 use App\Utility\ExtendedUserAccessControl;
-use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\AbstractSsoService;
-use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
 use Passbolt\Sso\Utility\Validation\OAuthTokenValidation;
 
 abstract class AbstractSsoController extends AppController
@@ -75,33 +73,6 @@ abstract class AbstractSsoController extends AppController
             return null;
         } else {
             return [$error => $desc];
-        }
-    }
-
-    /**
-     * Asserts that token is:
-     * - active / not deleted
-     * - not expired
-     *
-     * @param string $token SSO Auth token to assert.
-     * @param string $type Type of token.
-     * @return void
-     * @throws \Cake\Http\Exception\BadRequestException If token is deleted or expired.
-     */
-    protected function assertAuthToken(string $token, string $type): void
-    {
-        try {
-            $ssoAuthToken = (new SsoAuthenticationTokenGetService())->getOrFail($token, $type);
-        } catch (RecordNotFoundException $e) {
-            throw new BadRequestException(
-                __('The authentication token does not exist or has been deleted.'),
-                null,
-                $e
-            );
-        }
-
-        if ($ssoAuthToken->isExpired()) {
-            throw new BadRequestException(__('The authentication token has been expired.'));
         }
     }
 
