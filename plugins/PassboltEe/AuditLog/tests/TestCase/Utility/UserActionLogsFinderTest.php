@@ -40,14 +40,14 @@ class UserActionLogsFinderTest extends LogIntegrationTestCase
         // Create the entity histories that the finder should retrieve
         $user = UserFactory::make()->persist();
         EntitiesHistoryFactory::make(5)->users()
-            ->with('ActionLogs', ActionLogFactory::make()->with('Users')->inactive())
+            ->with('ActionLogs', ActionLogFactory::make()->with('Users')->error())
             ->with('Users', $user)
             ->persist();
 
         EntitiesHistoryFactory::make(5)
             ->users()
             ->create()
-            ->with('ActionLogs', ActionLogFactory::make()->with('Users')->active())
+            ->with('ActionLogs', ActionLogFactory::make()->with('Users')->success())
             ->with('Users', $user)
             ->persist();
 
