@@ -91,6 +91,16 @@ class SsoStateFactory extends CakephpBaseFactory
     }
 
     /**
+     * Sets "sso_recover" type
+     *
+     * @return $this
+     */
+    public function withTypeSsoRecover()
+    {
+        return $this->patchData(['type' => SsoState::TYPE_SSO_RECOVER]);
+    }
+
+    /**
      * @param string $ssoSettingsId SSO settings ID.
      * @return $this
      */

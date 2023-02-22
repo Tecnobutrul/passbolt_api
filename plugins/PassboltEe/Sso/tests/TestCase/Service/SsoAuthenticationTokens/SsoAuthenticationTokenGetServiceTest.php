@@ -17,13 +17,16 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Test\TestCase\Service\SsoAuthenticationTokens;
 
+use App\Error\Exception\CustomValidationException;
 use App\Model\Entity\Role;
 use App\Test\Factory\UserFactory;
 use App\Utility\ExtendedUserAccessControl;
 use App\Utility\UuidFactory;
 use Cake\Core\Configure;
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\BadRequestException;
 use CakephpFixtureFactories\Error\PersistenceException;
+use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
@@ -456,5 +459,49 @@ class SsoAuthenticationTokenGetServiceTest extends SsoTestCase
         } catch (BadRequestException $exception) {
             $this->assertTextContains('Settings mismatch', $exception->getMessage());
         }
+    }
+
+    public function testSsoAuthenticationTokenGetService_GetActiveNotExpiredOrFail_ErrorTokenNotExist(): void
+    {
+        $service = new SsoAuthenticationTokenGetService();
+
+        $this->expectException(RecordNotFoundException::class);
+
+        $service->getActiveNotExpiredOrFail(UuidFactory::uuid(), SsoState::TYPE_SSO_RECOVER);
+    }
+
+    public function testSsoAuthenticationTokenGetService_GetActiveNotExpiredOrFail_ErrorTokenDeleted(): void
+    {
+        $authToken = SsoAuthenticationTokenFactory::make()->inactive()->persist();
+        $service = new SsoAuthenticationTokenGetService();
+
+        $this->expectException(RecordNotFoundException::class);
+
+        $service->getActiveNotExpiredOrFail($authToken->token, SsoState::TYPE_SSO_RECOVER);
+    }
+
+    public function testSsoAuthenticationTokenGetService_GetActiveNotExpiredOrFail_ErrorTokenExpired(): void
+    {
+        $authToken = SsoAuthenticationTokenFactory::make()
+            ->active()
+            ->expired()
+            ->type(SsoState::TYPE_SSO_RECOVER)
+            ->persist();
+        $service = new SsoAuthenticationTokenGetService();
+
+        $this->expectException(CustomValidationException::class);
+
+        $service->getActiveNotExpiredOrFail($authToken->token, SsoState::TYPE_SSO_RECOVER);
+    }
+
+    public function testSsoAuthenticationTokenGetService_GetActiveNotExpiredOrFail_Success(): void
+    {
+        $authToken = SsoAuthenticationTokenFactory::make()->active()->type(SsoState::TYPE_SSO_RECOVER)->persist();
+        $service = new SsoAuthenticationTokenGetService();
+
+        $result = $service->getActiveNotExpiredOrFail($authToken->token, SsoState::TYPE_SSO_RECOVER);
+
+        $this->assertInstanceOf(SsoAuthenticationToken::class, $result);
+        $this->assertEquals($authToken->token, $result->token);
     }
 }

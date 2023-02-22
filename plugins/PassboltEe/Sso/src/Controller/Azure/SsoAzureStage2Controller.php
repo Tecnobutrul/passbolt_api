@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Controller\Azure;
 
+use App\Utility\Application\FeaturePluginAwareTrait;
 use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Routing\Router;
@@ -25,9 +26,12 @@ use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Azure\SsoAzureService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
+use Passbolt\SsoRecover\Service\SsoRecoverAssertAssertService;
 
 class SsoAzureStage2Controller extends AbstractSsoController
 {
+    use FeaturePluginAwareTrait;
+
     /**
      * @inheritDoc
      */
@@ -100,14 +104,49 @@ class SsoAzureStage2Controller extends AbstractSsoController
     {
         $this->User->assertNotLoggedIn();
 
-        // User is not logged in we use the default active settings
-        $service = new SsoAzureService();
-        $uac = $service->assertStateCodeAndGetUac($ssoState, $code, $this->User->ip(), $this->User->userAgent());
+        try {
+            // Get the settings associated with the state
+            $settingsDto = (new SsoSettingsGetService())->getByIdOrFail($ssoState->sso_settings_id);
+        } catch (\Exception $exception) {
+            throw new BadRequestException($exception->getMessage(), 400, $exception);
+        }
 
-        // Create SSO auth token for next step, e.g. get keys
-        $ssoAuthToken = $service->createAuthTokenToGetKey($uac, $service->getSettings()->id);
+        $service = new SsoAzureService($settingsDto);
+
+        switch ($ssoState->type) {
+            case SsoState::TYPE_SSO_GET_KEY:
+                $uac = $service->assertStateCodeAndGetUac(
+                    $ssoState,
+                    $code,
+                    $this->User->ip(),
+                    $this->User->userAgent()
+                );
+                // Create SSO auth token for next step, e.g. get keys
+                $ssoAuthToken = $service->createAuthTokenToGetKey($uac, $service->getSettings()->id);
+                $successUrl = Router::url('/sso/login/success?token=') . $ssoAuthToken->token;
+                break;
+            case SsoState::TYPE_SSO_RECOVER:
+                if (! $this->isFeaturePluginEnabled('SsoRecover')) {
+                    throw new BadRequestException(__('SsoRecover plugin is disabled.'));
+                }
+
+                $ssoRecoverAssertService = new SsoRecoverAssertAssertService();
+
+                $ssoAuthToken = $ssoRecoverAssertService->assertStateCodeAndGetAuthToken(
+                    $service,
+                    $ssoState,
+                    $code,
+                    $this->User->ip(),
+                    $this->User->userAgent()
+                );
+
+                $successUrl = $ssoRecoverAssertService->getSuccessUrl($ssoAuthToken->token);
+                break;
+            default:
+                throw new BadRequestException(__('The SSO state type is invalid.'));
+        }
 
         $this->response = $this->getResponse()->withCookie($service->clearStateCookie());
-        $this->redirect(Router::url('/sso/login/success?token=') . $ssoAuthToken->token);
+        $this->redirect($successUrl);
     }
 }
