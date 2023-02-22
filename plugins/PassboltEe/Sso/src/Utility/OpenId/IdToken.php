@@ -26,8 +26,8 @@ declare(strict_types=1);
  */
 namespace Passbolt\Sso\Utility\OpenId;
 
+use App\Model\Validation\EmailValidationRule;
 use Cake\Http\Exception\BadRequestException;
-use Cake\Validation\Validation;
 use Firebase\JWT\JWT;
 use League\OAuth2\Client\Token\AccessToken;
 use Passbolt\Sso\Utility\Azure\Provider\AzureProvider;
@@ -124,7 +124,7 @@ class IdToken extends AccessToken
             throw new BadRequestException('The iss (issuer) parameter is invalid.');
         }
 
-        if (!isset($tokenClaims['email']) || !Validation::email($tokenClaims['email'])) {
+        if (!isset($tokenClaims['email']) || !EmailValidationRule::check($tokenClaims['email'])) {
             throw new BadRequestException('The email claim is not found or invalid.');
         }
     }
