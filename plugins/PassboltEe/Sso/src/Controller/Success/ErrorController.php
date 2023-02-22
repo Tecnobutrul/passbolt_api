@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since         3.11.0
  */
 
-namespace Passbolt\Sso\Controller\Azure;
+namespace Passbolt\Sso\Controller\Success;
 
 use Passbolt\Sso\Controller\SsoErrorController;
 
