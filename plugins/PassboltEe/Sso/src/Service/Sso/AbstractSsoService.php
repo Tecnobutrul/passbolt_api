@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Service\Sso;
 
 use App\Model\Entity\User;
+use App\Model\Validation\EmailValidationRule;
 use App\Service\Users\UserGetService;
 use App\Utility\ExtendedUserAccessControl;
 use Cake\Http\Cookie\Cookie;
@@ -25,7 +26,6 @@ use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
-use Cake\Validation\Validation;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
@@ -234,7 +234,7 @@ abstract class AbstractSsoService
         }
 
         $email = $resourceOwner->getEmail();
-        if (!isset($email) || !is_string($email) || !Validation::email($email)) {
+        if (!isset($email) || !is_string($email) || !EmailValidationRule::check($email)) {
             $msg = __('Single sign-on failed.') . ' ' . __('Email not provided by provider.');
             throw new BadRequestException($msg);
         }
