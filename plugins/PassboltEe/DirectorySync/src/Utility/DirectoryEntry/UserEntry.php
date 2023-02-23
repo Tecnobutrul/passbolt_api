@@ -16,7 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\DirectorySync\Utility\DirectoryEntry;
 
-use Cake\Validation\Validation;
+use App\Model\Validation\EmailValidationRule;
 use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectType;
 
@@ -126,7 +126,7 @@ class UserEntry extends DirectoryEntry
 
         if (empty($this->user['username'])) {
             $this->_addError('email', __('A username is required.'));
-        } elseif (!Validation::email($this->user['username'], false)) {
+        } elseif (!EmailValidationRule::check($this->user['username'], true)) {
             $this->_addError('email', __('The email should be a valid email address.'));
         }
         if (empty($this->user['profile']['first_name'])) {
