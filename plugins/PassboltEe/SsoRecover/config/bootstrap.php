@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * Passbolt ~ Open source password manager for teams
@@ -12,16 +11,8 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.9.0
+ * @since         3.11.0
  */
-namespace Passbolt\Sso\Utility\OpenId;
+use Cake\Core\Configure;
 
-interface ResourceOwnerWithEmailInterface
-{
-    /**
-     * Returns the email of the authorized resource owner.
-     *
-     * @return mixed
-     */
-    public function getEmail();
-}
+Configure::load('Passbolt/SsoRecover.config', 'default', true);

@@ -19,7 +19,7 @@ namespace Passbolt\Sso\Test\TestCase\Controller\Keys;
 
 use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoKeysFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
@@ -35,8 +35,8 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
         $user = UserFactory::make()->active()->persist();
         $key = SsoKeysFactory::make()->userId($user->id)->persist();
-        $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
+        $ssoAuthToken = SsoAuthenticationTokenFactory::make()
+            ->type(SsoState::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->data([
@@ -46,10 +46,10 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
             ])
             ->persist();
 
-        $this->getJson('/sso/keys/' . $key->id . '/' . $user->id . '/' . $token->token . '.json');
+        $this->getJson('/sso/keys/' . $key->id . '/' . $user->id . '/' . $ssoAuthToken->token . '.json');
+
         $this->assertSuccess();
         $result = $this->_responseJson->body;
-
         $this->assertEquals($key->id, $result->id);
         $this->assertEquals($key->user_id, $result->user_id);
         $this->assertEquals($key->data, $result->data);
@@ -57,10 +57,9 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
         $this->assertEquals($key->modified_by, $result->modified_by);
         $this->assertNotEmpty($result->created);
         $this->assertNotEmpty($result->modified);
-
-        /** @var SsoAuthenticationToken $tokenUpdated */
-        $tokenUpdated = SsoAuthenticationTokenFactory::find()->firstOrFail();
-        $this->assertFalse($tokenUpdated->active);
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $updateSsoAuthToken */
+        $updateSsoAuthToken = SsoAuthenticationTokenFactory::find()->firstOrFail();
+        $this->assertFalse($updateSsoAuthToken->active);
     }
 
     /**
@@ -105,7 +104,7 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
     }
 
     /**
-     * 404 user and token ok but key was deleted
+     * 404 user and state ok but key was deleted
      */
     public function testSsoKeysGetController_ErrorKeyNotFound(): void
     {
@@ -113,7 +112,7 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
         $user = UserFactory::make()->active()->persist();
         $keyId = UuidFactory::uuid();
         $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_GET_KEY)
+            ->type(SsoState::TYPE_SSO_GET_KEY)
             ->userId($user->id)
             ->active()
             ->data([
@@ -124,6 +123,7 @@ class SsoKeysGetControllerTest extends SsoIntegrationTestCase
             ->persist();
 
         $this->getJson('/sso/keys/' . $keyId . '/' . $user->id . '/' . $token->token . '.json');
+
         $this->assertError(404);
     }
 }

@@ -41,30 +41,30 @@
             "no-api": true
         },
         {
-          "type": "vcs",
-          "url": "https://github.com/passbolt/cakephp-codesniffer.git",
-          "no-api": true
+            "type": "vcs",
+            "url": "https://github.com/passbolt/cakephp-codesniffer.git",
+            "no-api": true
         },
         {
-          "type": "vcs",
-          "url": "https://github.com/passbolt/ldaptools.git",
-          "no-api": true
+            "type": "vcs",
+            "url": "https://github.com/passbolt/ldaptools.git",
+            "no-api": true
         }
     ],
     "require": {
         "php": ">=7.3",
-        "ext-json" : "*",
-        "ext-posix" : "*",
-        "ext-intl" : "*",
-        "ext-mbstring" : "*",
-        "ext-gnupg" : "*",
+        "ext-json": "*",
+        "ext-posix": "*",
+        "ext-intl": "*",
+        "ext-mbstring": "*",
+        "ext-gnupg": "*",
         "ext-openssl": "*",
         "ext-pdo": "*",
-        "ext-curl" : "*",
-        "ext-ldap" : "*",
+        "ext-curl": "*",
+        "ext-ldap": "*",
         "cakephp/cakephp": "^4.3.11",
         "cakephp/migrations": "^3.5.2",
-        "robmorgan/phinx":"^0.12.10",
+        "robmorgan/phinx": "^0.12.10",
         "cakephp/plugin-installer": "^1.3.1",
         "mobiledetect/mobiledetectlib": "^2.8.39",
         "ramsey/uuid": "^4.2.3",
@@ -124,7 +124,8 @@
             "Passbolt\\SmtpSettings\\": "./plugins/PassboltCe/SmtpSettings/src",
             "Passbolt\\MultiFactorAuthentication\\": "./plugins/PassboltCe/MultiFactorAuthentication/src",
             "Passbolt\\SelfRegistration\\": "./plugins/PassboltCe/SelfRegistration/src",
-            "Passbolt\\Sso\\": "./plugins/PassboltEe/Sso/src"
+            "Passbolt\\Sso\\": "./plugins/PassboltEe/Sso/src",
+            "Passbolt\\SsoRecover\\": "./plugins/PassboltEe/SsoRecover/src"
         }
     },
     "autoload-dev": {
@@ -152,7 +153,8 @@
             "Passbolt\\MultiFactorAuthentication\\Test\\": "./plugins/PassboltCe/MultiFactorAuthentication/tests",
             "Passbolt\\SmtpSettings\\Test\\": "./plugins/PassboltCe/SmtpSettings/tests",
             "Passbolt\\SelfRegistration\\Test\\": "./plugins/PassboltCe/SelfRegistration/tests",
-            "Passbolt\\Sso\\Test\\": "./plugins/PassboltEe/Sso/tests"
+            "Passbolt\\Sso\\Test\\": "./plugins/PassboltEe/Sso/tests",
+            "Passbolt\\SsoRecover\\Test\\": "./plugins/PassboltEe/SsoRecover/tests"
         }
     },
     "scripts": {

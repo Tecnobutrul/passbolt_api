@@ -27,27 +27,10 @@ use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Dto\AbstractSsoSettingsDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDefaultDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoSetting;
-use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenGetService;
 
 class SsoSettingsGetService
 {
-    /**
-     * @param string $token uuid
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException if setting cannot be found
-     * @throws \Cake\Http\Exception\InternalErrorException if there is an issue with settings data decryption
-     * @throws \App\Error\Exception\AuthenticationTokenDataPropertyException if setting id is missing in SsoAuthToken props
-     * @return \Passbolt\Sso\Model\Dto\SsoSettingsDto
-     */
-    public function getDraftSettingFromTokenOrFail(string $token): SsoSettingsDto
-    {
-        $token = (new SsoAuthenticationTokenGetService())->getOrFail($token, SsoAuthenticationToken::TYPE_SSO_STATE);
-        $settingsId = $token->getDataProperty(SsoAuthenticationToken::DATA_SSO_SETTING_ID);
-
-        return $this->getDraftByIdOrFail($settingsId, true);
-    }
-
     /**
      * Return a setting identified with its id
      *
@@ -55,9 +38,9 @@ class SsoSettingsGetService
      * @throws \Cake\Http\Exception\BadRequestException if $id is not a valid uuid
      * @throws \Cake\Datasource\Exception\RecordNotFoundException if setting cannot be found
      * @throws \Cake\Http\Exception\InternalErrorException if there is an issue with settings data decryption
-     * @return \Passbolt\Sso\Model\Dto\AbstractSsoSettingsDto
+     * @return \Passbolt\Sso\Model\Dto\SsoSettingsDto
      */
-    public function getByIdOrFail(string $id): AbstractSsoSettingsDto
+    public function getByIdOrFail(string $id): SsoSettingsDto
     {
         if (!Validation::uuid($id)) {
             throw new BadRequestException(__('The SSO setting id should be a uuid.'));

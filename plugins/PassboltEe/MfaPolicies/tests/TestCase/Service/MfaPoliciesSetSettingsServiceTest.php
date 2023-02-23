@@ -22,7 +22,6 @@ use App\Test\Lib\Utility\ExtendedUserAccessControlTestTrait;
 use Cake\Event\EventList;
 use Cake\Event\EventManager;
 use Cake\Http\Exception\ForbiddenException;
-use CakephpTestSuiteLight\Fixture\TruncateDirtyTables;
 use Passbolt\MfaPolicies\Model\Dto\MfaPolicySettings;
 use Passbolt\MfaPolicies\Model\Entity\MfaPoliciesSetting;
 use Passbolt\MfaPolicies\Service\MfaPoliciesSetSettingsService;
@@ -34,7 +33,6 @@ use Passbolt\MfaPolicies\Test\Factory\MfaPoliciesSettingFactory;
 class MfaPoliciesSetSettingsServiceTest extends AppTestCase
 {
     use ExtendedUserAccessControlTestTrait;
-    use TruncateDirtyTables;
 
     /**
      * @var MfaPoliciesSetSettingsService
