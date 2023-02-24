@@ -42,6 +42,8 @@ class EeSolutionBootstrapperTest extends SolutionBootstrapperTestCase
         'Passbolt/Folders',
         'Passbolt/AccountRecovery',
         'Passbolt/Sso',
+        'Passbolt/MfaPolicies',
+        'Passbolt/SsoRecover',
     ];
 
     public function testEeSolutionBootstrapper_Application_Bootstrap(): void
@@ -99,6 +101,7 @@ class EeSolutionBootstrapperTest extends SolutionBootstrapperTestCase
         $this->enableFeaturePlugin('Tags');
         $this->enableFeaturePlugin('AccountRecovery');
         $this->enableFeaturePlugin('Sso');
+        $this->enableFeaturePlugin('SsoRecover');
         // These plugins are enabled by default if not defined
         Configure::delete('passbolt.plugins.ee.enabled');
         Configure::delete('passbolt.plugins.multiFactorAuthentication.enabled');
