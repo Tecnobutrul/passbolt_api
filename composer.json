@@ -79,7 +79,7 @@
         "spomky-labs/otphp": "^8.3.3",
         "bacon/bacon-qr-code": "^2.0.7",
         "enygma/yubikey": "^3.3",
-        "duosecurity/duo_php": "^1.0.1",
+        "duosecurity/duo_universal_php": "^1.0",
         "ldaptools/ldaptools": "dev-master#9e5ce1acb2d0dfa7f24c4d5628f778412f3ba617",
         "league/oauth2-client": "^2.6"
     },
@@ -179,7 +179,7 @@
             "./bin/cake i18n extract --app ./ --paths src,plugins,templates --output resources/locales/en_UK --exclude /tests,/vendors,/src/Command --overwrite --extract-core no --no-location --merge yes",
             "find resources/locales/en_UK -name '*.pot' -exec sh -c 'mv \"$1\" \"${1%.pot}.po\"' _ {} \\;"
         ],
-        "i18n:update": "git checkout l10n_release -- resources/locales/de_DE resources/locales/en_UK resources/locales/es_ES resources/locales/fr_FR resources/locales/ja_JP resources/locales/lt_LT resources/locales/nl_NL resources/locales/pl_PL resources/locales/sv_SE"
+        "i18n:update": "git checkout l10n_release -- resources/locales/de_DE resources/locales/en_UK resources/locales/es_ES resources/locales/fr_FR resources/locales/it_IT resources/locales/ja_JP resources/locales/ko_KR resources/locales/lt_LT resources/locales/nl_NL resources/locales/pl_PL resources/locales/pt_BR resources/locales/ro_RO resources/locales/sv_SE"
     },
     "prefer-stable": true
 }
