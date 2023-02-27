@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Service\SsoAuthenticationTokens;
 
 use App\Error\Exception\AuthenticationTokenDataPropertyException;
+use App\Error\Exception\CustomValidationException;
 use App\Utility\ExtendedUserAccessControl;
 use Cake\Core\Configure;
 use Cake\Datasource\Exception\RecordNotFoundException;
@@ -82,6 +83,33 @@ class SsoAuthenticationTokenGetService
         }
 
         return $tokenEntity;
+    }
+
+    /**
+     * Get active and not expired token or fail
+     *
+     * @param string $token Token value.
+     * @param string $type Type of token.
+     * @return \Passbolt\Sso\Model\Entity\SsoAuthenticationToken
+     * @throws \Cake\Http\Exception\NotFoundException If token is not found or inactive
+     * @throws \App\Error\Exception\CustomValidationException If the token is expired
+     * @throws \Cake\Http\Exception\BadRequestException If token id is not a valid uuid
+     */
+    public function getActiveNotExpiredOrFail(string $token, string $type): SsoAuthenticationToken
+    {
+        $ssoAuthToken = $this->getOrFail($token, $type);
+
+        if ($ssoAuthToken->isExpired()) {
+            $error = [
+                'token' => [
+                    'expired' => __('The token is expired.'),
+                ],
+            ];
+
+            throw new CustomValidationException(__('The authentication token is not valid.'), $error);
+        }
+
+        return $ssoAuthToken;
     }
 
     /**

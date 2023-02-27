@@ -21,7 +21,7 @@ use Cake\ORM\TableRegistry;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 
 /**
- * @covers \Passbolt\Sso\Model\Table\SsoAuthenticationTokensTable
+ * @covers \Passbolt\Sso\Model\Table\SsoKeysTable
  */
 class SsoKeysTableTest extends SsoTestCase
 {

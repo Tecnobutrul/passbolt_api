@@ -34,4 +34,7 @@ $routes->plugin('Passbolt/AuditLog', ['path' => '/actionlog'], function (RouteBu
                ->setPass(['folderId'])
                ->setMethods(['GET']);
     }
+
+    $routes->connect('/logs', ['controller' => 'ActionLogsIndex', 'action' => 'index'])
+        ->setMethods(['GET']);
 });

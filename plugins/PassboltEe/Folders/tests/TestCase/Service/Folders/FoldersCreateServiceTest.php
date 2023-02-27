@@ -80,18 +80,8 @@ class FoldersCreateServiceTest extends FoldersTestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->loadNotificationSettings();
-        (new EmailSubscriptionDispatcher())->collectSubscribedEmailRedactors();
-
         /** @var FoldersCreateService $service */
         $this->service = new FoldersCreateService();
-    }
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        $this->unloadNotificationSettings();
     }
 
     /* COMMON & VALIDATION */
@@ -158,6 +148,10 @@ class FoldersCreateServiceTest extends FoldersTestCase
 
     public function testCreateFolder_CommonSuccess_NotifyUserAfterCreate()
     {
+        $this->loadNotificationSettings();
+        $this->setEmailNotificationSetting('send.folder.create', true);
+        (new EmailSubscriptionDispatcher())->collectSubscribedEmailRedactors();
+
         $userId = UuidFactory::uuid('user.id.ada');
         $uac = new UserAccessControl(Role::USER, $userId);
         $folderData = ['name' => 'A'];
@@ -169,6 +163,7 @@ class FoldersCreateServiceTest extends FoldersTestCase
             'template' => 'Passbolt/Folders.LU/folder_create',
         ]);
         $this->assertEmailInBatchContains('You have created a new folder');
+        $this->unloadNotificationSettings();
     }
 
     /* PERSONAL FOLDER */

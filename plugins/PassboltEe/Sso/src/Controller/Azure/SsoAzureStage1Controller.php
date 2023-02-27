@@ -19,6 +19,7 @@ namespace Passbolt\Sso\Controller\Azure;
 
 use Cake\Event\EventInterface;
 use Passbolt\Sso\Controller\AbstractSsoController;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Azure\SsoAzureService;
 
 class SsoAzureStage1Controller extends AbstractSsoController
@@ -46,7 +47,7 @@ class SsoAzureStage1Controller extends AbstractSsoController
         $uac = $this->getUacFromData();
 
         // Redirect to provider
-        $url = $this->getSsoUrlWithCookie(new SsoAzureService(), $uac);
+        $url = $this->getSsoUrlWithCookie(new SsoAzureService(), $uac, SsoState::TYPE_SSO_GET_KEY);
         $this->success(__('The operation was successful.'), ['url' => $url]);
     }
 }

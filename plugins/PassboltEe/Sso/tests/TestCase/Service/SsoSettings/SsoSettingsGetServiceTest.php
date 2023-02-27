@@ -17,17 +17,14 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Test\TestCase\Service\SsoSettings;
 
-use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\InternalErrorException;
 use Passbolt\Sso\Model\Dto\AbstractSsoSettingsDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDefaultDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
-use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 
@@ -151,31 +148,5 @@ class SsoSettingsGetServiceTest extends SsoTestCase
     {
         $this->expectException(RecordNotFoundException::class);
         (new SsoSettingsGetService())->getDraftByIdOrFail(UuidFactory::uuid());
-    }
-
-    public function testSsoSettingsGetService_getDraftSettingFromTokenOrFail_Success(): void
-    {
-        $settings = SsoSettingsFactory::make()->azure()->draft()->persist();
-        $user = UserFactory::make()->admin()->active()->persist();
-        $token = SsoAuthenticationTokenFactory::make()
-            ->type(SsoAuthenticationToken::TYPE_SSO_STATE)
-            ->userId($user->id)
-            ->active()
-            ->data([
-                'sso_setting_id' => $settings->id,
-                'ip' => '127.0.0.1',
-                'user_agent' => 'phpunit',
-            ])
-            ->persist();
-
-        $result = (new SsoSettingsGetService())->getDraftSettingFromTokenOrFail($token->token);
-        $this->assertEquals(SsoSetting::STATUS_DRAFT, $result->status);
-        $this->assertTrue(isset($result->data));
-    }
-
-    public function testSsoSettingsGetService_getDraftSettingFromTokenOrFail_Error(): void
-    {
-        $this->expectException(RecordNotFoundException::class);
-        (new SsoSettingsGetService())->getDraftSettingFromTokenOrFail(UuidFactory::uuid());
     }
 }
