@@ -39,6 +39,13 @@ class SsoErrorController extends ErrorController
         }
 
         $this->viewBuilder()
+            /**
+             * Without `setTheme` calling this method from other controller(i.e. SsoRecover > ErrorController) won't work.
+             * Because as per CakePHP convention it will try to find template file in that particular plugin's folder.
+             *
+             * @see \Passbolt\SsoRecover\Controller\Azure\ErrorController
+             */
+            ->setTheme('Passbolt/Sso')
             ->setTemplatePath('Error')
             ->setTemplate('error');
     }

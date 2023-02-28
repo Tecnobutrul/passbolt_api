@@ -40,20 +40,30 @@ class AzureRecoverSuccessControllerTest extends SsoRecoverIntegrationTestCase
         $this->assertResponseCode(403);
 
         $this->assertResponseContains('The user should not be logged in.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     public function testAzureRecoverSuccessController_ErrorNoToken(): void
     {
         $this->get('/sso/recover/azure/success');
+
         $this->assertResponseCode(400);
+
         $this->assertResponseContains('The token is required in URL parameters.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     public function testAzureRecoverSuccessController_ErrorInvalidToken(): void
     {
         $this->get('/sso/recover/azure/success?token=nope');
+
         $this->assertResponseCode(400);
+
         $this->assertResponseContains('The token is required in URL parameters.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     public function testAzureRecoverSuccessController_ErrorTokenDeleted(): void
@@ -67,6 +77,8 @@ class AzureRecoverSuccessControllerTest extends SsoRecoverIntegrationTestCase
 
         $this->assertResponseCode(400);
         $this->assertResponseContains('The authentication token does not exist or has been deleted.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     public function testAzureRecoverSuccessController_ErrorTokenExpired(): void
@@ -77,6 +89,8 @@ class AzureRecoverSuccessControllerTest extends SsoRecoverIntegrationTestCase
 
         $this->assertResponseCode(400);
         $this->assertResponseContains('The authentication token has been expired.');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-error-details"');
     }
 
     public function testAzureRecoverSuccessController_Success(): void
@@ -87,5 +101,7 @@ class AzureRecoverSuccessControllerTest extends SsoRecoverIntegrationTestCase
 
         $this->assertResponseCode(200);
         $this->assertResponseContains('success');
+        $this->assertResponseContains('/js/app/api-feedback.js');
+        $this->assertResponseContains('id="api-success"');
     }
 }
