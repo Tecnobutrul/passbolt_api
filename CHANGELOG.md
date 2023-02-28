@@ -2,6 +2,35 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.11.0] - 2023-03-01
+### Added
+- PB-22435 As a user using SSO Azure I can recover my account using SSO Azure
+- PB-22741 As an administrator I should see an error in the healthcheck if I use php 7.3 or less
+- PB-22747 As an administrator I can define a regular expression to customise email validation
+- PB-22748 As an administrator I can access to the paginated list of action logs on the browser
+- PB-22866 As a user I want to use passbolt in Italian
+- PB-22866 As a user I want to use passbolt in Portuguese (Brazil)
+- PB-22866 As a user I want to use passbolt in Korean
+- PB-22866 As a user I want to use passbolt in Romanian
+
+### Fixed
+- PB-21489 As a user I should not see double headers in emails sent by the email digest
+
+### Improved
+- PB-22725 As an administrator I want to manage Duo v4 settings
+- PB-21763 As a user I want to see a clean SSO error feedback in the popup after failing to sign-up with SSO
+- PB-21764 As a user I want to see a clean SSO feedback in the popup after signing-in with SSO
+- PB-21906 As a user I don’t want to receive email by default when I create a resource or a folder as well as I don’t want to see any details for this content by default
+- PB-22512 As an SSO administrator I want to see the access_token details when it is missing or has invalid claims
+- PB-22610 As a user I want the SSO Azure authentication to support nonce
+
+### Maintenance
+- PB-22416 As a developer I can safely deactivate plugins between solutions
+- PB-22756 Fixes a range of failing pagination tests
+- PB-22760 SSO State Type refactoring
+- PB-22495 Refactors the SmtpTransport to enhance the code coverage of emails
+- PB-22430 Refactoring of SSO state to use separate table
+
 ## [3.10.0] - 2023-02-09
 ### Added
 - PB-19784 As a user I can self register if my email domain matches the policy defined by the administrators
