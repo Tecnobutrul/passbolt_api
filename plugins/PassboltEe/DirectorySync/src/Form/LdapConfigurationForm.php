@@ -73,6 +73,7 @@ class LdapConfigurationForm extends Form
         'groups_parent_group' => 'groupsParentGroup',
         'enabled_users_only' => 'enabledUsersOnly',
         'sync_users_create' => 'jobs.users.create',
+        'sync_users_update' => 'jobs.users.update',
         'sync_users_delete' => 'jobs.users.delete',
         'sync_groups_create' => 'jobs.groups.create',
         'sync_groups_delete' => 'jobs.groups.delete',
@@ -110,6 +111,7 @@ class LdapConfigurationForm extends Form
             ->addField('groups_parent_group', 'string')
             ->addField('enabled_users_only', 'boolean')
             ->addField('sync_users_create', 'boolean')
+            ->addField('sync_users_update', 'boolean')
             ->addField('sync_users_delete', 'boolean')
             ->addField('sync_groups_create', 'boolean')
             ->addField('sync_groups_delete', 'boolean')
@@ -247,6 +249,10 @@ class LdapConfigurationForm extends Form
         $validator
             ->allowEmptyString('sync_users_create')
             ->boolean('sync_users_create', __('The sync of created users setting should be a boolean.'));
+
+        $validator
+            ->allowEmptyString('sync_users_update')
+            ->boolean('sync_users_update', __('The sync of updated users setting should be a boolean.'));
 
         $validator
             ->allowEmptyString('sync_users_delete')

@@ -79,14 +79,20 @@ trait SyncAddTrait
             }
         }
 
-        /** @psalm-suppress TypeDoesNotContainType const ENTITY_TYPE is defined in two separate classes with different values */
-        // If it's a group. We need to process the group users.
-        if (self::ENTITY_TYPE == Alias::MODEL_GROUPS) {
-            if (!$this->directoryOrgSettings->isSyncOperationEnabled(strtolower(self::ENTITY_TYPE), 'update')) {
-                return;
+        if ($this->directoryOrgSettings->isSyncOperationEnabled(strtolower(self::ENTITY_TYPE), 'update')) {
+            /** @psalm-suppress TypeDoesNotContainType const ENTITY_TYPE is defined in two separate classes with different values */
+            switch (self::ENTITY_TYPE) {
+                case Alias::MODEL_USERS:
+                    //We need to update first and last name
+                    $this->handleUpdateUser($data, $entry, $existingEntity);
+                    break;
+                case Alias::MODEL_GROUPS:
+                    //We need to process the group users and rename it if needed.
+                    $this->handleUpdateGroup($data, $entry, $existingEntity);
+                    $this->handleGroupUsersEdit($data, $entry, $existingEntity);
+                    break;
+                default:
             }
-            $this->handleUpdateGroup($data, $entry, $existingEntity);
-            $this->handleGroupUsersEdit($data, $entry, $existingEntity);
         }
     }
 

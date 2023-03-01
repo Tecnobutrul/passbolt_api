@@ -16,8 +16,10 @@ declare(strict_types=1);
  */
 namespace Passbolt\DirectorySync\Actions\Traits;
 
+use App\Error\Exception\ValidationException;
 use App\Model\Entity\Group;
 use App\Model\Entity\Role;
+use App\Model\Entity\User;
 use App\Service\Groups\GroupsUpdateService;
 use App\Utility\UserAccessControl;
 use Passbolt\DirectorySync\Actions\Reports\ActionReport;
@@ -74,6 +76,86 @@ trait SyncUpdateTrait
             $this->addReportItem(new ActionReport(
                 __('The group {0} could not be renamed to {1}.', $existingGroup->name, $groupName),
                 Alias::MODEL_GROUPS,
+                Alias::ACTION_UPDATE,
+                Alias::STATUS_ERROR,
+                $error
+            ));
+        }
+    }
+
+    /**
+     * Handle update user.
+     *
+     * @param array $data data
+     * @param \Passbolt\DirectorySync\Model\Entity\DirectoryEntry|null $entry entry
+     * @param \App\Model\Entity\User $existingUser User
+     * @return void
+     */
+    public function handleUpdateUser(array $data, ?DirectoryEntry $entry, User $existingUser): void
+    {
+        $existingUser = $this->Users->get($existingUser->id, ['contain' => ['Profiles']]);
+        $firstName = $data['user']['profile']['first_name'] ?? null;
+        $lastName = $data['user']['profile']['last_name'] ?? null;
+        if (
+            !$firstName || !$lastName ||
+            (strtolower($firstName) === strtolower($existingUser->profile->first_name) &&
+                strtolower($lastName) === strtolower($existingUser->profile->last_name))
+        ) {
+            return;
+        }
+        //Extracting only first and last name to avoid modifying other fields
+        $updatedData = [
+            'profile' => [
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+            ],
+        ];
+        $this->updateUser($existingUser, $updatedData);
+    }
+
+    /**
+     * Update user
+     *
+     * @param \App\Model\Entity\User $existingUser User
+     * @param array $data data
+     * @return void
+     */
+    public function updateUser(User $existingUser, array $data): void
+    {
+        try {
+            $user = $this->Users->editEntity($existingUser, $data, Role::ADMIN);
+            $result = $this->Users->save($user, ['checkrules' => false]);
+
+            if (!$result) {
+                if ($user->hasErrors()) {
+                    $msg = __('Could not validate user data.');
+                    throw new ValidationException($msg, $user, $this->Users);
+                }
+                throw new \Exception('User could not be updated.');
+            }
+            // Send report.
+            $this->addReportItem(new ActionReport(
+                __(
+                    'The user {0} full name has been successfully updated to {1} {2}.',
+                    $existingUser->username,
+                    $user->profile->first_name,
+                    $user->profile->last_name
+                ),
+                Alias::MODEL_USERS,
+                Alias::ACTION_UPDATE,
+                Alias::STATUS_SUCCESS,
+                $user
+            ));
+        } catch (\Exception $exception) {
+            $error = new SyncError($existingUser, $exception);
+            $this->addReportItem(new ActionReport(
+                __(
+                    'The user {0} full name could not be updated to {1} {2}.',
+                    $existingUser->username,
+                    $data['profile']['first_name'],
+                    $data['profile']['last_name']
+                ),
+                Alias::MODEL_USERS,
                 Alias::ACTION_UPDATE,
                 Alias::STATUS_ERROR,
                 $error
