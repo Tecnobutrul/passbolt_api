@@ -50,6 +50,10 @@ class EeSolutionBootstrapperTest extends SolutionBootstrapperTestCase
     {
         Configure::delete('passbolt.webInstaller.configured');
         $plugins = $this->arrangeAndGetPlugins();
+        $expectedCePlugins = $this->removePluginFromList(
+            BaseSolutionBootstrapperTest::EXPECTED_CE_PLUGINS,
+            'Passbolt/JwtAuthentication'
+        );
         $expectedPluginList = array_merge(
             [
                 'Migrations',
@@ -59,8 +63,9 @@ class EeSolutionBootstrapperTest extends SolutionBootstrapperTestCase
                 'PassboltSeleniumApi',
                 'PassboltTestData',
                 'Passbolt/Ee',
+                'Passbolt/JwtAuthentication',
             ],
-            BaseSolutionBootstrapperTest::EXPECTED_CE_PLUGINS,
+            $expectedCePlugins,
             ['Passbolt/Log'],
             self::EXPECTED_EE_PLUGINS,
             [
@@ -84,6 +89,7 @@ class EeSolutionBootstrapperTest extends SolutionBootstrapperTestCase
             'PassboltSeleniumApi',
             'PassboltTestData',
             'Passbolt/Ee',
+            'Passbolt/JwtAuthentication',
             'Passbolt/WebInstaller',
             'Bake',
             'CakephpFixtureFactories',
