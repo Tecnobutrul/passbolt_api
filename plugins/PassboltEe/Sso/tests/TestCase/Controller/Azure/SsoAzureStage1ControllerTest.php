@@ -18,9 +18,14 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Test\TestCase\Controller\Azure;
 
 use App\Test\Factory\UserFactory;
+use Cake\Core\Configure;
+use Passbolt\Sso\Service\Sso\AbstractSsoService;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
+/**
+ * @property \Cake\Http\Response $_response
+ */
 class SsoAzureStage1ControllerTest extends SsoIntegrationTestCase
 {
     /**
@@ -32,10 +37,33 @@ class SsoAzureStage1ControllerTest extends SsoIntegrationTestCase
         $this->createAzureSettingsFromConfig($user);
 
         $this->postJson('/sso/azure/login.json', ['user_id' => $user->id]);
+
         $this->assertSuccess();
         $url = $this->_responseJsonBody->url;
         $this->assertStringContainsString('microsoft', $url);
         $this->assertStringContainsString('login_hint', $url);
+        // assert sso state cookie
+        $this->assertCookieSet(AbstractSsoService::SSO_STATE_COOKIE);
+        $cookie = $this->_response->getCookie(AbstractSsoService::SSO_STATE_COOKIE);
+        $this->assertEquals('/sso', $cookie['path']);
+    }
+
+    public function testSsoAzureStage1Controller_SuccessWithSubdir(): void
+    {
+        Configure::write('App.base', '/passbolt');
+        $user = UserFactory::make()->admin()->persist();
+        $this->createAzureSettingsFromConfig($user);
+
+        $this->postJson('/sso/azure/login.json', ['user_id' => $user->id]);
+
+        $this->assertSuccess();
+        $url = $this->_responseJsonBody->url;
+        $this->assertStringContainsString('microsoft', $url);
+        $this->assertStringContainsString('login_hint', $url);
+        // assert sso state cookie
+        $this->assertCookieSet(AbstractSsoService::SSO_STATE_COOKIE);
+        $cookie = $this->_response->getCookie(AbstractSsoService::SSO_STATE_COOKIE);
+        $this->assertEquals('/passbolt/sso', $cookie['path']);
     }
 
     /**
