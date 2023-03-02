@@ -37,6 +37,7 @@ class EeSolutionBootstrapper extends BaseSolutionBootstrapper
         }
 
         $app->addPlugin('Passbolt/Ee', ['bootstrap' => true, 'routes' => true]);
+        $this->addFeaturePluginIfEnabled($app, 'JwtAuthentication');
 
         // Add tags plugin if not configured.
         if (!WebInstallerMiddleware::isConfigured()) {
@@ -57,7 +58,6 @@ class EeSolutionBootstrapper extends BaseSolutionBootstrapper
         $app->addPlugin('Passbolt/EmailDigest', ['bootstrap' => true, 'routes' => true]);
         $app->addPlugin('Passbolt/Reports', ['bootstrap' => true, 'routes' => true]);
         $this->addFeaturePluginIfEnabled($app, 'Mobile');
-        $this->addFeaturePluginIfEnabled($app, 'JwtAuthentication');
         $this->addFeaturePluginIfEnabled($app, 'SelfRegistration');
         $app->addPlugin('Passbolt/PasswordGenerator', ['routes' => true]);
         $this->addFeaturePluginIfEnabled($app, 'SmtpSettings');
