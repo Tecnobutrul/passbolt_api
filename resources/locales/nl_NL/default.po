@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 41c2572bd9bd4cc908d3e09e0cbed6e5\n"
-"POT-Creation-Date: 2023-01-17 14:36+0000\n"
-"PO-Revision-Date: 2023-01-17 15:21\n"
+"POT-Creation-Date: 2023-02-27 10:30+0000\n"
+"PO-Revision-Date: 2023-02-27 12:45\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Dutch\n"
 "MIME-Version: 1.0\n"
@@ -175,6 +175,9 @@ msgstr "ongedefinieerde user agent"
 msgid "Access restricted to administrators."
 msgstr "Toegang beperkt tot beheerders."
 
+msgid "Access restricted to unauthenticated users."
+msgstr ""
+
 msgid "The user should not be logged in."
 msgstr ""
 
@@ -346,11 +349,11 @@ msgstr "Alleen gasten mogen een account herstellen. Log eerst uit."
 msgid "Recovery process started, check your email."
 msgstr "Het herstelproces is gestart, controleer uw e-mail."
 
-msgid "Registration is not opened to public. Please contact your administrator."
-msgstr "Registratie is niet openbaar. Neem contact op met je beheerder."
-
 msgid "Only guests are allowed to register."
 msgstr "Alleen gasten mogen zich registreren."
+
+msgid "Registration is not opened to public. Please contact your administrator."
+msgstr "Registratie is niet openbaar. Neem contact op met je beheerder."
 
 msgid "The user identifier should be a valid UUID or \"me\"."
 msgstr "De gebruikers-ID moet een geldige UUID zijn."
@@ -958,6 +961,12 @@ msgstr "De aanmaakdatum moet in het verleden liggen."
 msgid "The key should not already be expired."
 msgstr "De sleutel mag niet al verlopen zijn."
 
+msgid "The email should be a valid email address."
+msgstr "De e-mail moet een geldig e-mailadres zijn."
+
+msgid "The regular expression should be a valid string."
+msgstr ""
+
 msgid "The fingerprint does not match the one of the armored key."
 msgstr "De vingerafdruk komt niet overeen met die van de gepantserde sleutel."
 
@@ -972,6 +981,12 @@ msgstr "De verwijderingsstatus moet een geldige Boolean zijn."
 
 msgid "The key identifier should be a string of 8 hexadecimal characters."
 msgstr "De sleutel-ID moet een tekenreeks van 8 hexadecimale tekens zijn."
+
+msgid "The provided IP is invalid."
+msgstr ""
+
+msgid "The provided user agent is invalid."
+msgstr ""
 
 msgid "{0} just activated their account on passbolt"
 msgstr "{0} heeft zojuist diens account geactiveerd bij Passbolt"
@@ -1696,6 +1711,9 @@ msgstr "Een status is vereist."
 msgid "Could not validate action log data."
 msgstr "De gegevens van het actielogboek konden niet gevalideerd worden."
 
+msgid "The date {0} should be after the date {1}."
+msgstr ""
+
 msgid "The identifier should be not be empty."
 msgstr "De ID moet ingevuld worden."
 
@@ -1879,11 +1897,29 @@ msgstr "Het authenticatietoken is niet actief."
 msgid "The authentication token is expired."
 msgstr "Het authenticatietoken is verlopen."
 
-msgid "This functionality is not available using AJAX/JSON."
-msgstr "Deze toepassingsmogelijkheid is niet beschikbaar met AJAX/JSON."
+msgid "Unable to authenticate to Duo."
+msgstr ""
+
+msgid "Unable to validate the Duo callback data."
+msgstr ""
+
+msgid "A Duo state cookie is required."
+msgstr ""
+
+msgid "The Duo state cookie value should be a string."
+msgstr ""
+
+msgid "The Duo state cookie should be a valid UUID."
+msgstr ""
+
+msgid "This entrypoint is not available anymore."
+msgstr ""
 
 msgid "This authentication provider is not enabled for your organization."
 msgstr "Deze authenticatie-aanbieder is niet ingeschakeld voor jouw organisatie."
+
+msgid "This functionality is not available using AJAX/JSON."
+msgstr "Deze toepassingsmogelijkheid is niet beschikbaar met AJAX/JSON."
 
 msgid "This authentication provider is already setup. Disable it first"
 msgstr "Deze authenticatie-aanbieder is al ingesteld. Schakel deze eerst uit"
@@ -1924,14 +1960,29 @@ msgstr "De instellingen van de gebruiker voor Multi-factor Authenticatie zijn ve
 msgid "Please setup the Yubikey settings."
 msgstr "Stel de Yubikey-instellingen in."
 
-msgid "A signature is required."
-msgstr "Een handtekening is vereist."
+msgid "A state is required."
+msgstr ""
 
-msgid "The signature should not be empty."
-msgstr "De handtekening moet ingevuld worden."
+msgid "The state should be a valid BMP-UTF8 string."
+msgstr ""
 
-msgid "This is not a valid signature response."
-msgstr "Dit is geen geldig antwoord voor handtekeningen."
+msgid "The state should not be empty."
+msgstr ""
+
+msgid "A duo code is required."
+msgstr ""
+
+msgid "The duo code state should be a valid BMP-UTF8 string."
+msgstr ""
+
+msgid "The duo code should not be empty."
+msgstr ""
+
+msgid "The error description should be a valid BMP-UTF8 string."
+msgstr ""
+
+msgid "The error description state should be a valid BMP-UTF8 string."
+msgstr ""
 
 msgid "Something went wrong when validating the one-time password."
 msgstr "Er ging iets mis bij het valideren van het eenmalige wachtwoord."
@@ -1957,6 +2008,12 @@ msgstr "De OTP moet tenminste {0} tekens lang zijn."
 msgid "This yubikey is not associated with this user."
 msgstr "Deze Yubikey is niet gekoppeld aan deze gebruiker."
 
+msgid "No Duo error provided"
+msgstr ""
+
+msgid "No Duo error description provided"
+msgstr ""
+
 msgid "Your multi-factor authentication settings were reset by you."
 msgstr "Je hebt jouw Multi-factor Authenticatie-instellingen opnieuw ingesteld."
 
@@ -1965,6 +2022,63 @@ msgstr "De Multi-factor Authenticatie-instellingen zijn opnieuw ingesteld."
 
 msgid "Your multi-factor authentication settings were reset by an administrator."
 msgstr "Een beheerder heeft jouw Multi-factor Authenticatie-instellingen opnieuw ingesteld."
+
+msgid "The token should reference an active Duo callback authentication token."
+msgstr ""
+
+msgid "An authentication token state is required."
+msgstr ""
+
+msgid "The Duo state should match the authentication token state."
+msgstr ""
+
+msgid "Could not enable Duo MFA provider."
+msgstr ""
+
+msgid "Unable to verify Duo authentication."
+msgstr ""
+
+msgid "Could not validate the Duo settings."
+msgstr ""
+
+msgid "Could not login using Duo MFA provider."
+msgstr ""
+
+msgid "Unable to connect to Duo services."
+msgstr ""
+
+msgid "Unable to verify Duo code against Duo service."
+msgstr ""
+
+msgid "The duo authentication origin endpoint does not match the organization setting duo hostname."
+msgstr ""
+
+msgid "The duo authentication subscriber does not match the operator username."
+msgstr ""
+
+msgid "No configuration set for Duo client ID."
+msgstr ""
+
+msgid "No configuration set for Duo API hostname."
+msgstr ""
+
+msgid "No configuration set for Duo client secret."
+msgstr ""
+
+msgid "This is not a valid Duo client secret."
+msgstr ""
+
+msgid "This is not a valid Duo API hostname."
+msgstr ""
+
+msgid "This is not a valid Duo client ID."
+msgstr ""
+
+msgid "Cannot verify Duo settings."
+msgstr ""
+
+msgid "Could not validate Duo configuration"
+msgstr "De Duo-configuratie kon niet worden gevalideerd"
 
 msgid "The MFA token provided does not exist or is inactive."
 msgstr "Het opgegeven MFA-token bestaat niet of is inactief."
@@ -1993,33 +2107,6 @@ msgstr "Onbekende MFA-aanbieder: {0}."
 msgid "Could not validate multi-factor authentication provider configuration."
 msgstr "De configuratie van de Multi-factor Authenticatie-aanbieder kon niet worden gevalideerd."
 
-msgid "No configuration set for Duo integration key."
-msgstr "De Duo-integratiesleutel is niet geconfigureerd."
-
-msgid "No configuration set for Duo host name."
-msgstr "De Duo-hostnaam is niet geconfigureerd."
-
-msgid "No configuration set for Duo secret key."
-msgstr "De geheime Duo-sleutel is niet geconfigureerd."
-
-msgid "No configuration set for Duo salt."
-msgstr "De Duo-salt is niet geconfigureerd."
-
-msgid "Duo salt should be between 40 and 128 characters in length."
-msgstr "De Duo-salt moet tussen de 40 en 128 tekens lang zijn."
-
-msgid "This is not a valid Duo secret key."
-msgstr "Dit is geen geldige geheime Duo-sleutel."
-
-msgid "This is not a valid Duo host name."
-msgstr "Dit is geen geldige Duo-hostnaam."
-
-msgid "This is not a valid Duo integration key."
-msgstr "Dit is geen geldige Duo-integratiesleutel."
-
-msgid "Could not validate Duo configuration"
-msgstr "De Duo-configuratie kon niet worden gevalideerd"
-
 msgid "No configuration set for Yubikey OTP secret key."
 msgstr "De geheime Yubikey OTP-sleutel is niet geconfigureerd."
 
@@ -2035,8 +2122,56 @@ msgstr "De geheime Yubikey OTP-sleutel is niet geldig."
 msgid "Could not validate Yubikey configuration."
 msgstr "Kon de Yubikey-configuratie niet valideren."
 
-msgid "Duo multi-factor authentication"
-msgstr "Duo Multi-factor Authenticatie"
+msgid "Duo Multi Factor Authentication"
+msgstr ""
+
+msgid "Something went wrong."
+msgstr "Er ging iets mis."
+
+msgid "Please try again later or contact your administrator."
+msgstr "Probeer het later opnieuw of neem contact op met jouw beheerder."
+
+msgid "Logs"
+msgstr ""
+
+msgid "Retry"
+msgstr ""
+
+msgid "Getting started with Duo"
+msgstr ""
+
+msgid "How does it work?"
+msgstr "Hoe werkt het?"
+
+msgid "You sign in to passbolt just like you normally do."
+msgstr "Je meldt je aan bij Passbolt, net zoals je dat normaal doet."
+
+msgid "Use you 2FA device to authenticate."
+msgstr ""
+
+msgid "Follow the procedure to login."
+msgstr ""
+
+msgid "Cancel"
+msgstr "Annuleren"
+
+msgid "Get started"
+msgstr "Aan de slag"
+
+msgid "Requirements"
+msgstr "Vereisten"
+
+msgid "To proceed, you need to install the Duo mobile application or to have a device to authenticate which is supported by Duo."
+msgstr ""
+
+msgid "For the list of supported devices, see:"
+msgstr ""
+
+msgid "Duo authentication methods"
+msgstr ""
+
+msgid "Learn more"
+msgstr "Meer informatie"
 
 msgid "Duo multi-factor authentication is enabled!"
 msgstr "De Duo Multi-factor Authenticatie is ingeschakeld!"
@@ -2046,6 +2181,15 @@ msgstr "Wanneer je inlogt, zal je worden gevraagd de Duo-authenticatie uit te vo
 
 msgid "Since"
 msgstr "Sinds"
+
+msgid "Multi factor authentication verification"
+msgstr "Verificatie van de Multi-factor Authenticatie"
+
+msgid "Multi Factor Authentication Required"
+msgstr ""
+
+msgid "An additional authentication is required using Duo. You will be redirected to Duo for verification."
+msgstr ""
 
 msgid "Multi factor authentication"
 msgstr "Multi-factor Authenticatie"
@@ -2083,9 +2227,6 @@ msgstr "Scan deze streepjescode"
 msgid "Enter the six digit number as presented on your phone or tablet."
 msgstr "Voer het zescijferige nummer in zoals weergegeven op je telefoon of tablet."
 
-msgid "Requirements"
-msgstr "Vereisten"
-
 msgid "To proceed you need to install an application that supports Time Based One Time Passwords (TOTP) on your phone or tablet such as:"
 msgstr "Om verder te gaan moet je een applicatie installeren die Tijdelijke Eenmalige Wachtwoorden (TOTP) op je telefoon of tablet ondersteunt, zoals:"
 
@@ -2095,35 +2236,17 @@ msgstr "of"
 msgid "Getting started with Time based One Time Password (TOTP)"
 msgstr "Aan de slag met een Tijdelijk Eenmalig Wachtwoord (TOTP)"
 
-msgid "How does it work?"
-msgstr "Hoe werkt het?"
-
-msgid "diagram showing how it works"
-msgstr "diagram dat laat zien hoe het werkt"
-
-msgid "You sign in to passbolt just like you normally do."
-msgstr "Je meldt je aan bij Passbolt, net zoals je dat normaal doet."
-
 msgid "When using a new browser, you need an additional code from your phone."
 msgstr "Als je een nieuwe browser gebruikt, heb je een extra code vanaf je telefoon nodig."
 
 msgid "Once you enter this code, you can log in."
 msgstr "Zodra je deze code invoert, kan je je aanmelden."
 
-msgid "cancel"
-msgstr "annuleren"
-
-msgid "get started!"
-msgstr "aan de slag!"
-
 msgid "Time based One Time Password (TOTP) is enabled!"
 msgstr "Tijdelijk Eenmalig Wachtwoord (TOTP) is ingeschakeld!"
 
 msgid "When logging in from a new device you will need to enter a unique verification code generated by an app on your mobile."
 msgstr "Wanneer je inlogt vanaf een nieuw apparaat, moet je een unieke verificatiecode invoeren die gegenereerd wordt door een app op je mobiele telefoon."
-
-msgid "Multi factor authentication verification"
-msgstr "Verificatie van de Multi-factor Authenticatie"
 
 msgid "Remember this device for a month."
 msgstr "Onthoud dit apparaat een maand lang."
@@ -2142,6 +2265,9 @@ msgstr "Wanneer je inlogt vanaf een nieuw apparaat, heb je een unieke code nodig
 
 msgid "verify"
 msgstr "verifiëren"
+
+msgid "Sign-in with Duo"
+msgstr ""
 
 msgid "Or try with another provider"
 msgstr "Of probeer het met een andere aanbieder"
@@ -2224,6 +2350,78 @@ msgstr "Functie"
 msgid "No"
 msgstr "Nee"
 
+msgid "The self registration setting id should be a valid UUID."
+msgstr ""
+
+msgid "An email is required."
+msgstr "Een e-mailadres is vereist."
+
+msgid "The provider should not be empty."
+msgstr ""
+
+msgid "The provider should be part of the supported list: {0}."
+msgstr ""
+
+msgid "The data should not be empty."
+msgstr "De gegevens moeten ingevuld worden."
+
+msgid "The list of allowed domains should not be empty."
+msgstr ""
+
+msgid "The list of allowed domains should be an array of strings."
+msgstr ""
+
+msgid "The domain #{0} should be a valid domain."
+msgstr ""
+
+msgid "An email notification setting should be a boolean."
+msgstr "Een e-mailnotificatie-instelling moet een Boolean zijn."
+
+msgid "Allowed domains: {0}"
+msgstr ""
+
+msgid "{0} edited the self registration settings."
+msgstr ""
+
+msgid "You edited the self registration settings."
+msgstr ""
+
+msgid "{0} just created an account on passbolt!"
+msgstr ""
+
+msgid "The email is already registered."
+msgstr ""
+
+msgid "The self registration plugin is not enabled."
+msgstr ""
+
+msgid "The self registration data could not be validated."
+msgstr ""
+
+msgid "The self registration is disabled."
+msgstr ""
+
+msgid "The domain is not supported for self-registration."
+msgstr ""
+
+msgid "Email domain safe list"
+msgstr ""
+
+msgid "Could not parse the self registration settings found in database."
+msgstr ""
+
+msgid "Could not validate the self registration settings found in database."
+msgstr ""
+
+msgid "Could not validate the self registration settings."
+msgstr ""
+
+msgid "{0} updated the self registration settings"
+msgstr ""
+
+msgid "Status: {0}"
+msgstr ""
+
 msgid "A sender name is required."
 msgstr "De naam van een afzender is vereist."
 
@@ -2285,6 +2483,9 @@ msgid "A test recipient is required."
 msgstr "Een testontvanger is vereist."
 
 msgid "SMTP settings endpoints disabled."
+msgstr ""
+
+msgid "The client should be a valid IP or a valid domain."
 msgstr ""
 
 msgid "Could not validate the smtp settings."
@@ -2437,12 +2638,6 @@ msgstr "De volledige basis-URL moet ingevuld worden."
 msgid "The full base url should be a valid BMP-UTF8 string."
 msgstr "De volledige basis-URL moet een geldige BMP-UTF8-tekenreeks zijn."
 
-msgid "A public registration setting is required."
-msgstr "Een openbare registratie-instelling is vereist."
-
-msgid "The public registration setting should be a valid boolean."
-msgstr "De openbare registratie-instelling moet een geldige Boolean zijn."
-
 msgid "A force ssl status is required."
 msgstr "Een geforceerde SSL-status is vereist."
 
@@ -2548,9 +2743,6 @@ msgstr "naam van de database"
 msgid "Database name"
 msgstr "Naam van de database"
 
-msgid "Cancel"
-msgstr "Annuleren"
-
 msgid "Enter your SMTP server settings."
 msgstr "Voer uw SMTP-serverinstellingen in."
 
@@ -2583,6 +2775,12 @@ msgstr "poort"
 
 msgid "Port"
 msgstr "Poort"
+
+msgid "client"
+msgstr ""
+
+msgid "Client"
+msgstr ""
 
 msgid "Passbolt is not configured."
 msgstr "Passbolt is niet geconfigureerd."
@@ -2652,12 +2850,6 @@ msgstr "Volledige basis-URL"
 
 msgid "This is the url where passbolt will be accessible. This url will be used for places where the passbolt url cannot be guessed automatically, such as links in emails. No trailing slash."
 msgstr "Passbolt is toegangelijk met deze URL. Deze URL zal worden gebruikt als de Passbolt-URL niet automatisch kan worden geraden, zoals bij links in e-mails. Geen schuine streep aan het einde."
-
-msgid "Allow public registration?"
-msgstr "Openbare registratie toegestaan?"
-
-msgid "Allowing public registration means that any visitor can create himself an account on your passbolt. Unless your instance of passbolt is not reachable by the outside world, it is usually a bad idea."
-msgstr "Het toestaan van openbare registratie betekent dat elke bezoeker een account kan aanmaken op jouw Passbolt. Tenzij jouw Passbolt niet bereikbaar is voor de buitenwereld, is het meestal een slecht idee."
 
 msgid "Force SSL?"
 msgstr "SSL afdwingen?"
@@ -2884,9 +3076,6 @@ msgstr "De gegevens moeten een geldige tekenreeks zijn."
 msgid "The data is required."
 msgstr "De gegevens zijn vereist."
 
-msgid "The data should not be empty."
-msgstr "De gegevens moeten ingevuld worden."
-
 msgid "The data is too big."
 msgstr "De gegevens zijn te groot."
 
@@ -3042,9 +3231,6 @@ msgstr ""
 
 msgid "The account recovery user setting is not valid."
 msgstr ""
-
-msgid "An email notification setting should be a boolean."
-msgstr "Een e-mailnotificatie-instelling moet een Boolean zijn."
 
 msgid "You have disabled the account recovery."
 msgstr ""
@@ -3598,9 +3784,6 @@ msgstr "Een groepsnaam is vereist."
 msgid "A group member does not match the expected DN format."
 msgstr "Een groepslid komt niet overeen met het verwachte DN-formaat."
 
-msgid "The email should be a valid email address."
-msgstr "De e-mail moet een geldig e-mailadres zijn."
-
 msgid "Subscription key data is required."
 msgstr "Gegevens van de abonnementssleutel zijn vereist."
 
@@ -3645,9 +3828,6 @@ msgstr "Een vervaldatum is vereist."
 
 msgid "The subscription is expired."
 msgstr "Het abonnement is verlopen."
-
-msgid "An email is required."
-msgstr "Een e-mailadres is vereist."
 
 msgid "A customer identifier is required."
 msgstr "Een klant-ID is vereist."
@@ -3781,6 +3961,9 @@ msgstr "{0} heeft de map {1} bewerkt"
 msgid "Could not validate folder data."
 msgstr "De gegevens van de map konden niet worden gevalideerd."
 
+msgid "The folder parent id should be a valid UUID."
+msgstr ""
+
 msgid "The folder parent must exist."
 msgstr "Er moet een bovenliggende map zijn."
 
@@ -3838,6 +4021,42 @@ msgstr "heeft een map met je gedeeld"
 msgid "{0} updated the folder {1}"
 msgstr "{0} heeft de map {1} bijgewerkt"
 
+msgid "Only administrators are allowed to create/update MFA policies settings."
+msgstr ""
+
+msgid "Could not validate the MFA policies settings."
+msgstr ""
+
+msgid "The policy field is required."
+msgstr ""
+
+msgid "The type of the policy should be one of the following: {0}."
+msgstr ""
+
+msgid "The remember me for a month field is required."
+msgstr ""
+
+msgid "The remember me for a month should be a boolean type."
+msgstr ""
+
+msgid "The value should be an array."
+msgstr ""
+
+msgid "You edited the MFA policy"
+msgstr ""
+
+msgid "{0} edited the MFA policy"
+msgstr ""
+
+msgid "The MFA policy has been updated, the new configuration is as follow:"
+msgstr ""
+
+msgid "Policy: {0}"
+msgstr ""
+
+msgid "Remember me for a month: {0}"
+msgstr ""
+
 msgid "CSRF issue. The state in URL and Cookies do not match."
 msgstr ""
 
@@ -3860,6 +4079,12 @@ msgid "The settings id is required in URL parameters."
 msgstr ""
 
 msgid "The SSO setting does not exist."
+msgstr ""
+
+msgid "SsoRecover plugin is disabled."
+msgstr ""
+
+msgid "The SSO state type is invalid."
 msgstr ""
 
 msgid "Information about the key is required."
@@ -3887,9 +4112,6 @@ msgid "Ajax/Json request not supported."
 msgstr ""
 
 msgid "A provider is required."
-msgstr ""
-
-msgid "The provider should not be empty."
 msgstr ""
 
 msgid "The provider is not supported."
@@ -3955,6 +4177,84 @@ msgstr ""
 msgid "The status is not supported."
 msgstr ""
 
+msgid "The nonce should be a valid ASCII string."
+msgstr ""
+
+msgid "The nonce length should be minimum {0} characters."
+msgstr ""
+
+msgid "The nonce length should be maximum {0} characters."
+msgstr ""
+
+msgid "A nonce is required."
+msgstr ""
+
+msgid "The nonce should not be empty."
+msgstr ""
+
+msgid "The type length should be maximum {0} characters."
+msgstr ""
+
+msgid "The state should be a valid ASCII string."
+msgstr ""
+
+msgid "The state length should be minimum {0} characters."
+msgstr ""
+
+msgid "The state length should be maximum {0} characters."
+msgstr ""
+
+msgid "The SSO settings identifier should be a valid UUID."
+msgstr ""
+
+msgid "The SSO settings identifier should not be empty."
+msgstr ""
+
+msgid "The user agent should be a valid ASCII string."
+msgstr ""
+
+msgid "The user agent length should be maximum {0} characters."
+msgstr ""
+
+msgid "A user agent is required."
+msgstr ""
+
+msgid "The user agent should not be empty."
+msgstr ""
+
+msgid "The IP length should be maximum {0} characters."
+msgstr ""
+
+msgid "An IP is required."
+msgstr ""
+
+msgid "The IP should not be empty."
+msgstr ""
+
+msgid "This nonce is already in use."
+msgstr ""
+
+msgid "This state is already in use."
+msgstr ""
+
+msgid "The SSO setting identifier does not exist."
+msgstr ""
+
+msgid "The user identifier does not exist."
+msgstr ""
+
+msgid "The provided nonce is invalid."
+msgstr ""
+
+msgid "The provided state is invalid."
+msgstr ""
+
+msgid "The type of the SSO state is invalid."
+msgstr ""
+
+msgid "The user is missing for the SSO state."
+msgstr ""
+
 msgid "Single sign-on failed."
 msgstr ""
 
@@ -3965,6 +4265,9 @@ msgid "Email not provided by provider."
 msgstr ""
 
 msgid "Username mismatch."
+msgstr ""
+
+msgid "Invalid nonce."
 msgstr ""
 
 msgid "No valid SSO settings found."
@@ -4045,6 +4348,24 @@ msgstr ""
 msgid "It is not possible to save the SSO settings."
 msgstr ""
 
+msgid "The SSO state is invalid."
+msgstr ""
+
+msgid "The SSO state is expired."
+msgstr ""
+
+msgid "The SSO state could not be saved."
+msgstr ""
+
+msgid "The SSO state does not exist."
+msgstr ""
+
+msgid "Could not save the SSO state, invalid nonce."
+msgstr ""
+
+msgid "Could not save the SSO state, please try again later."
+msgstr ""
+
 msgid "Cannot parse JWKS endpoint response."
 msgstr ""
 
@@ -4067,6 +4388,24 @@ msgid "Unable to decode Azure JWT token."
 msgstr ""
 
 msgid "Single-sign on was a success"
+msgstr ""
+
+msgid "The authentication token does not exist or has been deleted."
+msgstr ""
+
+msgid "The authentication token has been expired."
+msgstr ""
+
+msgid "Could not validate the SSO recover request."
+msgstr ""
+
+msgid "The case field is required."
+msgstr ""
+
+msgid "The case is not supported. Only \"default\" case is supported."
+msgstr ""
+
+msgid "The token field is required."
 msgstr ""
 
 msgid "You do not have the permission to edit shared tags on this resource."
@@ -4162,9 +4501,6 @@ msgstr "startpagina"
 msgid "login"
 msgstr "inloggen"
 
-msgid "register"
-msgstr "registreren"
-
 msgid "{0} ({1}) just completed an account recovery. Feel free to get in touch with this user if you feel this action looks suspicious."
 msgstr ""
 
@@ -4181,6 +4517,12 @@ msgid "Unfortunately, they will need your help to delete their account and resta
 msgstr ""
 
 msgid "Please check with them first to confirm."
+msgstr ""
+
+msgid "Welcome to {0}!"
+msgstr ""
+
+msgid "{0} used the self registration feature to create an account on passbolt."
 msgstr ""
 
 msgid "Welcome back!"
