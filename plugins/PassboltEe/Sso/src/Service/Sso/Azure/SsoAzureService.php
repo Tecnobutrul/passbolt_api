@@ -39,14 +39,18 @@ class SsoAzureService extends AbstractSsoService
      *
      * @param \App\Utility\ExtendedUserAccessControl $uac user access control
      * @return string
+     * @throws \Exception Unable to generate nonce.
      */
     public function getAuthorizationUrl(ExtendedUserAccessControl $uac): string
     {
         $options = [
-            'login_hint' => $uac->getUsername(),
             'response_type' => 'code',
+            'nonce' => $this->generateNonce(),
         ];
 
+        if ($uac->getUsername() !== null) { // For some types(i.e. sso_recover) we don't have user details
+            $options['login_hint'] = $uac->getUsername();
+        }
         if (Configure::read('passbolt.plugins.sso.security.prompt')) {
             $options['prompt'] = 'login';
         }

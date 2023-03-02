@@ -17,9 +17,9 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Utility\Azure\ResourceOwner;
 
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
-use Passbolt\Sso\Utility\OpenId\ResourceOwnerWithEmailInterface;
+use Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface;
 
-class AzureResourceOwner implements ResourceOwnerInterface, ResourceOwnerWithEmailInterface
+class AzureResourceOwner implements ResourceOwnerInterface, SsoResourceOwnerInterface
 {
     /**
      * Response payload
@@ -66,5 +66,13 @@ class AzureResourceOwner implements ResourceOwnerInterface, ResourceOwnerWithEma
     public function toArray()
     {
         return $this->data;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getNonce(): ?string
+    {
+        return $this->data['nonce'] ?? null;
     }
 }
