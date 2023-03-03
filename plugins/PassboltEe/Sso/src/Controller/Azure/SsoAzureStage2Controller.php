@@ -92,7 +92,7 @@ class SsoAzureStage2Controller extends AbstractSsoController
         $ssoAuthToken = $service->createAuthTokenToActiveSettings($uac, $service->getSettings()->id);
 
         $this->response = $this->getResponse()->withCookie($service->clearStateCookie());
-        $this->redirect(Router::url('/sso/login/dry-run/success?token=') . $ssoAuthToken->token);
+        $this->redirect(Router::url("/sso/login/dry-run/success?token={$ssoAuthToken->token}", true));
     }
 
     /**
@@ -123,7 +123,7 @@ class SsoAzureStage2Controller extends AbstractSsoController
                 );
                 // Create SSO auth token for next step, e.g. get keys
                 $ssoAuthToken = $service->createAuthTokenToGetKey($uac, $service->getSettings()->id);
-                $successUrl = Router::url('/sso/login/success?token=') . $ssoAuthToken->token;
+                $successUrl = Router::url("/sso/login/success?token={$ssoAuthToken->token}", true);
                 break;
             case SsoState::TYPE_SSO_RECOVER:
                 if (! $this->isFeaturePluginEnabled('SsoRecover')) {
