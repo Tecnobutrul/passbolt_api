@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.11.1] - 2023-03-03
+### Fixed
+- PB-23283 As an administrator I can disable username validation in Duo Callback endpoints
+- PB-23310 As a user I can login and recover my account with SSO Azure when passbolt is in a sub-directory setup
+
 ## [3.11.0] - 2023-03-01
 ### Added
 - PB-22435 As a user using SSO Azure I can recover my account using SSO Azure
