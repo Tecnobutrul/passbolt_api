@@ -90,6 +90,6 @@ class SsoRecoverAssertAssertService
      */
     public function getSuccessUrl(string $token): string
     {
-        return Router::url('/sso/recover/azure/success?token=') . $token;
+        return Router::url("/sso/recover/azure/success?token={$token}", true);
     }
 }
