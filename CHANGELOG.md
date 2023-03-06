@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.11.1] - 2023-03-03
+### Fixed
+- PB-23283 As an administrator I can disable username validation in Duo Callback endpoints
+- PB-23310 As a user I can login and recover my account with SSO Azure when passbolt is in a sub-directory setup
+
 ## [3.11.0] - 2023-03-01
 ### Added
 - PB-22435 As a user using SSO Azure I can recover my account using SSO Azure
@@ -125,7 +130,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-19204: Sanitize MFA redirection by forbidding redirection to external URI
 - PB-19090: Protect forms from spell-jacking attack
 
-##  # Maintenance
+### Maintenance
 - PB-19235: Migrate comments controllers logic into services
 - PB-19603: Cover additional “add user to group” case: As group manager I can add a user to a group which have no resources shared with
 - PB-6081: Move enterprise plugins into plugins/PassboltEe
@@ -403,7 +408,7 @@ PB-16161 Refactor to split folder, resource and user related logic in respective
 - Drop support for PHP < v7.3, application require PHP v7.3 by default
 - Drop support for Composer < v2, application requires Composer v2 by default
 
-## Added
+### Added
 - Add dark theme to the community edition
 - Add new system check utilities in ./bin, for example ./bin/status-report
 - Add web installer automatically populates mysql credentials (VM / Debian Package)
@@ -594,7 +599,7 @@ PB-16161 Refactor to split folder, resource and user related logic in respective
 - PB-169: Implement email prefix/suffix on the User Directory Settings administration screen
 - PB-188: Implement ignored entries in "test connection" popup
 
-# Fixed
+### Fixed
 - PB-231: LDAP - ignored entries should not be validated during test connection
 - PB-226: LDAP - Fix "Openldap doesn't work with UI configuration"
 - PB-37: LDAP - implement user feedback: usersParentGroup and groupsParentGroup filters should be case insensitive
@@ -1133,7 +1138,7 @@ PB-16161 Refactor to split folder, resource and user related logic in respective
 - PASSBOLT-1784: GITHUB-29 PHP7 compatibility issue in migration console tasks
 - PASSBOLT-1790: Fixed update context sent by anonymous usage statistics
 
-## [1.3.0] - 2016-25-11
+## [1.3.0] - 2016-11-25
 ### Fixed
 - PASSBOLT-1721: SSL detection not working in healthcheck
 - PASSBOLT-1708: Accept JSON data content type for HTTP PUT during setup

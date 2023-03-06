@@ -26,6 +26,7 @@ use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Log\Log;
+use Cake\Routing\Router;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
@@ -135,7 +136,8 @@ abstract class AbstractSsoService
     public function clearStateCookie(): Cookie
     {
         return (new Cookie(self::SSO_STATE_COOKIE))
-            ->withPath('/sso')
+            /** With `Router::url` it will return "/<subdir>/sso", if `base` is set. Otherwise just "/sso". */
+            ->withPath(Router::url('/sso'))
             ->withValue('deleted')
             ->withSecure(true)
             ->withHttpOnly(true)
@@ -149,7 +151,8 @@ abstract class AbstractSsoService
     protected function createHttpOnlySecureCookie(SsoState $ssoState): Cookie
     {
         return (new Cookie(self::SSO_STATE_COOKIE))
-            ->withPath('/sso')
+            /** With `Router::url` it will return "/<subdir>/sso", if `base` is set. Otherwise just "/sso". */
+            ->withPath(Router::url('/sso'))
             ->withValue($ssoState->state)
             ->withSecure(true)
             ->withHttpOnly(true)
