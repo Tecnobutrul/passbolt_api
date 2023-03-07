@@ -17,38 +17,48 @@ declare(strict_types=1);
 
 namespace Passbolt\SsoRecover\Service;
 
+use App\Error\Exception\CustomValidationException;
+use App\Utility\Application\FeaturePluginAwareTrait;
 use App\Utility\ExtendedUserAccessControl;
 use Cake\Http\Exception\BadRequestException;
+use Cake\Http\Exception\ForbiddenException;
 use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Routing\Router;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\SelfRegistration\Service\DryRun\SelfRegistrationEmailDomainsDryRunService;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\AbstractSsoService;
 use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenSetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesAssertService;
+use Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface;
 
 class SsoRecoverAssertService
 {
     use LocatorAwareTrait;
+    use FeaturePluginAwareTrait;
 
     /**
-     * Fetches resource owner details from state & code and builds UAC object.
+     * Fetches resource owner details from state & code and returns URL to redirect.
      *
      * @param \Passbolt\Sso\Service\Sso\AbstractSsoService $ssoService SSO service.
      * @param \Passbolt\Sso\Model\Entity\SsoState $ssoState SSO state entity.
      * @param string $code Code.
      * @param string $ip IP.
      * @param string $userAgent User agent.
-     * @return \Passbolt\Sso\Model\Entity\SsoAuthenticationToken
+     * @return string URL to redirect.
+     * @throws \Exception When there's an error while retrieving resource owner.
+     * @throws \Cake\Http\Exception\BadRequestException When any assertions are failed.
+     * @throws \Cake\Http\Exception\BadRequestException When self-registration plugin is disabled.
+     * @throws \Cake\Http\Exception\BadRequestException When email domain is not allowed.
+     * @throws \Cake\Http\Exception\BadRequestException When email domains doesn't exist.
      */
-    public function assertStateCodeAndGetAuthToken(
+    public function assertAndGetRedirectUrl(
         AbstractSsoService $ssoService,
         SsoState $ssoState,
         string $code,
         string $ip,
         string $userAgent
-    ): SsoAuthenticationToken {
+    ): string {
         try {
             $resourceOwner = $ssoService->getResourceOwner($code);
 
@@ -68,28 +78,53 @@ class SsoRecoverAssertService
         $user = $usersTable->findByUsername($resourceOwner->getEmail())->first();
 
         if ($user === null) {
-            throw new BadRequestException(__('The user does not exist or has been deleted.'));
+            /**
+             * User not found, navigate to self-registration flow.
+             */
+            $this->isAllowedForSelfRegister($resourceOwner);
+
+            return Router::url("/sso/recover/error?email={$resourceOwner->getEmail()}", true);
         }
 
+        /**
+         * User found, continue with recover flow.
+         */
         $uac = new ExtendedUserAccessControl($user->role->name, $user->id, $user->username, $ip, $userAgent);
 
         (new SsoStatesAssertService())->assertAndConsumeWithoutUser($ssoState, $ssoService->getSettings()->id, $uac);
 
-        return (new SsoAuthenticationTokenSetService())->createOrFail(
+        $ssoAuthToken = (new SsoAuthenticationTokenSetService())->createOrFail(
             $uac,
             SsoState::TYPE_SSO_RECOVER,
             $ssoService->getSettings()->id
         );
+
+        return Router::url("/sso/recover/azure/success?token={$ssoAuthToken->token}", true);
     }
 
     /**
-     * Returns success URL to redirect.
-     *
-     * @param string $token Token to set in query parameter
-     * @return string
+     * @param \Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface $resourceOwner Resource owner.
+     * @return void
+     * @throws \Cake\Http\Exception\BadRequestException When self-registration plugin is disabled.
+     * @throws \Cake\Http\Exception\BadRequestException When email domain is not allowed.
+     * @throws \Cake\Http\Exception\BadRequestException When email domains doesn't exist.
      */
-    public function getSuccessUrl(string $token): string
+    private function isAllowedForSelfRegister(SsoResourceOwnerInterface $resourceOwner): void
     {
-        return Router::url("/sso/recover/azure/success?token={$token}", true);
+        if (! $this->isFeaturePluginEnabled('SelfRegistration')) {
+            throw new BadRequestException(__('The user does not exist or has been deleted.'));
+        }
+
+        $selfRegistrationService = new SelfRegistrationEmailDomainsDryRunService();
+        $data = ['email' => $resourceOwner->getEmail()];
+
+        try {
+            $selfRegistrationService->canGuestSelfRegister($data);
+        } catch (CustomValidationException | ForbiddenException $e) {
+            $msg = __('Access to this service requires an invitation. ');
+            $msg .= __('Please contact your administrator to request an invitation link.');
+
+            throw new BadRequestException($msg, null, $e);
+        }
     }
 }

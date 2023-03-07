@@ -132,15 +132,13 @@ class SsoAzureStage2Controller extends AbstractSsoController
 
                 $ssoRecoverAssertService = new SsoRecoverAssertService();
 
-                $ssoAuthToken = $ssoRecoverAssertService->assertStateCodeAndGetAuthToken(
+                $successUrl = $ssoRecoverAssertService->assertAndGetRedirectUrl(
                     $service,
                     $ssoState,
                     $code,
                     $this->User->ip(),
                     $this->User->userAgent()
                 );
-
-                $successUrl = $ssoRecoverAssertService->getSuccessUrl($ssoAuthToken->token);
                 break;
             default:
                 throw new BadRequestException(__('The SSO state type is invalid.'));
