@@ -26,7 +26,7 @@ use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Azure\SsoAzureService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
-use Passbolt\SsoRecover\Service\SsoRecoverAssertAssertService;
+use Passbolt\SsoRecover\Service\SsoRecoverAssertService;
 
 class SsoAzureStage2Controller extends AbstractSsoController
 {
@@ -130,7 +130,7 @@ class SsoAzureStage2Controller extends AbstractSsoController
                     throw new BadRequestException(__('SsoRecover plugin is disabled.'));
                 }
 
-                $ssoRecoverAssertService = new SsoRecoverAssertAssertService();
+                $ssoRecoverAssertService = new SsoRecoverAssertService();
 
                 $ssoAuthToken = $ssoRecoverAssertService->assertStateCodeAndGetAuthToken(
                     $service,

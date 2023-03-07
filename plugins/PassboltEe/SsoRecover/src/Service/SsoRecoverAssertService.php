@@ -28,7 +28,7 @@ use Passbolt\Sso\Service\Sso\AbstractSsoService;
 use Passbolt\Sso\Service\SsoAuthenticationTokens\SsoAuthenticationTokenSetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesAssertService;
 
-class SsoRecoverAssertAssertService
+class SsoRecoverAssertService
 {
     use LocatorAwareTrait;
 

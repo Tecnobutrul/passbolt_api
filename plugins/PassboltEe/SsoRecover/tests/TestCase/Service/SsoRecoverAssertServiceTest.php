@@ -26,15 +26,15 @@ use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\TestCase\Service\Sso\TestableSsoService;
 use Passbolt\Sso\Utility\Azure\ResourceOwner\AzureResourceOwner;
-use Passbolt\SsoRecover\Service\SsoRecoverAssertAssertService;
+use Passbolt\SsoRecover\Service\SsoRecoverAssertService;
 
 /**
- * @covers \Passbolt\SsoRecover\Service\SsoRecoverAssertAssertService
+ * @covers \Passbolt\SsoRecover\Service\SsoRecoverAssertService
  */
 class SsoRecoverAssertServiceTest extends AppTestCase
 {
     /**
-     * @var \Passbolt\SsoRecover\Service\SsoRecoverAssertAssertService
+     * @var \Passbolt\SsoRecover\Service\SsoRecoverAssertService
      */
     private $service;
 
@@ -45,7 +45,7 @@ class SsoRecoverAssertServiceTest extends AppTestCase
     {
         parent::setUp();
 
-        $this->service = new SsoRecoverAssertAssertService();
+        $this->service = new SsoRecoverAssertService();
     }
 
     /**
