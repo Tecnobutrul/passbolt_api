@@ -44,6 +44,7 @@ class DirectoryOrgSettingsTest extends AppTestCase
                 'users' => [
                     'create' => true,
                     'delete' => false,
+                    'update' => true,
                 ],
                 'groups' => [
                     'create' => true,

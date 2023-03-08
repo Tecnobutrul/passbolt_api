@@ -64,6 +64,8 @@ class LdapConfigurationForm extends Form
         'user_object_class' => 'userObjectClass',
         'group_path' => 'groupPath',
         'user_path' => 'userPath',
+        'group_custom_filters' => 'groupCustomFilters',
+        'user_custom_filters' => 'userCustomFilters',
         'use_email_prefix_suffix' => 'useEmailPrefixSuffix',
         'email_prefix' => 'emailPrefix',
         'email_suffix' => 'emailSuffix',
@@ -102,6 +104,8 @@ class LdapConfigurationForm extends Form
             ->addField('user_object_class', 'string')
             ->addField('group_path', 'string')
             ->addField('user_path', 'string')
+            ->addField('user_custom_filters', 'string')
+            ->addField('group_custom_filters', 'string')
             ->addField('use_email_prefix_suffix', 'boolean')
             ->addField('email_prefix', 'string')
             ->addField('email_suffix', 'string')
@@ -221,6 +225,14 @@ class LdapConfigurationForm extends Form
         $validator
             ->allowEmptyString('user_path')
             ->utf8('user_path', __('The user path should be a valid BMP-UTF8 string.'));
+
+        $validator
+            ->allowEmptyString('group_custom_filter')
+            ->utf8('group_custom_filter', __('The group custom filter should be a valid BMP-UTF8 string.'));
+
+        $validator
+            ->allowEmptyString('user_custom_filter')
+            ->utf8('user_custom_filter', __('The user custom filter should be a valid BMP-UTF8 string.'));
 
         $validator
             ->allowEmptyTime('use_email_prefix_suffix')
