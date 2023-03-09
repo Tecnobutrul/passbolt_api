@@ -24,7 +24,7 @@ use Cake\Http\Exception\BadRequestException;
 use Cake\Validation\Validation;
 
 /**
- * @property \App\Model\Table\ResourcesTable $Resources
+ * ResourcesUpdateController Class
  */
 class ResourcesUpdateController extends AppController
 {
