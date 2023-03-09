@@ -24,7 +24,7 @@ use Passbolt\DirectorySync\Utility\Alias;
  *
  * @package App\Utility
  */
-class ActionReport implements \Serializable
+class ActionReport
 {
     /**
      * @var string
@@ -89,11 +89,13 @@ class ActionReport implements \Serializable
     }
 
     /**
-     * @return string
+     * Serialize
+     *
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array // phpcs:ignore
     {
-        return serialize([
+        return [
             'message' => $this->message,
             'model' => $this->model,
             'data' => $this->data,
@@ -101,18 +103,17 @@ class ActionReport implements \Serializable
             'status' => $this->status,
             'created' => $this->created,
             'version' => '2',
-        ]);
+        ];
     }
 
     /**
      * Unserialize.
      *
-     * @param string $serialized serialized
+     * @param array $data data
      * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $data): void // phpcs:ignore
     {
-        $data = unserialize($serialized);
         foreach ($data as $key => $value) {
             if (in_array($key, ['message', 'model', 'data', 'action', 'status', 'created'])) {
                 $this->{$key} = $value;

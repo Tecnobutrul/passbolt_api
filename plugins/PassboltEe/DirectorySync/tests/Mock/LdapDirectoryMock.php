@@ -256,7 +256,7 @@ class LdapDirectoryMock
         $validGroupCustomFilter = !is_callable($groupCustomFilter);
         $validUserCustomFilter = !is_callable($userCustomFilter);
         $getExpectationCount = 0;
-        if ($validGroupCustomFilter) {
+        if ($validGroupCustomFilter && $this->settings->getGroupCustomFilters()) {
             try {
                 Parser::parse($groupCustomFilter);
             } catch (ParserException $pe) {
@@ -264,7 +264,7 @@ class LdapDirectoryMock
                 $getExpectationCount = 0;
             }
         }
-        if ($validUserCustomFilter) {
+        if ($validUserCustomFilter && $this->settings->getUserCustomFilters()) {
             try {
                 Parser::parse($userCustomFilter);
             } catch (ParserException $pe) {

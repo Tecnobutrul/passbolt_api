@@ -24,7 +24,7 @@ use Cake\ORM\Entity;
  *
  * @package App\Utility
  */
-class SyncError implements \Serializable
+class SyncError
 {
     /**
      * @var \Cake\ORM\Entity|null
@@ -74,25 +74,24 @@ class SyncError implements \Serializable
     /**
      * Serialize.
      *
-     * @return string
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array // phpcs:ignore
     {
-        return serialize([
+        return [
             'entity' => serialize($this->entity),
             'version' => '2',
-        ]);
+        ];
     }
 
     /**
      * Unserialize.
      *
-     * @param string $serialized serialized
+     * @param array $data data
      * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $data): void // phpcs:ignore
     {
-        $data = unserialize($serialized);
         foreach ($data as $key => $value) {
             if (in_array($key, ['$entity'])) {
                 $this->{$key} = $value;
