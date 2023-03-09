@@ -20,6 +20,7 @@ trait MigrationsAwareTrait
 {
     /**
      * Check if a migration was already run.
+     *
      * @param string $name Migration name
      * @return bool
      */
