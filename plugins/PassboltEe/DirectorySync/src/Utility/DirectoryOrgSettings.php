@@ -21,6 +21,7 @@ use App\Utility\UserAccessControl;
 use Cake\Core\Configure;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Datasource\ModelAwareTrait;
+use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 use Passbolt\DirectorySync\Plugin;
@@ -399,7 +400,19 @@ class DirectoryOrgSettings
         $keyid = $gpgConfig['serverKey']['fingerprint'];
         $passphrase = $gpgConfig['serverKey']['passphrase'];
         $gpg = OpenPGPBackendFactory::get();
-        $gpg->setDecryptKeyFromFingerprint($keyid, $passphrase);
+
+        try {
+            $gpg->setDecryptKeyFromFingerprint($keyid, $passphrase);
+        } catch (\Exception $exception) {
+            try {
+                $gpg->importServerKeyInKeyring();
+                $gpg->setDecryptKeyFromFingerprint($keyid, $passphrase);
+            } catch (\Exception $exception) {
+                $msg = __('The OpenPGP server key defined in the config cannot be used to decrypt.') . ' ';
+                $msg .= $exception->getMessage();
+                throw new InternalErrorException($msg, 500, $exception);
+            }
+        }
 
         return $gpg->decrypt($data);
     }
