@@ -62,6 +62,7 @@ class IdToken extends AccessToken
     public function __construct(array $options, AzureProvider $provider)
     {
         parent::__construct($options);
+
         $this->provider = $provider;
 
         if (empty($options['id_token']) || !is_string($options['id_token'])) {

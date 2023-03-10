@@ -80,6 +80,13 @@ class SsoSettingsFactory extends CakephpBaseFactory
             ->patchData(['data' => $file]);
     }
 
+    public function google(): SsoSettingsFactory
+    {
+        $file = file_get_contents(__DIR__ . DS . '..' . DS . 'Fixture' . DS . 'SsoSettings' . DS . 'google.msg');
+
+        return $this->patchData(['provider' => SsoSetting::PROVIDER_GOOGLE])->patchData(['data' => $file]);
+    }
+
     /**
      * @param string $data
      * @return SsoSettingsFactory this
