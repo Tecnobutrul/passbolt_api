@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Passbolt\Ee\Test\TestCase;
 
 use App\Test\Lib\SolutionBootstrapperTestCase;
+use App\Test\TestCase\BaseSolutionBootstrapperTest;
 use App\Utility\Application\FeaturePluginAwareTrait;
 use Cake\Core\Configure;
 use Cake\Core\PluginCollection;
@@ -84,6 +85,7 @@ class EeSolutionBootstrapperTest extends SolutionBootstrapperTestCase
             ]
         );
         $this->assertPluginList($plugins, $expectedPluginList);
+        $this->assertPluginListContains($plugins, BaseSolutionBootstrapperTest::EXPECTED_CE_PLUGINS);
     }
 
     public function testEeSolutionBootstrapper_Application_Bootstrap_WebInstaller_Required(): void
