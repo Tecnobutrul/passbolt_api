@@ -20,6 +20,7 @@ use App\Utility\UuidFactory;
 use Cake\Chronos\Chronos;
 use Cake\Chronos\ChronosInterface;
 use CakephpFixtureFactories\Factory\BaseFactory as CakephpBaseFactory;
+use Faker\Factory;
 use Faker\Generator;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Table\SsoSettingsTable;
@@ -138,5 +139,20 @@ class SsoSettingsFactory extends CakephpBaseFactory
     public function created(ChronosInterface $created): SsoSettingsFactory
     {
         return $this->patchData(compact('created'));
+    }
+
+    /**
+     * Returns fake credentials of google SSO provider.
+     *
+     * @return array
+     */
+    public static function getGoogleCredentials(): array
+    {
+        $faker = Factory::create();
+
+        return [
+            'client_id' => $faker->bothify('############-????????????????????????????????') . '.apps.googleusercontent.com',
+            'client_secret' => $faker->bothify('??????-#????#??????????????#???#?-#'),
+        ];
     }
 }
