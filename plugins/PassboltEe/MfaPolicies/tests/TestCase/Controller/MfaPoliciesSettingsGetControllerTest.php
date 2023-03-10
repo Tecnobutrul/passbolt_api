@@ -27,6 +27,24 @@ use Passbolt\MfaPolicies\Test\Factory\MfaPoliciesSettingFactory;
  */
 class MfaPoliciesSettingsGetControllerTest extends AppIntegrationTestCase
 {
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->enableFeaturePlugin('MfaPolicies');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function tearDown(): void
+    {
+        parent::tearDown();
+        $this->disableFeaturePlugin('Passbolt/MfaPolicies');
+    }
+
     public function testMfaPoliciesSettingsGet_ErrorFeatureDisabled()
     {
         $this->disableFeaturePlugin('MfaPolicies');

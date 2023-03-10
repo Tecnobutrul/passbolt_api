@@ -36,6 +36,24 @@ class EeSolutionBootstrapperTest extends SolutionBootstrapperTestCase
     use IntegrationTestTrait;
 
     public const EXPECTED_EE_PLUGINS = [
+        'Passbolt/Ee',
+        'Passbolt/JwtAuthentication',
+        'Passbolt/AccountSettings',
+        'Passbolt/Import',
+        'Passbolt/InFormIntegration',
+        'Passbolt/Locale',
+        'Passbolt/Export',
+        'Passbolt/ResourceTypes',
+        'Passbolt/RememberMe',
+        'Passbolt/EmailNotificationSettings',
+        'Passbolt/EmailDigest',
+        'Passbolt/Reports',
+        'Passbolt/Mobile',
+        'Passbolt/SelfRegistration',
+        'Passbolt/PasswordGenerator',
+        'Passbolt/SmtpSettings',
+        'Passbolt/MultiFactorAuthentication',
+        'Passbolt/Log',
         'Passbolt/AuditLog',
         'Passbolt/DirectorySync',
         'Passbolt/Tags',
@@ -50,10 +68,6 @@ class EeSolutionBootstrapperTest extends SolutionBootstrapperTestCase
     {
         Configure::delete('passbolt.webInstaller.configured');
         $plugins = $this->arrangeAndGetPlugins();
-        $expectedCePlugins = $this->removePluginFromList(
-            BaseSolutionBootstrapperTest::EXPECTED_CE_PLUGINS,
-            'Passbolt/JwtAuthentication'
-        );
         $expectedPluginList = array_merge(
             [
                 'Migrations',
@@ -62,11 +76,7 @@ class EeSolutionBootstrapperTest extends SolutionBootstrapperTestCase
                 'BryanCrowe/ApiPagination',
                 'PassboltSeleniumApi',
                 'PassboltTestData',
-                'Passbolt/Ee',
-                'Passbolt/JwtAuthentication',
             ],
-            $expectedCePlugins,
-            ['Passbolt/Log'],
             self::EXPECTED_EE_PLUGINS,
             [
                 'Bake',
@@ -75,6 +85,7 @@ class EeSolutionBootstrapperTest extends SolutionBootstrapperTestCase
             ]
         );
         $this->assertPluginList($plugins, $expectedPluginList);
+        $this->assertPluginListContains($plugins, BaseSolutionBootstrapperTest::EXPECTED_CE_PLUGINS);
     }
 
     public function testEeSolutionBootstrapper_Application_Bootstrap_WebInstaller_Required(): void
@@ -107,6 +118,7 @@ class EeSolutionBootstrapperTest extends SolutionBootstrapperTestCase
         $this->enableFeaturePlugin('Tags');
         $this->enableFeaturePlugin('AccountRecovery');
         $this->enableFeaturePlugin('Sso');
+        $this->enableFeaturePlugin('MfaPolicies');
         $this->enableFeaturePlugin('SsoRecover');
         // These plugins are enabled by default if not defined
         Configure::delete('passbolt.plugins.ee.enabled');
