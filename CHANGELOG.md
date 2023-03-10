@@ -2,6 +2,27 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.12.0] - 2023-03-14
+### Added
+PB-20535 As a community user I want to use folders
+PB-22749 Write action logs in syslog or in a file, with customizable action log query strategies
+
+### Fixed
+PB-23717 API calls with parameter api-version=1 should not throw an InternalException
+PB-21826 Fix emails entries should not be locked when threshold limit is exceeded
+PB-23311 The property is_mfa–enabled should be visible by admins only
+PB-23519 Fix DUO v4 migration warning message for organization settings without DUO
+PB-23721 As an administrator I want to be sure the server key is in the keyring before decrypting users directory settings
+
+### Improved
+PB-23333 Healthcheck should not display warnings when displaying informative message, but rather an info message.
+PB-23542 The version on config/version.php and in the CHANGELOG.md should always match
+PB-22892 Apply success and error page styling in SSO recover
+
+### Maintenance
+PB-23287 Duo multi-factor authentication redirection refactoring
+PB-23702 Update phpseclib/phpseclib dependency
+
 ## [3.11.1] - 2023-03-03
 ### Fixed
 - PB-23283 As an administrator I can disable username validation in Duo Callback endpoints
