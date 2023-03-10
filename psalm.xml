@@ -27,6 +27,7 @@
             <directory name="plugins/PassboltEe/AccountRecovery/templates/" />
             <directory name="plugins/PassboltEe/Sso/templates/" />
             <directory name="plugins/PassboltEe/MfaPolicies/templates/" />
+            <directory name="plugins/PassboltEe/SsoRecover/templates/" />
         </ignoreFiles>
     </projectFiles>
 </psalm>
