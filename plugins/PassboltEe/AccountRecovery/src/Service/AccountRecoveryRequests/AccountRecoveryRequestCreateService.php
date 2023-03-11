@@ -22,12 +22,12 @@ use App\Model\Entity\Role;
 use App\Service\AuthenticationTokens\AuthenticationTokenGetService;
 use App\Service\OpenPGP\PublicKeyValidationService;
 use App\Utility\UserAccessControl;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Event\Event;
 use Cake\Event\EventManager;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\Exception\PersistenceFailedException;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Utility\Hash;
 use Cake\Validation\Validation;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryRequest;
@@ -35,12 +35,11 @@ use Passbolt\AccountRecovery\Service\AccountRecoveryOrganizationPolicies\Account
 use Passbolt\AccountRecovery\Service\AccountRecoveryUserSettings\AccountRecoveryUserSettingsGetService;
 
 /**
- * @property \App\Model\Table\AuthenticationTokensTable $AuthenticationTokens
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryRequestsTable $AccountRecoveryRequests
+ * Class AccountRecoveryRequestCreateService
  */
 class AccountRecoveryRequestCreateService
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     public const REQUEST_CREATED_EVENT_NAME = 'Service.AccountRecoveryRequestCreate.afterCreate';
 
@@ -55,12 +54,24 @@ class AccountRecoveryRequestCreateService
     protected $policy;
 
     /**
+     * @var \App\Model\Table\AuthenticationTokensTable
+     */
+    protected $AuthenticationTokens;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryRequestsTable
+     */
+    protected $AccountRecoveryRequests;
+
+    /**
      * AccountRecoveryRequestCreateService constructor.
      */
     public function __construct()
     {
-        $this->loadModel('AuthenticationTokens');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryRequests');
+        /** @phpstan-ignore-next-line */
+        $this->AuthenticationTokens = $this->fetchTable('AuthenticationTokens');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryRequests = $this->fetchTable('Passbolt/AccountRecovery.AccountRecoveryRequests');
     }
 
     /**

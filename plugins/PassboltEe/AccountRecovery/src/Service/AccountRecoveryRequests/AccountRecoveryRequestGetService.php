@@ -21,12 +21,12 @@ use App\Model\Entity\AuthenticationToken;
 use App\Service\AuthenticationTokens\AuthenticationTokenGetService;
 use App\Service\Users\UserGetService;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Event\Event;
 use Cake\Event\EventManager;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Http\Exception\NotFoundException;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Validation\Validation;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryRequest;
 use Passbolt\AccountRecovery\Service\AccountRecoveryOrganizationPolicies\AccountRecoveryOrganizationPolicyGetService;
@@ -41,20 +41,50 @@ use Passbolt\AccountRecovery\Service\AccountRecoveryUserSettings\AccountRecovery
  */
 class AccountRecoveryRequestGetService
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     public const ACCOUNT_RECOVERY_REQUEST_GET_BAD_REQUEST = 'Service.AccountRecoveryRequestGetService.notFound';
+
+    /**
+     * @var \App\Model\Table\AuthenticationTokensTable
+     */
+    protected $AuthenticationTokens;
+
+    /**
+     * @var \App\Model\Table\UsersTable
+     */
+    protected $Users;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryRequestsTable
+     */
+    protected $AccountRecoveryRequests;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeysTable
+     */
+    protected $AccountRecoveryPrivateKeys;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryResponsesTable
+     */
+    protected $AccountRecoveryResponses;
 
     /**
      * AccountRecoveryRequestGetService constructor.
      */
     public function __construct()
     {
-        $this->loadModel('AuthenticationTokens');
-        $this->loadModel('Users');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryRequests');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryPrivateKeys');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryResponses');
+        /** @phpstan-ignore-next-line */
+        $this->AuthenticationTokens = $this->fetchTable('Users');
+        /** @phpstan-ignore-next-line */
+        $this->Users = $this->fetchTable('Users');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryRequests = $this->fetchTable('Passbolt/AccountRecovery.AccountRecoveryRequests');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryPrivateKeys = $this->fetchTable('Passbolt/AccountRecovery.AccountRecoveryPrivateKeys');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryResponses = $this->fetchTable('Passbolt/AccountRecovery.AccountRecoveryResponses');
     }
 
     /**

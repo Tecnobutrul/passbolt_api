@@ -17,7 +17,7 @@ declare(strict_types=1);
 namespace Passbolt\DirectorySync\Actions;
 
 use App\Model\Entity\Role;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Validation\Validation;
 use Passbolt\DirectorySync\Actions\Reports\ActionReport;
 use Passbolt\DirectorySync\Actions\Reports\ActionReportCollection;
@@ -29,17 +29,10 @@ use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
  * Directory factory class
  *
  * @package App\Utility
- * @property \App\Model\Table\UsersTable $Users
- * @property \App\Model\Table\GroupsTable $Groups
- * @property \App\Model\Table\GroupsUsersTable $GroupsUsers
- * @property \Passbolt\DirectorySync\Model\Table\DirectoryEntriesTable $DirectoryEntries
- * @property \Passbolt\DirectorySync\Model\Table\DirectoryReportsTable $DirectoryReports
- * @property \Passbolt\DirectorySync\Model\Table\DirectoryIgnoreTable $DirectoryIgnore
- * @property \Passbolt\DirectorySync\Model\Table\DirectoryRelationsTable $DirectoryRelations
  */
 abstract class SyncAction
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
      * @var string DirectoryReport uuid
@@ -82,6 +75,41 @@ abstract class SyncAction
     protected $report;
 
     /**
+     * @var \App\Model\Table\UsersTable
+     */
+    protected $Users;
+
+    /**
+     * @var \App\Model\Table\GroupsTable
+     */
+    protected $Groups;
+
+    /**
+     * @var \App\Model\Table\GroupsUsersTable
+     */
+    protected $GroupsUsers;
+
+    /**
+     * @var \Passbolt\DirectorySync\Model\Table\DirectoryEntriesTable
+     */
+    public $DirectoryEntries;
+
+    /**
+     * @var \Passbolt\DirectorySync\Model\Table\DirectoryIgnoreTable
+     */
+    protected $DirectoryIgnore;
+
+    /**
+     * @var \Passbolt\DirectorySync\Model\Table\DirectoryRelationsTable
+     */
+    public $DirectoryRelations;
+
+    /**
+     * @var \Passbolt\DirectorySync\Model\Table\DirectoryReportsTable
+     */
+    protected $DirectoryReports;
+
+    /**
      * Execute sync.
      *
      * @return void
@@ -99,13 +127,20 @@ abstract class SyncAction
         $this->directoryOrgSettings = DirectoryOrgSettings::get();
         $this->directory = DirectoryFactory::get($this->directoryOrgSettings);
 
-        $this->loadModel('Passbolt/DirectorySync.DirectoryEntries');
-        $this->loadModel('Passbolt/DirectorySync.DirectoryIgnore');
-        $this->loadModel('Passbolt/DirectorySync.DirectoryRelations');
-        $this->loadModel('Passbolt/DirectorySync.DirectoryReports');
-        $this->loadModel('Users');
-        $this->loadModel('Groups');
-        $this->loadModel('GroupsUsers');
+        /** @phpstan-ignore-next-line */
+        $this->DirectoryEntries = $this->fetchTable('Passbolt/DirectorySync.DirectoryEntries');
+        /** @phpstan-ignore-next-line */
+        $this->DirectoryIgnore = $this->fetchTable('Passbolt/DirectorySync.DirectoryIgnore');
+        /** @phpstan-ignore-next-line */
+        $this->DirectoryRelations = $this->fetchTable('Passbolt/DirectorySync.DirectoryRelations');
+        /** @phpstan-ignore-next-line */
+        $this->DirectoryReports = $this->fetchTable('Passbolt/DirectorySync.DirectoryReports');
+        /** @phpstan-ignore-next-line */
+        $this->Users = $this->fetchTable('Users');
+        /** @phpstan-ignore-next-line */
+        $this->Groups = $this->fetchTable('Groups');
+        /** @phpstan-ignore-next-line */
+        $this->GroupsUsers = $this->fetchTable('GroupsUsers');
         $this->summary = new ActionReportCollection();
         $this->defaultAdmin = $this->getDefaultAdmin();
         if (empty($this->defaultAdmin)) {

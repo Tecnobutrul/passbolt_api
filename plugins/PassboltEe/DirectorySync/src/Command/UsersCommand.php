@@ -22,13 +22,26 @@ use Cake\Console\ConsoleOptionParser;
 use Passbolt\DirectorySync\Actions\UserSyncAction;
 
 /**
- * @property \App\Model\Table\UsersTable $Users
- * @property \App\Model\Table\RolesTable $Roles
- * @property \App\Model\Table\AuthenticationTokensTable $AuthenticationTokens
+ * Class UsersCommand
  */
 class UsersCommand extends DirectorySyncCommand
 {
     use SyncCommandTrait;
+
+    /**
+     * @var \App\Model\Table\UsersTable
+     */
+    protected $Users;
+
+    /**
+     * @var \App\Model\Table\RolesTable
+     */
+    protected $Roles;
+
+    /**
+     * @var \App\Model\Table\AuthenticationTokensTable
+     */
+    protected $AuthenticationTokens;
 
     /**
      * Initializes the Shell
@@ -41,9 +54,12 @@ class UsersCommand extends DirectorySyncCommand
     public function initialize(): void
     {
         parent::initialize();
-        $this->loadModel('Users');
-        $this->loadModel('Roles');
-        $this->loadModel('AuthenticationTokens');
+        /** @phpstan-ignore-next-line */
+        $this->Users = $this->fetchTable('Users');
+        /** @phpstan-ignore-next-line */
+        $this->Roles = $this->fetchTable('Roles');
+        /** @phpstan-ignore-next-line */
+        $this->AuthenticationTokens = $this->fetchTable('AuthenticationTokens');
     }
 
     /**

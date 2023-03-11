@@ -32,6 +32,16 @@ use Cake\Validation\Validation;
 class DirectoryIgnoreController extends DirectoryController
 {
     /**
+     * @inheritDoc
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        /** @phpstan-ignore-next-line */
+        $this->DirectoryIgnore = $this->fetchTable('Passbolt/DirectorySync.DirectoryIgnore');
+    }
+
+    /**
      * Check if a record is ignored
      *
      * @param string $foreignModel foreign model
@@ -51,7 +61,6 @@ class DirectoryIgnoreController extends DirectoryController
             throw new BadRequestException(__('The record model is not valid.'));
         }
 
-        $this->loadModel('Passbolt/DirectorySync.DirectoryIgnore');
         $ignored = null;
         try {
             $ignored = $this->DirectoryIgnore->get($foreignKey);
@@ -81,7 +90,6 @@ class DirectoryIgnoreController extends DirectoryController
             throw new BadRequestException(__('The record model is not valid.'));
         }
 
-        $this->loadModel('Passbolt/DirectorySync.DirectoryIgnore');
         try {
             $ignored = $this->DirectoryIgnore->get($foreignKey);
         } catch (RecordNotFoundException $exception) {
@@ -110,7 +118,6 @@ class DirectoryIgnoreController extends DirectoryController
         if (!Validation::inList($foreignModel, ['Groups', 'Users', 'DirectoryEntries'])) {
             throw new BadRequestException(__('The record model is not valid.'));
         }
-        $this->loadModel('Passbolt/DirectorySync.DirectoryIgnore');
 
         try {
             $ignored = $this->DirectoryIgnore->createOrFail($foreignModel, $foreignKey);
@@ -144,8 +151,6 @@ class DirectoryIgnoreController extends DirectoryController
         if (!Validation::inList($foreignModel, ['Groups', 'Users', 'DirectoryEntries'])) {
             throw new BadRequestException(__('The record model is not valid.'));
         }
-
-        $this->loadModel('Passbolt/DirectorySync.DirectoryIgnore');
 
         try {
             $record = $this->DirectoryIgnore->get($foreignKey);

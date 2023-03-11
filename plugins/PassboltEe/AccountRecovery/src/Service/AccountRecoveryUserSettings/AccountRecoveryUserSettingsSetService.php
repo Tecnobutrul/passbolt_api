@@ -21,23 +21,19 @@ use App\Error\Exception\CustomValidationException;
 use App\Error\Exception\ValidationException;
 use App\Service\OpenPGP\MessageValidationService;
 use App\Utility\UserAccessControl;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\BadRequestException;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryPrivateKey;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryUserSetting;
-use Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable;
-use Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeysTable;
 use Passbolt\AccountRecovery\Service\AccountRecoveryOrganizationPolicies\AccountRecoveryOrganizationPolicyGetService;
 use Passbolt\AccountRecovery\Service\AccountRecoveryPrivateKeyPasswords\AccountRecoveryPrivateKeyPasswordsValidationService; // phpcs:ignore
 
 /**
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryUserSettingsTable $AccountRecoveryUserSettings
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeysTable $AccountRecoveryPrivateKeys
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable $AccountRecoveryPrivateKeyPasswords
+ * AccountRecoveryUserSettingsSetService Class
  */
 class AccountRecoveryUserSettingsSetService
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
      * @var \App\Utility\UserAccessControl
@@ -55,13 +51,34 @@ class AccountRecoveryUserSettingsSetService
     protected $data;
 
     /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryUserSettingsTable
+     */
+    protected $AccountRecoveryUserSettings;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeysTable
+     */
+    protected $AccountRecoveryPrivateKeys;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable
+     */
+    protected $AccountRecoveryPrivateKeyPasswords;
+
+    /**
      * @param \App\Utility\UserAccessControl $uac Logged in user
      */
     public function __construct(UserAccessControl $uac)
     {
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryUserSettings');
-        $this->loadModel(AccountRecoveryPrivateKeysTable::class);
-        $this->loadModel(AccountRecoveryPrivateKeyPasswordsTable::class);
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryUserSettings = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryUserSettings');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryPrivateKeys = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryPrivateKeys');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryPrivateKeyPasswords = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryPrivateKeyPasswords');
         $this->uac = $uac;
     }
 

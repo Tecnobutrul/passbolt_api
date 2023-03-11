@@ -18,18 +18,21 @@ namespace Passbolt\Ee\Service;
 
 use App\Model\Entity\Role;
 use App\Utility\UserAccessControl;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Passbolt\Ee\Error\Exception\Subscriptions\SubscriptionException;
 use Passbolt\Ee\Model\Dto\SubscriptionKeyDto;
 
 /**
  * Class SubscriptionKeyImportService
- *
- * @property \App\Model\Table\UsersTable $Users
  */
 class SubscriptionKeyImportService
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
+
+    /**
+     * @var \App\Model\Table\UsersTable
+     */
+    protected $Users;
 
     /**
      * @param string $fileName filename to import
@@ -40,8 +43,9 @@ class SubscriptionKeyImportService
     {
         $this->validateFile($fileName);
 
-        $this->loadModel('Users');
-        $firstAdmin = $this->Users->findFirstAdmin();
+        /** @var \App\Model\Table\UsersTable $usersTable */
+        $usersTable = $this->fetchTable('Users');
+        $firstAdmin = $usersTable->findFirstAdmin();
         if ($firstAdmin === null) {
             throw new SubscriptionException(__('No active admins were found.'));
         }

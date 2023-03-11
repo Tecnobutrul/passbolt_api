@@ -19,23 +19,28 @@ namespace Passbolt\AccountRecovery\Service\AccountRecoveryOrganizationPolicies;
 
 use App\Model\Table\AvatarsTable;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\ServerRequest;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryOrganizationPolicy;
 
 /**
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryOrganizationPoliciesTable $AccountRecoveryOrganizationPolicies
+ * Class AccountRecoveryOrganizationPolicyGetService
  */
 class AccountRecoveryOrganizationPolicyGetService implements AccountRecoveryOrganizationPolicyGetServiceInterface
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
      * @var \Cake\Http\ServerRequest
      */
     protected $request;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryOrganizationPoliciesTable
+     */
+    protected $AccountRecoveryOrganizationPolicies;
 
     /**
      * AccountRecoveryOrganizationPolicyGetService constructor.
@@ -44,7 +49,9 @@ class AccountRecoveryOrganizationPolicyGetService implements AccountRecoveryOrga
      */
     public function __construct(?ServerRequest $serverRequest = null)
     {
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryOrganizationPolicies');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryOrganizationPolicies = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryOrganizationPolicies');
         $this->request = $serverRequest ?? new ServerRequest();
     }
 
