@@ -67,8 +67,9 @@ class AzureRecoverSuccessController extends AbstractSsoController
         }
 
         $this->viewBuilder()
+            ->setTheme('Passbolt/Sso')
             ->setLayout('default')
             ->setTemplatePath('azure')
-            ->setTemplate('recover_success');
+            ->setTemplate('stage3');
     }
 }
