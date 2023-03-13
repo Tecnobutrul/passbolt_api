@@ -45,7 +45,7 @@ class MfaPoliciesSettingsSetControllerTest extends AppIntegrationTestCase
     {
         parent::setUp();
 
-        $this->enableFeaturePlugin('Passbolt/MfaPolicies');
+        $this->enableFeaturePlugin('MfaPolicies');
 
         RoleFactory::make()->guest()->persist();
         // Mock user agent and IP so extended user access control don't fail
@@ -62,7 +62,7 @@ class MfaPoliciesSettingsSetControllerTest extends AppIntegrationTestCase
     {
         parent::tearDown();
 
-        $this->disableFeaturePlugin('Passbolt/MfaPolicies');
+        $this->disableFeaturePlugin('MfaPolicies');
     }
 
     public function testMfaPoliciesSettingsSet_Error_FeatureDisabled()
