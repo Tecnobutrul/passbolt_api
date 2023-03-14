@@ -59,6 +59,14 @@ $routes->plugin('Passbolt/Sso', ['path' => '/sso'], function (RouteBuilder $rout
         ->setMethods(['POST']);
 
     $routes
+        ->connect('/google/login', [
+            'prefix' => 'Google',
+            'controller' => 'SsoGoogleStage1',
+            'action' => 'stage1',
+        ])
+        ->setMethods(['POST']);
+
+    $routes
         ->connect('/google/redirect', [
             'prefix' => 'Google',
             'controller' => 'SsoGoogleStage2',
