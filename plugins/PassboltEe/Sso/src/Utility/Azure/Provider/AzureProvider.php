@@ -268,6 +268,6 @@ class AzureProvider extends BaseOauth2Provider
             return $this->createResourceOwner($data, $token);
         }
 
-        throw new InternalErrorException('AccessToken should implement IdToken interface.');
+        throw new InternalErrorException('AccessToken should instance of BaseIdToken class.');
     }
 }

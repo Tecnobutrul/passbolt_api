@@ -27,6 +27,7 @@ use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Passbolt\Sso\Error\Exception\GoogleException;
 use Passbolt\Sso\Utility\Azure\Grant\JwtBearer;
+use Passbolt\Sso\Utility\Google\OpenId\GoogleIdToken;
 use Passbolt\Sso\Utility\Google\ResourceOwner\GoogleResourceOwner;
 use Passbolt\Sso\Utility\OpenId\BaseIdToken;
 use Passbolt\Sso\Utility\Provider\BaseOauth2Provider;
@@ -179,8 +180,7 @@ class GoogleProvider extends BaseOauth2Provider
      */
     protected function createAccessToken(array $response, AbstractGrant $grant): AccessToken
     {
-        // TODO: Implement GoogleIdToken and add more assertions
-        return new BaseIdToken($response, $this);
+        return new GoogleIdToken($response, $this);
     }
 
     /**
@@ -204,6 +204,6 @@ class GoogleProvider extends BaseOauth2Provider
             return $this->createResourceOwner($data, $token);
         }
 
-        throw new InternalErrorException('AccessToken should implement IdToken interface.');
+        throw new InternalErrorException('AccessToken should instance of BaseIdToken class.');
     }
 }
