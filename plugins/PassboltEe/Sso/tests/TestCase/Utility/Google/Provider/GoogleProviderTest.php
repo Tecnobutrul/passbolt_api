@@ -20,6 +20,7 @@ namespace Passbolt\Sso\Test\TestCase\Utility\Google\Provider;
 use App\Test\Lib\AppTestCase;
 use Cake\Core\Configure;
 use Passbolt\Sso\Test\Lib\GoogleProviderTestTrait;
+use Passbolt\Sso\Utility\Provider\BaseOauth2Provider;
 
 /**
  * @see \Passbolt\Sso\Utility\Google\Provider\GoogleProvider
@@ -40,7 +41,12 @@ class GoogleProviderTest extends AppTestCase
         }
     }
 
-    public function testSsoGooglePrfovider_getBaseAuthorizationUrl(): void
+    public function testSsoGoogleProvider_ExtendsBaseOauth2Provider(): void
+    {
+        $this->assertInstanceOf(BaseOauth2Provider::class, $this->getDummyGoogleProvider());
+    }
+
+    public function testSsoGoogleProvider_getBaseAuthorizationUrl(): void
     {
         $provider = $this->getDummyGoogleProvider();
         $url = $provider->getBaseAuthorizationUrl();

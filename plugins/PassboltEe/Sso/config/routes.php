@@ -58,6 +58,14 @@ $routes->plugin('Passbolt/Sso', ['path' => '/sso'], function (RouteBuilder $rout
         ])
         ->setMethods(['POST']);
 
+    $routes
+        ->connect('/google/redirect', [
+            'prefix' => 'Google',
+            'controller' => 'SsoGoogleStage2',
+            'action' => 'triage',
+        ])
+        ->setMethods(['GET']);
+
     // Generic success pages
 
     $routes->connect('/login/success', [

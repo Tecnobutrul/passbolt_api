@@ -21,7 +21,7 @@ use Cake\Http\Exception\BadRequestException;
 use Cake\TestSuite\TestCase;
 use InvalidArgumentException;
 use Passbolt\Sso\Test\Lib\AzureProviderTestTrait;
-use Passbolt\Sso\Utility\OpenId\IdToken;
+use Passbolt\Sso\Utility\OpenId\BaseIdToken;
 
 class AzureIdTokenTest extends TestCase
 {
@@ -32,7 +32,7 @@ class AzureIdTokenTest extends TestCase
         $provider = $this->getDummyAzureProvider();
         $this->expectException(InvalidArgumentException::class);
         $options = [];
-        new IdToken($options, $provider);
+        new BaseIdToken($options, $provider);
     }
 
     public function testSsoAzureIdToken_ErrorMissinIdToken(): void
@@ -43,7 +43,7 @@ class AzureIdTokenTest extends TestCase
             'access_token' => 'test',
             'expires_in' => 0,
         ];
-        new IdToken($options, $provider);
+        new BaseIdToken($options, $provider);
     }
 
     public function testSsoAzureIdToken_ErrorInvalidIdToken(): void
@@ -55,7 +55,7 @@ class AzureIdTokenTest extends TestCase
             'expires_in' => 0,
             'id_token' => [],
         ];
-        new IdToken($options, $provider);
+        new BaseIdToken($options, $provider);
     }
 
     public function testSsoAzureIdToken_ErrorVerificationKeys(): void
