@@ -111,7 +111,7 @@ class SsoRecoverAssertService
      */
     private function isAllowedForSelfRegister(SsoResourceOwnerInterface $resourceOwner): void
     {
-        if (! $this->isFeaturePluginEnabled('SelfRegistration')) {
+        if (!$this->isFeaturePluginEnabled('SelfRegistration')) {
             throw new BadRequestException(__('The user does not exist or has been deleted.'));
         }
 
