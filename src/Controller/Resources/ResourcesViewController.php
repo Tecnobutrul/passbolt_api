@@ -32,6 +32,16 @@ use Exception;
 class ResourcesViewController extends AppController
 {
     /**
+     * @inheritDoc
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        /** @phpstan-ignore-next-line */
+        $this->Resources = $this->fetchTable('Resources');
+    }
+
+    /**
      * Resource View action
      *
      * @param string $id uuid Identifier of the resource
@@ -45,7 +55,6 @@ class ResourcesViewController extends AppController
         if (!Validation::uuid($id)) {
             throw new BadRequestException(__('The resource identifier should be a valid UUID.'));
         }
-        $this->loadModel('Resources');
 
         // Retrieve and sanity the query options.
         $whitelist = ['contain' => [

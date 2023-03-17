@@ -59,8 +59,9 @@ class ResourcesUpdateController extends AppController
         if (Configure::read('passbolt.plugins.tags.enabled')) {
             $options['contain']['tag'] = true;
         }
-        $this->loadModel('Resources');
-        $output = $this->Resources->findView($this->User->id(), $resource->id, $options)->first();
+        /** @var \App\Model\Table\ResourcesTable $resourcesTable */
+        $resourcesTable = $this->fetchTable('Resources');
+        $output = $resourcesTable->findView($this->User->id(), $resource->id, $options)->first();
 
         $this->success(__('The resource has been updated successfully.'), $output);
     }
