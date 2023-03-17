@@ -145,13 +145,13 @@ return [
                         'update' => filter_var(env('PASSBOLT_EMAIL_SEND_GROUP_MANAGER_UPDATE', true), FILTER_VALIDATE_BOOLEAN),
                     ]
                 ],
-                // PRO EDITION ONLY
                 'folder' => [
                     'create' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_CREATE', false), FILTER_VALIDATE_BOOLEAN),
                     'update' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_UPDATE', true), FILTER_VALIDATE_BOOLEAN),
                     'delete' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_DELETE', true), FILTER_VALIDATE_BOOLEAN),
                     'share' => filter_var(env('PASSBOLT_EMAIL_SEND_FOLDER_SHARE', true), FILTER_VALIDATE_BOOLEAN),
                 ],
+                // PRO EDITION ONLY
                 'accountRecovery' => [
                     'request' => [
                         'user' => filter_var(env('PASSBOLT_EMAIL_SEND_ACCOUNT_RECOVERY_REQUEST_USER', true), FILTER_VALIDATE_BOOLEAN),
@@ -281,13 +281,13 @@ return [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_SELF_REGISTRATION_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
             ],
             'sso' => [
-                'enabled' => filter_var(env('PASSBOLT_PLUGINS_SSO_ENABLED', false), FILTER_VALIDATE_BOOLEAN)
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_SSO_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
             ],
             'mfaPolicies' => [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_MFA_POLICIES_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
             ],
             'ssoRecover' => [
-                'enabled' => filter_var(env('PASSBOLT_PLUGINS_SSO_RECOVER_ENABLED', false), FILTER_VALIDATE_BOOLEAN)
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_SSO_RECOVER_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
             ],
         ],
 
