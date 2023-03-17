@@ -21,24 +21,30 @@ use App\Service\OpenPGP\MessageRecipientValidationService;
 use App\Service\OpenPGP\MessageValidationService;
 use App\Service\OpenPGP\PublicKeyValidationService;
 use App\Utility\UserAccessControl;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 
 /**
  * Class AccountRecoveryPrivateKeyPasswordsValidationService
  *
  * @package Passbolt\AccountRecovery\Service\AccountRecoveryPrivateKeyPasswords
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable $AccountRecoveryPrivateKeyPasswords // phpcs:ignore
  */
 class AccountRecoveryPrivateKeyPasswordsValidationService
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable
+     */
+    protected $AccountRecoveryPrivateKeyPasswords;
 
     /**
      * AccountRecoveryPrivateKeyPasswordsValidationService constructor
      */
     public function __construct()
     {
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryPrivateKeyPasswords');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryPrivateKeyPasswords = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryPrivateKeyPasswords');
     }
 
     /**

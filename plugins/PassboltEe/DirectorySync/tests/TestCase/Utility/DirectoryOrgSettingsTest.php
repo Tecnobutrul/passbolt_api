@@ -21,7 +21,7 @@ use App\Test\Lib\AppTestCase;
 use App\Test\Lib\Utility\UserAccessControlTrait;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
-use Passbolt\DirectorySync\Plugin;
+use Passbolt\DirectorySync\DirectorySyncPlugin;
 use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 class DirectoryOrgSettingsTest extends AppTestCase
@@ -106,7 +106,7 @@ class DirectoryOrgSettingsTest extends AppTestCase
         $directoryOrgSettings->save($uac);
 
         // Merge with default config.
-        $defaultSettings = require Plugin::PLUGIN_CONFIG_PATH . 'config.php';
+        $defaultSettings = require DirectorySyncPlugin::PLUGIN_CONFIG_PATH . 'config.php';
         $settings = Hash::merge(Hash::get($defaultSettings, 'passbolt.plugins.directorySync'), $settings);
 
         $settings = array_merge(['source' => 'db'], $settings);

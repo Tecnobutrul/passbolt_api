@@ -26,9 +26,9 @@ use App\Test\Lib\Utility\Gpg\GpgAdaSetupTrait;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\ServerRequest;
 use Cake\ORM\TableRegistry;
+use Passbolt\AccountRecovery\AccountRecoveryPlugin;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryPrivateKeyPassword;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryUserSetting;
-use Passbolt\AccountRecovery\Plugin;
 use Passbolt\AccountRecovery\Service\Setup\AccountRecoverySetupCompleteService;
 use Passbolt\AccountRecovery\Test\Factory\AccountRecoveryOrganizationPolicyFactory;
 use Passbolt\AccountRecovery\Test\Factory\AccountRecoveryOrganizationPublicKeyFactory;
@@ -45,7 +45,7 @@ class AccountRecoverySetupCompleteServiceTest extends AccountRecoveryTestCase
     {
         parent::setUp();
 
-        (new Plugin())->addAssociationsToUsersTable();
+        (new AccountRecoveryPlugin())->addAssociationsToUsersTable();
     }
 
     /**

@@ -21,7 +21,7 @@ use Cake\Core\PluginApplicationInterface;
 use Passbolt\Tags\EventListener\AddTaggableBehaviorToTaggableTables;
 use Passbolt\Tags\EventListener\GroupsUsersEventListener;
 
-class Plugin extends BasePlugin
+class TagsPlugin extends BasePlugin
 {
     /**
      * @inheritDoc

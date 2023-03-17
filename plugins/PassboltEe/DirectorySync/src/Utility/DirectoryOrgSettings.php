@@ -20,15 +20,15 @@ use App\Utility\OpenPGP\OpenPGPBackendFactory;
 use App\Utility\UserAccessControl;
 use Cake\Core\Configure;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\InternalErrorException;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
-use Passbolt\DirectorySync\Plugin;
+use Passbolt\DirectorySync\DirectorySyncPlugin;
 
 class DirectoryOrgSettings
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
      * The organisation settings property name.
@@ -54,7 +54,8 @@ class DirectoryOrgSettings
      */
     public function __construct(?array $settings = [])
     {
-        $this->loadModel('OrganizationSettings');
+        /** @phpstan-ignore-next-line */
+        $this->OrganizationSettings = $this->fetchTable('OrganizationSettings');
 
         // If settings is not empty, we merge with the plugin default settings.
         // It is important to leave settings empty if no settings are set. This permits
@@ -130,7 +131,7 @@ class DirectoryOrgSettings
      */
     private static function getDefaultSettings()
     {
-        $path = Plugin::PLUGIN_CONFIG_PATH . 'config.php';
+        $path = DirectorySyncPlugin::PLUGIN_CONFIG_PATH . 'config.php';
         if (!\file_exists($path)) {
             return [];
         }

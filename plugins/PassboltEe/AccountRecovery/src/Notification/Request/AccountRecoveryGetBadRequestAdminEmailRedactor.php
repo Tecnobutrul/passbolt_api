@@ -24,22 +24,36 @@ use App\Notification\Email\EmailCollection;
 use App\Notification\Email\SubscribedEmailRedactorInterface;
 use App\Notification\Email\SubscribedEmailRedactorTrait;
 use App\Utility\Purifier;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Event\Event;
 use Cake\I18n\FrozenTime;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Passbolt\AccountRecovery\Service\AccountRecoveryRequests\AccountRecoveryRequestGetService;
 use Passbolt\Locale\Service\GetUserLocaleService;
 use Passbolt\Locale\Service\LocaleService;
 
 /**
- * @property \App\Model\Table\UsersTable $Users
+ * Class AccountRecoveryGetBadRequestAdminEmailRedactor
  */
 class AccountRecoveryGetBadRequestAdminEmailRedactor implements SubscribedEmailRedactorInterface
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
     use SubscribedEmailRedactorTrait;
 
     public const ADMIN_TEMPLATE = 'Passbolt/AccountRecovery.Requests/bad_request';
+
+    /**
+     * @var \App\Model\Table\UsersTable
+     */
+    protected $Users;
+
+    /**
+     * AccountRecoveryGetBadRequestAdminEmailRedactor Constructor
+     */
+    public function __construct()
+    {
+        /** @phpstan-ignore-next-line */
+        $this->Users = $this->fetchTable('Users');
+    }
 
     /**
      * Return the list of events to which the redactor is subscribed and when it must create emails to be sent.
@@ -60,7 +74,6 @@ class AccountRecoveryGetBadRequestAdminEmailRedactor implements SubscribedEmailR
     public function onSubscribedEvent(Event $event): EmailCollection
     {
         $emailCollection = new EmailCollection();
-        $this->loadModel('Users');
 
         $userId = $event->getData('userId');
         $requestId = $event->getData('requestId');

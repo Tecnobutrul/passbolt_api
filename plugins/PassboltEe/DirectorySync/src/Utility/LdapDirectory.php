@@ -25,8 +25,8 @@ use LdapTools\LdapManager;
 use LdapTools\Object\LdapObjectCollection;
 use LdapTools\Object\LdapObjectType;
 use LdapTools\Query\LdapQueryBuilder;
+use Passbolt\DirectorySync\DirectorySyncPlugin;
 use Passbolt\DirectorySync\Form\LdapConfigurationForm;
-use Passbolt\DirectorySync\Plugin;
 use Passbolt\DirectorySync\Utility\DirectoryEntry\DirectoryResults;
 
 /**
@@ -78,8 +78,8 @@ class LdapDirectory implements DirectoryInterface
         // 3) if none of the above exists, stick to the default schema.
         if (file_exists(CONFIG . 'DirectorySync' . DS . 'schema')) {
             $ldapConfig->setSchemaFolder(CONFIG . 'DirectorySync' . DS . 'schema');
-        } elseif (file_exists(Plugin::PLUGIN_CONFIG_PATH . 'schema')) {
-            $ldapConfig->setSchemaFolder(Plugin::PLUGIN_CONFIG_PATH . 'schema');
+        } elseif (file_exists(DirectorySyncPlugin::PLUGIN_CONFIG_PATH . 'schema')) {
+            $ldapConfig->setSchemaFolder(DirectorySyncPlugin::PLUGIN_CONFIG_PATH . 'schema');
         }
         $this->ldap = new LdapManager($ldapConfig);
         $this->directoryType = $this->getDirectoryType();

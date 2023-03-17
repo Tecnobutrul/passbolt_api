@@ -33,7 +33,8 @@ class AccountRecoveryRequestsViewController extends AppController
     public function initialize(): void
     {
         parent::initialize();
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryRequests');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryRequests = $this->fetchTable('Passbolt/AccountRecovery.AccountRecoveryRequests');
     }
 
     /**

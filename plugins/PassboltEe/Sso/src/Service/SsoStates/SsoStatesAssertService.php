@@ -85,7 +85,7 @@ class SsoStatesAssertService
     {
         $errorMsg = __('The SSO state is invalid.') . ' ';
 
-        if (! SsoState::isValidState($ssoState->state)) {
+        if (!SsoState::isValidState($ssoState->state)) {
             throw new BadRequestException(trim($errorMsg));
         }
 
@@ -126,7 +126,7 @@ class SsoStatesAssertService
     {
         $errorMsg = __('The SSO state is invalid.') . ' ';
 
-        if (! SsoState::isValidState($ssoState->state)) {
+        if (!SsoState::isValidState($ssoState->state)) {
             throw new BadRequestException(trim($errorMsg));
         }
 

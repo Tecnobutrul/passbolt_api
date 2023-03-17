@@ -12,16 +12,19 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.9.0
+ * @since         3.10.0
  */
-namespace Passbolt\Sso;
+namespace Passbolt\MfaPolicies;
 
 use App\Utility\Application\FeaturePluginAwareTrait;
 use Cake\Core\BasePlugin;
 use Cake\Core\ContainerInterface;
 use Cake\Core\PluginApplicationInterface;
+use Passbolt\MfaPolicies\Notification\Email\MfaPoliciesSettingsRedactorPool;
+use Passbolt\MfaPolicies\Service\RememberAMonthSettingService;
+use Passbolt\MultiFactorAuthentication\Service\MfaPolicies\RememberAMonthSettingInterface;
 
-class Plugin extends BasePlugin
+class MfaPoliciesPlugin extends BasePlugin
 {
     use FeaturePluginAwareTrait;
 
@@ -31,17 +34,9 @@ class Plugin extends BasePlugin
     public function bootstrap(PluginApplicationInterface $app): void
     {
         parent::bootstrap($app);
-        //$this->registerListeners($app);
-    }
 
-    /**
-     * Register Sso related listeners.
-     *
-     * @param \Cake\Core\PluginApplicationInterface $app App
-     * @return void
-     */
-    public function registerListeners(PluginApplicationInterface $app): void
-    {
+        // Register email redactors
+        $app->getEventManager()->on(new MfaPoliciesSettingsRedactorPool());
     }
 
     /**
@@ -49,5 +44,16 @@ class Plugin extends BasePlugin
      */
     public function services(ContainerInterface $container): void
     {
+        /**
+         * Overrides concrete implementation from MFA plugin.
+         * **Note:** Only extend if MFA plugin enabled, otherwise this can throw errors.
+         *
+         * @see \Passbolt\MultiFactorAuthentication\Plugin::services()
+         */
+        if ($this->isFeaturePluginEnabled('MultiFactorAuthentication')) {
+            $container
+                ->extend(RememberAMonthSettingInterface::class)
+                ->setConcrete(RememberAMonthSettingService::class);
+        }
     }
 }

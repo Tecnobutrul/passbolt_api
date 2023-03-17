@@ -36,7 +36,7 @@ use Passbolt\AccountRecovery\Service\Setup\AccountRecoverySetupCompleteService;
 use Passbolt\AccountRecovery\Service\Setup\AccountRecoverySetupStartService;
 use Passbolt\AccountRecovery\ServiceProvider\AccountRecoveryOrganizationPolicyServiceProvider;
 
-class Plugin extends BasePlugin
+class AccountRecoveryPlugin extends BasePlugin
 {
     /**
      * @inheritDoc

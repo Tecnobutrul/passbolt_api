@@ -18,6 +18,6 @@ namespace Passbolt\AuditLog;
 
 use Cake\Core\BasePlugin;
 
-class Plugin extends BasePlugin
+class AuditLogPlugin extends BasePlugin
 {
 }

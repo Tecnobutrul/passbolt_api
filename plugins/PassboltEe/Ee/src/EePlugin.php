@@ -21,7 +21,7 @@ use Cake\Core\BasePlugin;
 use Passbolt\Ee\Command\SubscriptionCheckCommand;
 use Passbolt\Ee\Command\SubscriptionImportCommand;
 
-class Plugin extends BasePlugin
+class EePlugin extends BasePlugin
 {
     /**
      * @inheritDoc

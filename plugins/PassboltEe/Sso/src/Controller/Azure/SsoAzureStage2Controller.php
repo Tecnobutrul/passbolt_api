@@ -126,7 +126,7 @@ class SsoAzureStage2Controller extends AbstractSsoController
                 $successUrl = Router::url("/sso/login/success?token={$ssoAuthToken->token}", true);
                 break;
             case SsoState::TYPE_SSO_RECOVER:
-                if (! $this->isFeaturePluginEnabled('SsoRecover')) {
+                if (!$this->isFeaturePluginEnabled('SsoRecover')) {
                     throw new BadRequestException(__('SsoRecover plugin is disabled.'));
                 }
 
