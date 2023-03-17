@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Notification\Email;
 
 use App\Notification\Email\AbstractSubscribedEmailRedactorPool;
+use Passbolt\Sso\Notification\Email\SsoSettings\SsoSettingsActivatedEmailRedactor;
 use Passbolt\Sso\Notification\Email\SsoSettings\SsoSettingsActiveDeletedEmailRedactor;
 
 class SsoSettingsRedactorPool extends AbstractSubscribedEmailRedactorPool
@@ -30,6 +31,7 @@ class SsoSettingsRedactorPool extends AbstractSubscribedEmailRedactorPool
     public function getSubscribedRedactors(): array
     {
         return [
+            new SsoSettingsActivatedEmailRedactor(),
             new SsoSettingsActiveDeletedEmailRedactor(),
         ];
     }

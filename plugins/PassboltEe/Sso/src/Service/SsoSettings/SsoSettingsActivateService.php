@@ -97,7 +97,11 @@ class SsoSettingsActivateService
         }
 
         // Notify settings have been changed
-        $event = new Event(self::AFTER_ACTIVATE_SSO_SETTINGS_EVENT, $this, ['uac' => $uac]);
+        $event = new Event(
+            self::AFTER_ACTIVATE_SSO_SETTINGS_EVENT,
+            $this,
+            ['uac' => $uac, 'ssoSetting' => $ssoSettingEntity]
+        );
         $this->SsoSettings->getEventManager()->dispatch($event);
 
         // Return new updated setting
