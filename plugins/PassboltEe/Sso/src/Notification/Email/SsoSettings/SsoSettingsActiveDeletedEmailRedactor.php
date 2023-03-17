@@ -114,7 +114,7 @@ class SsoSettingsActiveDeletedEmailRedactor implements SubscribedEmailRedactorIn
     ): Email {
         $subject = (new LocaleService())->translateString(
             $recipient->locale,
-            function () use ($operator, $recipient) {
+            function () use ($operator) {
                 return __('{0} deleted the SSO setting', Purifier::clean($operator->profile->first_name));
             }
         );
