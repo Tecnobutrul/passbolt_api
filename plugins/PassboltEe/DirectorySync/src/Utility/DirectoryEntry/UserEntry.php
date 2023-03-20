@@ -17,8 +17,8 @@ declare(strict_types=1);
 namespace Passbolt\DirectorySync\Utility\DirectoryEntry;
 
 use App\Model\Validation\EmailValidationRule;
-use LdapTools\Object\LdapObject;
-use LdapTools\Object\LdapObjectType;
+use LdapRecord\Models\Entry;
+use Passbolt\DirectorySync\Utility\DirectoryInterface;
 
 /**
  * Class UserEntry
@@ -39,7 +39,7 @@ class UserEntry extends DirectoryEntry
      *
      * @var string
      */
-    public $type = LdapObjectType::USER;
+    public $type = DirectoryInterface::ENTRY_TYPE_USER;
 
     /**
      * @var int|null
@@ -49,12 +49,12 @@ class UserEntry extends DirectoryEntry
     /**
      * Build user entry from ldap object.
      *
-     * @param \LdapTools\Object\LdapObject $ldapObject ldap object.
+     * @param \LdapRecord\Models\Entry $ldapObject ldap object.
      * @param array $mappingRules mapping rules.
      * @return $this directory entry.
      * @throws \Exception
      */
-    public function buildFromLdapObject(LdapObject $ldapObject, array $mappingRules)
+    public function buildFromLdapObject(Entry $ldapObject, array $mappingRules)
     {
         parent::buildFromLdapObject($ldapObject, $mappingRules);
         $this->user = [
@@ -72,12 +72,12 @@ class UserEntry extends DirectoryEntry
     /**
      * Return the corresponding userEntry from a given ldapObject.
      *
-     * @param \LdapTools\Object\LdapObject $ldapObject ldap object.
+     * @param \LdapRecord\Models\Entry $ldapObject ldap object.
      * @param array $mappingRules mapping rules.
      * @return \Passbolt\DirectorySync\Utility\DirectoryEntry\UserEntry user entry.
      * @throws \Exception
      */
-    public static function fromLdapObject(LdapObject $ldapObject, array $mappingRules)
+    public static function fromLdapObject(Entry $ldapObject, array $mappingRules)
     {
         $userEntry = new UserEntry([]);
         $userEntry->buildFromLdapObject($ldapObject, $mappingRules);
@@ -108,7 +108,7 @@ class UserEntry extends DirectoryEntry
      * @param array $data data
      * @return \Passbolt\DirectorySync\Utility\DirectoryEntry\UserEntry the user entry.
      */
-    public static function fromArray(array $data)
+    public static function fromArray(array $data): UserEntry
     {
         $userEntry = new UserEntry($data);
 
@@ -120,7 +120,7 @@ class UserEntry extends DirectoryEntry
      *
      * @return bool
      */
-    protected function _validate()
+    protected function _validate(): bool
     {
         parent::_validate();
 
@@ -144,7 +144,7 @@ class UserEntry extends DirectoryEntry
      *
      * @return bool
      */
-    public function validate()
+    public function validate(): bool
     {
         return $this->_validate();
     }
@@ -154,7 +154,7 @@ class UserEntry extends DirectoryEntry
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $extraData = [
             'user' => $this->user,

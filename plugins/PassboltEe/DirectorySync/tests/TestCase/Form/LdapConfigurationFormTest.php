@@ -32,6 +32,7 @@ class LdapConfigurationFormTest extends AppTestCase
     public static function getDummyFormData()
     {
         return [
+            'enabled' => true,
             'directory_type' => 'ad',
             'domain_name' => 'ldap.passbolt.local',
             'connection_type' => 'tls',

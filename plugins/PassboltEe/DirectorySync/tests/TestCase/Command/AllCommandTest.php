@@ -42,7 +42,17 @@ class AllCommandTest extends DirectorySyncConsoleIntegrationTestCase
         UserFactory::make()->admin()->persist();
 
         $this->useCommandRunner();
+        $this->exec('directory_sync all --persist');
+        $this->assertExitSuccess();
+    }
+
+    public function testDirectoryAllCommandWithExistingAdminNoConfigChecked(): void
+    {
+        UserFactory::make()->admin()->persist();
+
+        $this->useCommandRunner();
         $this->exec('directory_sync all');
         $this->assertExitSuccess();
+        $this->assertErrorContains('check config and pass option --persist');
     }
 }

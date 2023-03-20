@@ -18,9 +18,6 @@ namespace Passbolt\DirectorySync\Test\TestCase\Utility;
 
 use App\Utility\UuidFactory;
 use Cake\Core\Configure;
-use Cake\I18n\FrozenTime;
-use LdapTools\Object\LdapObject;
-use LdapTools\Object\LdapObjectType;
 use Passbolt\DirectorySync\Test\Utility\DirectorySyncIntegrationTestCase;
 use Passbolt\DirectorySync\Utility\DirectoryEntry\GroupEntry;
 
@@ -40,11 +37,11 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
     private function _getSampleLdapObject(array $modify = [])
     {
         $groupData = [
-            'name' => 'grouptest',
+            'cn' => 'grouptest',
             'dn' => 'CN=john,OU=posixGroups,OU=passbolt,OU=local',
-            'guid' => UuidFactory::uuid('ldap.group.id.john'),
-            'created' => new FrozenTime(),
-            'modified' => new FrozenTime(),
+            'objectGuid' => UuidFactory::uuid('ldap.group.id.john'),
+            'whenCreated' => new \DateTime(),
+            'whenChanged' => new \DateTime(),
         ];
 
         $groupData = array_merge($groupData, $modify);
@@ -56,9 +53,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
             }
         }
 
-        $ldapObject = new LdapObject($groupData, LdapObjectType::GROUP);
-
-        return $ldapObject;
+        return $this->getTestLdapGroupObject($groupData);
     }
 
     public function testDirectoryMappingSuccess()
@@ -77,7 +72,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorNoId()
     {
-        $ldapObject = $this->_getSampleLdapObject(['guid' => null]);
+        $ldapObject = $this->_getSampleLdapObject(['objectGuid' => null]);
 
         $groupEntry = new GroupEntry();
         $groupEntry->buildFromLdapObject($ldapObject, $this->mappingRules);
@@ -90,7 +85,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorInvalidId()
     {
-        $ldapObject = $this->_getSampleLdapObject(['guid' => 'thisisnotavalidguid']);
+        $ldapObject = $this->_getSampleLdapObject(['objectGuid' => 'thisisnotavalidguid']);
 
         $groupEntry = new GroupEntry();
         $groupEntry->buildFromLdapObject($ldapObject, $this->mappingRules);
@@ -126,7 +121,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorNoCreated()
     {
-        $ldapObject = $this->_getSampleLdapObject(['created' => null]);
+        $ldapObject = $this->_getSampleLdapObject(['whenCreated' => null]);
 
         $groupEntry = new GroupEntry();
         $groupEntry->buildFromLdapObject($ldapObject, $this->mappingRules);
@@ -138,7 +133,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorNoModified()
     {
-        $ldapObject = $this->_getSampleLdapObject(['modified' => null]);
+        $ldapObject = $this->_getSampleLdapObject(['whenChanged' => null]);
 
         $groupEntry = new GroupEntry();
         $groupEntry->buildFromLdapObject($ldapObject, $this->mappingRules);
@@ -150,7 +145,7 @@ class GroupEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorNoName()
     {
-        $ldapObject = $this->_getSampleLdapObject(['name' => null]);
+        $ldapObject = $this->_getSampleLdapObject(['cn' => null]);
 
         $groupEntry = new GroupEntry();
         $groupEntry->buildFromLdapObject($ldapObject, $this->mappingRules);

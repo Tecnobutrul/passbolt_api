@@ -25,6 +25,7 @@ use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 use Passbolt\DirectorySync\DirectorySyncPlugin;
+use Passbolt\DirectorySync\Utility\DirectoryEntry\DirectoryEntry;
 
 class DirectoryOrgSettings
 {
@@ -37,6 +38,19 @@ class DirectoryOrgSettings
      */
     public const ORG_SETTINGS_PROPERTY = 'directorySync';
 
+    /**
+     * Select server constants in multi-servers config
+     */
+    public const SERVER_SELECTION_ORDER = 'order';
+    public const SERVER_SELECTION_RANDOM = 'random';
+    /**
+     * Bind formats
+     */
+    public const BIND_FORMATS = [
+        DirectoryInterface::TYPE_AD => '%username%@%domainname%',
+        DirectoryInterface::TYPE_OPENLDAP => '%username%',
+        DirectoryInterface::TYPE_NAME_FREEIPA => '%username%',
+    ];
     /**
      * @var array
      */
@@ -160,7 +174,7 @@ class DirectoryOrgSettings
      */
     public function isEnabled()
     {
-        return !empty($this->settings);
+        return !empty($this->settings) && !empty($this->settings['enabled']);
     }
 
     /**
@@ -239,9 +253,9 @@ class DirectoryOrgSettings
      * Get fields mapping.
      *
      * @param string $type directory type
-     * @return bool|string
+     * @return array|null
      */
-    public function getFieldsMapping(?string $type = null)
+    public function getFieldsMapping(?string $type = null): ?array
     {
         if ($type === null) {
             return Hash::get($this->settings, 'fieldsMapping');
@@ -255,9 +269,25 @@ class DirectoryOrgSettings
      *
      * @return array
      */
-    public function getLdapSettings()
+    public function getLdapSettings(): array
     {
-        return Hash::get($this->settings, 'ldap');
+        $ldapSettings = Hash::get($this->settings, 'ldap.domains');
+
+        return $ldapSettings;
+    }
+
+    /**
+     * Get default domain if set or first domain from config
+     *
+     * @return array|\ArrayAccess|mixed
+     */
+    public function getDefaultDomain()
+    {
+        return Hash::get(
+            $this->settings,
+            'ldap.default_domain',
+            collection(array_keys($this->settings['ldap']['domains']))->first()
+        );
     }
 
     /**
@@ -267,7 +297,7 @@ class DirectoryOrgSettings
      * @param string $operation The type of operation
      * @return bool
      */
-    public function isSyncOperationEnabled($objectType, $operation)
+    public function isSyncOperationEnabled($objectType, $operation): bool
     {
         return Hash::get($this->settings, "jobs.$objectType.$operation", false);
     }
@@ -305,7 +335,7 @@ class DirectoryOrgSettings
     /**
      * Get UserCustomFilters
      *
-     * @return mixed (should be callable)
+     * @return mixed (should be string)
      */
     public function getUserCustomFilters()
     {
@@ -315,7 +345,7 @@ class DirectoryOrgSettings
     /**
      * Get GroupCustomFilters
      *
-     * @return mixed (should be callable)
+     * @return mixed (should be string)
      */
     public function getGroupCustomFilters()
     {
@@ -337,7 +367,7 @@ class DirectoryOrgSettings
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->settings;
     }
@@ -348,7 +378,7 @@ class DirectoryOrgSettings
      * @param array $settings The new settings
      * @return void
      */
-    public function set($settings)
+    public function set($settings): void
     {
         $this->settings = $settings;
     }
@@ -359,7 +389,7 @@ class DirectoryOrgSettings
      * @param \App\Utility\UserAccessControl $uac user access control
      * @return void
      */
-    public function save(UserAccessControl $uac)
+    public function save(UserAccessControl $uac): void
     {
         $settings = new \ArrayObject($this->settings);
         $settings = $settings->getArrayCopy();
@@ -377,7 +407,7 @@ class DirectoryOrgSettings
      * @param string $data The message to encrypt
      * @return string
      */
-    protected static function encrypt(string $data)
+    protected static function encrypt(string $data): string
     {
         $gpgConfig = Configure::read('passbolt.gpg');
         $keyid = $gpgConfig['serverKey']['fingerprint'];
@@ -395,7 +425,7 @@ class DirectoryOrgSettings
      * @param string $data The message to decrypt
      * @return string
      */
-    protected static function decrypt(string $data)
+    protected static function decrypt(string $data): string
     {
         $gpgConfig = Configure::read('passbolt.gpg');
         $keyid = $gpgConfig['serverKey']['fingerprint'];
@@ -416,5 +446,30 @@ class DirectoryOrgSettings
         }
 
         return $gpg->decrypt($data);
+    }
+
+    /**
+     * Format username using bind_format setting
+     *
+     * @param string $username The username to replace
+     * @param string $domain The domain to replace
+     * @param string $bindFormat The string with placeholders
+     * @return string
+     */
+    public static function formatUsername(string $username, string $domain, string $bindFormat): string
+    {
+        if (DirectoryEntry::isValidDn($username)) {
+            return $username;
+        }
+        $params = [
+            '/%username%/i',
+            '/%domainname%/i',
+        ];
+        $replacements = [
+            $username,
+            $domain,
+        ];
+
+        return preg_replace($params, $replacements, $bindFormat);
     }
 }

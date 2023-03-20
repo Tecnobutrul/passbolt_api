@@ -56,6 +56,6 @@ class DebugCommandTest extends DirectorySyncConsoleIntegrationTestCase
         $this->useCommandRunner();
         $this->exec('directory_sync debug');
         $this->assertExitError();
-        $this->assertOutputContains('<error>No LDAP server is available.</error>');
+        $this->assertOutputContains('<error>Can\'t contact LDAP server</error>');
     }
 }

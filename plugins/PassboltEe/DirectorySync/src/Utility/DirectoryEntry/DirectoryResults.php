@@ -17,9 +17,9 @@ declare(strict_types=1);
 namespace Passbolt\DirectorySync\Utility\DirectoryEntry;
 
 use App\Utility\UuidFactory;
-use LdapTools\Object\LdapObject;
-use LdapTools\Object\LdapObjectCollection;
-use LdapTools\Object\LdapObjectType;
+use LdapRecord\Models\Collection;
+use LdapRecord\Models\Entry;
+use Passbolt\DirectorySync\Utility\DirectoryInterface;
 use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 /**
@@ -32,14 +32,14 @@ class DirectoryResults
     /**
      * Raw ldap groups as returned by ldap directory.
      *
-     * @var array|\LdapTools\Object\LdapObjectCollection
+     * @var array|\LdapRecord\Models\Collection
      */
     private $ldapGroups;
 
     /**
      * Raw ldap users as returned by ldap directory.
      *
-     * @var array|\LdapTools\Object\LdapObjectCollection
+     * @var array|\LdapRecord\Models\Collection
      */
     private $ldapUsers;
 
@@ -107,12 +107,12 @@ class DirectoryResults
     /**
      * Initialize results with results returned from ldap directory.
      *
-     * @param \LdapTools\Object\LdapObjectCollection $ldapUsers ldap users
-     * @param \LdapTools\Object\LdapObjectCollection $ldapGroups ldap groups
+     * @param \LdapRecord\Models\Collection $ldapUsers ldap users
+     * @param \LdapRecord\Models\Collection $ldapGroups ldap groups
      * @return void
      * @throws \Exception
      */
-    public function initializeWithLdapResults(LdapObjectCollection $ldapUsers, LdapObjectCollection $ldapGroups)
+    public function initializeWithLdapResults(Collection $ldapUsers, Collection $ldapGroups)
     {
         $this->ldapGroups = $ldapGroups;
         $this->ldapUsers = $ldapUsers;
@@ -178,6 +178,7 @@ class DirectoryResults
      */
     public function transformLdapGroups()
     {
+        /** @var \LdapRecord\Models\Entry $ldapGroup */
         foreach ($this->ldapGroups as $ldapGroup) {
             $this->transformLdapGroup($ldapGroup);
         }
@@ -187,14 +188,12 @@ class DirectoryResults
      * Transform one ldap group.
      * Add a uuid if not present (based on cn)
      *
-     * @param \LdapTools\Object\LdapObject $ldapGroup ldap group
-     * @return \LdapTools\Object\LdapObject ldap object
+     * @param \LdapRecord\Models\Entry $ldapGroup ldap group
+     * @return \LdapRecord\Models\Entry ldap object
      */
-    public function transformLdapGroup(LdapObject $ldapGroup)
+    public function transformLdapGroup(Entry $ldapGroup)
     {
-        $this->_transformId($ldapGroup);
-
-        return $ldapGroup;
+        return $this->_transformId($ldapGroup);
     }
 
     /**
@@ -202,50 +201,71 @@ class DirectoryResults
      * Add a uuid if not present (based on cn)
      * Build an email if defined in the configuration.
      *
-     * @param \LdapTools\Object\LdapObject $ldapUser ldap user
-     * @return \LdapTools\Object\LdapObject ldap object
+     * @param \LdapRecord\Models\Entry $ldapUser ldap user
+     * @return \LdapRecord\Models\Entry ldap object
      */
-    public function transformLdapUser(LdapObject $ldapUser)
+    public function transformLdapUser(Entry $ldapUser)
     {
-        $this->_transformId($ldapUser);
-        $this->_transformEmail($ldapUser);
+        $ldapUser = $this->_transformId($ldapUser);
 
-        return $ldapUser;
+        return $this->_transformEmail($ldapUser);
     }
 
     /**
      * Transform ldap object email based on provided configuration.
      *
-     * @param \LdapTools\Object\LdapObject $ldapUser ldap user
-     * @return void
+     * @param \LdapRecord\Models\Entry $ldapUser ldap user
+     * @return \LdapRecord\Models\Entry
+     * @throws \RuntimeException A mapping rule for username attribute could not be found for the directory type
      */
-    protected function _transformEmail(LdapObject $ldapUser)
+    protected function _transformEmail(Entry $ldapUser): Entry
     {
-        $emailAttribute = $this->mappingRules[LdapObjectType::USER]['username'];
+        /** @var string $directoryType */
+        $directoryType = $ldapUser->getFirstAttribute('directoryType');
+        $mappingRules = $this->mappingRules[$directoryType] ?? [];
+        $emailAttribute = $mappingRules[DirectoryInterface::ENTRY_TYPE_USER]['username'] ?? null;
+        if (!$emailAttribute) {
+            throw new \RuntimeException(
+                __('A mapping rule for username attribute could not be found for directory type: {0}', $directoryType)
+            );
+        }
         $useEmailPrefixSuffix = $this->directorySettings->getUseEmailPrefixSuffix();
 
-        if (!$ldapUser->has($emailAttribute) && $useEmailPrefixSuffix) {
+        if (!$ldapUser->hasAttribute($emailAttribute) && $useEmailPrefixSuffix) {
             $emailPrefix = $this->directorySettings->getEmailPrefix();
-            $prefix = $ldapUser->get($emailPrefix);
+            $prefix = $ldapUser->getFirstAttribute($emailPrefix);
             $suffix = $this->directorySettings->getEmailSuffix();
-            $ldapUser->set($emailAttribute, $prefix . $suffix);
+            $ldapUser->setAttribute($emailAttribute, $prefix . $suffix);
         }
+
+        return $ldapUser;
     }
 
     /**
      * Adds a uuid to the ldap object if not present and if a dn exists.
      *
-     * @param \LdapTools\Object\LdapObject $ldapObject ldap object
-     * @return \LdapTools\Object\LdapObject ldap object
+     * @param \LdapRecord\Models\Entry $ldapObject ldap object
+     * @return \LdapRecord\Models\Entry ldap object
+     * @throws \RuntimeException A mapping rule for ID attribute could not be found for the directory type
      */
-    protected function _transformId(LdapObject $ldapObject)
+    protected function _transformId(Entry $ldapObject): Entry
     {
-        $idAttribute = $this->mappingRules[$ldapObject->getType()]['id'];
-        if (!$ldapObject->has($idAttribute) && $ldapObject->has('dn')) {
-            /** @var string $dn */
-            $dn = $ldapObject->get('dn');
+        /** @var string $type */
+        $type = $ldapObject->getFirstAttribute('objectType');
+        /** @var string $directoryType */
+        $directoryType = $ldapObject->getFirstAttribute('directoryType');
+        $idAttribute = $this->mappingRules[$directoryType][$type]['id'] ?? null;
+        if (!$idAttribute) {
+            throw new \RuntimeException(
+                __('A mapping rule for ID attribute could not be found for directory type: {0}', $directoryType)
+            );
+        }
+        $dn = $ldapObject->getDn();
+        if (!$ldapObject->hasAttribute($idAttribute) && $dn) {
             /** @psalm-suppress InvalidArgument it takes args, not an array */
-            $ldapObject->add($idAttribute, UuidFactory::uuid($dn));
+            $ldapObject->setAttribute($idAttribute, UuidFactory::uuid($dn));
+        } else {
+            $ldapObject->setAttribute($idAttribute, $ldapObject->getConvertedGuid());
         }
 
         return $ldapObject;
@@ -259,9 +279,18 @@ class DirectoryResults
      */
     private function _populateGroups()
     {
+        /** @var \LdapRecord\Models\Entry $ldapGroup */
         foreach ($this->ldapGroups as $ldapGroup) {
             if (!isset($this->groups[$ldapGroup->getDn()])) {
-                $groupEntry = GroupEntry::fromLdapObject($ldapGroup, $this->mappingRules);
+                /** @var string $directoryType */
+                $directoryType = $ldapGroup->getFirstAttribute('directoryType');
+                $mappingRules = $this->mappingRules[$ldapGroup->getFirstAttribute('directoryType')] ?? null;
+                if (!$mappingRules) {
+                    throw new \RuntimeException(
+                        __('Mapping rules could not be found for directory type: {0}', $directoryType)
+                    );
+                }
+                $groupEntry = GroupEntry::fromLdapObject($ldapGroup, $mappingRules);
                 if (!empty($ldapGroup->getDn())) {
                     $this->groups[$ldapGroup->getDn()] = $groupEntry;
                 } else {
@@ -311,13 +340,21 @@ class DirectoryResults
      * Populate users from Ldap results.
      *
      * @return void
-     * @throws \Exception
+     * @throws \RuntimeException If mapping rules could not be found for the directory type
      */
-    private function _populateUsers()
+    private function _populateUsers(): void
     {
         foreach ($this->ldapUsers as $ldapUser) {
             if (!isset($this->users[$ldapUser->getDn()])) {
-                $userEntry = UserEntry::fromLdapObject($ldapUser, $this->mappingRules);
+                /** @var string $directoryType */
+                $directoryType = $ldapUser->getFirstAttribute('directoryType');
+                $mappingRules = $this->mappingRules[$directoryType] ?? null;
+                if (!$mappingRules) {
+                    throw new \RuntimeException(
+                        __('Mapping rules could not be found for directory type: {0}', $directoryType)
+                    );
+                }
+                $userEntry = UserEntry::fromLdapObject($ldapUser, $mappingRules);
                 if (!empty($ldapUser->getDn())) {
                     $this->users[$ldapUser->getDn()] = $userEntry;
                 } else {
@@ -332,7 +369,7 @@ class DirectoryResults
      *
      * @return void
      */
-    private function _populateAllGroupsUsersDetails()
+    private function _populateAllGroupsUsersDetails(): void
     {
         foreach ($this->groups as $key => $group) {
             $this->groups[$key] = $this->_populateGroupGroupsUserDetails($group);
@@ -345,7 +382,7 @@ class DirectoryResults
      * @param \Passbolt\DirectorySync\Utility\DirectoryEntry\GroupEntry $group group
      * @return \Passbolt\DirectorySync\Utility\DirectoryEntry\GroupEntry returned group populated with groups users
      */
-    private function _populateGroupGroupsUserDetails(GroupEntry $group)
+    private function _populateGroupGroupsUserDetails(GroupEntry $group): GroupEntry
     {
         if (empty($group['group']['members'])) {
             return $group;
@@ -373,7 +410,7 @@ class DirectoryResults
      * @param bool $validOnly whether to return only valid users (without validation errors)
      * @return array
      */
-    public function getUsers(?bool $validOnly = false)
+    public function getUsers(?bool $validOnly = false): array
     {
         if (!$validOnly) {
             return $this->users;
@@ -395,7 +432,7 @@ class DirectoryResults
      * @param bool $validOnly whether to return only valid groups (without validation errors)
      * @return array
      */
-    public function getGroups(?bool $validOnly = false)
+    public function getGroups(?bool $validOnly = false): array
     {
         if (!$validOnly) {
             return $this->groups;
@@ -416,7 +453,7 @@ class DirectoryResults
      *
      * @return bool true or false
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return empty($this->users) && empty($this->groups);
     }
@@ -427,7 +464,7 @@ class DirectoryResults
      * @param string $memberDN the directory name
      * @return bool
      */
-    public function isGroup(string $memberDN)
+    public function isGroup(string $memberDN): bool
     {
         return isset($this->groups[$memberDN]);
     }
@@ -438,7 +475,7 @@ class DirectoryResults
      * @param string $memberDN the directory name
      * @return bool
      */
-    public function isUser(string $memberDN)
+    public function isUser(string $memberDN): bool
     {
         return isset($this->users[$memberDN]);
     }
@@ -451,16 +488,16 @@ class DirectoryResults
      * @param array $membersList members list
      * @return array
      */
-    private function _getGroupMembersRecursive(string $objectType, GroupEntry $group, array &$membersList)
+    private function _getGroupMembersRecursive(string $objectType, GroupEntry $group, array &$membersList): array
     {
-        if ($objectType == LdapObjectType::GROUP) {
+        if ($objectType === DirectoryInterface::ENTRY_TYPE_GROUP) {
             $members = $group['group']['groups'];
         } else {
             $members = $group['group']['users'];
         }
 
         foreach ($members as $memberDn) {
-            if ($objectType == LdapObjectType::GROUP) {
+            if ($objectType === DirectoryInterface::ENTRY_TYPE_GROUP) {
                 $member = $this->groups[$memberDn];
             } else {
                 $member = $this->users[$memberDn];
@@ -488,7 +525,7 @@ class DirectoryResults
      * @return \Passbolt\DirectorySync\Utility\DirectoryEntry\DirectoryResults the list of members
      * @throws \Exception
      */
-    public function getRecursivelyFromParentGroup(string $objectType, string $groupName)
+    public function getRecursivelyFromParentGroup(string $objectType, string $groupName): DirectoryResults
     {
         $group = $this->lookupGroupByGroupName($groupName);
 
@@ -500,9 +537,9 @@ class DirectoryResults
         $members = $this->_getGroupMembersRecursive($objectType, $group, $groupsList);
 
         $directoryResults = new DirectoryResults($this->mappingRules);
-        if ($objectType == LdapObjectType::USER) {
+        if ($objectType === DirectoryInterface::ENTRY_TYPE_USER) {
             $directoryResults->initializeWithEntries($members, []);
-        } elseif ($objectType == LdapObjectType::GROUP) {
+        } elseif ($objectType === DirectoryInterface::ENTRY_TYPE_GROUP) {
             // Retrieve the list of all the users that are part of the returned groups.
             $groupUsers = $this->_getUsersForGroups($members);
             $directoryResults->initializeWithEntries($groupUsers, $members);
@@ -516,7 +553,7 @@ class DirectoryResults
      *
      * @return array list of groups.
      */
-    private function _getRootGroups()
+    private function _getRootGroups(): array
     {
         $allChildren = [];
         foreach ($this->groups as $group) {
@@ -537,7 +574,7 @@ class DirectoryResults
      *
      * @return array list of users.
      */
-    private function _getRootUsers()
+    private function _getRootUsers(): array
     {
         $allChildren = [];
         foreach ($this->groups as $group) {
@@ -559,7 +596,7 @@ class DirectoryResults
      * @param \Passbolt\DirectorySync\Utility\DirectoryEntry\GroupEntry $group group
      * @return \Passbolt\DirectorySync\Utility\DirectoryEntry\GroupEntry $group GroupEntry populated with groups and users recursively.
      */
-    private function _getChildrenRecursive(GroupEntry $group)
+    private function _getChildrenRecursive(GroupEntry $group): GroupEntry
     {
         $groups = [];
         $users = [];
@@ -584,7 +621,7 @@ class DirectoryResults
      *
      * @return array nested tree.
      */
-    public function getTree()
+    public function getTree(): array
     {
         $orphans = $this->_getRootGroups();
         $res = [];
@@ -606,7 +643,7 @@ class DirectoryResults
      * @param int $level the current level
      * @return void
      */
-    private function _getFlattenedChildrenRecursive(GroupEntry &$group, array &$flatTree, int $level)
+    private function _getFlattenedChildrenRecursive(GroupEntry &$group, array &$flatTree, int $level): void
     {
         $g = clone $group;
         $g->level = $level;
@@ -628,7 +665,7 @@ class DirectoryResults
      *
      * @return array the flattened tree.
      */
-    public function getFlattenedTree()
+    public function getFlattenedTree(): array
     {
         $flatTree = [];
         $level = 0;
@@ -658,7 +695,7 @@ class DirectoryResults
      * @param array $groups a list of GroupEntry
      * @return array a list of User entries.
      */
-    private function _getUsersForGroups(array $groups)
+    private function _getUsersForGroups(array $groups): array
     {
         $users = [];
         foreach ($groups as $group) {
@@ -675,7 +712,7 @@ class DirectoryResults
      * @param \Passbolt\DirectorySync\Utility\DirectoryEntry\GroupEntry $group group entry
      * @return array a list of UserEntry users.
      */
-    private function _getUsersForGroup(GroupEntry $group)
+    private function _getUsersForGroup(GroupEntry $group): array
     {
         $users = [];
         foreach ($group['group']['users'] as $userDn) {
@@ -708,7 +745,7 @@ class DirectoryResults
      * @param bool $validOnly whether to return only valid users (without validation errors)
      * @return array array of users.
      */
-    public function getUsersAsArray(?bool $validOnly = false)
+    public function getUsersAsArray(?bool $validOnly = false): array
     {
         $results = [];
         $validUsers = $this->getUsers($validOnly);
@@ -725,7 +762,7 @@ class DirectoryResults
      * @param bool $validOnly whether to return only valid groups (without validation errors)
      * @return array array of groups.
      */
-    public function getGroupsAsArray(?bool $validOnly = false)
+    public function getGroupsAsArray(?bool $validOnly = false): array
     {
         $results = [];
         $validGroups = $this->getGroups($validOnly);
