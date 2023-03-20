@@ -63,6 +63,14 @@ class BaseIdToken extends AccessToken
 
         $keys = $provider->getJwtVerificationKeys();
         try {
+            /**
+             * To fix "Firebase\JWT\BeforeValidException: Cannot handle token prior" error.
+             *
+             * @link https://github.com/googleapis/google-api-php-client/issues/1630
+             * @link https://stackoverflow.com/questions/53658600/uncaught-exception-firebase-jwt-beforevalidexception-with-message-cannot-hand
+             */
+            JWT::$leeway = 10;
+
             $tokenClaims = (array)JWT::decode($this->idToken, $keys);
         } catch (\Exception $exception) {
             throw new BadRequestException(__('Unable to decode JWT token.'), 400, $exception);
