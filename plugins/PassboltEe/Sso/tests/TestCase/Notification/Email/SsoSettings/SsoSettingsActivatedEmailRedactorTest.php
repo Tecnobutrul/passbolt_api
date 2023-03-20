@@ -19,11 +19,11 @@ namespace Passbolt\Sso\Test\TestCase\Notification\Email\SsoSettings;
 
 use App\Model\Entity\Role;
 use App\Test\Factory\UserFactory;
+use App\Test\Lib\AppTestCase;
 use App\Utility\ExtendedUserAccessControl;
 use App\Utility\UuidFactory;
 use Cake\Event\Event;
 use Cake\I18n\FrozenTime;
-use Cake\TestSuite\TestCase;
 use Passbolt\Sso\Notification\Email\SsoSettings\SsoSettingsActivatedEmailRedactor;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsActivateService;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
@@ -31,19 +31,32 @@ use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 /**
  * @covers \Passbolt\Sso\Notification\Email\SsoSettings\SsoSettingsActivatedEmailRedactor
  */
-class SsoSettingsActivatedEmailRedactorTest extends TestCase
+class SsoSettingsActivatedEmailRedactorTest extends AppTestCase
 {
     /**
      * @var \Passbolt\Sso\Notification\Email\SsoSettings\SsoSettingsActivatedEmailRedactor
      */
     private $sut;
 
+    /**
+     * @inheritDoc
+     */
     public function setUp(): void
     {
+        parent::setUp();
+
         $this->sut = new SsoSettingsActivatedEmailRedactor();
         $this->loadPlugins(['Passbolt/Locale' => []]);
+    }
 
-        parent::setUp();
+    /**
+     * @inheritDoc
+     */
+    public function tearDown(): void
+    {
+        unset($this->sut);
+
+        parent::tearDown();
     }
 
     public function testSsoSettingsActivatedEmailRedactor_EmailIsSubscribedToEvent()
