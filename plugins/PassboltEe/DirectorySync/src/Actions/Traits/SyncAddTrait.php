@@ -85,6 +85,7 @@ trait SyncAddTrait
             if (!$this->directoryOrgSettings->isSyncOperationEnabled(strtolower(self::ENTITY_TYPE), 'update')) {
                 return;
             }
+            $this->handleUpdateGroup($data, $entry, $existingEntity);
             $this->handleGroupUsersEdit($data, $entry, $existingEntity);
         }
     }

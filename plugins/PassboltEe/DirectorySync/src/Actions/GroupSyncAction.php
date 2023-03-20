@@ -20,11 +20,13 @@ use Passbolt\DirectorySync\Actions\Traits\GroupUsersSyncTrait;
 use Passbolt\DirectorySync\Actions\Traits\SyncAddTrait;
 use Passbolt\DirectorySync\Actions\Traits\SyncDeleteTrait;
 use Passbolt\DirectorySync\Actions\Traits\SyncTrait;
+use Passbolt\DirectorySync\Actions\Traits\SyncUpdateTrait;
 use Passbolt\DirectorySync\Utility\Alias;
 
 class GroupSyncAction extends SyncAction
 {
     use GroupUsersSyncTrait;
+    use SyncUpdateTrait;
     use SyncAddTrait;
     use SyncDeleteTrait;
     use SyncTrait;
