@@ -30,13 +30,29 @@ $routes->plugin('Passbolt/SsoRecover', ['path' => '/sso/recover'], function (Rou
         ])
         ->setMethods(['POST']);
 
-    /**
-     * Generic success pages
-     */
     $routes
         ->connect('/azure/success', [
             'prefix' => 'Azure',
             'controller' => 'AzureRecoverSuccess',
+            'action' => 'ssoRecoverSuccess',
+        ])
+        ->setMethods(['GET']);
+
+    /**
+     * Google
+     */
+    $routes
+        ->connect('/google', [
+            'prefix' => 'Google',
+            'controller' => 'GoogleRecoverLogin',
+            'action' => 'login',
+        ])
+        ->setMethods(['POST']);
+
+    $routes
+        ->connect('/google/success', [
+            'prefix' => 'Google',
+            'controller' => 'GoogleRecoverSuccess',
             'action' => 'ssoRecoverSuccess',
         ])
         ->setMethods(['GET']);
