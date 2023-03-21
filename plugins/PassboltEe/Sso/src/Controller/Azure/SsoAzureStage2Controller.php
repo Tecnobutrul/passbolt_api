@@ -23,6 +23,7 @@ use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Routing\Router;
 use Passbolt\Sso\Controller\AbstractSsoController;
+use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Azure\SsoAzureService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;

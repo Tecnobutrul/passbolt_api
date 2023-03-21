@@ -22,6 +22,7 @@ use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Routing\Router;
 use Passbolt\Sso\Controller\AbstractSsoController;
+use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Google\SsoGoogleService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
@@ -141,7 +142,10 @@ class SsoGoogleStage2Controller extends AbstractSsoController
                     $this->User->userAgent()
                 );
 
-                $successUrl = $ssoRecoverAssertService->getSuccessUrl($ssoAuthToken->token);
+                $successUrl = $ssoRecoverAssertService->getSuccessUrl(
+                    $ssoAuthToken->token,
+                    SsoSetting::PROVIDER_GOOGLE
+                );
                 break;
             default:
                 throw new BadRequestException(__('The SSO state type is invalid.'));
