@@ -43,6 +43,8 @@ class LdapConfigurationFormTest extends AppTestCase
             'password' => 'password',
             'base_dn' => 'OU=PassboltUsers,DC=passbolt,DC=local',
             'user_path' => 'my user_path',
+            'group_custom_filters' => 'group-custom-filters',
+            'user_custom_filters' => 'user-custom-filters',
             'group_object_class' => 'my group_object_class',
             'user_object_class' => 'my user_object_class',
             'use_email_prefix_suffix' => true,
@@ -52,6 +54,7 @@ class LdapConfigurationFormTest extends AppTestCase
             'default_group_admin_user' => UserFactory::make()->user()->persist()->get('id'),
             'sync_users_create' => true,
             'sync_users_delete' => false,
+            'sync_users_update' => true,
             'sync_groups_create' => true,
             'sync_groups_delete' => false,
             'sync_groups_update' => true,
@@ -239,6 +242,26 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'user_path', $ldapSettings, $testCases);
     }
 
+    public function testDirectoryLdapConfigurationFormValidateError_GroupCustomFilters()
+    {
+        $ldapSettings = self::getDummyFormData();
+        $testCases = [
+            'allowempty' => self::getAllowEmptyTestCases(),
+            'utf8' => self::getUtf8TestCases(),
+        ];
+        $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'group_custom_filters', $ldapSettings, $testCases);
+    }
+
+    public function testDirectoryLdapConfigurationFormValidateError_UserCustomFilters()
+    {
+        $ldapSettings = self::getDummyFormData();
+        $testCases = [
+            'allowempty' => self::getAllowEmptyTestCases(),
+            'utf8' => self::getUtf8TestCases(),
+        ];
+        $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'user_custom_filters', $ldapSettings, $testCases);
+    }
+
     public function testDirectoryLdapConfigurationFormValidateError_UseEmailPrefixSuffix()
     {
         $ldapSettings = self::getDummyFormData();
@@ -289,6 +312,16 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_users_delete', $ldapSettings, $testCases);
     }
 
+    public function testDirectoryLdapConfigurationFormValidateError_SyncUsersUpdate()
+    {
+        $ldapSettings = self::getDummyFormData();
+        $testCases = [
+            'allowempty' => self::getAllowEmptyTestCases(),
+            'boolean' => self::getBooleanTestCases(),
+        ];
+        $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'sync_users_update', $ldapSettings, $testCases);
+    }
+
     public function testDirectoryLdapConfigurationFormValidateError_SyncGroupsCreate()
     {
         $ldapSettings = self::getDummyFormData();
@@ -332,9 +365,13 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFalse(isset($config['groupPath']));
         $this->assertEquals(Hash::get($config, 'jobs.users.create'), true);
         $this->assertEquals(Hash::get($config, 'jobs.users.delete'), false);
+        $this->assertEquals(Hash::get($config, 'jobs.users.update'), true);
         $this->assertEquals(Hash::get($config, 'jobs.groups.create'), true);
         $this->assertEquals(Hash::get($config, 'jobs.groups.delete'), false);
         $this->assertEquals(Hash::get($config, 'jobs.groups.update'), true);
+
+        $this->assertEquals($data['group_custom_filters'], Hash::get($config, 'groupCustomFilters'));
+        $this->assertEquals($data['user_custom_filters'], Hash::get($config, 'userCustomFilters'));
     }
 
     public function testDirectoryFormatOrgSettingsToFormData()
@@ -351,6 +388,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFalse(isset($formData['group_path']));
         $this->assertTrue($formData['sync_users_create']);
         $this->assertFalse($formData['sync_users_delete']);
+        $this->assertTrue($formData['sync_users_update']);
         $this->assertTrue($formData['sync_groups_create']);
         $this->assertFalse($formData['sync_groups_delete']);
         $this->assertTrue($formData['sync_groups_update']);
