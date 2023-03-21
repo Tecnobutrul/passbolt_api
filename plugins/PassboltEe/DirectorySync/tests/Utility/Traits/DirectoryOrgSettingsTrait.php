@@ -36,6 +36,7 @@ trait DirectoryOrgSettingsTrait
             'jobs' => [
                 'users' => [
                     'create' => true,
+                    'update' => true,
                     'delete' => true,
                 ],
                 'groups' => [

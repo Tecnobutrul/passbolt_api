@@ -8,6 +8,7 @@ return [
                 'jobs' => [
                     'users' => [
                         'create' => true,
+                        'update' => true,
                         'delete' => true,
                     ],
                     'groups' => [
