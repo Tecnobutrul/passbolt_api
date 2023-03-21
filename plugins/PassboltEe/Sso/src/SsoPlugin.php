@@ -20,6 +20,7 @@ use App\Utility\Application\FeaturePluginAwareTrait;
 use Cake\Core\BasePlugin;
 use Cake\Core\ContainerInterface;
 use Cake\Core\PluginApplicationInterface;
+use Passbolt\Sso\Notification\Email\SsoSettingsRedactorPool;
 
 class SsoPlugin extends BasePlugin
 {
@@ -31,7 +32,8 @@ class SsoPlugin extends BasePlugin
     public function bootstrap(PluginApplicationInterface $app): void
     {
         parent::bootstrap($app);
-        //$this->registerListeners($app);
+
+        $this->registerListeners($app);
     }
 
     /**
@@ -42,6 +44,8 @@ class SsoPlugin extends BasePlugin
      */
     public function registerListeners(PluginApplicationInterface $app): void
     {
+        // Register email redactors
+        $app->getEventManager()->on(new SsoSettingsRedactorPool());
     }
 
     /**
