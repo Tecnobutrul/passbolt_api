@@ -27,7 +27,7 @@ use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Google\SsoGoogleService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
-use Passbolt\SsoRecover\Service\SsoRecoverAssertAssertService;
+use Passbolt\SsoRecover\Service\SsoRecoverAssertService;
 
 class SsoGoogleStage2Controller extends AbstractSsoController
 {
@@ -132,18 +132,14 @@ class SsoGoogleStage2Controller extends AbstractSsoController
                     throw new BadRequestException(__('SsoRecover plugin is disabled.'));
                 }
 
-                $ssoRecoverAssertService = new SsoRecoverAssertAssertService();
+                $ssoRecoverAssertService = new SsoRecoverAssertService();
 
-                $ssoAuthToken = $ssoRecoverAssertService->assertStateCodeAndGetAuthToken(
+                $successUrl = $ssoRecoverAssertService->assertAndGetRedirectUrl(
                     $service,
                     $ssoState,
                     $code,
                     $this->User->ip(),
-                    $this->User->userAgent()
-                );
-
-                $successUrl = $ssoRecoverAssertService->getSuccessUrl(
-                    $ssoAuthToken->token,
+                    $this->User->userAgent(),
                     SsoSetting::PROVIDER_GOOGLE
                 );
                 break;

@@ -142,7 +142,8 @@ class SsoAzureStage2Controller extends AbstractSsoController
                     $ssoState,
                     $code,
                     $this->User->ip(),
-                    $this->User->userAgent()
+                    $this->User->userAgent(),
+                    SsoSetting::PROVIDER_AZURE
                 );
                 break;
             default:
