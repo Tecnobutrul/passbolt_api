@@ -22,6 +22,10 @@ return [
                             'SsoAzureStage2' => 'triage',
                         ],
                     ],
+                    /**
+                     * When checking nbf, iat or expiration times, we want to provide some extra leeway time to account for clock skew.
+                     */
+                    'jwtLeeway' => filter_var(env('PASSBOLT_PLUGINS_SSO_JTW_LEEWAY', '10'), FILTER_VALIDATE_INT),
                 ],
             ],
         ],

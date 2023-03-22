@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Utility\OpenId;
 
 use App\Model\Validation\EmailValidationRule;
+use Cake\Core\Configure;
 use Cake\Http\Exception\BadRequestException;
 use Firebase\JWT\JWT;
 use League\OAuth2\Client\Token\AccessToken;
@@ -69,7 +70,7 @@ class BaseIdToken extends AccessToken
              * @link https://github.com/googleapis/google-api-php-client/issues/1630
              * @link https://stackoverflow.com/questions/53658600/uncaught-exception-firebase-jwt-beforevalidexception-with-message-cannot-hand
              */
-            JWT::$leeway = 10;
+            JWT::$leeway = Configure::read('passbolt.plugins.sso.security.jwtLeeway');
 
             $tokenClaims = (array)JWT::decode($this->idToken, $keys);
         } catch (\Exception $exception) {
