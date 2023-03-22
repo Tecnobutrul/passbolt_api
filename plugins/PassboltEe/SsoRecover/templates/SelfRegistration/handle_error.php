@@ -37,5 +37,5 @@ echo $this->Html->script('/js/app/stylesheet.js?v=' . $version, [
 $this->end();
 ?>
 <div id="api-error-details" class="visually-hidden">
-    <?= $message ?>
+    <?= \App\Utility\Purifier::clean($message) ?>
 </div>
