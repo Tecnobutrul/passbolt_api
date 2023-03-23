@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Controller\Azure;
 
+use App\Service\Cookie\AbstractSecureCookieService;
 use Cake\Event\EventInterface;
 use Passbolt\Sso\Controller\AbstractSsoController;
 use Passbolt\Sso\Model\Entity\SsoState;
@@ -36,9 +37,10 @@ class SsoAzureStage1Controller extends AbstractSsoController
     /**
      * Return a URL to redirect the user to perform SSO
      *
+     * @param \App\Service\Cookie\AbstractSecureCookieService $cookieService Cookie service
      * @return void
      */
-    public function stage1(): void
+    public function stage1(AbstractSecureCookieService $cookieService): void
     {
         $this->assertJson();
 
@@ -47,7 +49,7 @@ class SsoAzureStage1Controller extends AbstractSsoController
         $uac = $this->getUacFromData();
 
         // Redirect to provider
-        $url = $this->getSsoUrlWithCookie(new SsoAzureService(), $uac, SsoState::TYPE_SSO_GET_KEY);
+        $url = $this->getSsoUrlWithCookie(new SsoAzureService($cookieService), $uac, SsoState::TYPE_SSO_GET_KEY);
         $this->success(__('The operation was successful.'), ['url' => $url]);
     }
 }

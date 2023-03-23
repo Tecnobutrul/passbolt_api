@@ -61,12 +61,12 @@ class SsoSettingsSetService
         $ssoSettingsTable = TableRegistry::getTableLocator()->get('Passbolt/Sso.SsoSettings');
         /** @var \Passbolt\Sso\Model\Entity\SsoSetting $ssoSettingEntity */
         $ssoSettingEntity = $ssoSettingsTable->newEntity([
-                'provider' => $data['provider'],
-                'status' => SsoSetting::STATUS_DRAFT,
-                'data' => $encryptedData,
-                'created_by' => $uac->getId(),
-                'modified_by' => $uac->getId(),
-            ], [
+            'provider' => $data['provider'],
+            'status' => SsoSetting::STATUS_DRAFT,
+            'data' => $encryptedData,
+            'created_by' => $uac->getId(),
+            'modified_by' => $uac->getId(),
+        ], [
             'accessibleFields' => [
                 'provider' => true,
                 'status' => true,
@@ -116,7 +116,19 @@ class SsoSettingsSetService
         $passphrase = Configure::read('passbolt.gpg.serverKey.passphrase');
         $gpg = OpenPGPBackendFactory::get();
         $gpg->setSignKeyFromFingerprint($fingerprint, $passphrase);
-        $gpg->setEncryptKeyFromFingerprint($fingerprint);
+
+        try {
+            $gpg->setEncryptKeyFromFingerprint($fingerprint);
+        } catch (\Exception $exception) {
+            try {
+                $gpg->importServerKeyInKeyring();
+                $gpg->setEncryptKeyFromFingerprint($fingerprint);
+            } catch (\Exception $exception) {
+                $msg = __('The OpenPGP server key defined in the config cannot be used to encrypt.') . ' ';
+                $msg .= $exception->getMessage();
+                throw new InternalErrorException($msg, 500, $exception);
+            }
+        }
 
         return $gpg->encrypt($jsonData, true);
     }
