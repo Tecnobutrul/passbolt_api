@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Controller\Google;
 
+use App\Service\Cookie\AbstractSecureCookieService;
 use App\Utility\Application\FeaturePluginAwareTrait;
 use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
@@ -46,9 +47,10 @@ class SsoGoogleStage2Controller extends AbstractSsoController
     /**
      * Handle both user is admin and trying to validate a setting or regular user SSO return.
      *
+     * @param \App\Service\Cookie\AbstractSecureCookieService $cookieService Cookie service
      * @return void
      */
-    public function triage(): void
+    public function triage(AbstractSecureCookieService $cookieService): void
     {
         // Get state from cookie and URL to prevent CSRF
         $state = $this->getStateFromUrlAndCookie();
@@ -67,18 +69,19 @@ class SsoGoogleStage2Controller extends AbstractSsoController
         }
 
         if ($this->User->isAdmin()) {
-            $this->stage2AsAdmin($ssoState, $code);
+            $this->stage2AsAdmin($cookieService, $ssoState, $code);
         } else {
-            $this->stage2($ssoState, $code);
+            $this->stage2($cookieService, $ssoState, $code);
         }
     }
 
     /**
+     * @param \App\Service\Cookie\AbstractSecureCookieService $cookieService Cookie service
      * @param \Passbolt\Sso\Model\Entity\SsoState $ssoState SSO state.
      * @param string $code jwt
      * @return void
      */
-    public function stage2AsAdmin(SsoState $ssoState, string $code): void
+    public function stage2AsAdmin(AbstractSecureCookieService $cookieService, SsoState $ssoState, string $code): void
     {
         try {
             // Get the draft settings
@@ -87,7 +90,7 @@ class SsoGoogleStage2Controller extends AbstractSsoController
             throw new BadRequestException($exception->getMessage(), 400, $exception);
         }
 
-        $service = new SsoGoogleService($settingsDto);
+        $service = new SsoGoogleService($cookieService, $settingsDto);
         $uac = $service->assertStateCodeAndGetUac($ssoState, $code, $this->User->ip(), $this->User->userAgent());
 
         // Create authentication token for next step, e.g. activate settings
@@ -98,11 +101,12 @@ class SsoGoogleStage2Controller extends AbstractSsoController
     }
 
     /**
+     * @param \App\Service\Cookie\AbstractSecureCookieService $cookieService Cookie service
      * @param \Passbolt\Sso\Model\Entity\SsoState $ssoState SSO state.
      * @param string $code jwt
      * @return void
      */
-    public function stage2(SsoState $ssoState, string $code): void
+    public function stage2(AbstractSecureCookieService $cookieService, SsoState $ssoState, string $code): void
     {
         $this->User->assertNotLoggedIn();
 
@@ -113,7 +117,7 @@ class SsoGoogleStage2Controller extends AbstractSsoController
             throw new BadRequestException($exception->getMessage(), 400, $exception);
         }
 
-        $service = new SsoGoogleService($settingsDto);
+        $service = new SsoGoogleService($cookieService, $settingsDto);
 
         switch ($ssoState->type) {
             case SsoState::TYPE_SSO_GET_KEY:

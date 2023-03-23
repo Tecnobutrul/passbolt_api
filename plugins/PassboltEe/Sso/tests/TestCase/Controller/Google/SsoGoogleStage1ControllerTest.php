@@ -35,6 +35,7 @@ class SsoGoogleStage1ControllerTest extends SsoIntegrationTestCase
      */
     public function testSsoGoogleStage1Controller_Success(): void
     {
+        $this->disableErrorHandlerMiddleware();
         $user = UserFactory::make()->admin()->persist();
         $ssoSetting = $this->createGoogleSettingsFromConfig($user);
 
