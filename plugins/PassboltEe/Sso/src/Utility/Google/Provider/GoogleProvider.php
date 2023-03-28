@@ -203,6 +203,6 @@ class GoogleProvider extends BaseOauth2Provider
             return $this->createResourceOwner($data, $token);
         }
 
-        throw new InternalErrorException('AccessToken should instance of BaseIdToken class.');
+        throw new InternalErrorException('AccessToken should be an instance of BaseIdToken class.');
     }
 }
