@@ -23,7 +23,6 @@ use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 
 /**
- * @property \App\Model\Table\ResourcesTable $Resources
  * @property \App\Model\Table\UsersTable $Users
  */
 class ResourcesAddController extends AppController
@@ -32,6 +31,11 @@ class ResourcesAddController extends AppController
      * @var \App\Service\Resources\ResourcesAddService
      */
     protected $resourcesAddService;
+
+    /**
+     * @var \App\Model\Table\ResourcesTable
+     */
+    protected $Resources;
 
     /**
      * @inheritDoc

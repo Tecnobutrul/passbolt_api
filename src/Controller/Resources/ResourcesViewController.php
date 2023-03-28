@@ -27,10 +27,15 @@ use Cake\Validation\Validation;
 use Exception;
 
 /**
- * @property \App\Model\Table\ResourcesTable $Resources
+ * ResourcesViewController Class
  */
 class ResourcesViewController extends AppController
 {
+    /**
+     * @var \App\Model\Table\ResourcesTable
+     */
+    protected $Resources;
+
     /**
      * @inheritDoc
      */
