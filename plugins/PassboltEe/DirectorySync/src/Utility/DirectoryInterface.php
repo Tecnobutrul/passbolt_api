@@ -38,6 +38,12 @@ interface DirectoryInterface
      * Filter constants
      */
     public const AD_ENABLED_USERS_FILTER = '(!(userAccountControl:1.2.840.113556.1.4.803:=2))';
+
+    /**
+     * SASL Mechanisms constants
+     */
+    public const SASL_MECH_GSSAPI = 'GSSAPI';
+
     /**
      * Get users.
      *

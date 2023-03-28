@@ -127,6 +127,24 @@ return [
                             // Optional: Whether or not to talk to LDAP over SSL. Default: false
                             //'use_ssl' => false,
 
+                            // Optional: Whether or not to use SASL to connect to LDAP. Default: false
+                            //'use_sasl' => false,
+
+                            // Optional: SASL Options to be passed to Connection
+                            // SASL options:
+                            //  - mech: Mechanism (Defaults: GSSAPI)
+                            //  - realm: Realm (Defaults: null)
+                            //  - authc_id: Verification Identity (Defaults: null)
+                            //  - authz_id: Authorization Identity (Defaults: null)
+                            //  - props: Options for Authorization Identity (Defaults: null)
+                            //'sasl_options' => [
+                            //    'mech' => null,
+                            //    'realm' => null,
+                            //    'authc_id' => null,
+                            //    'authz_id' => null,
+                            //    'props' => null
+                            //],
+
                             // Optional: The port to communicate to the LDAP servers on. If not set, default is 389
                             // If this is not set and 'use_ssl' is specified, the the port will be set to 636.
                             'port' => 389,

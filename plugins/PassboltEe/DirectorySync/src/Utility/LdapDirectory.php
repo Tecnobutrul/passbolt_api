@@ -21,6 +21,7 @@ use Cake\Utility\Hash;
 use LdapRecord\Configuration\DomainConfiguration;
 use LdapRecord\Connection;
 use LdapRecord\Container;
+use LdapRecord\Ldap;
 use LdapRecord\LdapRecordException;
 use LdapRecord\Models\Collection;
 use LdapRecord\Query\Builder;
@@ -103,6 +104,9 @@ class LdapDirectory implements DirectoryInterface
         DomainConfiguration::extend('domain');
         DomainConfiguration::extend('domain_name');
         DomainConfiguration::extend('ldap_type');
+        DomainConfiguration::extend('use_sasl', false);
+        DomainConfiguration::extend('sasl_options', []);
+        DomainConfiguration::extend('lazy_bind', false);
         foreach ($ldapSettings as $domain => $settings) {
             $connectionSettings = $this->prepareSettings($domain, $settings);
             $connection = $this->getConnection($connectionSettings);
@@ -131,8 +135,12 @@ class LdapDirectory implements DirectoryInterface
      */
     protected function getConnection(array $ldapSettings): Connection
     {
-        $connection = new Connection($ldapSettings);
-        if (Hash::get($ldapSettings, 'lazyBind', false) !== true) {
+        $ldap = new Ldap();
+        if (Hash::get($ldapSettings, 'use_sasl', false)) {
+            $ldap = new LdapSasl(Hash::get($ldapSettings, 'sasl_options', []));
+        }
+        $connection = new Connection($ldapSettings, $ldap);
+        if (Hash::get($ldapSettings, 'lazy_bind', false) !== true) {
             try {
                 $connection->connect();
             } catch (LdapRecordException $lre) {
@@ -552,6 +560,8 @@ class LdapDirectory implements DirectoryInterface
         $settings['domain'] = $domain;
         $settings['use_ssl'] = (bool)($settings['use_ssl'] ?? false);
         $settings['use_tls'] = (bool)($settings['use_tls'] ?? false);
+        $settings['use_sasl'] = (bool)($settings['use_sasl'] ?? false);
+        $settings['sasl_options'] = $settings['sasl_options'] ?? ['sasl_mech' => DirectoryInterface::SASL_MECH_GSSAPI];
         if (isset($settings['servers'])) {
             deprecationWarning(
                 'LDAP: `servers` key has been deprecated and it will be removed. Use `hosts` instead.'
@@ -571,11 +581,14 @@ class LdapDirectory implements DirectoryInterface
         if (!isset($settings['bind_format'])) {
             $settings['bind_format'] = DirectoryOrgSettings::BIND_FORMATS[$settings['ldap_type']];
         }
-        $settings['username'] = DirectoryOrgSettings::formatUsername(
-            $settings['username'],
-            $settings['domain_name'],
-            $settings['bind_format']
-        );
+        if (!empty($settings['username'])) {
+            $settings['username'] = DirectoryOrgSettings::formatUsername(
+                $settings['username'],
+                $settings['domain_name'],
+                $settings['bind_format']
+            );
+        }
+
         $domainConfiguration = new DomainConfiguration();
         //Intersect settings with domain configuration keys to avoid unexpected key error from library
         return array_intersect_key($settings, $domainConfiguration->all());
