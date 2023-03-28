@@ -16,9 +16,8 @@ declare(strict_types=1);
  */
 namespace Passbolt\DirectorySync\Utility\DirectoryEntry;
 
-use LdapTools\Object\LdapObject;
-use LdapTools\Object\LdapObjectType;
-use LdapTools\Utilities\LdapUtilities;
+use LdapRecord\Models\Entry;
+use Passbolt\DirectorySync\Utility\DirectoryInterface;
 
 /**
  * Class GroupEntry
@@ -46,22 +45,22 @@ class GroupEntry extends DirectoryEntry
      *
      * @var string
      */
-    public $type = LdapObjectType::GROUP;
+    public $type = DirectoryInterface::ENTRY_TYPE_GROUP;
 
     /**
      * Build a groupEntry from a ldap object.
      *
-     * @param \LdapTools\Object\LdapObject $ldapObject ldap object.
+     * @param \LdapRecord\Models\Entry $ldapObject ldap object.
      * @param array $mappingRules mapping rules
      * @return $this directory entry
      * @throws \Exception
      */
-    public function buildFromLdapObject(LdapObject $ldapObject, array $mappingRules)
+    public function buildFromLdapObject(Entry $ldapObject, array $mappingRules)
     {
         parent::buildFromLdapObject($ldapObject, $mappingRules);
         $this->group = [
             'name' => $this->getFieldValue('name'),
-            'members' => $this->getFieldValue('users'),
+            'members' => $this->getFieldValue('users', false),
             // groups and users can't be retrieved from the ldap object.
             // these values will be populated afterwards by DirectoryResults.
             'groups' => [],
@@ -75,12 +74,12 @@ class GroupEntry extends DirectoryEntry
     /**
      * Return a groupEntry from a ldap object.
      *
-     * @param \LdapTools\Object\LdapObject $ldapObject ldap object.
+     * @param \LdapRecord\Models\Entry $ldapObject ldap object.
      * @param array $mappingRules mapping rules.
      * @return \Passbolt\DirectorySync\Utility\DirectoryEntry\GroupEntry group entry
      * @throws \Exception
      */
-    public static function fromLdapObject(LdapObject $ldapObject, array $mappingRules): GroupEntry
+    public static function fromLdapObject(Entry $ldapObject, array $mappingRules): GroupEntry
     {
         $groupEntry = new GroupEntry([]);
         $groupEntry->buildFromLdapObject($ldapObject, $mappingRules);
@@ -132,7 +131,7 @@ class GroupEntry extends DirectoryEntry
      *
      * @return bool
      */
-    public function validate()
+    public function validate(): bool
     {
         return $this->_validate();
     }
@@ -142,7 +141,7 @@ class GroupEntry extends DirectoryEntry
      *
      * @return bool
      */
-    protected function _validate()
+    protected function _validate(): bool
     {
         parent::_validate();
 
@@ -152,7 +151,7 @@ class GroupEntry extends DirectoryEntry
 
         if (isset($this->group['members']) && !empty($this->group['members'])) {
             foreach ($this->group['members'] as $groupMember) {
-                if (!LdapUtilities::isValidLdapObjectDn($groupMember)) {
+                if (!self::isValidDn($groupMember)) {
                     $this->_addError('members', __('A group member does not match the expected DN format.'));
                 }
             }
@@ -166,7 +165,7 @@ class GroupEntry extends DirectoryEntry
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $extraData = [
             'group' => $this->group,
@@ -198,7 +197,7 @@ class GroupEntry extends DirectoryEntry
      * @param array $members group members
      * @return void
      */
-    public function setGroupMembers(array $members)
+    public function setGroupMembers(array $members): void
     {
         $this->group['members'] = $members;
     }
@@ -210,7 +209,7 @@ class GroupEntry extends DirectoryEntry
      * @param array $groups list of children groups.
      * @return void
      */
-    public function setGroupGroups(array $groups)
+    public function setGroupGroups(array $groups): void
     {
         $this->group['groups'] = $groups;
     }
@@ -222,7 +221,7 @@ class GroupEntry extends DirectoryEntry
      * @param array $users the children groups users
      * @return void
      */
-    public function setGroupUsers(array $users)
+    public function setGroupUsers(array $users): void
     {
         $this->group['users'] = $users;
     }

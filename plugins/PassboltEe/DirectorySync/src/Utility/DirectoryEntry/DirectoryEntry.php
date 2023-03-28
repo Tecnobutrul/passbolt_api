@@ -18,9 +18,9 @@ namespace Passbolt\DirectorySync\Utility\DirectoryEntry;
 
 use ArrayAccess;
 use Cake\I18n\FrozenTime;
-use LdapTools\Object\LdapObject;
-use LdapTools\Object\LdapObjectType;
-use LdapTools\Utilities\LdapUtilities;
+use LdapRecord\Models\Entry;
+use LdapRecord\Utilities;
+use Passbolt\DirectorySync\Utility\DirectoryInterface;
 
 abstract class DirectoryEntry implements ArrayAccess
 {
@@ -55,14 +55,14 @@ abstract class DirectoryEntry implements ArrayAccess
     /**
      * Object type.
      *
-     * @var mixed|null
+     * @var string|null
      */
     public $type = null;
 
     /**
      * Corresponding ldap object.
      *
-     * @var \LdapTools\Object\LdapObject|null
+     * @var \LdapRecord\Models\Entry|null
      */
     private $ldapObject = null;
 
@@ -138,9 +138,9 @@ abstract class DirectoryEntry implements ArrayAccess
      *
      * @return bool true or false
      */
-    public function isGroup()
+    public function isGroup(): bool
     {
-        return $this->type === LdapObjectType::GROUP;
+        return $this->type === DirectoryInterface::ENTRY_TYPE_GROUP;
     }
 
     /**
@@ -148,43 +148,52 @@ abstract class DirectoryEntry implements ArrayAccess
      *
      * @return bool true or false
      */
-    public function isUser()
+    public function isUser(): bool
     {
-        return $this->type === LdapObjectType::USER;
+        return $this->type === DirectoryInterface::ENTRY_TYPE_USER;
     }
 
     /**
      * Get field value.
      *
      * @param string $fieldName field name
+     * @param bool $first Returns first attribute found
      * @return mixed field value
      * @throws \Exception if the corresponding field name cannot be found.
      */
-    public function getFieldValue(string $fieldName)
+    public function getFieldValue(string $fieldName, bool $first = true)
     {
-        return self::getLdapObjectFieldValue($this->ldapObject, $fieldName, $this->mappingRules);
+        return self::getLdapObjectFieldValue($this->ldapObject, $fieldName, $this->mappingRules, $first);
     }
 
     /**
      * Get ldap object field value.
      *
-     * @param \LdapTools\Object\LdapObject $ldapObject ldap object.
+     * @param \LdapRecord\Models\Entry $ldapObject ldap object.
      * @param string $fieldName field name.
      * @param array $mappingRules mapping rules.
-     * @return mixed field value
+     * @param bool $first Returns first attribute found
+     * @return mixed field
      * @throws \Exception
      */
-    public static function getLdapObjectFieldValue(LdapObject $ldapObject, string $fieldName, array $mappingRules)
-    {
-        $mappingRules = $mappingRules[$ldapObject->getType()];
+    public static function getLdapObjectFieldValue(
+        Entry $ldapObject,
+        string $fieldName,
+        array $mappingRules,
+        bool $first = true
+    ) {
+        /** @var string $type */
+        $type = $ldapObject->getFirstAttribute('objectType');
+        $mappingRules = $mappingRules[$type];
         if (!isset($mappingRules[$fieldName])) {
             throw new \Exception('There is no mapping rule associated for the field: ' . $fieldName);
         }
 
         $fieldEquivalent = $mappingRules[$fieldName];
-        $call = 'get' . ucfirst($fieldEquivalent);
 
-        return $ldapObject->{$call}();
+        return $first ?
+            $ldapObject->getFirstAttribute(ucfirst($fieldEquivalent)) :
+            $ldapObject->getAttribute(ucfirst($fieldEquivalent));
     }
 
     /**
@@ -209,20 +218,21 @@ abstract class DirectoryEntry implements ArrayAccess
     /**
      * Build entry from a ldap object.
      *
-     * @param \LdapTools\Object\LdapObject $ldapObject ldap object
+     * @param \LdapRecord\Models\Entry $ldapObject ldap object
      * @param array $mappingRules mapping rules
      * @return $this
      * @throws \Exception
      */
-    public function buildFromLdapObject(LdapObject $ldapObject, array $mappingRules)
+    public function buildFromLdapObject(Entry $ldapObject, array $mappingRules)
     {
         $this->ldapObject = $ldapObject;
         $this->mappingRules = $mappingRules;
 
         $this->id = $this->getFieldValue('id');
-        $this->dn = $ldapObject->get('dn');
+        $this->dn = $ldapObject->getDn();
 
         $created = $this->getFieldValue('created');
+
         if (!empty($created)) {
             $this->created = new FrozenTime($created);
         }
@@ -240,19 +250,19 @@ abstract class DirectoryEntry implements ArrayAccess
      *
      * @return bool
      */
-    protected function _validate()
+    protected function _validate(): bool
     {
         $this->errors = [];
 
         if (empty($this->id)) {
             $this->_addError('id', 'id could not be retrieved');
-        } elseif (!LdapUtilities::isValidGuid($this->id)) {
+        } elseif (!Utilities::isValidGuid($this->id)) {
             $this->_addError('id', 'id does not match the expected Guid format');
         }
 
         if (empty($this->dn)) {
             $this->_addError('dn', 'dn could not be retrieved');
-        } elseif (!LdapUtilities::isValidLdapObjectDn($this->dn)) {
+        } elseif (!self::isValidDn($this->dn)) {
             $this->_addError('dn', 'dn does not match the expected DN format');
         }
 
@@ -267,13 +277,24 @@ abstract class DirectoryEntry implements ArrayAccess
     }
 
     /**
+     * Validate DN
+     *
+     * @param string $dn Distinguished name
+     * @return bool
+     */
+    public static function isValidDn(string $dn): bool
+    {
+        return ($pieces = Utilities::explodeDn($dn)) && count($pieces) >= 2;
+    }
+
+    /**
      * Add a validation error in the list of errors.
      *
      * @param string $field field name
      * @param string $errorMsg error message
      * @return void
      */
-    protected function _addError(string $field, string $errorMsg)
+    protected function _addError(string $field, string $errorMsg): void
     {
         if (!isset($this->errors[$field])) {
             $this->errors[$field] = [];
@@ -287,7 +308,7 @@ abstract class DirectoryEntry implements ArrayAccess
      *
      * @return array validation errors.
      */
-    public function errors()
+    public function errors(): array
     {
         return $this->errors;
     }
@@ -297,7 +318,7 @@ abstract class DirectoryEntry implements ArrayAccess
      *
      * @return string validation errors as a single string.
      */
-    public function getErrorsAsString()
+    public function getErrorsAsString(): string
     {
         $str = '';
         foreach ($this->errors as $field => $errors) {
@@ -314,7 +335,7 @@ abstract class DirectoryEntry implements ArrayAccess
      *
      * @return bool true if errors, false otherwise.
      */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return !empty($this->errors());
     }
@@ -324,7 +345,7 @@ abstract class DirectoryEntry implements ArrayAccess
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $res = [
             'type' => $this->type,
@@ -344,9 +365,9 @@ abstract class DirectoryEntry implements ArrayAccess
     /**
      * Get entry type.
      *
-     * @return mixed|null entry type
+     * @return string|null entry type
      */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -362,9 +383,9 @@ abstract class DirectoryEntry implements ArrayAccess
     /**
      * Build from ldap object.
      *
-     * @param \LdapTools\Object\LdapObject $ldapObject ldap object.
+     * @param \LdapRecord\Models\Entry $ldapObject ldap object.
      * @param array $mappingRules mapping rules.
      * @return mixed DirectoryEntry
      */
-    abstract public static function fromLdapObject(LdapObject $ldapObject, array $mappingRules);
+    abstract public static function fromLdapObject(Entry $ldapObject, array $mappingRules);
 }

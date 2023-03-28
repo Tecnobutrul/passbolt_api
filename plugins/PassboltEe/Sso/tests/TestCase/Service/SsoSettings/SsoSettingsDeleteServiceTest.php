@@ -19,7 +19,8 @@ namespace Passbolt\Sso\Test\TestCase\Service\SsoSettings;
 
 use App\Model\Entity\Role;
 use App\Test\Factory\UserFactory;
-use App\Utility\UserAccessControl;
+use App\Test\Lib\Utility\ExtendedUserAccessControlTestTrait;
+use App\Utility\ExtendedUserAccessControl;
 use App\Utility\UuidFactory;
 use Cake\Event\EventList;
 use Cake\Event\EventManager;
@@ -28,10 +29,13 @@ use Cake\Http\Exception\NotFoundException;
 use Cake\TestSuite\Constraint\EventFired;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsDeleteService;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
+use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
 
 class SsoSettingsDeleteServiceTest extends SsoTestCase
 {
+    use ExtendedUserAccessControlTestTrait;
+
     public function testSsoSettingsDeleteService_Success(): void
     {
         // Setup events
@@ -41,13 +45,23 @@ class SsoSettingsDeleteServiceTest extends SsoTestCase
         $setting = SsoSettingsFactory::make()->active()->persist();
         $this->assertEquals(1, SsoSettingsFactory::count());
 
-        $uac = new UserAccessControl(Role::ADMIN, $user->id);
+        $uac = new ExtendedUserAccessControl(
+            Role::ADMIN,
+            $user->id,
+            $user->username,
+            SsoIntegrationTestCase::IP_ADDRESS,
+            SsoIntegrationTestCase::USER_AGENT
+        );
         (new SsoSettingsDeleteService())->delete($uac, $setting->id);
 
         $this->assertEquals(0, SsoSettingsFactory::count());
 
         // Event is fired if
-        $this->assertEventFired(SsoSettingsDeleteService::AFTER_DELETE_ACTIVE_SSO_SETTINGS_EVENT);
+        $this->assertEventFiredWith(
+            SsoSettingsDeleteService::AFTER_DELETE_ACTIVE_SSO_SETTINGS_EVENT,
+            'uac',
+            $uac
+        );
     }
 
     public function testSsoSettingsDeleteService_Success_Draft(): void
@@ -59,7 +73,13 @@ class SsoSettingsDeleteServiceTest extends SsoTestCase
         $setting = SsoSettingsFactory::make()->draft()->persist();
         $this->assertEquals(1, SsoSettingsFactory::count());
 
-        $uac = new UserAccessControl(Role::ADMIN, $user->id);
+        $uac = new ExtendedUserAccessControl(
+            Role::ADMIN,
+            $user->id,
+            $user->username,
+            SsoIntegrationTestCase::IP_ADDRESS,
+            SsoIntegrationTestCase::USER_AGENT
+        );
         (new SsoSettingsDeleteService())->delete($uac, $setting->id);
 
         $this->assertEquals(0, SsoSettingsFactory::count());
@@ -76,21 +96,21 @@ class SsoSettingsDeleteServiceTest extends SsoTestCase
 
     public function testSsoSettingsDeleteService_Error_NotFound(): void
     {
-        $uac = new UserAccessControl(Role::ADMIN);
+        $uac = $this->mockExtendedAdminAccessControl();
         $this->expectException(NotFoundException::class);
         (new SsoSettingsDeleteService())->delete($uac, UuidFactory::uuid());
     }
 
     public function testSsoSettingsDeleteService_Error_InvalidId(): void
     {
-        $uac = new UserAccessControl(Role::ADMIN);
+        $uac = $this->mockExtendedAdminAccessControl();
         $this->expectException(BadRequestException::class);
         (new SsoSettingsDeleteService())->delete($uac, 'nope');
     }
 
     public function testSsoSettingsDeleteService_Error_NotAdmin(): void
     {
-        $uac = new UserAccessControl(Role::USER);
+        $uac = $this->mockExtendedUserAccessControl();
         $this->expectException(BadRequestException::class);
         (new SsoSettingsDeleteService())->delete($uac, 'nope');
     }

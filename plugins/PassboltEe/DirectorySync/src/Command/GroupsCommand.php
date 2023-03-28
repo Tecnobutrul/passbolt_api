@@ -22,12 +22,21 @@ use Cake\Console\ConsoleOptionParser;
 use Passbolt\DirectorySync\Actions\GroupSyncAction;
 
 /**
- * @property \App\Model\Table\GroupsTable $Groups
- * @property \App\Model\Table\UsersTable $Users
+ * Class GroupsCommand
  */
 class GroupsCommand extends DirectorySyncCommand
 {
     use SyncCommandTrait;
+
+    /**
+     * @var \App\Model\Table\GroupsTable
+     */
+    protected $Groups;
+
+    /**
+     * @var \App\Model\Table\UsersTable
+     */
+    protected $Users;
 
     /**
      * Initializes the Shell
@@ -40,8 +49,10 @@ class GroupsCommand extends DirectorySyncCommand
     public function initialize(): void
     {
         parent::initialize();
-        $this->loadModel('Groups');
-        $this->loadModel('Users');
+        /** @phpstan-ignore-next-line */
+        $this->Groups = $this->fetchTable('Groups');
+        /** @phpstan-ignore-next-line */
+        $this->Users = $this->fetchTable('Users');
     }
 
     /**
@@ -53,6 +64,11 @@ class GroupsCommand extends DirectorySyncCommand
             ->addOption('dry-run', [
                 'help' => 'Don\'t save the changes',
                 'default' => 'true',
+                'boolean' => true,
+            ])
+            ->addOption('persist', [
+                'help' => 'Persist data, otherwise it won\'t save the changes',
+                'default' => false,
                 'boolean' => true,
             ]);
 
@@ -67,7 +83,8 @@ class GroupsCommand extends DirectorySyncCommand
         parent::execute($args, $io);
 
         try {
-            $dryRun = $args->getOption('dry-run');
+            $dryRun = $args->getOption('dry-run') || !$args->getOption('persist');
+
             $action = new GroupSyncAction();
             $action->setDryRun($dryRun);
             $reports = $action->execute();
@@ -77,6 +94,8 @@ class GroupsCommand extends DirectorySyncCommand
 
             return $this->errorCode();
         }
+
+        $this->warnPersist($args, $io);
 
         return $this->successCode();
     }

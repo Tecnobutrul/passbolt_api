@@ -17,11 +17,11 @@ declare(strict_types=1);
 namespace Passbolt\DirectorySync\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
-use LdapTools\Object\LdapObjectType;
 use Passbolt\DirectorySync\Actions\GroupSyncAction;
 use Passbolt\DirectorySync\Actions\UserSyncAction;
 use Passbolt\DirectorySync\Test\Utility\DirectorySyncIntegrationTestCase;
 use Passbolt\DirectorySync\Utility\DirectoryEntry\DirectoryResults;
+use Passbolt\DirectorySync\Utility\DirectoryInterface;
 
 class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
 {
@@ -99,7 +99,7 @@ class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
     public function testDirectoryGroupsFromParentGroup()
     {
         $retrievedGroups = $this->directoryResults
-            ->getRecursivelyFromParentGroup(LdapObjectType::GROUP, 'Administration')
+            ->getRecursivelyFromParentGroup(DirectoryInterface::ENTRY_TYPE_GROUP, 'Administration')
             ->getGroups();
 
         $this->assertEquals(count($retrievedGroups), 2);
@@ -132,7 +132,7 @@ class DirectoryResultsTest extends DirectorySyncIntegrationTestCase
     public function testDirectoryUsersFromParentGroup()
     {
         $retrievedUsers = $this->directoryResults
-            ->getRecursivelyFromParentGroup(LdapObjectType::USER, 'Administration')
+            ->getRecursivelyFromParentGroup(DirectoryInterface::ENTRY_TYPE_USER, 'Administration')
             ->getUsers();
 
         $this->assertEquals(3, count($retrievedUsers));

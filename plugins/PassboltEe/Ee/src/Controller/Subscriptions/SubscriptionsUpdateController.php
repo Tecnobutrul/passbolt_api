@@ -44,7 +44,8 @@ class SubscriptionsUpdateController extends AppController
             throw new BadRequestException(__('Subscription key data is required.'));
         }
 
-        $this->loadModel('Passbolt/Ee.Subscriptions');
+        /** @phpstan-ignore-next-line */
+        $this->Subscriptions = $this->fetchTable('Passbolt/Ee.Subscriptions');
         try {
             $service = new SubscriptionKeySaveService();
             $subscriptionKey = $service->save($keyString, $this->User->getAccessControl());

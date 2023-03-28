@@ -27,7 +27,7 @@ use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Azure\SsoAzureService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
-use Passbolt\SsoRecover\Service\SsoRecoverAssertAssertService;
+use Passbolt\SsoRecover\Service\SsoRecoverAssertService;
 
 class SsoAzureStage2Controller extends AbstractSsoController
 {
@@ -130,21 +130,19 @@ class SsoAzureStage2Controller extends AbstractSsoController
                 $successUrl = Router::url("/sso/login/success?token={$ssoAuthToken->token}", true);
                 break;
             case SsoState::TYPE_SSO_RECOVER:
-                if (! $this->isFeaturePluginEnabled('SsoRecover')) {
+                if (!$this->isFeaturePluginEnabled('SsoRecover')) {
                     throw new BadRequestException(__('SsoRecover plugin is disabled.'));
                 }
 
-                $ssoRecoverAssertService = new SsoRecoverAssertAssertService();
+                $ssoRecoverAssertService = new SsoRecoverAssertService();
 
-                $ssoAuthToken = $ssoRecoverAssertService->assertStateCodeAndGetAuthToken(
+                $successUrl = $ssoRecoverAssertService->assertAndGetRedirectUrl(
                     $service,
                     $ssoState,
                     $code,
                     $this->User->ip(),
                     $this->User->userAgent()
                 );
-
-                $successUrl = $ssoRecoverAssertService->getSuccessUrl($ssoAuthToken->token);
                 break;
             default:
                 throw new BadRequestException(__('The SSO state type is invalid.'));

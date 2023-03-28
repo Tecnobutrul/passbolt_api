@@ -19,12 +19,10 @@ namespace Passbolt\DirectorySync\Test\TestCase\Utility;
 use App\Model\Entity\Role;
 use App\Utility\UuidFactory;
 use Cake\Core\Configure;
-use Cake\I18n\FrozenTime;
-use LdapTools\Object\LdapObject;
-use LdapTools\Object\LdapObjectCollection;
-use LdapTools\Object\LdapObjectType;
+use LdapRecord\Models\Collection;
 use Passbolt\DirectorySync\Test\Utility\DirectorySyncIntegrationTestCase;
 use Passbolt\DirectorySync\Utility\DirectoryEntry\DirectoryResults;
+use Passbolt\DirectorySync\Utility\DirectoryInterface;
 use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 class DirectoryResultsObjectTransformationTest extends DirectorySyncIntegrationTestCase
@@ -44,23 +42,24 @@ class DirectoryResultsObjectTransformationTest extends DirectorySyncIntegrationT
         Configure::write('passbolt.plugins.directorySync.enabled', true);
         $this->loadPlugins(['Passbolt/DirectorySync' => []]);
         Configure::load('Passbolt/DirectorySync.config', 'default', true);
-        $mappingRules = Configure::read('passbolt.plugins.directorySync.fieldsMapping.ad');
+        $mappingRules = Configure::read('passbolt.plugins.directorySync.fieldsMapping');
 
         // userData without guid.
         $userData = [
-            'guid' => UuidFactory::uuid('ldap.user.id.john'),
-            'firstName' => 'john',
-            'lastName' => 'doe',
-            'emailAddress' => 'john.doe@passbolt.com',
+            'objectGuid' => UuidFactory::uuid('ldap.user.id.john'),
+            'givenName' => 'john',
+            'sn' => 'doe',
+            'mail' => 'john.doe@passbolt.com',
             'dn' => 'CN=john,OU=accounts,OU=passbolt,OU=local',
-            'created' => new FrozenTime(),
-            'modified' => new FrozenTime(),
+            'directoryType' => DirectoryInterface::TYPE_AD,
+            'whenCreated' => new \DateTime(),
+            'whenChanged' => new \DateTime(),
         ];
-        $ldapObject = new LdapObject($userData, LdapObjectType::USER);
-        $ldapUsers = new LdapObjectCollection();
+        $ldapObject = $this->getTestLdapUserObject($userData);
+        $ldapUsers = new Collection();
         /** @psalm-suppress InvalidArgument see signature */
         $ldapUsers->add($ldapObject);
-        $ldapGroups = new LdapObjectCollection();
+        $ldapGroups = new Collection();
 
         $DirectoryResults = new DirectoryResults($mappingRules);
         $DirectoryResults->initializeWithLdapResults($ldapUsers, $ldapGroups);
@@ -81,22 +80,22 @@ class DirectoryResultsObjectTransformationTest extends DirectorySyncIntegrationT
         Configure::write('passbolt.plugins.directorySync.enabled', true);
         $this->loadPlugins(['Passbolt/DirectorySync' => []]);
         Configure::load('Passbolt/DirectorySync.config', 'default', true);
-        $mappingRules = Configure::read('passbolt.plugins.directorySync.fieldsMapping.ad');
-
+        $mappingRules = Configure::read('passbolt.plugins.directorySync.fieldsMapping');
         // userData without guid.
         $userData = [
-            'firstName' => 'john',
-            'lastName' => 'doe',
-            'emailAddress' => 'john.doe@passbolt.com',
+            'givenName' => 'john',
+            'sn' => 'doe',
+            'mail' => 'john.doe@passbolt.com',
             'dn' => 'CN=john,OU=accounts,OU=passbolt,OU=local',
-            'created' => new FrozenTime(),
-            'modified' => new FrozenTime(),
+            'directoryType' => DirectoryInterface::TYPE_AD,
+            'whenCreated' => new \DateTime(),
+            'whenChanged' => new \DateTime(),
         ];
-        $ldapObject = new LdapObject($userData, LdapObjectType::USER);
-        $ldapUsers = new LdapObjectCollection();
+        $ldapObject = $this->getTestLdapUserObject($userData);
+        $ldapUsers = new Collection();
         /** @psalm-suppress InvalidArgument see signature */
         $ldapUsers->add($ldapObject);
-        $ldapGroups = new LdapObjectCollection();
+        $ldapGroups = new Collection();
 
         $DirectoryResults = new DirectoryResults($mappingRules);
         $DirectoryResults->initializeWithLdapResults($ldapUsers, $ldapGroups);
@@ -117,23 +116,24 @@ class DirectoryResultsObjectTransformationTest extends DirectorySyncIntegrationT
         Configure::write('passbolt.plugins.directorySync.enabled', true);
         $this->loadPlugins(['Passbolt/DirectorySync' => []]);
         Configure::load('Passbolt/DirectorySync.config', 'default', true);
-        $mappingRules = Configure::read('passbolt.plugins.directorySync.fieldsMapping.ad');
+        $mappingRules = Configure::read('passbolt.plugins.directorySync.fieldsMapping');
 
         // userData with no email, but a uid
         $userData = [
-            'guid' => UuidFactory::uuid('ldap.user.id.john'),
-            'firstName' => 'john',
-            'lastName' => 'doe',
+            'objectGuid' => UuidFactory::uuid('ldap.user.id.john'),
+            'givenName' => 'john',
+            'sn' => 'doe',
             'uid' => 'jdoe',
             'dn' => 'CN=john,OU=accounts,OU=passbolt,OU=local',
-            'created' => new FrozenTime(),
-            'modified' => new FrozenTime(),
+            'directoryType' => DirectoryInterface::TYPE_AD,
+            'whenCreated' => new \DateTime(),
+            'whenChanged' => new \DateTime(),
         ];
-        $ldapObject = new LdapObject($userData, LdapObjectType::USER);
-        $ldapUsers = new LdapObjectCollection();
+        $ldapObject = $this->getTestLdapUserObject($userData);
+        $ldapUsers = new Collection();
         /** @psalm-suppress InvalidArgument see signature */
         $ldapUsers->add($ldapObject);
-        $ldapGroups = new LdapObjectCollection();
+        $ldapGroups = new Collection();
 
         // Save corresponding settings.
         $uac = $this->mockUserAccessControl('admin', Role::ADMIN);

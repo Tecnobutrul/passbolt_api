@@ -25,6 +25,7 @@ use Cake\Utility\Hash;
 use Cake\Validation\Validation;
 use Cake\Validation\Validator;
 use Passbolt\DirectorySync\Utility\DirectoryFactory;
+use Passbolt\DirectorySync\Utility\DirectoryInterface;
 use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 class LdapConfigurationForm extends Form
@@ -32,7 +33,7 @@ class LdapConfigurationForm extends Form
     public const CONNECTION_TYPE_PLAIN = 'plain';
     public const CONNECTION_TYPE_SSL = 'ssl';
     public const CONNECTION_TYPE_TLS = 'tls';
-    public const SUPPORTED_DIRECTORY_TYPE = ['ad', 'openldap'];
+    public const SUPPORTED_DIRECTORY_TYPE = [DirectoryInterface::TYPE_AD, DirectoryInterface::TYPE_OPENLDAP];
 
     /**
      * @var string[]
@@ -50,18 +51,21 @@ class LdapConfigurationForm extends Form
      * @var array
      */
     private static $configurationMapping = [
+        'enabled' => 'enabled',
         'source' => 'source',
         'directory_type' => 'ldap.domains.org_domain.ldap_type',
         'domain_name' => 'ldap.domains.org_domain.domain_name',
         'username' => 'ldap.domains.org_domain.username',
         'password' => 'ldap.domains.org_domain.password',
         'base_dn' => 'ldap.domains.org_domain.base_dn',
-        'server' => 'ldap.domains.org_domain.servers.0',
+        'server' => 'ldap.domains.org_domain.hosts.0',
         'port' => 'ldap.domains.org_domain.port',
         'group_object_class' => 'groupObjectClass',
         'user_object_class' => 'userObjectClass',
         'group_path' => 'groupPath',
         'user_path' => 'userPath',
+        'group_custom_filters' => 'groupCustomFilters',
+        'user_custom_filters' => 'userCustomFilters',
         'use_email_prefix_suffix' => 'useEmailPrefixSuffix',
         'email_prefix' => 'emailPrefix',
         'email_suffix' => 'emailSuffix',
@@ -71,6 +75,7 @@ class LdapConfigurationForm extends Form
         'groups_parent_group' => 'groupsParentGroup',
         'enabled_users_only' => 'enabledUsersOnly',
         'sync_users_create' => 'jobs.users.create',
+        'sync_users_update' => 'jobs.users.update',
         'sync_users_delete' => 'jobs.users.delete',
         'sync_groups_create' => 'jobs.groups.create',
         'sync_groups_delete' => 'jobs.groups.delete',
@@ -86,6 +91,7 @@ class LdapConfigurationForm extends Form
     protected function _buildSchema(Schema $schema): \Cake\Form\Schema
     {
         return $schema
+            ->addField('enabled', 'boolean')
             ->addField('directory_type', ['type' => 'string'])
             ->addField('domain_name', 'string')
             ->addField('username', ['type' => 'string'])
@@ -98,6 +104,8 @@ class LdapConfigurationForm extends Form
             ->addField('user_object_class', 'string')
             ->addField('group_path', 'string')
             ->addField('user_path', 'string')
+            ->addField('user_custom_filters', 'string')
+            ->addField('group_custom_filters', 'string')
             ->addField('use_email_prefix_suffix', 'boolean')
             ->addField('email_prefix', 'string')
             ->addField('email_suffix', 'string')
@@ -107,6 +115,7 @@ class LdapConfigurationForm extends Form
             ->addField('groups_parent_group', 'string')
             ->addField('enabled_users_only', 'boolean')
             ->addField('sync_users_create', 'boolean')
+            ->addField('sync_users_update', 'boolean')
             ->addField('sync_users_delete', 'boolean')
             ->addField('sync_groups_create', 'boolean')
             ->addField('sync_groups_delete', 'boolean')
@@ -218,6 +227,14 @@ class LdapConfigurationForm extends Form
             ->utf8('user_path', __('The user path should be a valid BMP-UTF8 string.'));
 
         $validator
+            ->allowEmptyString('group_custom_filter')
+            ->utf8('group_custom_filter', __('The group custom filter should be a valid BMP-UTF8 string.'));
+
+        $validator
+            ->allowEmptyString('user_custom_filter')
+            ->utf8('user_custom_filter', __('The user custom filter should be a valid BMP-UTF8 string.'));
+
+        $validator
             ->allowEmptyTime('use_email_prefix_suffix')
             ->boolean('use_email_prefix_suffix', __('The email prefix/suffix setting should be a valid boolean.'));
 
@@ -244,6 +261,10 @@ class LdapConfigurationForm extends Form
         $validator
             ->allowEmptyString('sync_users_create')
             ->boolean('sync_users_create', __('The sync of created users setting should be a boolean.'));
+
+        $validator
+            ->allowEmptyString('sync_users_update')
+            ->boolean('sync_users_update', __('The sync of updated users setting should be a boolean.'));
 
         $validator
             ->allowEmptyString('sync_users_delete')

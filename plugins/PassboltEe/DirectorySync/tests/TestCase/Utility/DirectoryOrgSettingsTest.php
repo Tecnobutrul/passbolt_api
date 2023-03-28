@@ -21,7 +21,7 @@ use App\Test\Lib\AppTestCase;
 use App\Test\Lib\Utility\UserAccessControlTrait;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
-use Passbolt\DirectorySync\Plugin;
+use Passbolt\DirectorySync\DirectorySyncPlugin;
 use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 class DirectoryOrgSettingsTest extends AppTestCase
@@ -36,6 +36,7 @@ class DirectoryOrgSettingsTest extends AppTestCase
     public static function getDummySettings()
     {
         return [
+            'enabled' => true,
             'userPath' => 'CN=Operations',
             'defaultUser' => 'admin@passbolt.com',
             'defaultGroupAdminUser' => 'ada@passbolt.com',
@@ -43,6 +44,7 @@ class DirectoryOrgSettingsTest extends AppTestCase
                 'users' => [
                     'create' => true,
                     'delete' => false,
+                    'update' => true,
                 ],
                 'groups' => [
                     'create' => true,
@@ -57,7 +59,7 @@ class DirectoryOrgSettingsTest extends AppTestCase
                         'username' => 'root',
                         'password' => 'password',
                         'base_dn' => 'OU=PassboltUsers,DC=passbolt,DC=local',
-                        'servers' => ['127.0.0.1'],
+                        'hosts' => ['127.0.0.1'],
                         'port' => 636,
                         'use_ssl' => true,
                         'use_tls' => false,
@@ -106,7 +108,7 @@ class DirectoryOrgSettingsTest extends AppTestCase
         $directoryOrgSettings->save($uac);
 
         // Merge with default config.
-        $defaultSettings = require Plugin::PLUGIN_CONFIG_PATH . 'config.php';
+        $defaultSettings = require DirectorySyncPlugin::PLUGIN_CONFIG_PATH . 'config.php';
         $settings = Hash::merge(Hash::get($defaultSettings, 'passbolt.plugins.directorySync'), $settings);
 
         $settings = array_merge(['source' => 'db'], $settings);

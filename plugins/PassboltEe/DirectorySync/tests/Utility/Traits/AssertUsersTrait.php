@@ -34,4 +34,23 @@ trait AssertUsersTrait
         $results = $Users->find()->where($where)->all()->toArray();
         $this->assertEquals(0, count($results), __('The user should not exist'));
     }
+
+    /**
+     * Assert user full name
+     *
+     * @param $id
+     * @param string $firstName
+     * @param string $lastName
+     * @return void
+     */
+    public function assertUserFullName($id, string $firstName, string $lastName): void
+    {
+        /** @var \App\Model\Table\UsersTable $Users */
+        $Users = TableRegistry::getTableLocator()->get('Users');
+        /** @var \App\Model\Entity\User $user */
+        $user = $Users->find()->contain(['Profiles'])->where([$Users->aliasField('id') => $id])->first();
+        $this->assertNotEmpty($user, __('The user does not exist'));
+        $this->assertTextEquals($firstName, $user->profile->first_name, __('First name is wrong. Actual first name: {0}', $user->profile->first_name));
+        $this->assertTextEquals($lastName, $user->profile->last_name, __('Last name is wrong. Actual last name: {0}', $user->profile->last_name));
+    }
 }

@@ -347,7 +347,7 @@ class ActionLogResultsParser
                 }
 
                 if (Configure::read('passbolt.plugins.folders.enabled')) {
-                    if (! isset($data['folder'])) {
+                    if (!isset($data['folder'])) {
                         $data['folder'] = $permission->get('folder');
                     }
                 }

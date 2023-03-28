@@ -50,4 +50,15 @@ $routes->plugin('Passbolt/SsoRecover', ['path' => '/sso/recover'], function (Rou
             'action' => 'start',
         ])
         ->setMethods(['POST']);
+
+    /**
+     * Redirection URL when user can self-register
+     */
+    $routes
+        ->connect('/error', [
+            'prefix' => 'SelfRegistration',
+            'controller' => 'HandleError',
+            'action' => 'handleError',
+        ])
+        ->setMethods(['GET']);
 });
