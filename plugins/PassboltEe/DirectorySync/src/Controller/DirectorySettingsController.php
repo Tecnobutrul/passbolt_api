@@ -30,6 +30,18 @@ class DirectorySettingsController extends DirectoryController
     use ViewVarsTrait;
 
     /**
+     * Initialize
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('ObfuscateFields', ['fields' => ['password']]);
+    }
+
+    /**
      * Retrieve the settings
      *
      * @return void
