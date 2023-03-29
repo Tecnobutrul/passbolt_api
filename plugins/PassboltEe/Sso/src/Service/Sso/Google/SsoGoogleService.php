@@ -18,7 +18,6 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Service\Sso\Google;
 
 use App\Utility\ExtendedUserAccessControl;
-use Cake\Core\Configure;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Routing\Router;
 use League\OAuth2\Client\Provider\AbstractProvider;

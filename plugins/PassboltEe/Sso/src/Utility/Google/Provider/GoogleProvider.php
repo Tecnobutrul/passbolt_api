@@ -160,23 +160,6 @@ class GoogleProvider extends BaseOauth2Provider
     /**
      * @inheritDoc
      */
-    protected function getAuthorizationParameters(array $options)
-    {
-        $options = parent::getAuthorizationParameters($options);
-
-        /**
-         * The "approval_prompt" MUST be removed as it is not supported by Google, use "prompt" instead:
-         *
-         * @link https://developers.google.com/identity/protocols/oauth2/openid-connect#prompt
-         */
-        unset($options['approval_prompt']);
-
-        return $options;
-    }
-
-    /**
-     * @inheritDoc
-     */
     protected function createAccessToken(array $response, AbstractGrant $grant): AccessToken
     {
         return new BaseIdToken($response, $this);
