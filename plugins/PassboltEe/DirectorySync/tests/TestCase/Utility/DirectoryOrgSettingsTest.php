@@ -115,4 +115,16 @@ class DirectoryOrgSettingsTest extends AppTestCase
         $retrievedDirectoryOrgSettings = DirectoryOrgSettings::get();
         $this->assertEquals($settings, $retrievedDirectoryOrgSettings->toArray());
     }
+
+    /**
+     * Test getPassword
+     *
+     * @return void
+     */
+    public function testDirectoryOrgSettings_getPassword()
+    {
+        $settings = self::getDummySettings();
+        $directoryOrgSettings = new DirectoryOrgSettings($settings);
+        $this->assertSame('password', $directoryOrgSettings->getPassword());
+    }
 }

@@ -350,6 +350,10 @@ class LdapConfigurationForm extends Form
         }
         $settings['ldap.domains.org_domain.use_ssl'] = $data['connection_type'] === 'ssl' ? 1 : 0;
         $settings['ldap.domains.org_domain.use_tls'] = $data['connection_type'] === 'tls' ? 1 : 0;
+        if (!isset($settings['ldap.domains.org_domain.password'])) {
+            $settings['ldap.domains.org_domain.password'] = DirectoryOrgSettings::get()->getPassword();
+        }
+
         $settings = Hash::expand($settings);
 
         return $settings;

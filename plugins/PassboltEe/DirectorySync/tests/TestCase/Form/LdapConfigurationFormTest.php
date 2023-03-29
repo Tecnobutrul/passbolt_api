@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\DirectorySync\Test\TestCase\Form;
 
+use App\Model\Entity\Role;
 use App\Test\Factory\UserFactory;
 use App\Test\Lib\AppTestCase;
 use App\Test\Lib\Model\FormatValidationTrait;
@@ -23,6 +24,7 @@ use Cake\Event\EventDispatcherTrait;
 use Cake\Utility\Hash;
 use Passbolt\DirectorySync\Form\LdapConfigurationForm;
 use Passbolt\DirectorySync\Test\TestCase\Utility\DirectoryOrgSettingsTest;
+use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 class LdapConfigurationFormTest extends AppTestCase
 {
@@ -372,6 +374,27 @@ class LdapConfigurationFormTest extends AppTestCase
 
         $this->assertEquals($data['group_custom_filters'], Hash::get($config, 'groupCustomFilters'));
         $this->assertEquals($data['user_custom_filters'], Hash::get($config, 'userCustomFilters'));
+    }
+
+    /**
+     * Test formatFormDataToOrgSettings when password
+     * has been removed from data.
+     *
+     * @return void
+     */
+    public function testDirectoryFormatFormDataToOrgSettings_emptyPassword()
+    {
+        $uac = $this->mockUserAccessControl('admin', Role::ADMIN);
+        $settings = DirectoryOrgSettingsTest::getDummySettings();
+        $settings['ldap']['domains']['org_domain']['password'] = 'test-password';
+        $directoryOrgSettings = new DirectoryOrgSettings($settings);
+        $directoryOrgSettings->save($uac);
+
+        $data = self::getDummyFormData();
+        unset($data['password']);
+        $config = LdapConfigurationForm::formatFormDataToOrgSettings($data);
+
+        $this->assertEquals('test-password', Hash::get($config, 'ldap.domains.org_domain.password'));
     }
 
     public function testDirectoryFormatOrgSettingsToFormData()

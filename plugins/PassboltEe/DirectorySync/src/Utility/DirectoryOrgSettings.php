@@ -472,4 +472,15 @@ class DirectoryOrgSettings
 
         return preg_replace($params, $replacements, $bindFormat);
     }
+
+    /**
+     * Get password for domain
+     *
+     * @param string $domain Domain name
+     * @return string
+     */
+    public function getPassword(string $domain = 'org_domain'): string
+    {
+        return Hash::get($this->settings, "ldap.domains.$domain.password", '');
+    }
 }
