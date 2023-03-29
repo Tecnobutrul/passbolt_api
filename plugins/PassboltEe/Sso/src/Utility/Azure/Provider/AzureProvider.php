@@ -165,10 +165,18 @@ class AzureProvider extends BaseOauth2Provider
             throw new InternalErrorException(__('Invalid JWKS endpoint response. Keys missing.'));
         }
 
+        /**
+         * Here we are using custom method to check JWK key signature as we can't use `JWK::parseKeySet` method directly
+         * because Azure don't provide "kty" parameter in the keys.
+         *
+         * @see \Firebase\JWT\JWK::parseKeySet()
+         */
         return $this->parseJwksKeys($response['keys']);
     }
 
     /**
+     * Parse & check JWT keys signature from Azure.
+     *
      * @param array $responseKeys keys from Jwks endpoint
      * @return array of openssl compatible keys
      */
