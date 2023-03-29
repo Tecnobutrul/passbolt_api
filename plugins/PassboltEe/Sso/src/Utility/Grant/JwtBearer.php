@@ -25,7 +25,7 @@ declare(strict_types=1);
  * @since         3.9.0
  */
 
-namespace Passbolt\Sso\Utility\Azure\Grant;
+namespace Passbolt\Sso\Utility\Grant;
 
 use League\OAuth2\Client\Grant\AbstractGrant;
 

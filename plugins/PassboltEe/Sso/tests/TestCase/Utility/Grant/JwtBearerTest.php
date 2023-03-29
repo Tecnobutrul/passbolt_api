@@ -15,7 +15,7 @@ declare(strict_types=1);
  * @since         3.9.0
  */
 
-namespace Passbolt\Sso\Test\TestCase\Utility\Azure\Grant;
+namespace Passbolt\Sso\Test\TestCase\Utility\Grant;
 
 use Cake\TestSuite\TestCase;
 
