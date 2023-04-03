@@ -1,5 +1,7 @@
 <?php
 
+use Passbolt\Sso\Model\Entity\SsoSetting;
+
 return [
     'passbolt' => [
         'plugins' => [
@@ -26,6 +28,12 @@ return [
                      * When checking nbf, iat or expiration times, we want to provide some extra leeway time(in seconds) to account for clock skew.
                      */
                     'jwtLeeway' => filter_var(env('PASSBOLT_PLUGINS_SSO_JWT_LEEWAY', '0'), FILTER_VALIDATE_INT),
+                ],
+                'providers' => [
+                    SsoSetting::PROVIDER_AZURE => filter_var(
+                        env('PASSBOLT_PLUGINS_SSO_PROVIDER_AZURE_ENABLED', true),
+                        FILTER_VALIDATE_BOOLEAN
+                    ),
                 ],
             ],
         ],
