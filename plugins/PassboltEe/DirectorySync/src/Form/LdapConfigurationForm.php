@@ -33,6 +33,8 @@ class LdapConfigurationForm extends Form
     public const CONNECTION_TYPE_PLAIN = 'plain';
     public const CONNECTION_TYPE_SSL = 'ssl';
     public const CONNECTION_TYPE_TLS = 'tls';
+    public const AUTHENTICATION_TYPE_BASIC = 'basic';
+    public const AUTHENTICATION_TYPE_SASL = 'sasl';
     public const SUPPORTED_DIRECTORY_TYPE = [DirectoryInterface::TYPE_AD, DirectoryInterface::TYPE_OPENLDAP];
 
     /**
@@ -350,7 +352,10 @@ class LdapConfigurationForm extends Form
         }
         $settings['ldap.domains.org_domain.use_ssl'] = $data['connection_type'] === 'ssl' ? 1 : 0;
         $settings['ldap.domains.org_domain.use_tls'] = $data['connection_type'] === 'tls' ? 1 : 0;
-        if (!isset($settings['ldap.domains.org_domain.password'])) {
+        $settings['ldap.domains.org_domain.use_sasl'] =
+            Hash::get($data, 'authentication_type') === self::AUTHENTICATION_TYPE_SASL ? 1 : 0;
+
+        if (!isset($settings['ldap.domains.org_domain.password']) && !$settings['ldap.domains.org_domain.use_sasl']) {
             $settings['ldap.domains.org_domain.password'] = DirectoryOrgSettings::get()->getPassword();
         }
 
@@ -416,6 +421,11 @@ class LdapConfigurationForm extends Form
             $data['connection_type'] = self::CONNECTION_TYPE_SSL;
         } elseif ($isTls) {
             $data['connection_type'] = self::CONNECTION_TYPE_TLS;
+        }
+        $data['authentication_type'] = self::AUTHENTICATION_TYPE_BASIC;
+        $isSasl = !empty($settings['ldap.domains.org_domain.use_sasl']);
+        if ($isSasl) {
+            $data['authentication_type'] = self::AUTHENTICATION_TYPE_SASL;
         }
 
         return $data;

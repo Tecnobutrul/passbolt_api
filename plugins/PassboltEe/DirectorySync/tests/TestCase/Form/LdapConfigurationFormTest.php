@@ -37,6 +37,7 @@ class LdapConfigurationFormTest extends AppTestCase
             'enabled' => true,
             'directory_type' => 'ad',
             'domain_name' => 'ldap.passbolt.local',
+            'authentication_type' => 'basic',
             'connection_type' => 'tls',
             'server' => '127.0.0.1',
             'host' => 'my host',
@@ -363,6 +364,7 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertEquals(Hash::get($config, 'ldap.domains.org_domain.domain_name'), 'ldap.passbolt.local');
         $this->assertEquals(Hash::get($config, 'ldap.domains.org_domain.username'), 'root');
         $this->assertEquals(Hash::get($config, 'ldap.domains.org_domain.password'), 'password');
+        $this->assertEquals(Hash::get($config, 'ldap.domains.org_domain.use_sasl'), false);
         $this->assertEquals(Hash::get($config, 'ldap.domains.org_domain.base_dn'), 'OU=PassboltUsers,DC=passbolt,DC=local');
         $this->assertFalse(isset($config['groupPath']));
         $this->assertEquals(Hash::get($config, 'jobs.users.create'), true);
@@ -415,5 +417,34 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertTrue($formData['sync_groups_create']);
         $this->assertFalse($formData['sync_groups_delete']);
         $this->assertTrue($formData['sync_groups_update']);
+        $this->assertSame(LdapConfigurationForm::AUTHENTICATION_TYPE_BASIC, $formData['authentication_type']);
+    }
+
+    /**
+     * Test form data to org settings with SASL
+     *
+     * @return void
+     */
+    public function testDirectoryFormatFormDataToOrgSettings_withSasl()
+    {
+        $data = self::getDummyFormData();
+        $data['authentication_type'] = LdapConfigurationForm::AUTHENTICATION_TYPE_SASL;
+        $config = LdapConfigurationForm::formatFormDataToOrgSettings($data);
+        $this->assertSame(1, Hash::get($config, 'ldap.domains.org_domain.use_sasl'));
+    }
+
+    /**
+     * Test org settings to form data with SASL
+     *
+     * @return void
+     */
+    public function testDirectoryFormatOrgSettingsToFormData_withSasl()
+    {
+        $settings = DirectoryOrgSettingsTest::getDummySettings();
+        $settings['ldap']['domains']['org_domain']['use_sasl'] = true;
+
+        $formData = LdapConfigurationForm::formatOrgSettingsToFormData($settings);
+
+        $this->assertSame(LdapConfigurationForm::AUTHENTICATION_TYPE_SASL, $formData['authentication_type']);
     }
 }

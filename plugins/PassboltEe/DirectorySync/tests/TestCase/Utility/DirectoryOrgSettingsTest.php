@@ -64,6 +64,7 @@ class DirectoryOrgSettingsTest extends AppTestCase
                         'use_ssl' => true,
                         'use_tls' => false,
                         'ldap_type' => 'ad',
+                        'use_sasl' => false,
                     ],
                 ],
             ],
