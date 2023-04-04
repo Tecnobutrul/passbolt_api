@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\Sso\Test\TestCase\Controller\Providers;
 
+use Cake\Core\Configure;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
@@ -40,6 +41,31 @@ class SsoProvidersGetControllerTest extends SsoIntegrationTestCase
     public function testSsoProvidersGetController_Success(): void
     {
         $this->logInAsAdmin();
+
+        $this->getJson('/sso/providers.json');
+
+        $this->assertSuccess();
+        $this->assertEqualsCanonicalizing([SsoSetting::PROVIDER_AZURE], $this->_responseJsonBody);
+    }
+
+    public function testSsoProvidersGetController_Success_Disabled(): void
+    {
+        $this->logInAsAdmin();
+        Configure::write('passbolt.plugins.sso.providers', []);
+
+        $this->getJson('/sso/providers.json');
+
+        $this->assertSuccess();
+        $this->assertEqualsCanonicalizing([], $this->_responseJsonBody);
+    }
+
+    public function testSsoProvidersGetController_Success_NotSupportedProviderIsOmitted(): void
+    {
+        $this->logInAsAdmin();
+        Configure::write(
+            'passbolt.plugins.sso.providers',
+            [SsoSetting::PROVIDER_AZURE => true, 'facebook' => true]
+        );
 
         $this->getJson('/sso/providers.json');
 

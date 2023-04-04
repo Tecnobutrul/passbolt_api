@@ -19,20 +19,21 @@ namespace Passbolt\Sso\Controller\Providers;
 
 use App\Controller\AppController;
 use Cake\Core\Configure;
+use Passbolt\Sso\Model\Entity\SsoSetting;
 
 class SsoProvidersGetController extends AppController
 {
     /**
      * @return void
      */
-    public function get(): void
+    public function getEnabledInSystemConfig(): void
     {
         $this->User->assertIsAdmin();
 
         $providers = [];
 
         foreach (Configure::read('passbolt.plugins.sso.providers') as $providerName => $isEnabled) {
-            if ($isEnabled) {
+            if (in_array($providerName, SsoSetting::ALLOWED_PROVIDERS) && $isEnabled) {
                 $providers[] = $providerName;
             }
         }

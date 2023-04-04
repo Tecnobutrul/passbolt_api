@@ -30,7 +30,7 @@ $routes->plugin('Passbolt/Sso', ['path' => '/sso'], function (RouteBuilder $rout
         ->connect('/providers', [
             'prefix' => 'Providers',
             'controller' => 'SsoProvidersGet',
-            'action' => 'get',
+            'action' => 'getEnabledInSystemConfig',
         ])
         ->setMethods(['GET']);
 

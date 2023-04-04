@@ -1,7 +1,5 @@
 <?php
 
-use Passbolt\Sso\Model\Entity\SsoSetting;
-
 return [
     'passbolt' => [
         'plugins' => [
@@ -29,12 +27,7 @@ return [
                      */
                     'jwtLeeway' => filter_var(env('PASSBOLT_PLUGINS_SSO_JWT_LEEWAY', '0'), FILTER_VALIDATE_INT),
                 ],
-                'providers' => [
-                    SsoSetting::PROVIDER_AZURE => filter_var(
-                        env('PASSBOLT_PLUGINS_SSO_PROVIDER_AZURE_ENABLED', true),
-                        FILTER_VALIDATE_BOOLEAN
-                    ),
-                ],
+                // 'providers' => [], // see default.php
             ],
         ],
     ],
