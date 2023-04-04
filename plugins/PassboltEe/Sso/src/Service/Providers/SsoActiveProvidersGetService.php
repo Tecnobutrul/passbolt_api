@@ -15,22 +15,26 @@ declare(strict_types=1);
  * @since         4.0.0
  */
 
-namespace Passbolt\Sso\Controller\Providers;
+namespace Passbolt\Sso\Service\Providers;
 
-use App\Controller\AppController;
-use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
+use Cake\Core\Configure;
+use Passbolt\Sso\Model\Entity\SsoSetting;
 
-class SsoProvidersGetController extends AppController
+class SsoActiveProvidersGetService
 {
     /**
-     * @return void
+     * @return array
      */
-    public function getEnabledInSystemConfig(): void
+    public function get(): array
     {
-        $this->User->assertIsAdmin();
+        $providers = [];
 
-        $providers = (new SsoActiveProvidersGetService())->get();
+        foreach (Configure::read('passbolt.plugins.sso.providers') as $providerName => $isEnabled) {
+            if (in_array($providerName, SsoSetting::ALLOWED_PROVIDERS) && $isEnabled) {
+                $providers[] = $providerName;
+            }
+        }
 
-        $this->success(__('The operation was successful.'), $providers);
+        return $providers;
     }
 }
