@@ -35,10 +35,10 @@ class LdapConfigurationFormTest extends AppTestCase
     {
         return [
             'enabled' => true,
+            'hosts' => ['127.0.0.1'],
             'directory_type' => 'ad',
             'domain_name' => 'ldap.passbolt.local',
             'connection_type' => 'tls',
-            'server' => '127.0.0.1',
             'host' => 'my host',
             'port' => 999,
             'username' => 'root',
@@ -115,15 +115,14 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'base_dn', $ldapSettings, $testCases);
     }
 
-    public function testDirectoryLdapConfigurationFormValidateError_Server()
+    public function testDirectoryLdapConfigurationFormValidateError_Hosts()
     {
         $ldapSettings = self::getDummyFormData();
         $testCases = [
             'required' => self::getRequirePresenceTestCases(),
-            'notEmpty' => self::getNotEmptyTestCases(),
-            'utf8' => self::getUtf8TestCases(),
         ];
-        $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'server', $ldapSettings, $testCases);
+
+        $this->assertFormFieldFormatValidation(LdapConfigurationForm::class, 'hosts', $ldapSettings, $testCases);
     }
 
     public function testDirectoryLdapConfigurationFormValidateError_Port()
@@ -361,6 +360,8 @@ class LdapConfigurationFormTest extends AppTestCase
 
         $this->assertEquals(Hash::get($config, 'ldap.domains.org_domain.ldap_type'), 'ad');
         $this->assertEquals(Hash::get($config, 'ldap.domains.org_domain.domain_name'), 'ldap.passbolt.local');
+        $this->assertEquals($data['hosts'], Hash::get($config, 'ldap.domains.org_domain.hosts'));
+        $this->assertIsArray(Hash::get($config, 'ldap.domains.org_domain.hosts'));
         $this->assertEquals(Hash::get($config, 'ldap.domains.org_domain.username'), 'root');
         $this->assertEquals(Hash::get($config, 'ldap.domains.org_domain.password'), 'password');
         $this->assertEquals(Hash::get($config, 'ldap.domains.org_domain.base_dn'), 'OU=PassboltUsers,DC=passbolt,DC=local');
@@ -405,6 +406,8 @@ class LdapConfigurationFormTest extends AppTestCase
         $this->assertEquals('ad', $formData['directory_type']);
         $this->assertEquals('passbolt.local', $formData['domain_name']);
         $this->assertEquals('root', $formData['username']);
+        $this->assertIsArray($formData['hosts']);
+        $this->assertEquals($settings['ldap']['domains']['org_domain']['hosts'], $formData['hosts']);
         $this->assertEquals('password', $formData['password']);
         $this->assertEquals('ssl', $formData['connection_type']);
         $this->assertEquals('OU=PassboltUsers,DC=passbolt,DC=local', $formData['base_dn']);
