@@ -45,7 +45,10 @@ class SsoProvidersGetControllerTest extends SsoIntegrationTestCase
         $this->getJson('/sso/providers.json');
 
         $this->assertSuccess();
-        $this->assertEqualsCanonicalizing([SsoSetting::PROVIDER_AZURE], $this->_responseJsonBody);
+        $this->assertEqualsCanonicalizing(
+            [SsoSetting::PROVIDER_AZURE, SsoSetting::PROVIDER_GOOGLE],
+            $this->_responseJsonBody
+        );
     }
 
     public function testSsoProvidersGetController_Success_Disabled(): void

@@ -152,7 +152,7 @@ class SsoSettingsViewCurrentControllerTest extends SsoIntegrationTestCase
         $this->assertSuccess();
         $body = $this->_responseJsonBody;
         $this->assertNull($body->provider);
-        $this->assertEqualsCanonicalizing([SsoSetting::PROVIDER_AZURE], $body->providers);
+        $this->assertEqualsCanonicalizing([SsoSetting::PROVIDER_AZURE, SsoSetting::PROVIDER_GOOGLE], $body->providers);
     }
 
     public function testSsoSettingsViewCurrentController_SuccesEmptyAdminAllProvidersDisabled(): void

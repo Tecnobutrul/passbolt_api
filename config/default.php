@@ -288,6 +288,10 @@ return [
                         env('PASSBOLT_PLUGINS_SSO_PROVIDER_AZURE_ENABLED', true),
                         FILTER_VALIDATE_BOOLEAN
                     ),
+                    SsoSetting::PROVIDER_GOOGLE => filter_var(
+                        env('PASSBOLT_PLUGINS_SSO_PROVIDER_GOOGLE_ENABLED', true),
+                        FILTER_VALIDATE_BOOLEAN
+                    ),
                 ],
             ],
             'mfaPolicies' => [

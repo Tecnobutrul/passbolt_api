@@ -69,29 +69,32 @@ $routes->plugin('Passbolt/Sso', ['path' => '/sso'], function (RouteBuilder $rout
      * Endpoints related to Google provider.
      */
 
-    $routes
-        ->connect('/google/login/dry-run', [
-            'prefix' => 'Google',
-            'controller' => 'SsoGoogleStage1DryRun',
-            'action' => 'stage1DryRun',
-        ])
-        ->setMethods(['POST']);
+    $google = SsoSetting::PROVIDER_GOOGLE;
+    if (Configure::read("passbolt.plugins.sso.providers.{$google}")) {
+        $routes
+            ->connect('/google/login/dry-run', [
+                'prefix' => 'Google',
+                'controller' => 'SsoGoogleStage1DryRun',
+                'action' => 'stage1DryRun',
+            ])
+            ->setMethods(['POST']);
 
-    $routes
-        ->connect('/google/login', [
-            'prefix' => 'Google',
-            'controller' => 'SsoGoogleStage1',
-            'action' => 'stage1',
-        ])
-        ->setMethods(['POST']);
+        $routes
+            ->connect('/google/login', [
+                'prefix' => 'Google',
+                'controller' => 'SsoGoogleStage1',
+                'action' => 'stage1',
+            ])
+            ->setMethods(['POST']);
 
-    $routes
-        ->connect('/google/redirect', [
-            'prefix' => 'Google',
-            'controller' => 'SsoGoogleStage2',
-            'action' => 'triage',
-        ])
-        ->setMethods(['GET']);
+        $routes
+            ->connect('/google/redirect', [
+                'prefix' => 'Google',
+                'controller' => 'SsoGoogleStage2',
+                'action' => 'triage',
+            ])
+            ->setMethods(['GET']);
+    }
 
     // Generic success pages
 
