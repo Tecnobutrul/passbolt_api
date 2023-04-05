@@ -12,20 +12,22 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.9.0
+ * @since         4.0.0
  */
 
-namespace Passbolt\Sso\Test\TestCase\Utility\Azure\Grant;
+namespace Passbolt\SsoRecover\Controller\Google;
 
-use Cake\TestSuite\TestCase;
+use Passbolt\Sso\Controller\SsoErrorController;
 
-class JwtBearerTest extends TestCase
+/**
+ * @see \Passbolt\Sso\Controller\SsoErrorController For actual code.
+ *
+ * This is because CakePHP works on convention. When an error is thrown from prefix controller,
+ * it needs to have ErrorController class present inside prefix folder.
+ * @link https://book.cakephp.org/4/en/development/errors.html#custom-errorcontroller
+ * @link https://github.com/cakephp/cakephp/issues/17025
+ */
+class ErrorController extends SsoErrorController
 {
-    public function testJwtBearer(): void
-    {
-        $sut = new JwtBearerMock();
-        $this->assertStringContainsString('jwt', $sut->testGetName());
-        $this->assertStringContainsString('oauth', $sut->testGetName());
-        $this->assertIsArray($sut->testGetRequiredRequestParameters());
-    }
+    // nothing to do here
 }

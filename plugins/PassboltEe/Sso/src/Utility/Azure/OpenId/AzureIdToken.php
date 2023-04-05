@@ -20,33 +20,42 @@ declare(strict_types=1);
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @link          https://github.com/TheNetworg/oauth2-azure/blob/master/src/Grant/JwtBearer.php
+ * @link          https://github.com/TheNetworg/oauth2-azure/blob/master/src/Token/AccessToken.php
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
+namespace Passbolt\Sso\Utility\Azure\OpenId;
 
-namespace Passbolt\Sso\Utility\Azure\Grant;
+use Cake\Http\Exception\BadRequestException;
+use Passbolt\Sso\Utility\Azure\Provider\AzureProvider;
+use Passbolt\Sso\Utility\OpenId\BaseIdToken;
 
-use League\OAuth2\Client\Grant\AbstractGrant;
-
-class JwtBearer extends AbstractGrant
+/**
+ * @property \Passbolt\Sso\Utility\Azure\Provider\AzureProvider $provider
+ */
+class AzureIdToken extends BaseIdToken
 {
     /**
-     * @return string grant type
+     * {@inheritDoc}
+     *
+     * Override this method to perform provider specific assertions.
      */
-    protected function getName()
+    public function assertTokenClaims(array $tokenClaims): void
     {
-        return 'urn:ietf:params:oauth:grant-type:jwt-bearer';
-    }
+        parent::assertTokenClaims($tokenClaims);
 
-    /**
-     * @return array of string
-     */
-    protected function getRequiredRequestParameters()
-    {
-        return [
-            'requested_token_use',
-            'assertion',
-        ];
+        if (
+            !isset($tokenClaims['tid']) || !is_string($tokenClaims['tid']) ||
+            $this->provider->getTenant() != $tokenClaims['tid']
+        ) {
+            throw new BadRequestException('The tid (tenant id) parameter is invalid.');
+        }
+
+        if (
+            !isset($tokenClaims['ver']) || !is_string($tokenClaims['ver']) ||
+            $tokenClaims['ver'] != AzureProvider::ENDPOINT_VERSION_2_0
+        ) {
+            throw new BadRequestException('The ver (version) parameter is invalid.');
+        }
     }
 }

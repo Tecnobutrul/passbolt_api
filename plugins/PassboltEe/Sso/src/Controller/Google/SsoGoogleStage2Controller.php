@@ -12,10 +12,10 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.9.0
+ * @since         4.0.0
  */
 
-namespace Passbolt\Sso\Controller\Azure;
+namespace Passbolt\Sso\Controller\Google;
 
 use App\Service\Cookie\AbstractSecureCookieService;
 use App\Utility\Application\FeaturePluginAwareTrait;
@@ -25,12 +25,12 @@ use Cake\Routing\Router;
 use Passbolt\Sso\Controller\AbstractSsoController;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Entity\SsoState;
-use Passbolt\Sso\Service\Sso\Azure\SsoAzureService;
+use Passbolt\Sso\Service\Sso\Google\SsoGoogleService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
 use Passbolt\Sso\Service\SsoStates\SsoStatesGetService;
 use Passbolt\SsoRecover\Service\SsoRecoverAssertService;
 
-class SsoAzureStage2Controller extends AbstractSsoController
+class SsoGoogleStage2Controller extends AbstractSsoController
 {
     use FeaturePluginAwareTrait;
 
@@ -40,11 +40,12 @@ class SsoAzureStage2Controller extends AbstractSsoController
     public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
+
         $this->Authentication->allowUnauthenticated(['triage']);
     }
 
     /**
-     * Handle both user is admin and trying to validate a setting or regular user SSO return
+     * Handle both user is admin and trying to validate a setting or regular user SSO return.
      *
      * @param \App\Service\Cookie\AbstractSecureCookieService $cookieService Cookie service
      * @return void
@@ -80,7 +81,7 @@ class SsoAzureStage2Controller extends AbstractSsoController
      * @param string $code jwt
      * @return void
      */
-    private function stage2AsAdmin(AbstractSecureCookieService $cookieService, SsoState $ssoState, string $code): void
+    public function stage2AsAdmin(AbstractSecureCookieService $cookieService, SsoState $ssoState, string $code): void
     {
         try {
             // Get the draft settings
@@ -89,7 +90,7 @@ class SsoAzureStage2Controller extends AbstractSsoController
             throw new BadRequestException($exception->getMessage(), 400, $exception);
         }
 
-        $service = new SsoAzureService($cookieService, $settingsDto);
+        $service = new SsoGoogleService($cookieService, $settingsDto);
         $uac = $service->assertStateCodeAndGetUac($ssoState, $code, $this->User->ip(), $this->User->userAgent());
 
         // Create authentication token for next step, e.g. activate settings
@@ -105,7 +106,7 @@ class SsoAzureStage2Controller extends AbstractSsoController
      * @param string $code jwt
      * @return void
      */
-    private function stage2(AbstractSecureCookieService $cookieService, SsoState $ssoState, string $code): void
+    public function stage2(AbstractSecureCookieService $cookieService, SsoState $ssoState, string $code): void
     {
         $this->User->assertNotLoggedIn();
 
@@ -116,7 +117,7 @@ class SsoAzureStage2Controller extends AbstractSsoController
             throw new BadRequestException($exception->getMessage(), 400, $exception);
         }
 
-        $service = new SsoAzureService($cookieService, $settingsDto);
+        $service = new SsoGoogleService($cookieService, $settingsDto);
 
         switch ($ssoState->type) {
             case SsoState::TYPE_SSO_GET_KEY:
@@ -143,7 +144,7 @@ class SsoAzureStage2Controller extends AbstractSsoController
                     $code,
                     $this->User->ip(),
                     $this->User->userAgent(),
-                    SsoSetting::PROVIDER_AZURE
+                    SsoSetting::PROVIDER_GOOGLE
                 );
                 break;
             default:

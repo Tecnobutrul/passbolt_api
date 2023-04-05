@@ -12,22 +12,22 @@ declare(strict_types=1);
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.9.0
+ * @since         4.0.0
  */
+namespace Passbolt\Sso\Test\Lib;
 
-namespace Passbolt\Sso\Test\TestCase\Utility\Azure\Grant;
+use Cake\Core\Configure;
+use Cake\Routing\Router;
+use Passbolt\Sso\Utility\Google\Provider\GoogleProvider;
 
-use Passbolt\Sso\Utility\Azure\Grant\JwtBearer;
-
-class JwtBearerMock extends JwtBearer
+trait GoogleProviderTestTrait
 {
-    public function testGetName()
+    public function getDummyGoogleProvider(): GoogleProvider
     {
-        return $this->getName();
-    }
-
-    public function testGetRequiredRequestParameters()
-    {
-        return $this->getRequiredRequestParameters();
+        return new GoogleProvider([
+            'clientId' => Configure::read('passbolt.selenium.sso.google.clientId'),
+            'clientSecret' => Configure::read('passbolt.selenium.sso.google.secretId'),
+            'redirectUri' => Router::url('/sso/google/redirect', true),
+        ]);
     }
 }

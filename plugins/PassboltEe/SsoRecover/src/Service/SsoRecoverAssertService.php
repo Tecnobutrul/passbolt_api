@@ -45,6 +45,7 @@ class SsoRecoverAssertService
      * @param string $code Code.
      * @param string $ip IP.
      * @param string $userAgent User agent.
+     * @param string $provider SSO provider.
      * @return string URL to redirect.
      * @throws \Exception When there's an error while retrieving resource owner.
      * @throws \Cake\Http\Exception\BadRequestException When any assertions are failed.
@@ -57,7 +58,8 @@ class SsoRecoverAssertService
         SsoState $ssoState,
         string $code,
         string $ip,
-        string $userAgent
+        string $userAgent,
+        string $provider
     ): string {
         try {
             $resourceOwner = $ssoService->getResourceOwner($code);
@@ -99,7 +101,7 @@ class SsoRecoverAssertService
             $ssoService->getSettings()->id
         );
 
-        return Router::url("/sso/recover/azure/success?token={$ssoAuthToken->token}", true);
+        return Router::url("/sso/recover/{$provider}/success?token={$ssoAuthToken->token}", true);
     }
 
     /**

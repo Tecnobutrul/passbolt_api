@@ -304,6 +304,10 @@ return [
                     'secretId' => env('PASSBOLT_SELENIUM_SSO_AZURE_SECRET_ID', ''),
                     'secretExpiry' => env('PASSBOLT_SELENIUM_SSO_AZURE_SECRET_EXPIRY', '')
                 ],
+                'google' => [
+                    'clientId' => env('PASSBOLT_SELENIUM_SSO_GOOGLE_CLIENT_ID', ''),
+                    'secretId' => env('PASSBOLT_SELENIUM_SSO_GOOGLE_SECRET_ID', ''),
+                ],
             ],
         ],
 

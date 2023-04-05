@@ -21,7 +21,9 @@ use Cake\Routing\RouteBuilder;
 $routes->plugin('Passbolt/Sso', ['path' => '/sso'], function (RouteBuilder $routes) {
     $routes->setExtensions(['json']);
 
-    // Azure
+    /**
+     * Endpoints related to Azure provider.
+     */
 
     $routes->connect('/azure/login', [
             'prefix' => 'Azure',
@@ -40,6 +42,34 @@ $routes->plugin('Passbolt/Sso', ['path' => '/sso'], function (RouteBuilder $rout
     $routes->connect('/azure/redirect', [
             'prefix' => 'Azure',
             'controller' => 'SsoAzureStage2',
+            'action' => 'triage',
+        ])
+        ->setMethods(['GET']);
+
+    /**
+     * Endpoints related to Google provider.
+     */
+
+    $routes
+        ->connect('/google/login/dry-run', [
+            'prefix' => 'Google',
+            'controller' => 'SsoGoogleStage1DryRun',
+            'action' => 'stage1DryRun',
+        ])
+        ->setMethods(['POST']);
+
+    $routes
+        ->connect('/google/login', [
+            'prefix' => 'Google',
+            'controller' => 'SsoGoogleStage1',
+            'action' => 'stage1',
+        ])
+        ->setMethods(['POST']);
+
+    $routes
+        ->connect('/google/redirect', [
+            'prefix' => 'Google',
+            'controller' => 'SsoGoogleStage2',
             'action' => 'triage',
         ])
         ->setMethods(['GET']);

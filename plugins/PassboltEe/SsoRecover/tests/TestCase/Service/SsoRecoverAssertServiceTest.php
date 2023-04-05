@@ -22,6 +22,7 @@ use Cake\Http\Exception\BadRequestException;
 use Cake\Routing\Router;
 use Passbolt\SelfRegistration\Test\Lib\SelfRegistrationTestTrait;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
+use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
@@ -91,7 +92,8 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
     }
 
@@ -123,7 +125,8 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
     }
 
@@ -156,7 +159,8 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
     }
 
@@ -190,11 +194,12 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
     }
 
-    public function testAssertStateCodeAndGetAuthToken_Success(): void
+    public function testAssertStateCodeAndGetAuthToken_Success_Azure(): void
     {
         $nonce = SsoState::generate();
         $ip = '127.0.0.1';
@@ -217,13 +222,49 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
 
         /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $ssoAuthToken */
         $ssoAuthToken = SsoAuthenticationTokenFactory::find()->firstOrFail();
         $this->assertEquals(
             Router::url("/sso/recover/azure/success?token={$ssoAuthToken->token}", true),
+            $result
+        );
+    }
+
+    public function testAssertStateCodeAndGetAuthToken_Success_Google(): void
+    {
+        $nonce = SsoState::generate();
+        $ip = '127.0.0.1';
+        $userAgent = 'phpunit';
+        $user = UserFactory::make()->user()->active()->persist();
+        $ssoSetting = SsoSettingsFactory::make()->active()->persist();
+        $ssoState = SsoStateFactory::make(['user_id' => null, 'nonce' => $nonce, 'ip' => $ip, 'user_agent' => $userAgent])
+            ->withTypeSsoRecover()
+            ->ssoSettingsId($ssoSetting->id)
+            ->persist();
+        // Mock azure SSO service to return specific resource owner
+        $azureResourceOwner = new AzureResourceOwner(['email' => $user->username, 'nonce' => $nonce]);
+        $ssoService = $this->getMockBuilder(TestableSsoService::class)->getMock();
+        $ssoService->method('getResourceOwner')->willReturn($azureResourceOwner);
+        $settingsDto = new SsoSettingsDto($ssoSetting, []);
+        $ssoService->method('getSettings')->willReturn($settingsDto);
+
+        $result = $this->service->assertAndGetRedirectUrl(
+            $ssoService,
+            $ssoState,
+            '123456',
+            $ip,
+            $userAgent,
+            SsoSetting::PROVIDER_GOOGLE
+        );
+
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $ssoAuthToken */
+        $ssoAuthToken = SsoAuthenticationTokenFactory::find()->firstOrFail();
+        $this->assertEquals(
+            Router::url("/sso/recover/google/success?token={$ssoAuthToken->token}", true),
             $result
         );
     }
@@ -253,7 +294,8 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
 
         $this->assertEquals(Router::url("/sso/recover/error?email={$userEmail}", true), $result);
@@ -287,7 +329,8 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
     }
 
@@ -319,7 +362,8 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
     }
 }
