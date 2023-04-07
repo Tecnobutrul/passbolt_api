@@ -58,7 +58,7 @@ class LdapConfigurationForm extends Form
         'username' => 'ldap.domains.org_domain.username',
         'password' => 'ldap.domains.org_domain.password',
         'base_dn' => 'ldap.domains.org_domain.base_dn',
-        'server' => 'ldap.domains.org_domain.hosts.0',
+        'hosts' => 'ldap.domains.org_domain.hosts',
         'port' => 'ldap.domains.org_domain.port',
         'group_object_class' => 'groupObjectClass',
         'user_object_class' => 'userObjectClass',
@@ -97,7 +97,6 @@ class LdapConfigurationForm extends Form
             ->addField('username', ['type' => 'string'])
             ->addField('password', ['type' => 'string'])
             ->addField('base_dn', ['type' => 'string'])
-            ->addField('server', ['type' => 'string'])
             ->addField('port', ['type' => 'string'])
             ->addField('connection_type', ['type' => 'string'])
             ->addField('group_object_class', 'string')
@@ -160,9 +159,9 @@ class LdapConfigurationForm extends Form
             ->utf8('base_dn', __('The base DN should be a valid BMP-UTF8 string.'));
 
         $validator
-            ->requirePresence('server', 'create', __('A server is required.'))
-            ->notEmptyString('server', __('The server should not be empty.'))
-            ->utf8('server', __('The server should be a valid BMP-UTF8 string.'));
+            ->requirePresence('hosts', 'create', __('At least one host is required.'))
+            ->hasAtLeast('hosts', 1, __('At least one host is required.'))
+            ->isArray('hosts', __('The hosts should be a valid array.'));
 
         $validator
             ->requirePresence('port', 'create', __('A port number is required.'))
@@ -368,6 +367,7 @@ class LdapConfigurationForm extends Form
     public static function formatOrgSettingsToFormData(?array $settings = [])
     {
         $data = [];
+        $hosts = Hash::get($settings, 'ldap.domains.org_domain.hosts', []);
         $settings = Hash::flatten($settings);
         if (empty($settings)) {
             return $data;
@@ -403,6 +403,7 @@ class LdapConfigurationForm extends Form
             }
         }
 
+        $settings['ldap.domains.org_domain.hosts'] = $hosts;
         foreach (self::$configurationMapping as $prop => $propVal) {
             if (isset($settings[$propVal])) {
                 $data[$prop] = $settings[$propVal];
@@ -430,8 +431,13 @@ class LdapConfigurationForm extends Form
      */
     protected function testConnection(array $data)
     {
-        $directorySettings = new DirectoryOrgSettings(self::formatFormDataToOrgSettings($data));
-        $ldapDirectory = DirectoryFactory::get($directorySettings);
+        $settings = self::formatFormDataToOrgSettings($data);
+        foreach ($settings['ldap']['domains']['org_domain']['hosts'] as $host) {
+            $tmpSettings = $settings;
+            $tmpSettings['hosts'] = [$host];
+            $directorySettings = new DirectoryOrgSettings($tmpSettings);
+            $ldapDirectory = DirectoryFactory::get($directorySettings);
+        }
 
         return true;
     }
