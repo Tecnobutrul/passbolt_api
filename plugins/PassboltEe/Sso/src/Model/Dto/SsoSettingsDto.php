@@ -19,6 +19,7 @@ namespace Passbolt\Sso\Model\Dto;
 
 use Cake\Http\Exception\InternalErrorException;
 use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
 
 class SsoSettingsDto extends AbstractSsoSettingsDto
 {
@@ -29,7 +30,7 @@ class SsoSettingsDto extends AbstractSsoSettingsDto
     public function __construct(SsoSetting $setting, ?array $data = null)
     {
         $this->provider = $setting->provider ?? null;
-        $this->providers = SsoSetting::ALLOWED_PROVIDERS;
+        $this->providers = (new SsoActiveProvidersGetService())->get();
         $this->id = $setting->id ?? null;
         $this->status = $setting->status ?? null;
         $this->created = $setting->created ?? null;

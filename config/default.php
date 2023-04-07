@@ -16,6 +16,7 @@
 use App\Model\Entity\AuthenticationToken;
 use App\Utility\AuthToken\AuthTokenExpiryConfigValidator;
 use Passbolt\JwtAuthentication\Service\AccessToken\JwtAbstractService;
+use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Entity\SsoState;
 
 $authTokenExpiryConfigValidator = new AuthTokenExpiryConfigValidator();
@@ -281,7 +282,17 @@ return [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_SELF_REGISTRATION_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
             ],
             'sso' => [
-                'enabled' => filter_var(env('PASSBOLT_PLUGINS_SSO_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_SSO_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
+                'providers' => [
+                    SsoSetting::PROVIDER_AZURE => filter_var(
+                        env('PASSBOLT_PLUGINS_SSO_PROVIDER_AZURE_ENABLED', true),
+                        FILTER_VALIDATE_BOOLEAN
+                    ),
+                    SsoSetting::PROVIDER_GOOGLE => filter_var(
+                        env('PASSBOLT_PLUGINS_SSO_PROVIDER_GOOGLE_ENABLED', true),
+                        FILTER_VALIDATE_BOOLEAN
+                    ),
+                ],
             ],
             'mfaPolicies' => [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_MFA_POLICIES_ENABLED', true), FILTER_VALIDATE_BOOLEAN),

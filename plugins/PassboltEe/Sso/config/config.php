@@ -27,6 +27,7 @@ return [
                      */
                     'jwtLeeway' => filter_var(env('PASSBOLT_PLUGINS_SSO_JWT_LEEWAY', '0'), FILTER_VALIDATE_INT),
                 ],
+                // 'providers' => [], // see default.php
             ],
         ],
     ],

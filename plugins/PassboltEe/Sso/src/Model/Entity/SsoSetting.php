@@ -48,7 +48,7 @@ class SsoSetting extends Entity
     public const PROVIDER_GOOGLE = 'google';
 
     /**
-     * List of allowed SSO providers.
+     * List of supported providers.
      *
      * @var array
      */

@@ -14,7 +14,9 @@ declare(strict_types=1);
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
+use Cake\Core\Configure;
 use Cake\Routing\RouteBuilder;
+use Passbolt\Sso\Model\Entity\SsoSetting;
 
 /** @var \Cake\Routing\RouteBuilder $routes */
 
@@ -22,57 +24,77 @@ $routes->plugin('Passbolt/Sso', ['path' => '/sso'], function (RouteBuilder $rout
     $routes->setExtensions(['json']);
 
     /**
+     * Returns list of enabled providers.
+     */
+    $routes
+        ->connect('/providers', [
+            'prefix' => 'Providers',
+            'controller' => 'SsoProvidersGet',
+            'action' => 'getEnabledInSystemConfig',
+        ])
+        ->setMethods(['GET']);
+
+    /**
      * Endpoints related to Azure provider.
      */
 
-    $routes->connect('/azure/login', [
-            'prefix' => 'Azure',
-            'controller' => 'SsoAzureStage1',
-            'action' => 'stage1',
-        ])
-        ->setMethods(['POST']);
+    $azure = SsoSetting::PROVIDER_AZURE;
+    if (Configure::read("passbolt.plugins.sso.providers.{$azure}")) {
+        $routes
+            ->connect('/azure/login', [
+                'prefix' => 'Azure',
+                'controller' => 'SsoAzureStage1',
+                'action' => 'stage1',
+            ])
+            ->setMethods(['POST']);
 
-    $routes->connect('/azure/login/dry-run', [
-            'prefix' => 'Azure',
-            'controller' => 'SsoAzureStage1DryRun',
-            'action' => 'stage1DryRun',
-        ])
-        ->setMethods(['POST']);
+        $routes
+            ->connect('/azure/login/dry-run', [
+                'prefix' => 'Azure',
+                'controller' => 'SsoAzureStage1DryRun',
+                'action' => 'stage1DryRun',
+            ])
+            ->setMethods(['POST']);
 
-    $routes->connect('/azure/redirect', [
-            'prefix' => 'Azure',
-            'controller' => 'SsoAzureStage2',
-            'action' => 'triage',
-        ])
-        ->setMethods(['GET']);
+        $routes
+            ->connect('/azure/redirect', [
+                'prefix' => 'Azure',
+                'controller' => 'SsoAzureStage2',
+                'action' => 'triage',
+            ])
+            ->setMethods(['GET']);
+    }
 
     /**
      * Endpoints related to Google provider.
      */
 
-    $routes
-        ->connect('/google/login/dry-run', [
-            'prefix' => 'Google',
-            'controller' => 'SsoGoogleStage1DryRun',
-            'action' => 'stage1DryRun',
-        ])
-        ->setMethods(['POST']);
+    $google = SsoSetting::PROVIDER_GOOGLE;
+    if (Configure::read("passbolt.plugins.sso.providers.{$google}")) {
+        $routes
+            ->connect('/google/login/dry-run', [
+                'prefix' => 'Google',
+                'controller' => 'SsoGoogleStage1DryRun',
+                'action' => 'stage1DryRun',
+            ])
+            ->setMethods(['POST']);
 
-    $routes
-        ->connect('/google/login', [
-            'prefix' => 'Google',
-            'controller' => 'SsoGoogleStage1',
-            'action' => 'stage1',
-        ])
-        ->setMethods(['POST']);
+        $routes
+            ->connect('/google/login', [
+                'prefix' => 'Google',
+                'controller' => 'SsoGoogleStage1',
+                'action' => 'stage1',
+            ])
+            ->setMethods(['POST']);
 
-    $routes
-        ->connect('/google/redirect', [
-            'prefix' => 'Google',
-            'controller' => 'SsoGoogleStage2',
-            'action' => 'triage',
-        ])
-        ->setMethods(['GET']);
+        $routes
+            ->connect('/google/redirect', [
+                'prefix' => 'Google',
+                'controller' => 'SsoGoogleStage2',
+                'action' => 'triage',
+            ])
+            ->setMethods(['GET']);
+    }
 
     // Generic success pages
 
