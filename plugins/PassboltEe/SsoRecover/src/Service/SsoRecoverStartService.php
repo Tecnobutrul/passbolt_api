@@ -60,7 +60,7 @@ class SsoRecoverStartService
      * @param \App\Model\Entity\User $user User entity.
      * @return string
      */
-    public function getType(User $user): string
+    private function getType(User $user): string
     {
         if ($user->active) {
             // The user is already active, so it is anticipated that they have to recover the account
@@ -76,6 +76,7 @@ class SsoRecoverStartService
      *
      * @param string $userId User identifier.
      * @return \App\Model\Entity\User
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When user is not found.
      */
     private function getUser(string $userId): User
     {
