@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.0.0-rc.1] - 2023-04-19
+### Added
+- Entry test
+
 ## [3.12.0] - 2023-03-15
 ### Added
 - PB-20535 As a community user I want to use folders
