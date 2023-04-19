@@ -24,6 +24,14 @@ use Passbolt\AuditLog\Utility\FolderActionLogsFinder;
 class FolderLogsController extends BaseLogsController
 {
     /**
+     * @inheritDoc
+     */
+    public function getModelName(): string
+    {
+        return 'Folders';
+    }
+
+    /**
      * View action logs for a given folder.
      *
      * @param string|null $folderId folder id

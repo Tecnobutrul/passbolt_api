@@ -20,7 +20,8 @@ namespace Passbolt\AuditLog\Test\TestCase\Utility;
 use App\Model\Entity\Role;
 use App\Utility\UserAccessControl;
 use App\Utility\UuidFactory;
-use Passbolt\AuditLog\Test\TestCase\Traits\ActionLogsOperationsTrait;
+use Passbolt\AuditLog\Test\Lib\ActionLogsOperationsTestTrait;
+use Passbolt\AuditLog\Utility\ActionLogResultsParser;
 use Passbolt\AuditLog\Utility\ResourceActionLogsFinder;
 use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 
@@ -30,32 +31,26 @@ use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
  */
 class ActionLogsFinderResourceSecretUpdateTest extends LogIntegrationTestCase
 {
-    use ActionLogsOperationsTrait;
+    use ActionLogsOperationsTestTrait;
 
     public $fixtures = [
         'app.Base/Users',
-        'app.Base/Gpgkeys',
         'app.Base/Profiles',
-        'app.Base/Roles',
-        'app.Base/Groups',
-        'app.Base/GroupsUsers',
         'app.Base/Resources',
-        'app.Base/ResourceTypes',
         'app.Base/Permissions',
-        'app.Base/Secrets',
-        'app.Base/Favorites',
     ];
 
     public function testAuditLogsActionLogsFinderResourceSecretUpdated()
     {
         $uac = new UserAccessControl(Role::USER, UuidFactory::uuid('user.id.ada'));
-        $this->simulateResourceSecretUpdate($uac, UuidFactory::uuid('resource.id.apache'));
+        $resourceId = UuidFactory::uuid('resource.id.apache');
+        $this->simulateResourceSecretUpdate($uac, $resourceId);
 
         $ActionLogsFinder = new ResourceActionLogsFinder();
-        $actionLogs = $ActionLogsFinder->find($uac, UuidFactory::uuid('resource.id.apache'));
+        $actionLogs = $ActionLogsFinder->find($uac, $resourceId);
+        $actionLogs = (new ActionLogResultsParser($actionLogs->all(), ['resources' => [$resourceId]]))->parse();
 
         $this->assertEquals(count($actionLogs), 1);
-
         $this->assertEquals($actionLogs[0]['type'], 'Resource.Secrets.updated');
         $this->assertTrue(isset($actionLogs[0]['data']));
         $this->assertTrue(isset($actionLogs[0]['data']['resource']));
