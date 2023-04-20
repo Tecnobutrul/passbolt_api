@@ -20,7 +20,6 @@ namespace Passbolt\AuditLog\Utility;
 use App\Model\Table\AvatarsTable;
 use App\Utility\UserAccessControl;
 use Cake\Core\Configure;
-use Cake\Datasource\Paginator;
 use Cake\ORM\Query;
 use Cake\ORM\TableRegistry;
 
@@ -32,9 +31,9 @@ abstract class BaseActionLogsFinder
      * @param \App\Utility\UserAccessControl $uac UAC
      * @param string $entityId entity id
      * @param array|null $options options array
-     * @return array
+     * @return \Cake\ORM\Query
      */
-    abstract public function find(UserAccessControl $uac, string $entityId, ?array $options = []): array;
+    abstract public function find(UserAccessControl $uac, string $entityId, ?array $options = []): Query;
 
     /**
      * @var \Passbolt\Log\Model\Table\ActionLogsTable
@@ -181,20 +180,5 @@ abstract class BaseActionLogsFinder
                 'Profiles.last_name']]]);
 
         $query->innerJoinWith('Users.Profiles');
-    }
-
-    /**
-     * Paginate results as per the pagination options provided.
-     *
-     * @param \Cake\ORM\Query $query query
-     * @param array $options options
-     * @return \Cake\ORM\Query
-     */
-    protected function _paginate(Query $query, array $options): Query
-    {
-        $paginator = new Paginator();
-        $paginator->paginate($query, $options);
-
-        return $query;
     }
 }

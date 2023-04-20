@@ -27,7 +27,7 @@ class UserActionLogsFinder extends BaseActionLogsFinder
     /**
      * @inheritDoc
      */
-    public function find(UserAccessControl $uac, string $entityId, ?array $options = []): array
+    public function find(UserAccessControl $uac, string $entityId, ?array $options = []): Query
     {
         // Build query.
         $query = TableRegistry::getTableLocator()->get('Passbolt/Log.ActionLogs')
@@ -55,13 +55,7 @@ class UserActionLogsFinder extends BaseActionLogsFinder
                     });
             });
 
-        if (!empty($options)) {
-            $query = $this->_paginate($query, $options);
-        }
-        $actionLogs = $query->all();
-        $resultParser = new ActionLogResultsParser($actionLogs, ['users' => [$entityId]]);
-
-        return $resultParser->parse();
+        return $query;
     }
 
     /**
@@ -82,10 +76,6 @@ class UserActionLogsFinder extends BaseActionLogsFinder
                 'type' => 'INNER',
                 'conditions' => ['userActionLogs.ActionLogs__id' => new IdentifierExpression('ActionLogs.id')],
             ],
-        ]);
-
-        $query->order([
-            'ActionLogs.created' => 'DESC',
         ]);
     }
 

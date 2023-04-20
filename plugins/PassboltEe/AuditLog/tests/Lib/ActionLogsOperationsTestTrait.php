@@ -13,7 +13,7 @@ declare(strict_types=1);
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-namespace Passbolt\AuditLog\Test\TestCase\Traits;
+namespace Passbolt\AuditLog\Test\Lib;
 
 use App\Utility\UserAccessControl;
 use App\Utility\UserAction;
@@ -21,7 +21,7 @@ use App\Utility\UuidFactory;
 use Cake\ORM\TableRegistry;
 use Passbolt\Log\Model\Entity\EntityHistory;
 
-trait ActionLogsOperationsTrait
+trait ActionLogsOperationsTestTrait
 {
     /**
      * Simulate a share operation from the perspective of action logs and history tables.
