@@ -82,7 +82,7 @@ class UserLogsControllerTest extends LogIntegrationTestCase
         $this->getJson('/actionlog/user/' . $user->id . '.json');
         $this->assertResponseOk();
 
-        $actionLogs = json_decode(json_encode($this->_responseJsonBody), true);
+        $actionLogs = $this->getResponseBodyAsArray();
         $this->assertSame(5, count($actionLogs));
         $sortedActionLogs = Hash::sort($actionLogs, '{n}.created', 'desc');
         $this->assertSame($actionLogs, $sortedActionLogs);
