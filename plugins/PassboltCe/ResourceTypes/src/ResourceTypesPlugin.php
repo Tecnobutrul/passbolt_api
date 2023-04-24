@@ -17,7 +17,19 @@ declare(strict_types=1);
 namespace Passbolt\ResourceTypes;
 
 use Cake\Core\BasePlugin;
+use Cake\Core\ContainerInterface;
+use Passbolt\ResourceTypes\Service\ResourceTypesFinderInterface;
+use Passbolt\ResourceTypes\Service\ResourceTypesFinderService;
 
 class ResourceTypesPlugin extends BasePlugin
 {
+    /**
+     * @inheritDoc
+     */
+    public function services(ContainerInterface $container): void
+    {
+        $container
+            ->add(ResourceTypesFinderInterface::class)
+            ->setConcrete(ResourceTypesFinderService::class);
+    }
 }

@@ -125,7 +125,8 @@
             "Passbolt\\MultiFactorAuthentication\\": "./plugins/PassboltCe/MultiFactorAuthentication/src",
             "Passbolt\\SelfRegistration\\": "./plugins/PassboltCe/SelfRegistration/src",
             "Passbolt\\Sso\\": "./plugins/PassboltEe/Sso/src",
-            "Passbolt\\SsoRecover\\": "./plugins/PassboltEe/SsoRecover/src"
+            "Passbolt\\SsoRecover\\": "./plugins/PassboltEe/SsoRecover/src",
+            "Passbolt\\TotpResourceTypes\\": "./plugins/PassboltCe/TotpResourceTypes/src"
         }
     },
     "autoload-dev": {
@@ -154,7 +155,9 @@
             "Passbolt\\SmtpSettings\\Test\\": "./plugins/PassboltCe/SmtpSettings/tests",
             "Passbolt\\SelfRegistration\\Test\\": "./plugins/PassboltCe/SelfRegistration/tests",
             "Passbolt\\Sso\\Test\\": "./plugins/PassboltEe/Sso/tests",
-            "Passbolt\\SsoRecover\\Test\\": "./plugins/PassboltEe/SsoRecover/tests"
+            "Passbolt\\SsoRecover\\Test\\": "./plugins/PassboltEe/SsoRecover/tests",
+            "Passbolt\\ResourceTypes\\Test\\": "./plugins/PassboltCe/ResourceTypes/tests",
+            "Passbolt\\TotpResourceTypes\\Test\\": "./plugins/PassboltCe/TotpResourceTypes/tests"
         }
     },
     "scripts": {
