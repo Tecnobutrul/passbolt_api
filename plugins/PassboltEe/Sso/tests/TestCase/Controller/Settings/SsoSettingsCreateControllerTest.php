@@ -40,6 +40,7 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
                 'tenant_id' => UuidFactory::uuid(),
                 'client_secret' => UuidFactory::uuid(),
                 'client_secret_expiry' => Chronos::now()->addDays(365),
+                'prompt' => 'login',
             ],
         ];
         $this->postJson('/sso/settings.json', $data);
@@ -96,6 +97,31 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
         $this->assertTrue(isset($body->data->client_id));
         $this->assertTrue(isset($body->data->client_secret));
         $this->assertTrue(isset($body->data->client_secret_expiry));
+        // Make sure prompt is optional
+        $this->assertObjectNotHasAttribute('prompt', $body->data);
+    }
+
+    public function testSsoSettingsCreateController_ErrorValidationData_InvalidPromptValue(): void
+    {
+        $this->logInAsAdmin();
+        $data = [
+            'provider' => 'azure',
+            'data' => [
+                'url' => 'https://login.microsoftonline.com',
+                'client_id' => UuidFactory::uuid(),
+                'tenant_id' => UuidFactory::uuid(),
+                'client_secret' => UuidFactory::uuid(),
+                'client_secret_expiry' => Chronos::now()->addDays(365),
+                'prompt' => 'foo',
+            ],
+        ];
+
+        $this->postJson('/sso/settings.json', $data);
+
+        $this->assertError(400);
+        $body = $this->_responseJsonBody;
+        $this->assertTrue(isset($body->data->prompt));
+        $this->assertEquals('The prompt is not supported.', $body->data->prompt->inList);
     }
 
     /**

@@ -50,6 +50,11 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
     public $tenant_id;
 
     /**
+     * @var string
+     */
+    public $prompt;
+
+    /**
      * @param array $data with
      *  - url string
      *  - client_id string uuid
@@ -64,6 +69,7 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
         $this->tenant_id = $data['tenant_id'] ?? '';
         $this->client_secret = $data['client_secret'] ?? '';
         $this->client_secret_expiry = $data['client_secret_expiry'] ?? '';
+        $this->prompt = $data['prompt'] ?? '';
     }
 
     /**
@@ -82,6 +88,7 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
             'tenant_id' => $this->tenant_id,
             'client_secret' => $this->client_secret,
             'client_secret_expiry' => $this->client_secret_expiry,
+            'prompt' => $this->prompt,
         ];
 
         // Serialize date if it's not already a string
