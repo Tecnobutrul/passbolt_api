@@ -2,6 +2,31 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.12.1] - 2023-03-15
+
+This are my release notes beware all of you
+sladkfjsdlkfj
+
+lsdkfjs
+dlfkj
+dlsfkjsdlfkjsdfljksdfjsdlf
+sdflkjsdf
+
+### Added
+- PB-22741 As an administrator I should see an error in the healthcheck if I use php 7.3 or less
+- PB-22747 As an administrator I can define a regular expression to customise email validation
+- PB-22866 As a user I want to use passbolt in Italian
+- PB-22866 As a user I want to use passbolt in Portuguese (Brazil)
+- PB-22866 As a user I want to use passbolt in Korean
+- PB-22866 As a user I want to use passbolt in Romanian
+
+### Fixed
+- PB-21489 As a user I should not see double headers in emails sent by the email digest
+
+### Improved
+- PB-22725 As an administrator I want to manage Duo v4 settings
+- PB-21906 As a user I don’t want to receive email by default when I create a resource or a folder as well as I don’t want to see any details for this content by default
+
 ## [3.12.0] - 2023-03-15
 ### Added
 PB-20535 As a community user I want to use folders
