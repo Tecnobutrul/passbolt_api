@@ -31,6 +31,7 @@ jobs:
               uses: actions/checkout@v3
               with:
                   repository: dlen/passbolt_help
+                  token: ${{ secrets.GH_TOKEN}}
                   path: passbolt_help
             - name: Create help site release notes file
               run: |
@@ -49,9 +50,11 @@ jobs:
                   ---
                   EOF
                   cat RELEASE_NOTES.md >> passbolt_help/_releases/ce/v${{ github.ref_name }}.md
-                  cd passbolt_help
-                  git config --global user.name "release bot"
-                  git config --global user.email "contact@passbolt.com"
-                  git add -A
-                  git commit -m "New release notes for CE ${{ github.ref_name }}"
-                  git push
+            - name: Publish release
+              uses: stefanzweifel/git-auto-commit-action@v4
+              with:
+                  commit_message: "ci: New release notes for CE ${{ github.ref_name }}"
+                  commit_user_email: contact@passbolt.com
+                  commit_user_name: GitHub Actions
+                  repository: ./passbolt_help
+                  continue-on-error: false
