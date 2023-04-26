@@ -4,6 +4,46 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.12.5] - 2023-04-28
+
+Release 3.12 for passbolt includes several new features and enhancements. Starting
+with Microsoft Azure being enabled by default for SSO capabilities.
+The feature has been thoroughly audited by Cure53, and the issues identified by
+the community have been fixed, so the feature is officially out of Beta!
+
+Another notable new feature is the ability to customise passbolt to output
+the action logs in syslog or a file, giving administrators more control
+and visibility on what is happening on their instance and leverage other
+tools for threat and unusual activity detection. Administrators can also
+implement their own handler for action logs to further customise their
+passbolt instance reporting. A blog to demonstrate this new feature
+will be available soon.
+
+Version 3.12 also includes important fixes, such as a fix to ensure that
+only administrators can see which users have MFA enabled. This regression
+was spotted during the Cure53 march security audit. The full report will
+be available shortly. Spoiler alert: no critical vulnerability was found.
+
+Lastly, more file formats for export are included in release 3.12.
+This provides more options for migrating data between applications.
+
+Overall, this release gives users more options while also improving
+passbolt’s functionality and security. The team extends a warm thank
+you to everyone who participated in the SSO alpha and beta tests cycles,
+for reporting issues and assisting us in resolving them.
+
+### Added
+
+- PASSBOLT-1419: Cleanup config.json for js client and remove useless config.
+- PASSBOLT-1514: By default passbolt app should not be indexed by search engines.
+- PASSBOLT-1474: API: Upgrade cakephp to 2.8.3.
+- PASSBOLT-1288: As an AD during install I should have status page to help me.
+
+### Fixed bugs
+- PASSBOLT-1502: String is depracated in Cakephp since version 2.7 use CakeText instead.
+- PASSBOLT-1466: GET /auth/verify.json Content-Type should not be text/html but JSON.
+- PASSBOLT-1443: Copy to clipboard icon is misleading
+
 ## [1.6.9] - 2018-01-12
 ### Fixed
 - PASSBOLT-2599: PR#209: Expose the 'client' variable in the default email conf
