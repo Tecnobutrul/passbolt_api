@@ -3,7 +3,7 @@ name: Create Release
 on:
   push:
     tags:
-      - '*.*.*'
+      - "*.*.*"
 
 jobs:
   build:
@@ -22,6 +22,35 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
+          release_notes_file: RELEASE_NOTES.md
           draft: false
           prerelease: false
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
+      - name: Checkout help site
+        uses: actions/checkout@v3
+        with:
+          name: dlen/passbolt_help     <-- clone https://github.com/org1/repo1
+          ref: refs/heads/master
+      - name: Create help site release notes file
+        run: |
+          cat << EOF >> passbolt_help/_releases/ce/v${{ github.ref }}.md
+          ---
+          title: $(grep name config/version.php | awk -F "'" '{print $4}')
+          slug: $(grep name config/version.php | awk -F "'" '{print $4}' | tr ' ' '_' | tr '[:upper:]' '[:lower:]')
+          layout: release
+          categories: releases ce
+          version: v${{ github.ref }}
+          product: ce
+          song: https://youtu.be/qw6ZX07NZSM
+          quote: $(grep name config/version.php | awk -F "'" '{print $4}')
+          permalink: /releases/ce/$(grep name config/version.php | awk -F "'" '{print $4}' | tr ' ' '_' | tr '[:upper:]' '[:lower:]')
+          date: $(date +'%Y-%m-%d')
+          ---
+          EOF
+          cat RELEASE_NOTES.md >> passbolt_help/_releases/ce/v${{ github.ref }}.md
+          cd passbolt_help
+          git config --global user.name "release bot"
+          git config --global user.email "contact@passbolt.com"
+          git add -A
+          git commit -m "New release notes for CE ${{ github.ref }}"
+          git push
