@@ -18,7 +18,6 @@ declare(strict_types=1);
 namespace Passbolt\AuditLog\Controller;
 
 use Cake\Http\Exception\BadRequestException;
-use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 use Cake\Validation\Validation;
@@ -26,6 +25,14 @@ use Passbolt\AuditLog\Utility\UserActionLogsFinder;
 
 class UserLogsController extends BaseLogsController
 {
+    /**
+     * @inheritDoc
+     */
+    public function getModelName(): string
+    {
+        return 'Users';
+    }
+
     /**
      * View action logs for a given user.
      *
@@ -37,9 +44,7 @@ class UserLogsController extends BaseLogsController
      */
     public function view(?string $userId = null)
     {
-        if (!$this->User->isAdmin()) {
-            throw new ForbiddenException(__('Only administrators can view user logs.'));
-        }
+        $this->User->assertIsAdmin(__('Only administrators can view user logs.'));
 
         // Check request sanity
         if (!Validation::uuid($userId)) {

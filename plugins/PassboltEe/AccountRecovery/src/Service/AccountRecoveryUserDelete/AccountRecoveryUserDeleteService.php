@@ -18,21 +18,17 @@ declare(strict_types=1);
 namespace Passbolt\AccountRecovery\Service\AccountRecoveryUserDelete;
 
 use App\Model\Entity\AuthenticationToken;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Utility\Hash;
 use Cake\Validation\Validation;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryRequest;
 
 /**
- * @property \App\Model\Table\AuthenticationTokensTable $AuthenticationTokens
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryUserSettingsTable $AccountRecoveryUserSettings
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable $AccountRecoveryPrivateKeyPasswords // phpcs:ignore
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeysTable $AccountRecoveryPrivateKeys
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryRequestsTable $AccountRecoveryRequests
+ * Class AccountRecoveryUserDeleteService
  */
 class AccountRecoveryUserDeleteService
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
      * @var \Cake\Http\ServerRequest
@@ -40,15 +36,48 @@ class AccountRecoveryUserDeleteService
     protected $request;
 
     /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeysTable
+     */
+    protected $AccountRecoveryPrivateKeys;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable
+     */
+    protected $AccountRecoveryPrivateKeyPasswords;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryRequestsTable
+     */
+    protected $AccountRecoveryRequests;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryUserSettingsTable
+     */
+    protected $AccountRecoveryUserSettings;
+
+    /**
+     * @var \App\Model\Table\AuthenticationTokensTable
+     */
+    protected $AuthenticationTokens;
+
+    /**
      * AccountRecoveryUserDeleteService constructor.
      */
     public function __construct()
     {
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryUserSettings');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryPrivateKeys');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryPrivateKeyPasswords');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryRequests');
-        $this->loadModel('AuthenticationTokens');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryUserSettings = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryUserSettings');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryPrivateKeys = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryPrivateKeys');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryPrivateKeyPasswords = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryPrivateKeyPasswords');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryRequests = $this->fetchTable('Passbolt/AccountRecovery.AccountRecoveryRequests');
+        /** @phpstan-ignore-next-line */
+        $this->AuthenticationTokens = $this->fetchTable('AuthenticationTokens');
     }
 
     /**

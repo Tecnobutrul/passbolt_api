@@ -28,11 +28,46 @@ use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 class SsoKeysGetControllerTest extends SsoIntegrationTestCase
 {
     /**
-     * 200 auth token is consumed
+     * 200 auth token is consumed for Azure
      */
-    public function testSsoKeysGetController_Success(): void
+    public function testSsoKeysGetController_Success_Azure(): void
     {
         $settings = SsoSettingsFactory::make()->azure()->active()->persist();
+        $user = UserFactory::make()->active()->persist();
+        $key = SsoKeysFactory::make()->userId($user->id)->persist();
+        $ssoAuthToken = SsoAuthenticationTokenFactory::make()
+            ->type(SsoState::TYPE_SSO_GET_KEY)
+            ->userId($user->id)
+            ->active()
+            ->data([
+                'sso_setting_id' => $settings->id,
+                'ip' => SsoIntegrationTestCase::IP_ADDRESS,
+                'user_agent' => SsoIntegrationTestCase::USER_AGENT,
+            ])
+            ->persist();
+
+        $this->getJson('/sso/keys/' . $key->id . '/' . $user->id . '/' . $ssoAuthToken->token . '.json');
+
+        $this->assertSuccess();
+        $result = $this->_responseJson->body;
+        $this->assertEquals($key->id, $result->id);
+        $this->assertEquals($key->user_id, $result->user_id);
+        $this->assertEquals($key->data, $result->data);
+        $this->assertEquals($key->created_by, $result->created_by);
+        $this->assertEquals($key->modified_by, $result->modified_by);
+        $this->assertNotEmpty($result->created);
+        $this->assertNotEmpty($result->modified);
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $updateSsoAuthToken */
+        $updateSsoAuthToken = SsoAuthenticationTokenFactory::find()->firstOrFail();
+        $this->assertFalse($updateSsoAuthToken->active);
+    }
+
+    /**
+     * 200 auth token is consumed for Google
+     */
+    public function testSsoKeysGetController_Success_Google(): void
+    {
+        $settings = SsoSettingsFactory::make()->google()->active()->persist();
         $user = UserFactory::make()->active()->persist();
         $key = SsoKeysFactory::make()->userId($user->id)->persist();
         $ssoAuthToken = SsoAuthenticationTokenFactory::make()

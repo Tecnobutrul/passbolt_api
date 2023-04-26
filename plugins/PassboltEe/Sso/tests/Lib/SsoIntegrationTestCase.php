@@ -25,7 +25,6 @@ use App\Test\Lib\Utility\LoginTestTrait;
 use App\Utility\UserAccessControl;
 use Cake\Core\Configure;
 use Cake\I18n\FrozenTime;
-use Cake\ORM\TableRegistry;
 use Cake\TestSuite\IntegrationTestTrait;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoSetting;
@@ -89,7 +88,7 @@ class SsoIntegrationTestCase extends SsoTestCase
         try {
             // create a correct setting using the service
             (new SsoSettingsSetService())->create($uac, $data);
-            $ssoSettingsTable = TableRegistry::getTableLocator()->get('Passbolt/Sso.SsoSettings');
+            $ssoSettingsTable = $this->fetchTable('Passbolt/Sso.SsoSettings');
             // activate it the fast way
             /** @var SsoSetting $setting */
             $setting = $ssoSettingsTable->find()->firstOrFail();
@@ -100,6 +99,46 @@ class SsoIntegrationTestCase extends SsoTestCase
         }
 
         /** @var SsoSettingsDto $dto */
+        $dto = (new SsoSettingsGetService())->getByIdOrFail($setting->id);
+
+        return $dto;
+    }
+
+    /**
+     * @param User $admin User entity (mostly this will be with "admin" role)
+     * @param string|null $status Status.
+     * @return SsoSettingsDto
+     */
+    public function createGoogleSettingsFromConfig(User $admin, ?string $status = SsoSetting::STATUS_ACTIVE): SsoSettingsDto
+    {
+        $seleniumSsoConfig = Configure::read('passbolt.selenium.sso.active');
+        if (!isset($seleniumSsoConfig) || !$seleniumSsoConfig) {
+            $this->markTestSkipped('Selenium SSO is set to inactive, skipping tests.');
+        }
+
+        $uac = new UserAccessControl(Role::ADMIN, $admin->id);
+        $data = [
+            'provider' => SsoSetting::PROVIDER_GOOGLE,
+            'data' => [
+                'client_id' => Configure::read('passbolt.selenium.sso.google.clientId'),
+                'client_secret' => Configure::read('passbolt.selenium.sso.google.secretId'),
+            ],
+        ];
+
+        try {
+            // create a correct setting using the service
+            (new SsoSettingsSetService())->create($uac, $data);
+            $ssoSettingsTable = $this->fetchTable('Passbolt/Sso.SsoSettings');
+            // activate it the fast way
+            /** @var SsoSetting $setting */
+            $setting = $ssoSettingsTable->find()->firstOrFail();
+            $setting->status = $status;
+            $ssoSettingsTable->save($setting);
+        } catch (CustomValidationException $exception) {
+            $this->fail('Config passbolt.selenium.sso.google is invalid.');
+        }
+
+        /** @var \Passbolt\Sso\Model\Dto\SsoSettingsDto $dto */
         $dto = (new SsoSettingsGetService())->getByIdOrFail($setting->id);
 
         return $dto;

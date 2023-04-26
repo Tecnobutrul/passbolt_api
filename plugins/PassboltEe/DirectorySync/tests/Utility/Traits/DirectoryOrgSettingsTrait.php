@@ -30,11 +30,13 @@ trait DirectoryOrgSettingsTrait
     public function enableDirectoryIntegration()
     {
         $settings = [
+            'enabled' => true,
             'defaultUser' => 'admin@passbolt.com',
             'defaultGroupAdminUser' => 'ada@passbolt.com',
             'jobs' => [
                 'users' => [
                     'create' => true,
+                    'update' => true,
                     'delete' => true,
                 ],
                 'groups' => [

@@ -21,6 +21,7 @@ use App\Test\Factory\UserFactory;
 use App\Utility\UserAccessControl;
 use Cake\ORM\TableRegistry;
 use Passbolt\AuditLog\Utility\FolderActionLogsFinder;
+use Passbolt\Folders\FoldersPlugin;
 use Passbolt\Folders\Test\Factory\FolderFactory;
 use Passbolt\Log\Test\Lib\LogIntegrationTestCase;
 
@@ -28,19 +29,19 @@ class FolderActionLogsFinderTest extends LogIntegrationTestCase
 {
     public function testFolderActionLogsFinder_Find()
     {
-        $isFolderPluginDisabled = !$this->isFeaturePluginEnabled('Folders');
+        $isFolderPluginDisabled = !$this->isFeaturePluginEnabled(FoldersPlugin::class);
         TableRegistry::getTableLocator()->clear();
-        $this->enableFeaturePlugin('Folders');
+        $this->enableFeaturePlugin(FoldersPlugin::class);
         $user = UserFactory::make()->persist();
         $uac = new UserAccessControl($user->role->name, $user->id);
         $folder = FolderFactory::make()->withPermissionsFor([$user])->persist();
 
         $finder = new FolderActionLogsFinder();
         $results = $finder->find($uac, $folder->id);
-        $this->assertEmpty($results);
+        $this->assertSame(0, $results->count());
 
         if ($isFolderPluginDisabled) {
-            $this->disableFeaturePlugin('Folders');
+            $this->disableFeaturePlugin(FoldersPlugin::class);
         }
     }
 }

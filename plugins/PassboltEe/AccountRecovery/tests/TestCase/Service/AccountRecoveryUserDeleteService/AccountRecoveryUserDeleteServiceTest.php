@@ -22,9 +22,9 @@ use App\Test\Factory\AuthenticationTokenFactory;
 use App\Test\Factory\GpgkeyFactory;
 use App\Test\Factory\UserFactory;
 use CakephpFixtureFactories\Scenario\ScenarioAwareTrait;
+use Passbolt\AccountRecovery\AccountRecoveryPlugin;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryPrivateKeyPassword;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryRequest;
-use Passbolt\AccountRecovery\Plugin;
 use Passbolt\AccountRecovery\Service\AccountRecoveryUserDelete\AccountRecoveryUserDeleteService;
 use Passbolt\AccountRecovery\Test\Factory\AccountRecoveryPrivateKeyFactory;
 use Passbolt\AccountRecovery\Test\Factory\AccountRecoveryPrivateKeyPasswordFactory;
@@ -40,7 +40,7 @@ class AccountRecoveryUserDeleteServiceTest extends AccountRecoveryTestCase
     public function setUp(): void
     {
         parent::setUp();
-        (new Plugin())->addAssociationsToUsersTable();
+        (new AccountRecoveryPlugin())->addAssociationsToUsersTable();
     }
 
     public function testAccountRecoveryUserDeleteService_Error_InvalidId(): void

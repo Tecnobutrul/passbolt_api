@@ -17,18 +17,18 @@ declare(strict_types=1);
 namespace Passbolt\Ee\Service;
 
 use App\Utility\UserAccessControl;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Log\Log;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Passbolt\Ee\Error\Exception\Subscriptions\SubscriptionRecordNotFoundException;
 use Passbolt\Ee\Model\Dto\SubscriptionKeyDto;
 
 /**
- * @property \Passbolt\Ee\Model\Table\SubscriptionsTable $Subscriptions
+ * Class SubscriptionKeyGetService
  */
 class SubscriptionKeyGetService
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     public const LEGACY_SUBSCRIPTION_FILE = CONFIG . 'license';
     public const SUBSCRIPTION_FILE = CONFIG . 'subscription_key.txt';
@@ -37,13 +37,18 @@ class SubscriptionKeyGetService
      * @var \Passbolt\Ee\Service\SubscriptionKeyValidateService $SubscriptionValidateService
      */
     protected $SubscriptionValidateService;
+    /**
+     * @var \Passbolt\Ee\Model\Table\SubscriptionsTable
+     */
+    protected $Subscriptions;
 
     /**
      * SubscriptionKeyGetService constructor.
      */
     public function __construct()
     {
-        $this->loadModel('Passbolt/Ee.Subscriptions');
+        /** @phpstan-ignore-next-line */
+        $this->Subscriptions = $this->fetchTable('Passbolt/Ee.Subscriptions');
         $this->SubscriptionValidateService = new SubscriptionKeyValidateService();
     }
 

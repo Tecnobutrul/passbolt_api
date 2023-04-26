@@ -18,9 +18,6 @@ namespace Passbolt\DirectorySync\Test\TestCase\Utility;
 
 use App\Utility\UuidFactory;
 use Cake\Core\Configure;
-use Cake\I18n\FrozenTime;
-use LdapTools\Object\LdapObject;
-use LdapTools\Object\LdapObjectType;
 use Passbolt\DirectorySync\Test\Utility\DirectorySyncIntegrationTestCase;
 use Passbolt\DirectorySync\Utility\DirectoryEntry\UserEntry;
 
@@ -40,13 +37,13 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
     private function _getSampleLdapObject(array $modify = [])
     {
         $userData = [
-            'firstName' => 'john',
-            'lastName' => 'doe',
-            'emailAddress' => 'john.doe@passbolt.com',
+            'givenName' => 'john',
+            'sn' => 'doe',
+            'mail' => 'john.doe@passbolt.com',
             'dn' => 'CN=john,OU=accounts,OU=passbolt,OU=local',
-            'guid' => UuidFactory::uuid('ldap.user.id.john'),
-            'created' => new FrozenTime(),
-            'modified' => new FrozenTime(),
+            'objectGuid' => UuidFactory::uuid('ldap.user.id.john'),
+            'whenCreated' => new \DateTime(),
+            'whenChanged' => new \DateTime(),
         ];
 
         $userData = array_merge($userData, $modify);
@@ -58,9 +55,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
             }
         }
 
-        $ldapObject = new LdapObject($userData, LdapObjectType::USER);
-
-        return $ldapObject;
+        return $this->getTestLdapUserObject($userData);
     }
 
     public function testDirectoryMappingSuccess()
@@ -81,7 +76,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorNoId()
     {
-        $ldapObject = $this->_getSampleLdapObject(['guid' => null]);
+        $ldapObject = $this->_getSampleLdapObject(['objectGuid' => null]);
 
         $userEntry = new UserEntry();
         $userEntry->buildFromLdapObject($ldapObject, $this->mappingRules);
@@ -94,7 +89,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorInvalidId()
     {
-        $ldapObject = $this->_getSampleLdapObject(['guid' => 'thisisnotavalidguid']);
+        $ldapObject = $this->_getSampleLdapObject(['objectGuid' => 'thisisnotavalidguid']);
 
         $userEntry = new UserEntry();
         $userEntry->buildFromLdapObject($ldapObject, $this->mappingRules);
@@ -130,7 +125,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorNoCreated()
     {
-        $ldapObject = $this->_getSampleLdapObject(['created' => null]);
+        $ldapObject = $this->_getSampleLdapObject(['whenCreated' => null]);
 
         $userEntry = new UserEntry();
         $userEntry->buildFromLdapObject($ldapObject, $this->mappingRules);
@@ -142,7 +137,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorNoModified()
     {
-        $ldapObject = $this->_getSampleLdapObject(['modified' => null]);
+        $ldapObject = $this->_getSampleLdapObject(['whenChanged' => null]);
 
         $userEntry = new UserEntry();
         $userEntry->buildFromLdapObject($ldapObject, $this->mappingRules);
@@ -154,7 +149,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorNoFirstName()
     {
-        $ldapObject = $this->_getSampleLdapObject(['firstName' => null]);
+        $ldapObject = $this->_getSampleLdapObject(['givenName' => null]);
 
         $userEntry = new UserEntry();
         $userEntry->buildFromLdapObject($ldapObject, $this->mappingRules);
@@ -166,7 +161,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorNoLastName()
     {
-        $ldapObject = $this->_getSampleLdapObject(['lastName' => null]);
+        $ldapObject = $this->_getSampleLdapObject(['sn' => null]);
 
         $userEntry = new UserEntry();
         $userEntry->buildFromLdapObject($ldapObject, $this->mappingRules);
@@ -178,7 +173,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorNoEmailAddress()
     {
-        $ldapObject = $this->_getSampleLdapObject(['emailAddress' => null]);
+        $ldapObject = $this->_getSampleLdapObject(['mail' => null]);
 
         $userEntry = new UserEntry();
         $userEntry->buildFromLdapObject($ldapObject, $this->mappingRules);
@@ -190,7 +185,7 @@ class UserEntryTest extends DirectorySyncIntegrationTestCase
 
     public function testDirectoryValidateErrorInvalidEmailAddress()
     {
-        $ldapObject = $this->_getSampleLdapObject(['emailAddress' => 'invalidemail']);
+        $ldapObject = $this->_getSampleLdapObject(['mail' => 'invalidemail']);
 
         $userEntry = new UserEntry();
         $userEntry->buildFromLdapObject($ldapObject, $this->mappingRules);

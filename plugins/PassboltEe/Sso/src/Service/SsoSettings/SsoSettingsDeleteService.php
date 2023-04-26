@@ -16,7 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\Sso\Service\SsoSettings;
 
-use App\Utility\UserAccessControl;
+use App\Utility\ExtendedUserAccessControl;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Event\Event;
 use Cake\Http\Exception\BadRequestException;
@@ -36,14 +36,14 @@ class SsoSettingsDeleteService
     /**
      * Delete a setting identified with its id
      *
-     * @param \App\Utility\UserAccessControl $uac user access control
+     * @param \App\Utility\ExtendedUserAccessControl $uac user access control
      * @param string $id uuid setting id
      * @throws \Cake\Http\Exception\BadRequestException if $id is not a valid uuid
      * @throws \Cake\Http\Exception\NotFoundException if settings cannot be found
      * @throws \Cake\Http\Exception\InternalErrorException if the settings could not be deleted
      * @return void
      */
-    public function delete(UserAccessControl $uac, string $id): void
+    public function delete(ExtendedUserAccessControl $uac, string $id): void
     {
         if (!Validation::uuid($id)) {
             throw new BadRequestException(__('The SSO setting id should be a uuid.'));
@@ -70,7 +70,11 @@ class SsoSettingsDeleteService
 
         // Notify other administrators if an active policy was changed
         if ($ssoSetting->status === SsoSetting::STATUS_ACTIVE) {
-            $event = new Event(self::AFTER_DELETE_ACTIVE_SSO_SETTINGS_EVENT, $this, ['uac' => $uac]);
+            $event = new Event(
+                self::AFTER_DELETE_ACTIVE_SSO_SETTINGS_EVENT,
+                $this,
+                ['uac' => $uac, 'ssoSetting' => $ssoSetting]
+            );
             $ssoSettingsTable->getEventManager()->dispatch($event);
         }
     }

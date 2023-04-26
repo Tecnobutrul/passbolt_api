@@ -26,11 +26,24 @@ use Passbolt\Ee\Service\SubscriptionKeyImportService;
 
 /**
  * Subscription Check shell command.
- *
- * @property \Passbolt\Ee\Model\Table\SubscriptionsTable $Subscriptions
  */
 class SubscriptionImportCommand extends PassboltCommand
 {
+    /**
+     * @var \Passbolt\Ee\Model\Table\SubscriptionsTable
+     */
+    protected $Subscriptions;
+
+    /**
+     * @inheritDoc
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        /** @phpstan-ignore-next-line */
+        $this->Subscriptions = $this->fetchTable('Passbolt/Ee.Subscriptions');
+    }
+
     /**
      * @inheritDoc
      */
@@ -53,8 +66,6 @@ class SubscriptionImportCommand extends PassboltCommand
     public function execute(Arguments $args, ConsoleIo $io): ?int
     {
         parent::execute($args, $io);
-
-        $this->loadModel('Passbolt/Ee.Subscriptions');
 
         $file = $args->getOption('file');
         $importService = new SubscriptionKeyImportService();

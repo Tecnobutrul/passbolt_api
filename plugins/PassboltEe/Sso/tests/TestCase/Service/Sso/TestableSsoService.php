@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Test\TestCase\Service\Sso;
 
+use App\Service\Cookie\DefaultSecureCookieService;
 use App\Utility\ExtendedUserAccessControl;
 use Cake\Http\Cookie\Cookie;
 use League\OAuth2\Client\Provider\AbstractProvider;
@@ -28,6 +29,12 @@ use Passbolt\Sso\Test\Factory\SsoStateFactory;
 
 class TestableSsoService extends AbstractSsoService
 {
+    public function __construct(?SsoSettingsDto $settingsDto = null)
+    {
+        $cookieService = new DefaultSecureCookieService();
+        parent::__construct($cookieService, $settingsDto);
+    }
+
     public function createStateCookie(ExtendedUserAccessControl $uac, string $type): Cookie
     {
         $ssoState = SsoStateFactory::make()->withTypeSsoSetSettings()->persist();

@@ -20,6 +20,7 @@ use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
@@ -50,6 +51,33 @@ class SsoSettingsActivateControllerTest extends SsoIntegrationTestCase
         $this->assertSuccess();
         $settingDto = $this->_responseJsonBody;
         $this->assertEquals($settingDto->id, $settings->id);
+    }
+
+    public function testSsoSettingsActivateController_SuccessGoogle(): void
+    {
+        $settings = SsoSettingsFactory::make()->google()->persist();
+        $user = UserFactory::make()->admin()->active()->persist();
+        $ssoAuthToken = SsoAuthenticationTokenFactory::make()
+            ->type(SsoState::TYPE_SSO_SET_SETTINGS)
+            ->userId($user->id)
+            ->active()
+            ->data([
+                'sso_setting_id' => $settings->id,
+                'ip' => SsoIntegrationTestCase::IP_ADDRESS,
+                'user_agent' => SsoIntegrationTestCase::USER_AGENT,
+            ])
+            ->persist();
+        $this->logInAs($user);
+
+        $this->postJson('/sso/settings/' . $settings->id . '.json', [
+            'status' => SsoSetting::STATUS_ACTIVE,
+            'token' => $ssoAuthToken->token,
+        ]);
+
+        $this->assertSuccess();
+        $settingDto = $this->_responseJsonBody;
+        $this->assertEquals($settingDto->id, $settings->id);
+        $this->assertEquals((new SsoActiveProvidersGetService())->get(), $settingDto->providers);
     }
 
     public function testSsoSettingsActivateController_ErrorNotLoggedIn(): void

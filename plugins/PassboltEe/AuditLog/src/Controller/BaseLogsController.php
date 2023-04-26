@@ -18,7 +18,9 @@ declare(strict_types=1);
 namespace Passbolt\AuditLog\Controller;
 
 use App\Controller\AppController;
+use App\Error\Exception\FeaturePluginDisabledException;
 use Cake\Datasource\Exception\PageOutOfBoundsException;
+use Passbolt\AuditLog\Utility\ActionLogResultsParser;
 use Passbolt\AuditLog\Utility\BaseActionLogsFinder;
 
 abstract class BaseLogsController extends AppController
@@ -32,7 +34,20 @@ abstract class BaseLogsController extends AppController
         'limit' => 5,
         'maxLimit' => 20,
         'whiteList' => ['limit', 'page'],
+        'sortableFields' => [
+            'ActionLogs.created',
+        ],
+        'order' => [
+            'ActionLogs.created' => 'desc', // Default sorted field
+        ],
     ];
+
+    /**
+     * Name of the model
+     *
+     * @return string
+     */
+    abstract public function getModelName(): string;
 
     /**
      * Initialize
@@ -43,7 +58,9 @@ abstract class BaseLogsController extends AppController
     public function initialize(): void
     {
         parent::initialize();
-        $this->loadComponent('Paginator');
+        $this->loadComponent('ApiPagination', [
+            'model' => 'ActionLogs',
+        ]);
     }
 
     /**
@@ -54,12 +71,12 @@ abstract class BaseLogsController extends AppController
      */
     protected function viewByEntity(BaseActionLogsFinder $logsFinder, string $entityId): void
     {
-        // Get pagination options.
-        $options = $this->Paginator->mergeOptions('', $this->paginate);
-
         try {
-            $logs = $logsFinder->find($this->User->getAccessControl(), $entityId, $options);
-        } catch (PageOutOfBoundsException $e) {
+            $logs = $logsFinder->find($this->User->getAccessControl(), $entityId);
+            $this->paginate($logs);
+            $resultParser = new ActionLogResultsParser($logs->all(), [lcfirst($this->getModelName()) => [$entityId]]);
+            $logs = $resultParser->parse();
+        } catch (PageOutOfBoundsException | FeaturePluginDisabledException $e) {
             $logs = [];
         }
 

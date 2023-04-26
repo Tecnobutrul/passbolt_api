@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Controller\Azure;
 
+use App\Service\Cookie\AbstractSecureCookieService;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\NotFoundException;
 use Passbolt\Sso\Controller\AbstractSsoController;
@@ -29,9 +30,10 @@ class SsoAzureStage1DryRunController extends AbstractSsoController
     /**
      * Perform a SSO Login dry run for a given settings_id
      *
+     * @param \App\Service\Cookie\AbstractSecureCookieService $cookieService Cookie service
      * @return void
      */
-    public function stage1DryRun(): void
+    public function stage1DryRun(AbstractSecureCookieService $cookieService): void
     {
         $this->assertJson();
 
@@ -49,7 +51,7 @@ class SsoAzureStage1DryRunController extends AbstractSsoController
 
         // Redirect to provider
         $url = $this->getSsoUrlWithCookie(
-            new SsoAzureService($settingsDto),
+            new SsoAzureService($cookieService, $settingsDto),
             $uac,
             SsoState::TYPE_SSO_SET_SETTINGS
         );

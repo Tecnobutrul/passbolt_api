@@ -163,7 +163,7 @@ class DirectorySettingsControllerTest extends DirectorySyncIntegrationTestCase
         $this->authenticateAs('admin');
         $this->putJson('/directorysync/settings.json?api-version=2', $formData);
         $this->assertError(400);
-        $errors = json_decode(json_encode($this->_responseJsonBody), true);
+        $errors = $this->getResponseBodyAsArray();
         $this->assertNotEmpty($errors);
         $error = Hash::get($errors, 'domain_name._empty');
     }
@@ -234,7 +234,7 @@ class DirectorySettingsControllerTest extends DirectorySyncIntegrationTestCase
         $this->authenticateAs('admin');
         $this->postJson('/directorysync/settings/test.json?api-version=2', $formData);
         $this->assertError(400);
-        $errors = json_decode(json_encode($this->_responseJsonBody), true);
+        $errors = $this->getResponseBodyAsArray();
         $this->assertNotEmpty($errors);
     }
 

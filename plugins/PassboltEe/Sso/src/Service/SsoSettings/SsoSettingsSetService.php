@@ -26,6 +26,7 @@ use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\TableRegistry;
 use Passbolt\Sso\Form\BaseSsoSettingsForm;
 use Passbolt\Sso\Form\SsoSettingsAzureDataForm;
+use Passbolt\Sso\Form\SsoSettingsGoogleDataForm;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 
@@ -47,7 +48,7 @@ class SsoSettingsSetService
         $form = $this->getSsoSettingsForm($data);
         if (!$form->execute($data)) {
             throw new CustomValidationException(
-                __('Something went wrong when validating the Azure single-sign on settings.'),
+                __('Something went wrong when validating the single-sign on settings.'),
                 $form->getErrors()
             );
         }
@@ -60,21 +61,24 @@ class SsoSettingsSetService
         // Build entity
         $ssoSettingsTable = TableRegistry::getTableLocator()->get('Passbolt/Sso.SsoSettings');
         /** @var \Passbolt\Sso\Model\Entity\SsoSetting $ssoSettingEntity */
-        $ssoSettingEntity = $ssoSettingsTable->newEntity([
+        $ssoSettingEntity = $ssoSettingsTable->newEntity(
+            [
                 'provider' => $data['provider'],
                 'status' => SsoSetting::STATUS_DRAFT,
                 'data' => $encryptedData,
                 'created_by' => $uac->getId(),
                 'modified_by' => $uac->getId(),
-            ], [
-            'accessibleFields' => [
-                'provider' => true,
-                'status' => true,
-                'data' => true,
-                'created_by' => true,
-                'modified_by' => true,
             ],
-        ]);
+            [
+                'accessibleFields' => [
+                    'provider' => true,
+                    'status' => true,
+                    'data' => true,
+                    'created_by' => true,
+                    'modified_by' => true,
+                ],
+            ]
+        );
 
         // Check for validation or build rules errors
         $errors = $ssoSettingEntity->getErrors();
@@ -97,8 +101,7 @@ class SsoSettingsSetService
 
         $result = json_encode($dataDto->toArray());
         if (!$result) {
-            $msg = __('It is not possible to save the SSO settings.');
-            throw new InternalErrorException($msg);
+            throw new InternalErrorException(__('It is not possible to save the SSO settings.'));
         }
 
         return $result;
@@ -116,7 +119,19 @@ class SsoSettingsSetService
         $passphrase = Configure::read('passbolt.gpg.serverKey.passphrase');
         $gpg = OpenPGPBackendFactory::get();
         $gpg->setSignKeyFromFingerprint($fingerprint, $passphrase);
-        $gpg->setEncryptKeyFromFingerprint($fingerprint);
+
+        try {
+            $gpg->setEncryptKeyFromFingerprint($fingerprint);
+        } catch (\Exception $exception) {
+            try {
+                $gpg->importServerKeyInKeyring();
+                $gpg->setEncryptKeyFromFingerprint($fingerprint);
+            } catch (\Exception $exception) {
+                $msg = __('The OpenPGP server key defined in the config cannot be used to encrypt.') . ' ';
+                $msg .= $exception->getMessage();
+                throw new InternalErrorException($msg, 500, $exception);
+            }
+        }
 
         return $gpg->encrypt($jsonData, true);
     }
@@ -140,6 +155,8 @@ class SsoSettingsSetService
         switch ($data['provider']) {
             case SsoSetting::PROVIDER_AZURE:
                 return new SsoSettingsAzureDataForm();
+            case SsoSetting::PROVIDER_GOOGLE:
+                return new SsoSettingsGoogleDataForm();
             default:
                 throw new BadRequestException('Service provider not supported.');
         }
