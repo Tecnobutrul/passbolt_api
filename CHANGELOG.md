@@ -2,6 +2,25 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.12.2] - 2023-03-15
+
+This is a demo for the comms team to the release notes
+
+### Added
+PB-20535 As a community user I want to use folders
+PB-22749 As an administrator I can customise passbolt to output the action logs in syslog
+PB-22749 As an administrator I can customise passbolt to output the action logs in a file
+PB-22749 As an administrator I can implement my own action logs handler
+
+### Fixed
+PB-23717 As a user using the json API I should get a bad request error instead of an internal error if using api-version=v1
+PB-21826 Fix emails entries should not be locked when threshold limit is exceeded
+PB-23519 As an administrator running the DUO v4 migration I should not see a warning message if DUO was not configured
+PB-23721 As an administrator I want to be sure the server key is in the keyring before decrypting users directory settings
+
+### Security
+PB-23311 As an administrator I should be the only one to know which users have enabled MFA
+
 ## [3.12.1] - 2023-03-15
 
 This are my release notes beware all of you
