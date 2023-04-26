@@ -24,6 +24,14 @@ use Passbolt\AuditLog\Utility\ResourceActionLogsFinder;
 class ResourceLogsController extends BaseLogsController
 {
     /**
+     * @inheritDoc
+     */
+    public function getModelName(): string
+    {
+        return 'Resources';
+    }
+
+    /**
      * View action logs for a given resource.
      *
      * @param string|null $resourceId resource id

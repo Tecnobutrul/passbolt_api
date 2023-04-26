@@ -24,7 +24,7 @@ use App\Test\Factory\UserFactory;
 use App\Utility\UuidFactory;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\NotFoundException;
-use Passbolt\AccountRecovery\Plugin;
+use Passbolt\AccountRecovery\AccountRecoveryPlugin;
 use Passbolt\AccountRecovery\Service\AccountRecoveryRequests\AccountRecoveryRequestGetService;
 use Passbolt\AccountRecovery\Test\Factory\AccountRecoveryOrganizationPolicyFactory;
 use Passbolt\AccountRecovery\Test\Factory\AccountRecoveryRequestFactory;
@@ -36,7 +36,7 @@ class AccountRecoveryRequestGetServiceTest extends AccountRecoveryTestCase
     public function setUp(): void
     {
         parent::setUp();
-        (new Plugin())->addAssociationsToUsersTable();
+        (new AccountRecoveryPlugin())->addAssociationsToUsersTable();
     }
 
     public function testAccountRecoveryRequestGetService_Success_PendingStatus()

@@ -18,24 +18,30 @@ declare(strict_types=1);
 namespace Passbolt\AccountRecovery\Service\AccountRecoveryUserSettings;
 
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Http\Exception\NotFoundException;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Query;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryUserSetting;
 
 /**
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryUserSettingsTable $AccountRecoveryUserSettings
+ * Class AccountRecoveryUserSettingsGetService
  */
 class AccountRecoveryUserSettingsGetService
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     /**
-     * @return \Passbolt\AccountRecovery\Model\Entity\AccountRecoveryUserSetting|null
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryUserSettingsTable
+     */
+    protected $AccountRecoveryUserSettings;
+
+    /**
+     * @return void
      */
     public function __construct()
     {
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryUserSettings');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryUserSettings = $this->fetchTable('Passbolt/AccountRecovery.AccountRecoveryUserSettings');
     }
 
     /**

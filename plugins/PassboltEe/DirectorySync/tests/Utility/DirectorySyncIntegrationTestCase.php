@@ -20,10 +20,13 @@ use App\Test\Lib\AppIntegrationTestCase;
 use App\Test\Lib\Utility\UserAccessControlTrait;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
+use LdapRecord\Models\ActiveDirectory\Group;
+use LdapRecord\Models\ActiveDirectory\User;
 use Passbolt\DirectorySync\Test\Utility\Traits\AssertDirectoryTrait;
 use Passbolt\DirectorySync\Test\Utility\Traits\AssertReportTrait;
 use Passbolt\DirectorySync\Test\Utility\Traits\DirectoryOrgSettingsTrait;
 use Passbolt\DirectorySync\Test\Utility\Traits\MockDirectoryTrait;
+use Passbolt\DirectorySync\Utility\DirectoryInterface;
 
 abstract class DirectorySyncIntegrationTestCase extends AppIntegrationTestCase
 {
@@ -73,5 +76,33 @@ abstract class DirectorySyncIntegrationTestCase extends AppIntegrationTestCase
         $this->enableDirectoryIntegration();
         $this->loadPlugins(['Passbolt/EmailDigest' => []]);
         $this->loadPlugins(['Passbolt/Locale' => []]);
+    }
+
+    /**
+     * Creates an LDAP User object with test data
+     *
+     * @param array $data
+     * @return \LdapRecord\Models\ActiveDirectory\User
+     */
+    protected function getTestLdapUserObject(array $data): User
+    {
+        $ldapObject = new User($data);
+        $ldapObject->addAttributeValue('objectType', DirectoryInterface::ENTRY_TYPE_USER);
+
+        return $ldapObject;
+    }
+
+    /**
+     * Creates an LDAP Group object with test data
+     *
+     * @param array $data
+     * @return \LdapRecord\Models\ActiveDirectory\Group
+     */
+    protected function getTestLdapGroupObject(array $data): Group
+    {
+        $ldapObject = new Group($data);
+        $ldapObject->addAttributeValue('objectType', DirectoryInterface::ENTRY_TYPE_GROUP);
+
+        return $ldapObject;
     }
 }

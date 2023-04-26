@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace Passbolt\SsoRecover\Controller\Azure;
 
 use App\Model\Entity\Role;
+use App\Service\Cookie\AbstractSecureCookieService;
 use App\Utility\ExtendedUserAccessControl;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Event\EventInterface;
@@ -42,9 +43,10 @@ class AzureRecoverLoginController extends AbstractSsoController
     /**
      * Return a URL to redirect the user to perform SSO (without hint)
      *
+     * @param \App\Service\Cookie\AbstractSecureCookieService $cookieService Cookie service
      * @return void
      */
-    public function login(): void
+    public function login(AbstractSecureCookieService $cookieService): void
     {
         try {
             (new SsoSettingsGetService())->getActiveOrFail();
@@ -62,7 +64,7 @@ class AzureRecoverLoginController extends AbstractSsoController
             $this->User->userAgent()
         );
 
-        $url = $this->getSsoUrlWithCookie(new SsoAzureService(), $uac, SsoState::TYPE_SSO_RECOVER);
+        $url = $this->getSsoUrlWithCookie(new SsoAzureService($cookieService), $uac, SsoState::TYPE_SSO_RECOVER);
 
         $this->success(__('The operation was successful.'), ['url' => $url]);
     }

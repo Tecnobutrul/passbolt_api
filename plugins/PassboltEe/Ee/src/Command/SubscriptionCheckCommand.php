@@ -32,11 +32,24 @@ use Passbolt\Ee\Service\SubscriptionKeyGetService;
 
 /**
  * Subscription Check shell command.
- *
- * @property \Passbolt\Ee\Model\Table\SubscriptionsTable $Subscriptions
  */
 class SubscriptionCheckCommand extends PassboltCommand
 {
+    /**
+     * @var \Passbolt\Ee\Model\Table\SubscriptionsTable
+     */
+    protected $Subscriptions;
+
+    /**
+     * @inheritDoc
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        /** @phpstan-ignore-next-line */
+        $this->Subscriptions = $this->fetchTable('Passbolt/Ee.Subscriptions');
+    }
+
     /**
      * @inheritDoc
      */
@@ -53,8 +66,6 @@ class SubscriptionCheckCommand extends PassboltCommand
     public function execute(Arguments $args, ConsoleIo $io): ?int
     {
         parent::execute($args, $io);
-
-        $this->loadModel('Passbolt/Ee.Subscriptions');
 
         try {
             $service = new SubscriptionKeyGetService();
@@ -107,7 +118,7 @@ class SubscriptionCheckCommand extends PassboltCommand
     {
         $data = $subscription->toArray();
         /** @var \App\Model\Table\UsersTable $users */
-        $users = $this->loadModel('Users');
+        $users = $this->fetchTable('Users');
 
         $io->nl();
         $io->out(__('Thanks for choosing Passbolt Pro'));

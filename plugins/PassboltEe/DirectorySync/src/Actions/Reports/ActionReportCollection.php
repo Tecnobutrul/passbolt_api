@@ -21,7 +21,7 @@ namespace Passbolt\DirectorySync\Actions\Reports;
  *
  * @package App\Utility
  */
-class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, \Countable
+class ActionReportCollection implements \Iterator, \ArrayAccess, \Countable
 {
     /**
      * @var array
@@ -114,22 +114,22 @@ class ActionReportCollection implements \Serializable, \Iterator, \ArrayAccess, 
     /**
      * Serialize
      *
-     * @return string
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array // phpcs:ignore
     {
-        return serialize($this->reports);
+        return $this->reports;
     }
 
     /**
      * Unserialize
      *
-     * @param string $serialized serialized data
+     * @param array $data data
      * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $data): void // phpcs:ignore
     {
-        $this->reports = unserialize($serialized);
+        $this->reports = $data;
     }
 
     /**

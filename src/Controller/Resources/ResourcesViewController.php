@@ -27,10 +27,25 @@ use Cake\Validation\Validation;
 use Exception;
 
 /**
- * @property \App\Model\Table\ResourcesTable $Resources
+ * ResourcesViewController Class
  */
 class ResourcesViewController extends AppController
 {
+    /**
+     * @var \App\Model\Table\ResourcesTable
+     */
+    protected $Resources;
+
+    /**
+     * @inheritDoc
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        /** @phpstan-ignore-next-line */
+        $this->Resources = $this->fetchTable('Resources');
+    }
+
     /**
      * Resource View action
      *
@@ -45,7 +60,6 @@ class ResourcesViewController extends AppController
         if (!Validation::uuid($id)) {
             throw new BadRequestException(__('The resource identifier should be a valid UUID.'));
         }
-        $this->loadModel('Resources');
 
         // Retrieve and sanity the query options.
         $whitelist = ['contain' => [

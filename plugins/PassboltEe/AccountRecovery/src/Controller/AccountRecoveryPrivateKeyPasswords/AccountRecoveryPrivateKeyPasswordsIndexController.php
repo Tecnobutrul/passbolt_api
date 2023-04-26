@@ -38,7 +38,9 @@ class AccountRecoveryPrivateKeyPasswordsIndexController extends AppController
     public function initialize(): void
     {
         parent::initialize();
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryPrivateKeyPasswords');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryPrivateKeyPasswords = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryPrivateKeyPasswords');
         $this->loadComponent('ApiPagination', [
             'model' => 'AccountRecoveryPrivateKeyPasswords',
         ]);

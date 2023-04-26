@@ -19,22 +19,27 @@ namespace Passbolt\SsoRecover\Test\TestCase\Service;
 use App\Test\Factory\UserFactory;
 use App\Test\Lib\AppTestCase;
 use Cake\Http\Exception\BadRequestException;
+use Cake\Routing\Router;
+use Passbolt\SelfRegistration\Test\Lib\SelfRegistrationTestTrait;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
-use Passbolt\Sso\Model\Entity\SsoAuthenticationToken;
+use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Entity\SsoState;
+use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\TestCase\Service\Sso\TestableSsoService;
 use Passbolt\Sso\Utility\Azure\ResourceOwner\AzureResourceOwner;
-use Passbolt\SsoRecover\Service\SsoRecoverAssertAssertService;
+use Passbolt\SsoRecover\Service\SsoRecoverAssertService;
 
 /**
- * @covers \Passbolt\SsoRecover\Service\SsoRecoverAssertAssertService
+ * @covers \Passbolt\SsoRecover\Service\SsoRecoverAssertService
  */
 class SsoRecoverAssertServiceTest extends AppTestCase
 {
+    use SelfRegistrationTestTrait;
+
     /**
-     * @var \Passbolt\SsoRecover\Service\SsoRecoverAssertAssertService
+     * @var \Passbolt\SsoRecover\Service\SsoRecoverAssertService
      */
     private $service;
 
@@ -45,7 +50,7 @@ class SsoRecoverAssertServiceTest extends AppTestCase
     {
         parent::setUp();
 
-        $this->service = new SsoRecoverAssertAssertService();
+        $this->service = new SsoRecoverAssertService();
     }
 
     /**
@@ -82,12 +87,13 @@ class SsoRecoverAssertServiceTest extends AppTestCase
         $this->expectException(BadRequestException::class);
         $this->expectErrorMessage('Invalid nonce');
 
-        $this->service->assertStateCodeAndGetAuthToken(
+        $this->service->assertAndGetRedirectUrl(
             $ssoService,
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
     }
 
@@ -112,14 +118,15 @@ class SsoRecoverAssertServiceTest extends AppTestCase
         $ssoService->method('getSettings')->willReturn($settingsDto);
 
         $this->expectException(BadRequestException::class);
-        $this->expectErrorMessage('The user does not exist or has been deleted');
+        $this->expectErrorMessage('Access to this service requires an invitation');
 
-        $this->service->assertStateCodeAndGetAuthToken(
+        $this->service->assertAndGetRedirectUrl(
             $ssoService,
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
     }
 
@@ -145,14 +152,15 @@ class SsoRecoverAssertServiceTest extends AppTestCase
         $ssoService->method('getSettings')->willReturn($settingsDto);
 
         $this->expectException(BadRequestException::class);
-        $this->expectErrorMessage('The user does not exist or has been deleted');
+        $this->expectErrorMessage('Access to this service requires an invitation');
 
-        $this->service->assertStateCodeAndGetAuthToken(
+        $this->service->assertAndGetRedirectUrl(
             $ssoService,
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
     }
 
@@ -181,16 +189,17 @@ class SsoRecoverAssertServiceTest extends AppTestCase
         $this->expectException(BadRequestException::class);
         $this->expectErrorMessage('The SSO state is expired');
 
-        $this->service->assertStateCodeAndGetAuthToken(
+        $this->service->assertAndGetRedirectUrl(
             $ssoService,
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
     }
 
-    public function testAssertStateCodeAndGetAuthToken_Success(): void
+    public function testAssertStateCodeAndGetAuthToken_Success_Azure(): void
     {
         $nonce = SsoState::generate();
         $ip = '127.0.0.1';
@@ -208,14 +217,153 @@ class SsoRecoverAssertServiceTest extends AppTestCase
         $settingsDto = new SsoSettingsDto($ssoSetting, []);
         $ssoService->method('getSettings')->willReturn($settingsDto);
 
-        $result = $this->service->assertStateCodeAndGetAuthToken(
+        $result = $this->service->assertAndGetRedirectUrl(
             $ssoService,
             $ssoState,
             '123456',
             $ip,
-            $userAgent
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
         );
 
-        $this->assertInstanceOf(SsoAuthenticationToken::class, $result);
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $ssoAuthToken */
+        $ssoAuthToken = SsoAuthenticationTokenFactory::find()->firstOrFail();
+        $this->assertEquals(
+            Router::url("/sso/recover/azure/success?token={$ssoAuthToken->token}", true),
+            $result
+        );
+    }
+
+    public function testAssertStateCodeAndGetAuthToken_Success_Google(): void
+    {
+        $nonce = SsoState::generate();
+        $ip = '127.0.0.1';
+        $userAgent = 'phpunit';
+        $user = UserFactory::make()->user()->active()->persist();
+        $ssoSetting = SsoSettingsFactory::make()->active()->persist();
+        $ssoState = SsoStateFactory::make(['user_id' => null, 'nonce' => $nonce, 'ip' => $ip, 'user_agent' => $userAgent])
+            ->withTypeSsoRecover()
+            ->ssoSettingsId($ssoSetting->id)
+            ->persist();
+        // Mock azure SSO service to return specific resource owner
+        $azureResourceOwner = new AzureResourceOwner(['email' => $user->username, 'nonce' => $nonce]);
+        $ssoService = $this->getMockBuilder(TestableSsoService::class)->getMock();
+        $ssoService->method('getResourceOwner')->willReturn($azureResourceOwner);
+        $settingsDto = new SsoSettingsDto($ssoSetting, []);
+        $ssoService->method('getSettings')->willReturn($settingsDto);
+
+        $result = $this->service->assertAndGetRedirectUrl(
+            $ssoService,
+            $ssoState,
+            '123456',
+            $ip,
+            $userAgent,
+            SsoSetting::PROVIDER_GOOGLE
+        );
+
+        /** @var \Passbolt\Sso\Model\Entity\SsoAuthenticationToken $ssoAuthToken */
+        $ssoAuthToken = SsoAuthenticationTokenFactory::find()->firstOrFail();
+        $this->assertEquals(
+            Router::url("/sso/recover/google/success?token={$ssoAuthToken->token}", true),
+            $result
+        );
+    }
+
+    public function testAssertAndGetRedirectUrl_Success_SelfRegistration(): void
+    {
+        $nonce = SsoState::generate();
+        $ip = '127.0.0.1';
+        $userAgent = 'phpunit';
+        $userEmail = 'ada@passbolt.com';
+        $ssoSetting = SsoSettingsFactory::make()->active()->persist();
+        $ssoState = SsoStateFactory::make(['user_id' => null, 'nonce' => $nonce, 'ip' => $ip, 'user_agent' => $userAgent])
+            ->withTypeSsoRecover()
+            ->ssoSettingsId($ssoSetting->id)
+            ->persist();
+        // Set self-registration data
+        $this->setSelfRegistrationSettingsData();
+        // Mock azure SSO service to return specific resource owner
+        $azureResourceOwner = new AzureResourceOwner(['email' => $userEmail, 'nonce' => $nonce]);
+        $ssoService = $this->getMockBuilder(TestableSsoService::class)->getMock();
+        $ssoService->method('getResourceOwner')->willReturn($azureResourceOwner);
+        $settingsDto = new SsoSettingsDto($ssoSetting, []);
+        $ssoService->method('getSettings')->willReturn($settingsDto);
+
+        $result = $this->service->assertAndGetRedirectUrl(
+            $ssoService,
+            $ssoState,
+            '123456',
+            $ip,
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
+        );
+
+        $this->assertEquals(Router::url("/sso/recover/error?email={$userEmail}", true), $result);
+    }
+
+    public function testAssertAndGetRedirectUrl_Error_SelfRegistrationDisabled(): void
+    {
+        $nonce = SsoState::generate();
+        $ip = '127.0.0.1';
+        $userAgent = 'phpunit';
+        $userEmail = 'ada@passbolt.com';
+        $ssoSetting = SsoSettingsFactory::make()->active()->persist();
+        $ssoState = SsoStateFactory::make(['user_id' => null, 'nonce' => $nonce, 'ip' => $ip, 'user_agent' => $userAgent])
+            ->withTypeSsoRecover()
+            ->ssoSettingsId($ssoSetting->id)
+            ->persist();
+        // Mock azure SSO service to return specific resource owner
+        $azureResourceOwner = new AzureResourceOwner(['email' => $userEmail, 'nonce' => $nonce]);
+        $ssoService = $this->getMockBuilder(TestableSsoService::class)->getMock();
+        $ssoService->method('getResourceOwner')->willReturn($azureResourceOwner);
+        $settingsDto = new SsoSettingsDto($ssoSetting, []);
+        $ssoService->method('getSettings')->willReturn($settingsDto);
+        // Disable plugin
+        $this->disableFeaturePlugin('SelfRegistration');
+
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage('user does not exist or has been deleted');
+
+        $this->service->assertAndGetRedirectUrl(
+            $ssoService,
+            $ssoState,
+            '123456',
+            $ip,
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
+        );
+    }
+
+    public function testAssertAndGetRedirectUrl_Error_EmailNotAllowed(): void
+    {
+        $nonce = SsoState::generate();
+        $ip = '127.0.0.1';
+        $userAgent = 'phpunit';
+        $userEmail = 'foo@not-a-passbolt.com';
+        $ssoSetting = SsoSettingsFactory::make()->active()->persist();
+        $ssoState = SsoStateFactory::make(['user_id' => null, 'nonce' => $nonce, 'ip' => $ip, 'user_agent' => $userAgent])
+            ->withTypeSsoRecover()
+            ->ssoSettingsId($ssoSetting->id)
+            ->persist();
+        // Set self-registration data
+        $this->setSelfRegistrationSettingsData();
+        // Mock azure SSO service to return specific resource owner
+        $azureResourceOwner = new AzureResourceOwner(['email' => $userEmail, 'nonce' => $nonce]);
+        $ssoService = $this->getMockBuilder(TestableSsoService::class)->getMock();
+        $ssoService->method('getResourceOwner')->willReturn($azureResourceOwner);
+        $settingsDto = new SsoSettingsDto($ssoSetting, []);
+        $ssoService->method('getSettings')->willReturn($settingsDto);
+
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage('Access to this service requires an invitation');
+
+        $this->service->assertAndGetRedirectUrl(
+            $ssoService,
+            $ssoState,
+            '123456',
+            $ip,
+            $userAgent,
+            SsoSetting::PROVIDER_AZURE
+        );
     }
 }

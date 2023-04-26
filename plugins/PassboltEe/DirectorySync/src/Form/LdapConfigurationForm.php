@@ -25,6 +25,7 @@ use Cake\Utility\Hash;
 use Cake\Validation\Validation;
 use Cake\Validation\Validator;
 use Passbolt\DirectorySync\Utility\DirectoryFactory;
+use Passbolt\DirectorySync\Utility\DirectoryInterface;
 use Passbolt\DirectorySync\Utility\DirectoryOrgSettings;
 
 class LdapConfigurationForm extends Form
@@ -32,7 +33,9 @@ class LdapConfigurationForm extends Form
     public const CONNECTION_TYPE_PLAIN = 'plain';
     public const CONNECTION_TYPE_SSL = 'ssl';
     public const CONNECTION_TYPE_TLS = 'tls';
-    public const SUPPORTED_DIRECTORY_TYPE = ['ad', 'openldap'];
+    public const AUTHENTICATION_TYPE_BASIC = 'basic';
+    public const AUTHENTICATION_TYPE_SASL = 'sasl';
+    public const SUPPORTED_DIRECTORY_TYPE = [DirectoryInterface::TYPE_AD, DirectoryInterface::TYPE_OPENLDAP];
 
     /**
      * @var string[]
@@ -50,18 +53,21 @@ class LdapConfigurationForm extends Form
      * @var array
      */
     private static $configurationMapping = [
+        'enabled' => 'enabled',
         'source' => 'source',
         'directory_type' => 'ldap.domains.org_domain.ldap_type',
         'domain_name' => 'ldap.domains.org_domain.domain_name',
         'username' => 'ldap.domains.org_domain.username',
         'password' => 'ldap.domains.org_domain.password',
         'base_dn' => 'ldap.domains.org_domain.base_dn',
-        'server' => 'ldap.domains.org_domain.servers.0',
+        'hosts' => 'ldap.domains.org_domain.hosts',
         'port' => 'ldap.domains.org_domain.port',
         'group_object_class' => 'groupObjectClass',
         'user_object_class' => 'userObjectClass',
         'group_path' => 'groupPath',
         'user_path' => 'userPath',
+        'group_custom_filters' => 'groupCustomFilters',
+        'user_custom_filters' => 'userCustomFilters',
         'use_email_prefix_suffix' => 'useEmailPrefixSuffix',
         'email_prefix' => 'emailPrefix',
         'email_suffix' => 'emailSuffix',
@@ -71,6 +77,7 @@ class LdapConfigurationForm extends Form
         'groups_parent_group' => 'groupsParentGroup',
         'enabled_users_only' => 'enabledUsersOnly',
         'sync_users_create' => 'jobs.users.create',
+        'sync_users_update' => 'jobs.users.update',
         'sync_users_delete' => 'jobs.users.delete',
         'sync_groups_create' => 'jobs.groups.create',
         'sync_groups_delete' => 'jobs.groups.delete',
@@ -86,18 +93,20 @@ class LdapConfigurationForm extends Form
     protected function _buildSchema(Schema $schema): \Cake\Form\Schema
     {
         return $schema
+            ->addField('enabled', 'boolean')
             ->addField('directory_type', ['type' => 'string'])
             ->addField('domain_name', 'string')
             ->addField('username', ['type' => 'string'])
             ->addField('password', ['type' => 'string'])
             ->addField('base_dn', ['type' => 'string'])
-            ->addField('server', ['type' => 'string'])
             ->addField('port', ['type' => 'string'])
             ->addField('connection_type', ['type' => 'string'])
             ->addField('group_object_class', 'string')
             ->addField('user_object_class', 'string')
             ->addField('group_path', 'string')
             ->addField('user_path', 'string')
+            ->addField('user_custom_filters', 'string')
+            ->addField('group_custom_filters', 'string')
             ->addField('use_email_prefix_suffix', 'boolean')
             ->addField('email_prefix', 'string')
             ->addField('email_suffix', 'string')
@@ -107,6 +116,7 @@ class LdapConfigurationForm extends Form
             ->addField('groups_parent_group', 'string')
             ->addField('enabled_users_only', 'boolean')
             ->addField('sync_users_create', 'boolean')
+            ->addField('sync_users_update', 'boolean')
             ->addField('sync_users_delete', 'boolean')
             ->addField('sync_groups_create', 'boolean')
             ->addField('sync_groups_delete', 'boolean')
@@ -151,9 +161,9 @@ class LdapConfigurationForm extends Form
             ->utf8('base_dn', __('The base DN should be a valid BMP-UTF8 string.'));
 
         $validator
-            ->requirePresence('server', 'create', __('A server is required.'))
-            ->notEmptyString('server', __('The server should not be empty.'))
-            ->utf8('server', __('The server should be a valid BMP-UTF8 string.'));
+            ->requirePresence('hosts', 'create', __('At least one host is required.'))
+            ->hasAtLeast('hosts', 1, __('At least one host is required.'))
+            ->isArray('hosts', __('The hosts should be a valid array.'));
 
         $validator
             ->requirePresence('port', 'create', __('A port number is required.'))
@@ -218,6 +228,14 @@ class LdapConfigurationForm extends Form
             ->utf8('user_path', __('The user path should be a valid BMP-UTF8 string.'));
 
         $validator
+            ->allowEmptyString('group_custom_filter')
+            ->utf8('group_custom_filter', __('The group custom filter should be a valid BMP-UTF8 string.'));
+
+        $validator
+            ->allowEmptyString('user_custom_filter')
+            ->utf8('user_custom_filter', __('The user custom filter should be a valid BMP-UTF8 string.'));
+
+        $validator
             ->allowEmptyTime('use_email_prefix_suffix')
             ->boolean('use_email_prefix_suffix', __('The email prefix/suffix setting should be a valid boolean.'));
 
@@ -244,6 +262,10 @@ class LdapConfigurationForm extends Form
         $validator
             ->allowEmptyString('sync_users_create')
             ->boolean('sync_users_create', __('The sync of created users setting should be a boolean.'));
+
+        $validator
+            ->allowEmptyString('sync_users_update')
+            ->boolean('sync_users_update', __('The sync of updated users setting should be a boolean.'));
 
         $validator
             ->allowEmptyString('sync_users_delete')
@@ -329,6 +351,13 @@ class LdapConfigurationForm extends Form
         }
         $settings['ldap.domains.org_domain.use_ssl'] = $data['connection_type'] === 'ssl' ? 1 : 0;
         $settings['ldap.domains.org_domain.use_tls'] = $data['connection_type'] === 'tls' ? 1 : 0;
+        $settings['ldap.domains.org_domain.use_sasl'] =
+            Hash::get($data, 'authentication_type') === self::AUTHENTICATION_TYPE_SASL ? 1 : 0;
+
+        if (!isset($settings['ldap.domains.org_domain.password']) && !$settings['ldap.domains.org_domain.use_sasl']) {
+            $settings['ldap.domains.org_domain.password'] = DirectoryOrgSettings::get()->getPassword();
+        }
+
         $settings = Hash::expand($settings);
 
         return $settings;
@@ -343,6 +372,7 @@ class LdapConfigurationForm extends Form
     public static function formatOrgSettingsToFormData(?array $settings = [])
     {
         $data = [];
+        $hosts = Hash::get($settings, 'ldap.domains.org_domain.hosts', []);
         $settings = Hash::flatten($settings);
         if (empty($settings)) {
             return $data;
@@ -378,6 +408,7 @@ class LdapConfigurationForm extends Form
             }
         }
 
+        $settings['ldap.domains.org_domain.hosts'] = $hosts;
         foreach (self::$configurationMapping as $prop => $propVal) {
             if (isset($settings[$propVal])) {
                 $data[$prop] = $settings[$propVal];
@@ -392,6 +423,11 @@ class LdapConfigurationForm extends Form
         } elseif ($isTls) {
             $data['connection_type'] = self::CONNECTION_TYPE_TLS;
         }
+        $data['authentication_type'] = self::AUTHENTICATION_TYPE_BASIC;
+        $isSasl = !empty($settings['ldap.domains.org_domain.use_sasl']);
+        if ($isSasl) {
+            $data['authentication_type'] = self::AUTHENTICATION_TYPE_SASL;
+        }
 
         return $data;
     }
@@ -405,8 +441,13 @@ class LdapConfigurationForm extends Form
      */
     protected function testConnection(array $data)
     {
-        $directorySettings = new DirectoryOrgSettings(self::formatFormDataToOrgSettings($data));
-        $ldapDirectory = DirectoryFactory::get($directorySettings);
+        $settings = self::formatFormDataToOrgSettings($data);
+        foreach ($settings['ldap']['domains']['org_domain']['hosts'] as $host) {
+            $tmpSettings = $settings;
+            $tmpSettings['hosts'] = [$host];
+            $directorySettings = new DirectoryOrgSettings($tmpSettings);
+            $ldapDirectory = DirectoryFactory::get($directorySettings);
+        }
 
         return true;
     }

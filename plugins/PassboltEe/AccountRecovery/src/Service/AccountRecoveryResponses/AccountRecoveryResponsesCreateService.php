@@ -23,10 +23,10 @@ use App\Service\OpenPGP\MessageValidationService;
 use App\Service\OpenPGP\PublicKeyValidationService;
 use App\Utility\UserAccessControl;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Event\Event;
 use Cake\Http\Exception\BadRequestException;
 use Cake\I18n\FrozenTime;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Utility\Hash;
 use Cake\Validation\Validation;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryRequest;
@@ -37,12 +37,10 @@ use Passbolt\AccountRecovery\Service\AccountRecoveryOrganizationPolicies\Account
  * Class AccountRecoveryResponsesCreateService
  *
  * @package Passbolt\AccountRecovery\Service\AccountRecoveryResponses
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryResponsesTable $AccountRecoveryResponses
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryRequestsTable $AccountRecoveryRequests
  */
 class AccountRecoveryResponsesCreateService
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     public const RESPONSE_APPROVED_EVENT_NAME = 'Service.AccountRecoveryResponsesCreate.afterApproved';
     public const RESPONSE_REJECTED_EVENT_NAME = 'Service.AccountRecoveryResponsesCreate.afterRejected';
@@ -63,12 +61,24 @@ class AccountRecoveryResponsesCreateService
     protected $uac;
 
     /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryRequestsTable
+     */
+    protected $AccountRecoveryRequests;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryResponsesTable
+     */
+    protected $AccountRecoveryResponses;
+
+    /**
      * Email redactor constructor
      */
     public function __construct()
     {
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryRequests');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryResponses');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryRequests = $this->fetchTable('Passbolt/AccountRecovery.AccountRecoveryRequests');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryResponses = $this->fetchTable('Passbolt/AccountRecovery.AccountRecoveryResponses');
     }
 
     /**

@@ -56,6 +56,15 @@ trait SyncCommandTrait
             $this->displayReport($report, $io);
         }
         $io->out();
+        $io->out(__('Updated:'));
+        $updated = $reports->getByAction(Alias::ACTION_UPDATE);
+        if (!count($updated)) {
+            $this->success(str_pad('[success]', $this->pad) . __('No new item to update'), $io);
+        }
+        foreach ($updated as $i => $report) {
+            $this->displayReport($report, $io);
+        }
+        $io->out();
         $io->out(__('Deleted:'));
         $deleted = $reports->getByAction(Alias::ACTION_DELETE);
         if (!count($deleted)) {

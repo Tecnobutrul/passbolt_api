@@ -17,15 +17,19 @@ declare(strict_types=1);
 
 namespace Passbolt\AuditLog\Utility;
 
+use App\Error\Exception\FeaturePluginDisabledException;
+use App\Utility\Application\FeaturePluginAwareTrait;
 use App\Utility\UserAccessControl;
-use Cake\Core\Configure;
 use Cake\Database\Expression\IdentifierExpression;
 use Cake\Http\Exception\NotFoundException;
 use Cake\ORM\Query;
 use Cake\ORM\TableRegistry;
+use Passbolt\Folders\FoldersPlugin;
 
 class FolderActionLogsFinder extends BaseActionLogsFinder
 {
+    use FeaturePluginAwareTrait;
+
     /**
      * Find ActionLog ids for a given FolderHistory folder id
      *
@@ -80,7 +84,7 @@ class FolderActionLogsFinder extends BaseActionLogsFinder
         $subQuery = $this->_findActionLogIdsForFolders($folderId)
             ->union($this->_findActionLogIdsForPermissionsHistoryFolders($folderId));
 
-        $query->join([
+        return $query->join([
             'folderActionLogs' => [
                 'table' => $subQuery,
                 'alias' => 'folderActionLogs',
@@ -88,21 +92,15 @@ class FolderActionLogsFinder extends BaseActionLogsFinder
                 'conditions' => ['folderActionLogs.ActionLogs__id' => new IdentifierExpression('ActionLogs.id')],
             ],
         ]);
-
-        $query->order([
-            'ActionLogs.created' => 'DESC',
-        ]);
-
-        return $query;
     }
 
     /**
      * @inheritDoc
      */
-    public function find(UserAccessControl $uac, string $entityId, ?array $options = []): array
+    public function find(UserAccessControl $uac, string $entityId, ?array $options = []): Query
     {
-        if (!Configure::read('passbolt.plugins.folders.enabled')) {
-            return [];
+        if (!$this->isFeaturePluginEnabled(FoldersPlugin::class)) {
+            throw new FeaturePluginDisabledException();
         }
 
         // Check that the folder exists and is accessible.
@@ -116,13 +114,7 @@ class FolderActionLogsFinder extends BaseActionLogsFinder
 
         // Build query.
         $q = $this->_getBaseQuery();
-        $q = $this->_filterQueryByFolderId($q, $entityId);
-        if (!empty($options)) {
-            $q = $this->_paginate($q, $options);
-        }
-        $actionLogs = $q->all();
-        $resultParser = new ActionLogResultsParser($actionLogs, ['folders' => [$entityId]]);
 
-        return $resultParser->parse();
+        return $this->_filterQueryByFolderId($q, $entityId);
     }
 }

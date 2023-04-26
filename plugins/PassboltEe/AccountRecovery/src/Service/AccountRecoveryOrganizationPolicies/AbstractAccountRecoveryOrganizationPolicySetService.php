@@ -24,22 +24,17 @@ use App\Service\OpenPGP\PublicKeyRevocationCheckService;
 use App\Service\OpenPGP\PublicKeyValidationService;
 use App\Utility\UserAccessControl;
 use Cake\Datasource\Exception\RecordNotFoundException;
-use Cake\Datasource\ModelAwareTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Utility\Hash;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryOrganizationPolicy;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryOrganizationPublicKey;
 
 /**
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryOrganizationPoliciesTable $AccountRecoveryOrganizationPolicies // phpcs:ignore
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryOrganizationPublicKeysTable $AccountRecoveryOrganizationPublicKeys // phpcs:ignore
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable $AccountRecoveryPrivateKeyPasswords // phpcs:ignore
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeysTable $AccountRecoveryPrivateKeys
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryRequestsTable $AccountRecoveryRequests
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryUserSettingsTable $AccountRecoveryUserSettings
+ * AbstractAccountRecoveryOrganizationPolicySetService Class
  */
 class AbstractAccountRecoveryOrganizationPolicySetService
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
 
     public const AFTER_ENABLE_POLICY_EVENT = 'accountRecovery.policy.enable';
     public const AFTER_DISABLE_POLICY_EVENT = 'accountRecovery.policy.disable';
@@ -61,16 +56,58 @@ class AbstractAccountRecoveryOrganizationPolicySetService
     protected $currentPolicy = null;
 
     /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryOrganizationPoliciesTable
+     */
+    protected $AccountRecoveryOrganizationPolicies;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryOrganizationPublicKeysTable
+     */
+    protected $AccountRecoveryOrganizationPublicKeys;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeysTable
+     */
+    protected $AccountRecoveryPrivateKeys;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable
+     */
+    protected $AccountRecoveryPrivateKeyPasswords;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryRequestsTable
+     */
+    protected $AccountRecoveryRequests;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryUserSettingsTable
+     */
+    protected $AccountRecoveryUserSettings;
+
+    /**
      * AbstractCompleteService constructor
      */
     public function __construct()
     {
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryOrganizationPolicies');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryOrganizationPublicKeys');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryPrivateKeys');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryPrivateKeyPasswords');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryRequests');
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryUserSettings');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryOrganizationPolicies = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryOrganizationPolicies');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryOrganizationPublicKeys = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryOrganizationPublicKeys');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryPrivateKeys = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryPrivateKeys');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryPrivateKeyPasswords = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryPrivateKeyPasswords');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryRequests = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryRequests');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryUserSettings = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryUserSettings');
         $this->getService = new AccountRecoveryOrganizationPolicyGetService();
     }
 

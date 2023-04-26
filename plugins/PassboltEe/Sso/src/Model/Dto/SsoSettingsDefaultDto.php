@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Model\Dto;
 
-use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
 
 class SsoSettingsDefaultDto extends AbstractSsoSettingsDto
 {
@@ -26,7 +26,7 @@ class SsoSettingsDefaultDto extends AbstractSsoSettingsDto
      */
     public function __construct()
     {
-        $this->providers = SsoSetting::ALLOWED_PROVIDERS;
+        $this->providers = (new SsoActiveProvidersGetService())->get();
         $this->provider = null;
         $this->id = null;
         $this->status = null;

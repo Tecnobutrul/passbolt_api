@@ -128,7 +128,7 @@ class ResourceActionLogsFinder extends BaseActionLogsFinder
             ->union($this->_findActionLogIdsForResourcesSecretAccesses($resourceId))
             ->union($this->_findActionLogIdsForResourcesSecretHistory($resourceId));
 
-        $query->join([
+        return $query->join([
             'resourceActionLogs' => [
                 'table' => $subQuery,
                 'alias' => 'resourceActionLogs',
@@ -136,12 +136,6 @@ class ResourceActionLogsFinder extends BaseActionLogsFinder
                 'conditions' => ['resourceActionLogs.ActionLogs__id' => new IdentifierExpression('ActionLogs.id')],
             ],
         ]);
-
-        $query->order([
-            'ActionLogs.created' => 'DESC',
-        ]);
-
-        return $query;
     }
 
     /**
@@ -167,20 +161,14 @@ class ResourceActionLogsFinder extends BaseActionLogsFinder
     /**
      * @inheritDoc
      */
-    public function find(UserAccessControl $uac, string $entityId, ?array $options = []): array
+    public function find(UserAccessControl $uac, string $entityId, ?array $options = []): Query
     {
         // Check that user can access to resource.
         $this->_checkUserCanAccessResource($uac, $entityId);
 
         // Build query.
         $q = $this->_getBaseQuery();
-        $q = $this->_filterQueryByResourceId($q, $entityId);
-        if (!empty($options)) {
-            $q = $this->_paginate($q, $options);
-        }
-        $actionLogs = $q->all();
-        $resultParser = new ActionLogResultsParser($actionLogs, ['resources' => [$entityId]]);
 
-        return $resultParser->parse();
+        return $this->_filterQueryByResourceId($q, $entityId);
     }
 }

@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Test\TestCase\Service\Sso;
 
+use App\Service\Cookie\DefaultSecureCookieService;
 use App\Test\Factory\UserFactory;
 use App\Utility\ExtendedUserAccessControl;
 use Passbolt\Sso\Model\Entity\SsoState;
@@ -36,7 +37,7 @@ class SsoAzureServiceTest extends SsoIntegrationTestCase
         $uac = new ExtendedUserAccessControl($user->role->name, $user->id, $user->username, '127.0.0.1', 'phpunit');
 
         // Main service features = generate url + cookie
-        $sut = new SsoAzureService();
+        $sut = new SsoAzureService(new DefaultSecureCookieService());
         $url = $sut->getAuthorizationUrl($uac);
         $cookie = $sut->createStateCookie($uac, SsoState::TYPE_SSO_SET_SETTINGS);
 

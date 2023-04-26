@@ -31,6 +31,18 @@ use Cake\Validation\Validation;
 class ResourcesTagsAddController extends AppController
 {
     /**
+     * @inheritDoc
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        /** @phpstan-ignore-next-line */
+        $this->Resources = $this->fetchTable('Resources');
+        /** @phpstan-ignore-next-line */
+        $this->Tags = $this->fetchTable('Passbolt/Tags.Tags');
+    }
+
+    /**
      * Add tags for a given resource.
      * Providing an empty list of tags delete all the personal tags
      *
@@ -45,8 +57,6 @@ class ResourcesTagsAddController extends AppController
             throw new BadRequestException(__('The resource identifier should be a valid UUID.'));
         }
 
-        $this->loadModel('Resources');
-        $this->loadModel('Passbolt/Tags.Tags');
         $userId = $this->User->id();
         $data = $this->_formatRequestData();
 

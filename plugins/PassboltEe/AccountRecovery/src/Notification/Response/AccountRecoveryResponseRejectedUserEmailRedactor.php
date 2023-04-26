@@ -22,22 +22,36 @@ use App\Notification\Email\Email;
 use App\Notification\Email\EmailCollection;
 use App\Notification\Email\SubscribedEmailRedactorInterface;
 use App\Notification\Email\SubscribedEmailRedactorTrait;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Event\Event;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryResponse;
 use Passbolt\AccountRecovery\Service\AccountRecoveryResponses\AccountRecoveryResponsesCreateService;
 use Passbolt\Locale\Service\GetUserLocaleService;
 use Passbolt\Locale\Service\LocaleService;
 
 /**
- * @property \App\Model\Table\UsersTable $Users
+ * Class AccountRecoveryResponseRejectedUserEmailRedactor
  */
 class AccountRecoveryResponseRejectedUserEmailRedactor implements SubscribedEmailRedactorInterface
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
     use SubscribedEmailRedactorTrait;
 
     public const USER_TEMPLATE = 'Passbolt/AccountRecovery.Responses/user_rejected';
+
+    /**
+     * @var \App\Model\Table\UsersTable
+     */
+    protected $Users;
+
+    /**
+     * AccountRecoveryResponseRejectedUserEmailRedactor Constructor
+     */
+    public function __construct()
+    {
+        /** @phpstan-ignore-next-line */
+        $this->Users = $this->fetchTable('Users');
+    }
 
     /**
      * Return the list of events to which the redactor is subscribed and when it must create emails to be sent.
@@ -58,7 +72,6 @@ class AccountRecoveryResponseRejectedUserEmailRedactor implements SubscribedEmai
     public function onSubscribedEvent(Event $event): EmailCollection
     {
         $emailCollection = new EmailCollection();
-        $this->loadModel('Users');
         /** @var \Passbolt\AccountRecovery\Model\Entity\AccountRecoveryResponse $response */
         $response = $event->getSubject();
 

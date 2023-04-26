@@ -20,10 +20,15 @@ use App\Utility\UuidFactory;
 use Cake\Chronos\Chronos;
 use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
+use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
 class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
 {
+    /**
+     * Azure provider
+     */
     public function testSsoSettingsCreateController_SuccessAzure(): void
     {
         $this->logInAsAdmin();
@@ -43,7 +48,7 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
 
         $this->assertTrue(Validation::uuid($body->id));
         $this->assertEquals(SsoSetting::PROVIDER_AZURE, $body->provider);
-        $this->assertEquals(SsoSetting::ALLOWED_PROVIDERS, $body->providers);
+        $this->assertEquals((new SsoActiveProvidersGetService())->get(), $body->providers);
         $this->assertEquals(SsoSetting::STATUS_DRAFT, $body->status);
         $this->assertEquals($data['data'], (array)$body->data);
     }
@@ -91,5 +96,31 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
         $this->assertTrue(isset($body->data->client_id));
         $this->assertTrue(isset($body->data->client_secret));
         $this->assertTrue(isset($body->data->client_secret_expiry));
+    }
+
+    /**
+     * Google provider
+     */
+    public function testSsoSettingsCreateController_SuccessGoogle(): void
+    {
+        $this->logInAsAdmin();
+        $googleCreds = SsoSettingsFactory::getGoogleCredentials();
+        $data = [
+            'provider' => SsoSetting::PROVIDER_GOOGLE,
+            'data' => [
+                'client_id' => $googleCreds['client_id'],
+                'client_secret' => $googleCreds['client_secret'],
+            ],
+        ];
+
+        $this->postJson('/sso/settings.json', $data);
+
+        $this->assertSuccess();
+        $body = $this->_responseJsonBody;
+        $this->assertTrue(Validation::uuid($body->id));
+        $this->assertEquals(SsoSetting::PROVIDER_GOOGLE, $body->provider);
+        $this->assertEquals((new SsoActiveProvidersGetService())->get(), $body->providers);
+        $this->assertEquals(SsoSetting::STATUS_DRAFT, $body->status);
+        $this->assertEquals($data['data'], (array)$body->data);
     }
 }

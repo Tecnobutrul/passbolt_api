@@ -24,6 +24,7 @@ use Passbolt\Sso\Model\Dto\AbstractSsoSettingsDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDefaultDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
@@ -40,7 +41,7 @@ class SsoSettingsGetServiceTest extends SsoTestCase
         $this->assertEquals($ssoSetting->id, $ssoSettingsDto->id);
         $this->assertEquals($ssoSetting->status, $ssoSettingsDto->status);
         $this->assertEquals(SsoSetting::PROVIDER_AZURE, $ssoSettingsDto->getProvider());
-        $this->assertEquals(SsoSetting::ALLOWED_PROVIDERS, $ssoSettingsDto->getProviders());
+        $this->assertEquals((new SsoActiveProvidersGetService())->get(), $ssoSettingsDto->getProviders());
         $this->assertEquals($ssoSetting->created_by, $ssoSettingsDto->created_by);
         $this->assertEquals($ssoSetting->modified_by, $ssoSettingsDto->modified_by);
         $this->assertNotEmpty($ssoSetting->created);
@@ -73,7 +74,7 @@ class SsoSettingsGetServiceTest extends SsoTestCase
         /** @var AbstractSsoSettingsDto $ssoSetting */
         $ssoSetting = (new SsoSettingsGetService())->getActiveOrDefault();
         $this->assertEquals(SsoSetting::PROVIDER_AZURE, $ssoSetting->getProvider());
-        $this->assertEquals(SsoSetting::ALLOWED_PROVIDERS, $ssoSetting->getProviders());
+        $this->assertEquals((new SsoActiveProvidersGetService())->get(), $ssoSetting->getProviders());
 
         $this->assertTrue($ssoSetting instanceof SsoSettingsDto);
         $this->assertEquals($ssoSettingActive->id, $ssoSetting->id);
@@ -110,7 +111,7 @@ class SsoSettingsGetServiceTest extends SsoTestCase
 
         $this->assertTrue($ssoSetting instanceof SsoSettingsDefaultDto);
         $this->assertEquals(null, $ssoSetting->getProvider());
-        $this->assertEquals(SsoSetting::ALLOWED_PROVIDERS, $ssoSetting->getProviders());
+        $this->assertEquals((new SsoActiveProvidersGetService())->get(), $ssoSetting->getProviders());
         $this->assertTrue(!isset($ssoSetting->status));
         $this->assertTrue(!isset($ssoSetting->created));
         $this->assertTrue(!isset($ssoSetting->modified));
@@ -132,7 +133,7 @@ class SsoSettingsGetServiceTest extends SsoTestCase
         SsoSettingsFactory::make()->data($armoredMessage)->active()->persist();
         $ssoSetting = (new SsoSettingsGetService())->getActiveOrDefault(true);
         $this->assertEquals(null, $ssoSetting->getProvider());
-        $this->assertEquals(SsoSetting::ALLOWED_PROVIDERS, $ssoSetting->getProviders());
+        $this->assertEquals((new SsoActiveProvidersGetService())->get(), $ssoSetting->getProviders());
         $this->assertEquals(true, !isset($ssoSetting->data));
     }
 

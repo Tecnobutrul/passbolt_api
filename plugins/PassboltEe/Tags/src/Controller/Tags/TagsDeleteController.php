@@ -33,6 +33,18 @@ class TagsDeleteController extends AppController
     use TagAccessTrait;
 
     /**
+     * @inheritDoc
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        /** @phpstan-ignore-next-line */
+        $this->Tags = $this->fetchTable('Passbolt/Tags.Tags');
+        /** @phpstan-ignore-next-line */
+        $this->ResourcesTags = $this->fetchTable('Passbolt/Tags.ResourcesTags');
+    }
+
+    /**
      * Tag delete action
      *
      * @param string|null $id Id of the tag to delete
@@ -43,9 +55,6 @@ class TagsDeleteController extends AppController
         if (!Validation::uuid($id)) {
             throw new BadRequestException(__('The tag id is not valid.'));
         }
-
-        $this->loadModel('Passbolt/Tags.Tags');
-        $this->loadModel('Passbolt/Tags.ResourcesTags');
 
         try {
             /** @var \Passbolt\Tags\Model\Entity\Tag $tag */

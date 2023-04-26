@@ -21,10 +21,25 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 
 /**
- * @property \Passbolt\DirectorySync\Model\Table\DirectoryIgnoreTable $DirectoryIgnore
+ * Class IgnoreListCommand
  */
 class IgnoreListCommand extends DirectorySyncCommand
 {
+    /**
+     * @var \Passbolt\DirectorySync\Model\Table\DirectoryIgnoreTable
+     */
+    protected $DirectoryIgnore;
+
+    /**
+     * @inheritDoc
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        /** @phpstan-ignore-next-line */
+        $this->DirectoryIgnore = $this->fetchTable('Passbolt/DirectorySync.DirectoryIgnore');
+    }
+
     /**
      * @inheritDoc
      */
@@ -43,8 +58,6 @@ class IgnoreListCommand extends DirectorySyncCommand
         parent::execute($args, $io);
 
         // Output some data as a table.
-
-        $this->loadModel('Passbolt/DirectorySync.DirectoryIgnore');
         $di = $this->DirectoryIgnore->find()
             ->select()
             ->contain(['Users', 'Groups', 'DirectoryEntries'])

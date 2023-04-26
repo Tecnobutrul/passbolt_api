@@ -19,6 +19,32 @@ namespace Passbolt\DirectorySync\Utility;
 interface DirectoryInterface
 {
     /**
+     * Directory Type constants
+     */
+    public const TYPE_AD = 'ad';
+    public const TYPE_OPENLDAP = 'openldap';
+    public const TYPE_FREEIPA = 'freeipa';
+    public const TYPE_NAME_OPENLDAP = 'OpenLDAP';
+    public const TYPE_NAME_AD = 'ActiveDirectory';
+    public const TYPE_NAME_FREEIPA = 'FreeIPA';
+
+    /**
+     * Entry type constants
+     */
+    public const ENTRY_TYPE_GROUP = 'group';
+    public const ENTRY_TYPE_USER = 'user';
+
+    /**
+     * Filter constants
+     */
+    public const AD_ENABLED_USERS_FILTER = '(!(userAccountControl:1.2.840.113556.1.4.803:=2))';
+
+    /**
+     * SASL Mechanisms constants
+     */
+    public const SASL_MECH_GSSAPI = 'GSSAPI';
+
+    /**
      * Get users.
      *
      * @return mixed

@@ -26,6 +26,7 @@ use Cake\Chronos\Chronos;
 use Cake\Core\Configure;
 use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsSetService;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoTestCase;
@@ -57,7 +58,7 @@ class SsoSettingsSetServiceTest extends SsoTestCase
         // Check returned object is correctly formatted
         $this->assertTrue(Validation::uuid($dto->id));
         $this->assertEquals(SsoSetting::PROVIDER_AZURE, $dto->getProvider());
-        $this->assertEquals(SsoSetting::ALLOWED_PROVIDERS, $dto->getProviders());
+        $this->assertEquals((new SsoActiveProvidersGetService())->get(), $dto->getProviders());
         $this->assertEquals(SsoSetting::STATUS_DRAFT, $dto->status);
         $this->assertEquals($data['data'], $dto->getData()->toArray());
 
