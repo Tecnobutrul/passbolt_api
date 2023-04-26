@@ -33,13 +33,13 @@ jobs:
                   path: passbolt_help
             - name: Create help site release notes file
               run: |
-                  cat << EOF >> passbolt_help/_releases/ce/v${{ github.ref }}.md
+                  cat << EOF >> passbolt_help/_releases/ce/v${{ github.ref_name }}.md
                   ---
                   title: $(grep name config/version.php | awk -F "'" '{print $4}')
                   slug: $(grep name config/version.php | awk -F "'" '{print $4}' | tr ' ' '_' | tr '[:upper:]' '[:lower:]')
                   layout: release
                   categories: releases ce
-                  version: v${{ github.ref }}
+                  version: v${{ github.ref_name }}
                   product: ce
                   song: https://youtu.be/qw6ZX07NZSM
                   quote: $(grep name config/version.php | awk -F "'" '{print $4}')
@@ -47,10 +47,10 @@ jobs:
                   date: $(date +'%Y-%m-%d')
                   ---
                   EOF
-                  cat RELEASE_NOTES.md >> passbolt_help/_releases/ce/v${{ github.ref }}.md
+                  cat RELEASE_NOTES.md >> passbolt_help/_releases/ce/v${{ github.ref_name }}.md
                   cd passbolt_help
                   git config --global user.name "release bot"
                   git config --global user.email "contact@passbolt.com"
                   git add -A
-                  git commit -m "New release notes for CE ${{ github.ref }}"
+                  git commit -m "New release notes for CE ${{ github.ref_name }}"
                   git push
