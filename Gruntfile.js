@@ -1,238 +1,216 @@
-//var fs = require('fs');
-var childProcess = require('child_process');
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         2.0.0
+ */
+var path = require('path');
 
+/**
+ * This Gruntfile provides tasks and commands to build and distribute the project
+ *
+ * @param grunt object
+ */
 module.exports = function(grunt) {
 
-	// ========================================================================
-	// High level variables
+  /**
+   * Path shortcuts
+   * @type object
+   */
+  var paths = {
+    node_modules: 'node_modules/',
+    node_modules_styleguide: 'node_modules/passbolt-styleguide/',
+    webroot: 'webroot/',
+    img: 'webroot/img/',
+    css: 'webroot/css/',
+    js: 'webroot/js/',
+    locales: 'resources/locales/',
+    cakephp_locales: 'vendor/cakephp/localized/resources/locales/'
+  };
 
-	var config = {
-		webroot : 'app/webroot',
-		styleguide : 'passbolt-styleguide',
-		modules_path : 'node_modules'
-	};
+  /**
+   * Import package.json file content
+   * Allow to get access to version and project name for example
+   */
+  var pkg = grunt.file.readJSON('package.json');
 
-	// ========================================================================
-	// Configure task options
+  /**
+   * Load baseline NPM tasks
+   */
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
-	grunt.initConfig({
-		config : config,
-		pkg: grunt.file.readJSON('package.json'),
-		clean: {
-			'lib': [
-				'<%= config.webroot %>/js/lib/can',
-				'<%= config.webroot %>/js/lib/jquery',
-				'<%= config.webroot %>/js/lib/jquery-ui',
-				'<%= config.webroot %>/js/lib/mad',
-				'<%= config.webroot %>/js/lib/moment',
-				'<%= config.webroot %>/js/lib/moment-timezone',
-				'<%= config.webroot %>/js/lib/jquery-mousewheel',
-				'<%= config.webroot %>/js/lib/<%= config.styleguide %>',
-				'<%= config.webroot %>/js/lib/steal',
-				'<%= config.webroot %>/js/lib/underscore',
-				'<%= config.webroot %>/js/lib/xregexp',
-				'<%= config.webroot %>/js/lib/jssha',
-				'<%= config.webroot %>/js/lib/urijs',
-				'<%= config.webroot %>/js/lib/semver'
-			]
-		},
-		shell: {
-			mad_lib_patch: {
-				options: {
-					stderr: false
-				},
-				command: [
-					'(cd ./app/webroot/js/lib/can; patch -p1 < ../mad/patches/can-system_preload_template.patch;)',
-					'(cd ./app/webroot/js/lib/can; patch -p1 < ../mad/patches/can-util_string_get_object_set_object.patch;)'
-					//'(cd ./node_modules/documentjs; patch -p1 < ./app/webroot/js/lib/mad/patches/patches/documentjs-demo_tag_url_and_sharp.patch;)'
-				].join('&&')
-			},
-			updatestyleguide: {
-				options: {
-					stderr: false
-				},
-				command: 'rm -rf <%= config.modules_path %>/<%= config.styleguide %>; npm install'
-			}
-		},
-		copy: {
-			styleguide : {
-				files: [{
-					// Fonts
-					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/fonts',
-					src: '*',
-					dest: '<%= config.webroot %>/fonts',
-					expand: true
-				},{
-					// Images for webroots (favicons, etc.)
-					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img/webroot',
-					src: '*',
-					dest: '<%= config.webroot %>',
-					expand: true
-				},{
-					// Images
-					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img',
-					src: ['default/**','logo/**','third_party/**','avatar/**','controls/**', 'illustrations/nest.png'],
-					dest: '<%= config.webroot %>/img',
-					expand: true
-				},{
-					// Less
-					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/build/css',
-					src: ['devel.min.css', 'login.min.css', 'main.min.css', 'setup.min.css'],
-					dest: '<%= config.webroot %>/css',
-					expand: true
-				}]
-			},
-			lib : {
-				files: [{
-					// steal
-					cwd: '<%= config.modules_path %>/steal/',
-					src: ['steal.js', 'steal.production.js', 'ext/**', 'src/**'],
-					dest: '<%= config.webroot %>/js/lib/steal/',
-					nonull: true,
-					expand: true
-				}, {
-					// canjs
-					cwd: '<%= config.modules_path %>/can/',
-					src: ['*/**', 'can.js'],
-					dest: '<%= config.webroot %>/js/lib/can/',
-					nonull: true,
-					expand: true
-				}, {
-					// mad
-					cwd: '<%= config.modules_path %>/passbolt-mad/',
-					src: ['src/**', 'patches/**'],
-					dest: '<%= config.webroot %>/js/lib/mad/',
-					nonull: true,
-					expand: true
-				}, {
-					// Jquery
-					cwd: '<%= config.modules_path %>/jquery/',
-					src: 'dist/jquery.js',
-					dest: '<%= config.webroot %>/js/lib/jquery/',
-					nonull: true,
-					expand: true
-				}, {
-					// moment
-					cwd: '<%= config.modules_path %>/moment/',
-					src: ['locale/**', 'moment.js'],
-					dest: '<%= config.webroot %>/js/lib/moment/',
-					nonull: true,
-					expand: true
-				}, {
-					// moment-timezone
-					cwd: '<%= config.modules_path %>/moment-timezone/',
-					src: ['builds/moment-timezone-with-data.js'],
-					dest: '<%= config.webroot %>/js/lib/moment-timezone/',
-					nonull: true,
-					expand: true
-				}, {
-					// jquery-mousewheel
-					cwd: '<%= config.modules_path %>/jquery-mousewheel/',
-					src: 'jquery.mousewheel.js',
-					dest: '<%= config.webroot %>/js/lib/jquery-mousewheel/',
-					nonull: true,
-					expand: true
-				}, {
-					// underscore
-					cwd: '<%= config.modules_path %>/underscore/',
-					src: 'underscore.js',
-					dest: '<%= config.webroot %>/js/lib/underscore/',
-					nonull: true,
-					expand: true
-				}, {
-					// xregexp
-					cwd: '<%= config.modules_path %>/xregexp/',
-					src: 'xregexp-all.js',
-					dest: '<%= config.webroot %>/js/lib/xregexp/',
-					nonull: true,
-					expand: true
-				}, {
-					// jssha
-					cwd: '<%= config.modules_path %>/jssha/',
-					src: 'src/**',
-					dest: '<%= config.webroot %>/js/lib/jssha/',
-					nonull: true,
-					expand: true
-				}, {
-					// urijs
-					cwd: '<%= config.modules_path %>/urijs/',
-					src: 'src/**',
-					dest: '<%= config.webroot %>/js/lib/urijs/',
-					nonull: true,
-					expand: true
-				}, {
-					// semver
-					cwd: '<%= config.modules_path %>/semver/',
-					src: 'semver.js',
-					dest: '<%= config.webroot %>/js/lib/semver/',
-					nonull: true,
-					expand: true
-				}]
-			}
-		},
-		"steal-build": {
-			app: {
-				options: {
-					system: {
-						config: "./app/webroot/js/stealconfig.js",
-						main: "app/passbolt"
-					},
-					buildOptions: {
-						minify: true
-					}
-				}
-			},
-			login: {
-				options: {
-					system: {
-						config: "./app/webroot/js/stealconfig.js",
-						main: "app/login"
-					},
-					buildOptions: {
-						minify: true
-					}
-				}
-			}
-		}
-	});
+  /**
+   * Register project specific grunt tasks
+   */
+  grunt.registerTask('default', ['dependencies-update', 'styleguide-update']);
+  grunt.registerTask('styleguide-update', 'copy:styleguide');
+  grunt.registerTask('styleguide-watch', ['watch:node-modules-styleguide']);
+  grunt.registerTask('dependencies-update', 'copy:dependencies');
 
-	// on watch events configure jshint:all to only run on changed file
-	//    grunt.event.on('watch', function(action, filepath) {
-	//        grunt.config(['jshint', 'all'], filepath);
-	//    });
+  /**
+   * Tasks definition
+   */
+  grunt.initConfig({
+    pkg: pkg,
 
-	// ========================================================================
-	// Initialise
+    copy: {
+      dependencies: {
+        files: [{
+          // Openpgp
+          cwd: paths.node_modules + 'openpgp/dist',
+          src: ['openpgp.min.js'],
+          dest: paths.js + 'vendors',
+          expand: true
+        }, {
+          // jQuery
+          cwd: paths.node_modules + 'jquery/dist',
+          src: ['jquery.min.js'],
+          dest: paths.js + 'vendors',
+          expand: true
+        }]
+      },
+      styleguide: {
+        files: [{
+          // Fonts
+          cwd: paths.node_modules_styleguide + 'src/fonts',
+          src: '*',
+          dest: paths.webroot + 'fonts',
+          expand: true
+        }, {
+          // Images for webroots (favicons, etc.)
+          cwd: paths.node_modules_styleguide + 'src/img/webroot',
+          src: '*',
+          dest: paths.webroot,
+          expand: true
+        }, {
+          // Images
+          cwd: paths.node_modules_styleguide + 'src/img',
+          src: [
+            // Default Avatars
+            'avatar/**',
+            // Passbolt logos
+            'logo/icon-20_white.png', 'logo/icon-20_grey.png', 'logo/icon-20.png',
+            'logo/icon-48_white.png', 'logo/icon-48.png',
+            'logo/logo.png', 'logo/logo@2x.png', 'logo/logo.svg', 'logo/logo_white.svg', 'logo/logo_white.png',
+            // Image for inputs and controls
+            'controls/check_black.svg',
+            'controls/check_white.svg',
+            'controls/chevron-down_black.svg',
+            'controls/chevron-down_white.svg',
+            'controls/chevron-down_blue.svg',
+            'controls/dot_white.svg',
+            'controls/dot_red.svg',
+            'controls/dot_black.svg',
+            'controls/infinite-bar.gif',
+            'controls/loading_light.svg',
+            'controls/loading_dark.svg',
+            'controls/overlay-opacity-50.png',
+            'controls/success.svg',
+            'controls/fail.svg',
+            'controls/warning.svg',
+            'controls/attention.svg',
+            // Login page 3rd party logo
+            'third_party/firefox_logo.png',
+            'third_party/FirefoxAMO_black.svg',
+            'third_party/FirefoxAMO_white.svg',
+            'third_party/ChromeWebStore_black.svg',
+            'third_party/ChromeWebStore_white.svg',
+            'third_party/edge-addon-black.svg',
+            'third_party/edge-addon-white.svg',
+            'third_party/chosen-sprite.png',
+            'third_party/chosen-sprite@2x.png',
+            'third_party/firefox.svg',
+            'third_party/chrome.svg',
+            'third_party/edge.svg',
+            'third_party/brave.svg',
+            'third_party/vivaldi.svg',
 
-	grunt.loadNpmTasks('grunt-contrib-jshint');
+            // Smtp provider 3rd party logo
+            'third_party/aws-ses.svg',
+            'third_party/azure.svg',
+            'third_party/elastic-email.svg',
+            'third_party/gmail.svg',
+            'third_party/mailgun.svg',
+            'third_party/mailjet.svg',
+            'third_party/mandrill.svg',
+            'third_party/sendgrid.svg',
+            'third_party/sendinblue.svg',
+            'third_party/zoho.svg',
 
-	grunt.loadNpmTasks('grunt-contrib-uglify');
+            // Setup
+            'illustrations/email.png',
+            // Themes preview
+            'themes/*.png',
+            // Totp images
+            'diagrams/totp.svg',
+            'third_party/duo.svg',
+            'third_party/google-authenticator.svg',
+            'third_party/yubikey.svg',
+          ],
+          dest: paths.webroot + 'img',
+          expand: true
+        }, {
+          // CSS
+          cwd: paths.node_modules_styleguide + 'build/css/themes/default',
+          src: ['api_main.min.css', 'api_authentication.min.css', 'ext_authentication.min.css'],
+          dest: paths.webroot + 'css/themes/default',
+          expand: true
+        }, {
+          // Midgar css theme
+          cwd: paths.node_modules_styleguide + 'build/css/themes/midgar',
+          src: ['api_main.min.css', 'api_authentication.min.css', 'ext_authentication.min.css'],
+          dest: paths.webroot + 'css/themes/midgar',
+          expand: true
+        }, {
+          // Solarized light css theme
+          cwd: paths.node_modules_styleguide + 'build/css/themes/solarized_light',
+          src: ['api_main.min.css', 'api_authentication.min.css', 'ext_authentication.min.css'],
+          dest: paths.webroot + 'css/themes/solarized_light',
+          expand: true
+        }, {
+          // Solarized dark css theme
+          cwd: paths.node_modules_styleguide + 'build/css/themes/solarized_dark',
+          src: ['api_main.min.css', 'api_authentication.min.css', 'ext_authentication.min.css'],
+          dest: paths.webroot + 'css/themes/solarized_dark',
+          expand: true
+        },{
+          // Translation files
+          cwd: paths.node_modules_styleguide + 'src/locales',
+          src: ['**'],
+          dest: paths.webroot + 'locales',
+          expand: true
+        }, {
+          // Javascript applications
+          cwd: paths.node_modules_styleguide + 'build/js/dist',
+          src: ['api-account-recovery.js', 'api-app.js', 'api-recover.js', 'api-setup.js', 'api-triage.js', 'api-vendors.js', 'api-feedback.js'],
+          dest: paths.js + 'app',
+          expand: true
+        },]
+      },
+      locales: {
+        // CakePHP Locale Resources
+        files: [{
+          cwd: paths.cakephp_locales,
+          src: ['fr_FR/*.po'],
+          dest: paths.locales,
+          expand: true
+        }]
+      }
+    },
 
-	grunt.loadNpmTasks('grunt-contrib-concat');
-
-	grunt.loadNpmTasks('grunt-contrib-clean');
-
-	grunt.loadNpmTasks('grunt-shell');
-
-	grunt.loadNpmTasks('grunt-contrib-copy');
-
-	grunt.loadNpmTasks("steal-tools");
-
-	// ========================================================================
-	// Register Tasks
-
-	// Npm styleguide deploy
-	grunt.registerTask('styleguide-update', ['shell:updatestyleguide','copy:styleguide']);
-
-	// Npm libs deploy
-	grunt.registerTask('lib-deploy', ['clean:lib', 'copy:lib', 'shell:mad_lib_patch']);
-
-	// Build mad & all the demos apps to ensure that everything compile
-	grunt.registerTask("build", ["steal-build:app", "steal-build:login"]);
-	grunt.registerTask("build-app", ["steal-build:app"]);
-	grunt.registerTask("build-login", ["steal-build:login"]);
-
-	// 'grunt' default
-	grunt.registerTask('default', ["steal-build:app", "steal-build:login"]);
-
+    watch: {
+      'node-modules-styleguide': {
+        files: [paths.node_modules_styleguide + 'build/**/*'],
+        tasks: ['styleguide-update']
+      }
+    }
+  });
 };

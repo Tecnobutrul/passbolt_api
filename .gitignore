@@ -1,75 +1,68 @@
+# Personal scripts #
+####################
+# you can place your personal bash scripts in bin/my
+/bin/my/*
+
 # Local config #
 ################
-/app/Config/core.php
-/app/Config/database.php
-/app/Config/app.php
-/app/Config/anonymous_statistics.php
-/app/Config/email.php
+/config/app.php
+/config/passbolt.php
+/config/Migrations/schema-dump-default.lock
+/config/gpg/serverkey.asc
+/config/gpg/serverkey_private.asc
+/config/gpg/*.asc
+/config/gpg/*.key
+/config/license
+/config/subscription_key.txt
+/config/ldap.php
+/config/DirectorySync/schema/*
+/config/jwt/jwt.key
+/config/jwt/jwt.pem
 
-# Temp config files #
-#####################
-/app/tmp/config
-/app/tmp/config/*
-
-# User specific #
-#################
-/app/webroot/img/public/*
-!/app/webroot/img/public/empty
-
-# Cake temp files #
-###################
-/app/tmp/cache/*
-/app/tmp/cache/models/*
-!/app/tmp/cache/models/empty
-/app/tmp/cache/persistent/*
-!/app/tmp/cache/persistent/empty
-/app/tmp/cache/views/*
-/app/tmp/gpg/*
-/app/tmp/logs/*
-/app/tmp/purifier/*
-/app/tmp/selenium/*
-!/app/tmp/selenium/empty
-/app/tmp/sessions/*
-/app/tmp/tests/*
-/app/tmp/image-processing/*
-/app/tmp/file-storage-test/*
-/app/tmp/schema
-/lib/Cake/Console/Templates/skel/tmp/
-
-# Plugins #
-###########
-/Plugin
-/plugins
-
-# bower, composer, grunt
-/bower_components
+# JS Dependencies #
+################
 /node_modules
-composer.lock
 
-# Misc #
-########
-/app/composer.phar
-/build
-/dist
-/tags
-*.mo
+# Legacy images #
+#################
+/webroot/img/public/*
+!/webroot/img/public/empty
 
-# JS App config & doc #
-#######################
-/app/webroot/js/lib/mad/docs/
-/app/webroot/js/lib/mad/docs.html
+# DEBIAN Package #
+##################
+.kitchen/
+.kitchen.local.yml
+debian/tmp/
+debian/passbolt-ce/
+debian/.debhelper/
+debian/files
+debian/passbolt-api-ce/
+debian/passbolt-api-pro/
+debian/*debhelper*
+debian/*substvars*
+
+# RPM Package #
+###############
+/_passbolt-configure
+/cron.d
+/logrotate.d
+/*.rpm
+
+# CakePHP specific files #
+##########################
+/config/app_local.php
+/config/.env
+/logs/*
+/tmp/*
+!/tmp/avatars/empty
+/vendor/*
 
 # IDE and editor specific files #
 #################################
-/nbproject
-.idea
-*.mo
-.project
+
 
 # IDE and editor specific files #
 #################################
-/nbproject
-.idea
 /.project
 /.buildpath
 /.settings/
@@ -84,53 +77,58 @@ composer.lock
 Icon?
 ehthumbs.db
 Thumbs.db
-/.settings
-/.idea/*
+.directory
 
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
-
-.buildpath
-*.iml
-
-## Directory-based project format:
-.idea/
-# if you remove the above rule, at least ignore the following:
-
-# User-specific stuff:
-# .idea/workspace.xml
-# .idea/tasks.xml
-# .idea/dictionaries
-
-# Sensitive or high-churn files:
-# .idea/dataSources.ids
-# .idea/dataSources.xml
-# .idea/sqlDataSources.xml
-# .idea/dynamic.xml
-# .idea/uiDesigner.xml
-
-# Gradle:
-# .idea/gradle.xml
-# .idea/libraries
-
-# Mongo Explorer plugin:
-# .idea/mongoSettings.xml
-
-## File-based project format:
-*.ipr
-*.iws
-
-## Plugin-specific files:
-
-# IntelliJ
-/out/
-
-# mpeltonen/sbt-idea plugin
-.idea_modules/
-
-# JIRA plugin
-atlassian-ide-plugin.xml
+# Tool specific files #
+#######################
+# PHPUnit
+.phpunit.result.cache
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
+
+# IDE specific files  #
+#######################
+# vim
+*~
+*.swp
+*.swo
+# sublime text & textmate
+*.sublime-*
+*.stTheme.cache
+*.tmlanguage.cache
+*.tmPreferences.cache
+# Eclipse
+.settings/*
+# JetBrains, aka PHPStorm, IntelliJ IDEA
+.idea
+.idea/*
+/.idea/*
+/out/
+# NetBeans
+nbproject/*
+/nbproject
+# Visual Studio Code
+.vscode
+# Sass preprocessor
+.sass-cache/
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+# JIRA plugin
+atlassian-ide-plugin.xml
+# Others
+*.mo
+.project
+.buildpath
+*.iml
+
+# Tilt
+tilt_modules*
+## File-based project format:
+*.ipr
+*.iws
+
+# PHPUNIT generated file
+.phpunit.result.cache
