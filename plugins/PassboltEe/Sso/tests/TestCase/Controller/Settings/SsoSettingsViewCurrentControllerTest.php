@@ -23,6 +23,9 @@ use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
+/**
+ * @covers \Passbolt\Sso\Controller\Settings\SsoSettingsViewCurrentController
+ */
 class SsoSettingsViewCurrentControllerTest extends SsoIntegrationTestCase
 {
     public function testSsoSettingsViewCurrentController_SuccessAzure(): void
@@ -75,6 +78,7 @@ class SsoSettingsViewCurrentControllerTest extends SsoIntegrationTestCase
         $this->assertEquals($activeProviders, $body->providers);
         $this->assertEquals(SsoSetting::STATUS_ACTIVE, $body->status);
         $this->assertEquals('https://login.microsoftonline.com', $body->data->url);
+        $this->assertEquals('login', $body->data->prompt);
         $this->assertTrue(Validation::uuid($body->data->client_id));
         $this->assertTrue(Validation::uuid($body->data->tenant_id));
         $this->assertTrue(is_string($body->data->client_secret));
@@ -143,7 +147,7 @@ class SsoSettingsViewCurrentControllerTest extends SsoIntegrationTestCase
         $this->assertNull($body->provider);
     }
 
-    public function testSsoSettingsViewCurrentController_SuccesEmptyAdmin(): void
+    public function testSsoSettingsViewCurrentController_SuccessEmptyAdmin(): void
     {
         $this->logInAsAdmin();
 
@@ -155,7 +159,7 @@ class SsoSettingsViewCurrentControllerTest extends SsoIntegrationTestCase
         $this->assertEqualsCanonicalizing([SsoSetting::PROVIDER_AZURE, SsoSetting::PROVIDER_GOOGLE], $body->providers);
     }
 
-    public function testSsoSettingsViewCurrentController_SuccesEmptyAdminAllProvidersDisabled(): void
+    public function testSsoSettingsViewCurrentController_SuccessEmptyAdminAllProvidersDisabled(): void
     {
         $this->logInAsAdmin();
         Configure::write('passbolt.plugins.sso.providers', []);
