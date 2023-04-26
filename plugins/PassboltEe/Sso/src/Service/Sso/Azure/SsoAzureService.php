@@ -18,7 +18,6 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Service\Sso\Azure;
 
 use App\Utility\ExtendedUserAccessControl;
-use Cake\Core\Configure;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Routing\Router;
 use League\OAuth2\Client\Provider\AbstractProvider;
@@ -46,13 +45,11 @@ class SsoAzureService extends AbstractSsoService
         $options = [
             'response_type' => 'code',
             'nonce' => $this->generateNonce(),
+            'prompt' => $this->getSettings()->getData()->toArray()['prompt'],
         ];
 
         if ($uac->getUsername() !== null) { // For some types(i.e. sso_recover) we don't have user details
             $options['login_hint'] = $uac->getUsername();
-        }
-        if (Configure::read('passbolt.plugins.sso.security.prompt')) {
-            $options['prompt'] = 'login';
         }
 
         return $this->provider->getAuthorizationUrl($options);
