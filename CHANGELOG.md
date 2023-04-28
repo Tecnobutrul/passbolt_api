@@ -2,7 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [4.0.0-rc.2] - 2023-04-25
+## [4.0.0-rc.3] - 2023-04-28
+### Fixed
+- PB-24051 Fixes field obfuscation not to obfuscate the first element in pure array
+- PB-24470 Fixes recover_user command not showing while running passbolt -h
+
+## [4.0.0-rc.2] - 2023-04-26
 ### Added
 - PB-21580 As a user I can use Google as single sign on provider
 - PB-24245 Adds two TOTP resource types feature flag
@@ -40,6 +45,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-24039 Action log event listener should not throw error on missing connection
 - PB-23558 Remove PHP 8.2 deprecation warnings
 - PB-23557 Remove PHP 8.1 deprecation warnings
+
+## [3.12.2] - 2023-04-25
+### Security
+- PB-24315 As signed-in user creating resources with encrypted description the API should not store unencrypted descriptions even if provided by the client
 
 ## [3.12.0] - 2023-03-15
 ### Added
