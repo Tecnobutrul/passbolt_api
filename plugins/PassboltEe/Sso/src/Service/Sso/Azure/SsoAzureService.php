@@ -24,9 +24,11 @@ use League\OAuth2\Client\Provider\AbstractProvider;
 use Passbolt\Sso\Model\Dto\SsoSettingsAzureDataDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\AbstractSsoService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsGetService;
 use Passbolt\Sso\Utility\Azure\Provider\AzureProvider;
+use Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface;
 
 class SsoAzureService extends AbstractSsoService
 {
@@ -95,5 +97,40 @@ class SsoAzureService extends AbstractSsoService
         return $ssoSettings;
     }
 
+    // OVERRIDDEN METHODS
+
+    /**
+     * @inheritDoc
+     */
+    public function assertResourceOwnerAgainstSsoState(
+        SsoResourceOwnerInterface $resourceOwner,
+        SsoState $ssoState
+    ): void {
+        parent::assertResourceOwnerAgainstSsoState($resourceOwner, $ssoState);
+
+        /** @var \Passbolt\Sso\Utility\Azure\ResourceOwner\AzureResourceOwner $resourceOwner */
+        $this->assertAuthTime($resourceOwner->getAuthTime(), $ssoState->created->getTimestamp());
+    }
+
     // HELPERS
+
+    /**
+     * @param int|null $authTime `auth_time` received from Azure. The value can be `null` when the claim is not added in
+     *                           the Azure AD admin console since it's an optional claim.
+     * @param int $ssoStateCreatedAt SSO state created timestamp.
+     * @return void
+     */
+    private function assertAuthTime(?int $authTime, int $ssoStateCreatedAt): void
+    {
+        $ssoSettingsData = $this->getSettings()->getData()->toArray();
+
+        if ($ssoSettingsData['prompt'] === 'none') {
+            return;
+        }
+
+        if ($authTime !== null && $authTime < $ssoStateCreatedAt) {
+            $msg = __('Single sign-on failed.') . ' ' . __('You must authenticate with Azure again.');
+            throw new BadRequestException($msg);
+        }
+    }
 }
