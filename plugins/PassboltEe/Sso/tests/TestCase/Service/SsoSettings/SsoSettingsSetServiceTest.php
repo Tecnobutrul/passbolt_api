@@ -50,6 +50,7 @@ class SsoSettingsSetServiceTest extends SsoTestCase
                 'tenant_id' => UuidFactory::uuid(),
                 'client_secret' => UuidFactory::uuid(),
                 'client_secret_expiry' => Chronos::now()->addDays(365),
+                'prompt' => 'none',
             ],
         ];
 

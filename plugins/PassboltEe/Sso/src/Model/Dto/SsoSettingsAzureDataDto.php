@@ -50,12 +50,18 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
     public $tenant_id;
 
     /**
+     * @var string
+     */
+    public $prompt;
+
+    /**
      * @param array $data with
      *  - url string
      *  - client_id string uuid
      *  - tenant_id string uuid
      *  - client_secret string
      *  - client_secret_expiry string|datetime
+     *  - prompt string
      */
     public function __construct(array $data)
     {
@@ -64,6 +70,7 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
         $this->tenant_id = $data['tenant_id'] ?? '';
         $this->client_secret = $data['client_secret'] ?? '';
         $this->client_secret_expiry = $data['client_secret_expiry'] ?? '';
+        $this->prompt = $data['prompt'] ?? 'login'; // Set "login" by default
     }
 
     /**
@@ -73,6 +80,7 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
      *  - tenant_id string uuid
      *  - client_secret string
      *  - client_secret_expiry string
+     *  - prompt string
      */
     public function toArray(): array
     {
@@ -82,6 +90,7 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
             'tenant_id' => $this->tenant_id,
             'client_secret' => $this->client_secret,
             'client_secret_expiry' => $this->client_secret_expiry,
+            'prompt' => $this->prompt,
         ];
 
         // Serialize date if it's not already a string

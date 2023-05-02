@@ -22,6 +22,9 @@ use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
+/**
+ * @covers \Passbolt\Sso\Controller\Settings\SsoSettingsViewController
+ */
 class SsoSettingsViewControllerTest extends SsoIntegrationTestCase
 {
     public function testSsoSettingsViewController_SuccessAzure(): void
@@ -37,6 +40,7 @@ class SsoSettingsViewControllerTest extends SsoIntegrationTestCase
         $this->assertEquals((new SsoActiveProvidersGetService())->get(), $body->providers);
         $this->assertEquals(SsoSetting::STATUS_DRAFT, $body->status);
         $this->assertEquals('https://login.microsoftonline.com', $body->data->url);
+        $this->assertEquals('login', $body->data->prompt);
         $this->assertTrue(Validation::uuid($body->data->client_id));
         $this->assertTrue(Validation::uuid($body->data->tenant_id));
         $this->assertTrue(is_string($body->data->client_secret));

@@ -75,4 +75,14 @@ class AzureResourceOwner implements ResourceOwnerInterface, SsoResourceOwnerInte
     {
         return $this->data['nonce'] ?? null;
     }
+
+    /**
+     * Returns `auth_time` if present in data, `null` if not present.
+     *
+     * @return int|null
+     */
+    public function getAuthTime(): ?int
+    {
+        return $this->data['auth_time'] ?? null;
+    }
 }
