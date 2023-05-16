@@ -36,7 +36,7 @@ class SsoSettingsDeleteController extends AppController
             throw new BadRequestException(__('The SSO setting id should be a uuid.'));
         }
 
-        (new SsoSettingsDeleteService())->delete($this->User->getAccessControl(), $id);
+        (new SsoSettingsDeleteService())->delete($this->User->getExtendAccessControl(), $id);
         $this->success(__('The SSO settings were deleted.'), []);
     }
 }

@@ -20,6 +20,7 @@ namespace Passbolt\Sso\Test\TestCase\Utility\Azure\Provider;
 use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
 use Passbolt\Sso\Test\Lib\AzureProviderTestTrait;
+use Passbolt\Sso\Utility\Provider\BaseOauth2Provider;
 
 class AzureProviderTest extends TestCase
 {
@@ -31,6 +32,11 @@ class AzureProviderTest extends TestCase
         if (!isset($azureConfig)) {
             $this->markTestSkipped('Selenium SSO is set to inactive, skipping tests.');
         }
+    }
+
+    public function testSsoAzureProvider_ExtendsBaseOauth2Provider(): void
+    {
+        $this->assertInstanceOf(BaseOauth2Provider::class, $this->getDummyAzureProvider());
     }
 
     public function testSsoAzureProvider_getBaseAuthorizationUrl(): void

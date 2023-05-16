@@ -23,17 +23,31 @@ use App\Notification\Email\Email;
 use App\Notification\Email\EmailCollection;
 use App\Notification\Email\SubscribedEmailRedactorInterface;
 use App\Notification\Email\SubscribedEmailRedactorTrait;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Event\Event;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryOrganizationPolicy;
 
 /**
- * @property \App\Model\Table\UsersTable $Users
+ * Class AbstractAccountRecoveryOrganizationPolicyEmailRedactor
  */
 abstract class AbstractAccountRecoveryOrganizationPolicyEmailRedactor implements SubscribedEmailRedactorInterface
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
     use SubscribedEmailRedactorTrait;
+
+    /**
+     * @var \App\Model\Table\UsersTable
+     */
+    protected $Users;
+
+    /**
+     * AccountRecoveryGetBadRequestAdminEmailRedactor Constructor
+     */
+    public function __construct()
+    {
+        /** @phpstan-ignore-next-line */
+        $this->Users = $this->fetchTable('Users');
+    }
 
     /**
      * @param \App\Model\Entity\User $admin Admin receiving the mail
@@ -54,7 +68,6 @@ abstract class AbstractAccountRecoveryOrganizationPolicyEmailRedactor implements
     public function onSubscribedEvent(Event $event): EmailCollection
     {
         $emailCollection = new EmailCollection();
-        $this->loadModel('Users');
         /** @var \Passbolt\AccountRecovery\Model\Entity\AccountRecoveryOrganizationPolicy $policy */
         $policy = $event->getData('policy');
         /** @var \App\Utility\UserAccessControl $uac */

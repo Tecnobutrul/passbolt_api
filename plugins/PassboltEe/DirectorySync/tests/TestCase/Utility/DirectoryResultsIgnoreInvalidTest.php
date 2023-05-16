@@ -17,11 +17,11 @@ declare(strict_types=1);
 namespace Passbolt\DirectorySync\Test\TestCase\Utility;
 
 use Cake\Core\Configure;
-use LdapTools\Object\LdapObjectType;
 use Passbolt\DirectorySync\Actions\GroupSyncAction;
 use Passbolt\DirectorySync\Actions\UserSyncAction;
 use Passbolt\DirectorySync\Test\Utility\DirectorySyncIntegrationTestCase;
 use Passbolt\DirectorySync\Utility\DirectoryEntry\DirectoryResults;
+use Passbolt\DirectorySync\Utility\DirectoryInterface;
 
 class DirectoryResultsIgnoreInvalidTest extends DirectorySyncIntegrationTestCase
 {
@@ -71,7 +71,7 @@ class DirectoryResultsIgnoreInvalidTest extends DirectorySyncIntegrationTestCase
         $DirectoryResults = new DirectoryResults([]);
         $DirectoryResults->initializeWithEntries($users, $groups);
         $resultSet = $DirectoryResults
-            ->getRecursivelyFromParentGroup(LdapObjectType::USER, 'Administration');
+            ->getRecursivelyFromParentGroup(DirectoryInterface::ENTRY_TYPE_USER, 'Administration');
 
         $invalidUsers = $resultSet->getInvalidUsers();
 

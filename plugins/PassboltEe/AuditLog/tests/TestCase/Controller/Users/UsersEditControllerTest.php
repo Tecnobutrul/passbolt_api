@@ -55,7 +55,7 @@ class UsersEditControllerTest extends LogIntegrationTestCase
         // Assert User Action Logs
         $this->getJson("/actionlog/user/{$user->get('id')}.json");
         $this->assertResponseOk();
-        $body = json_decode(json_encode($this->_responseJsonBody), true);
+        $body = $this->getResponseBodyAsArray();
         $this->assertCount(1, $body);
         $creator = $body[0]['creator'];
         $data = $body[0]['data'];

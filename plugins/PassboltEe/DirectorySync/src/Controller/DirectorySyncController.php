@@ -28,6 +28,16 @@ use Passbolt\DirectorySync\Actions\AllSyncAction;
 class DirectorySyncController extends DirectoryController
 {
     /**
+     * @inheritDoc
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        /** @phpstan-ignore-next-line */
+        $this->Users = $this->fetchTable('Users');
+    }
+
+    /**
      * Before filter
      *
      * @param \Cake\Event\EventInterface $event An Event instance
@@ -36,7 +46,6 @@ class DirectorySyncController extends DirectoryController
      */
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
-        $this->loadModel('Users');
         if ($this->User->role() !== Role::ADMIN) {
             throw new ForbiddenException('Only administrators can access directory sync functionalities');
         }

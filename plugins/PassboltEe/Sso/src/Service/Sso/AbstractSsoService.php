@@ -19,6 +19,7 @@ namespace Passbolt\Sso\Service\Sso;
 
 use App\Model\Entity\User;
 use App\Model\Validation\EmailValidationRule;
+use App\Service\Cookie\AbstractSecureCookieService;
 use App\Service\Users\UserGetService;
 use App\Utility\ExtendedUserAccessControl;
 use Cake\Http\Cookie\Cookie;
@@ -26,7 +27,6 @@ use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\Log\Log;
-use Cake\Routing\Router;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
@@ -39,6 +39,11 @@ use Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface;
 
 abstract class AbstractSsoService
 {
+    /**
+     * @var \App\Service\Cookie\AbstractSecureCookieService $cookieService used to generate cookies
+     */
+    protected $cookieService;
+
     /**
      * @var \League\OAuth2\Client\Provider\AbstractProvider $provider used to cache provider
      */
@@ -87,10 +92,12 @@ abstract class AbstractSsoService
     /**
      * Constructor
      *
+     * @param \App\Service\Cookie\AbstractSecureCookieService $cookieService Cookie service
      * @param \Passbolt\Sso\Model\Dto\SsoSettingsDto|null $settingsDto setting
      */
-    public function __construct(?SsoSettingsDto $settingsDto = null)
+    public function __construct(AbstractSecureCookieService $cookieService, ?SsoSettingsDto $settingsDto = null)
     {
+        $this->cookieService = $cookieService;
         // settings must be initialized before provider to work
         $this->settings = $settingsDto ?? $this->assertAndGetSsoSettings();
         $this->provider = $this->getOAuthProvider($this->settings);
@@ -135,13 +142,11 @@ abstract class AbstractSsoService
      */
     public function clearStateCookie(): Cookie
     {
-        return (new Cookie(self::SSO_STATE_COOKIE))
-            /** With `Router::url` it will return "/<subdir>/sso", if `base` is set. Otherwise just "/sso". */
-            ->withPath(Router::url('/sso'))
-            ->withValue('deleted')
-            ->withSecure(true)
-            ->withHttpOnly(true)
-            ->withExpired();
+        return $this->cookieService->createExpired(
+            self::SSO_STATE_COOKIE,
+            'deleted',
+            '/sso'
+        );
     }
 
     /**
@@ -150,13 +155,12 @@ abstract class AbstractSsoService
      */
     protected function createHttpOnlySecureCookie(SsoState $ssoState): Cookie
     {
-        return (new Cookie(self::SSO_STATE_COOKIE))
-            /** With `Router::url` it will return "/<subdir>/sso", if `base` is set. Otherwise just "/sso". */
-            ->withPath(Router::url('/sso'))
-            ->withValue($ssoState->state)
-            ->withSecure(true)
-            ->withHttpOnly(true)
-            ->withExpiry($ssoState->getExpiryTime());
+        return $this->cookieService->create(
+            self::SSO_STATE_COOKIE,
+            $ssoState->state,
+            '/sso',
+            $ssoState->getExpiryTime()
+        );
     }
 
     /**

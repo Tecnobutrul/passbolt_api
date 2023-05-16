@@ -18,8 +18,8 @@ namespace Passbolt\Ee\Test\TestCase\Command;
 
 use App\Test\Factory\UserFactory;
 use App\Test\Lib\AppTestCase;
-use Cake\Datasource\ModelAwareTrait;
-use Cake\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\Console\TestSuite\ConsoleIntegrationTestTrait;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use CakephpTestSuiteLight\Fixture\TruncateDirtyTables;
 use Passbolt\Ee\Error\Exception\Subscriptions\SubscriptionRecordNotFoundException;
 use Passbolt\Ee\Model\Entity\Subscription;
@@ -33,8 +33,13 @@ class SubscriptionImportCommandTest extends AppTestCase
 {
     use ConsoleIntegrationTestTrait;
     use DummySubscriptionTrait;
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
     use TruncateDirtyTables;
+
+    /**
+     * @var \Passbolt\Ee\Model\Table\SubscriptionsTable
+     */
+    protected $Subscriptions;
 
     /**
      * setUp method
@@ -46,7 +51,7 @@ class SubscriptionImportCommandTest extends AppTestCase
         parent::setUp();
         $this->useCommandRunner();
         $this->setUpPathAndPublicSubscriptionKey();
-        $this->loadModel('Passbolt/Ee.Subscriptions');
+        $this->Subscriptions = $this->fetchTable('Passbolt/Ee.Subscriptions');
     }
 
     /**

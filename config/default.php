@@ -16,6 +16,7 @@
 use App\Model\Entity\AuthenticationToken;
 use App\Utility\AuthToken\AuthTokenExpiryConfigValidator;
 use Passbolt\JwtAuthentication\Service\AccessToken\JwtAbstractService;
+use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Entity\SsoState;
 
 $authTokenExpiryConfigValidator = new AuthTokenExpiryConfigValidator();
@@ -253,6 +254,9 @@ return [
             'resourceTypes' => [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_RESOURCE_TYPES_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
             ],
+            'totpResourceTypes' => [
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_TOTP_RESOURCE_TYPES_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
+            ],
             'mobile' => [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_MOBILE_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
             ],
@@ -281,7 +285,17 @@ return [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_SELF_REGISTRATION_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
             ],
             'sso' => [
-                'enabled' => filter_var(env('PASSBOLT_PLUGINS_SSO_ENABLED', true), FILTER_VALIDATE_BOOLEAN)
+                'enabled' => filter_var(env('PASSBOLT_PLUGINS_SSO_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
+                'providers' => [
+                    SsoSetting::PROVIDER_AZURE => filter_var(
+                        env('PASSBOLT_PLUGINS_SSO_PROVIDER_AZURE_ENABLED', true),
+                        FILTER_VALIDATE_BOOLEAN
+                    ),
+                    SsoSetting::PROVIDER_GOOGLE => filter_var(
+                        env('PASSBOLT_PLUGINS_SSO_PROVIDER_GOOGLE_ENABLED', true),
+                        FILTER_VALIDATE_BOOLEAN
+                    ),
+                ],
             ],
             'mfaPolicies' => [
                 'enabled' => filter_var(env('PASSBOLT_PLUGINS_MFA_POLICIES_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
@@ -303,6 +317,10 @@ return [
                     'clientId' => env('PASSBOLT_SELENIUM_SSO_AZURE_CLIENT_ID', ''),
                     'secretId' => env('PASSBOLT_SELENIUM_SSO_AZURE_SECRET_ID', ''),
                     'secretExpiry' => env('PASSBOLT_SELENIUM_SSO_AZURE_SECRET_EXPIRY', '')
+                ],
+                'google' => [
+                    'clientId' => env('PASSBOLT_SELENIUM_SSO_GOOGLE_CLIENT_ID', ''),
+                    'secretId' => env('PASSBOLT_SELENIUM_SSO_GOOGLE_SECRET_ID', ''),
                 ],
             ],
         ],
@@ -347,6 +365,10 @@ return [
         // false will render your installation insecure.
         'ssl' => [
             'force' => filter_var(env('PASSBOLT_SSL_FORCE', true), FILTER_VALIDATE_BOOLEAN)
+        ],
+        //ObfuscateFields placeholder
+        'obfuscateFields' => [
+            'placeholder' => env('PASSBOLT_OBFUSCATE_FIELDS_PLACEHOLDER', \App\Controller\Component\ObfuscateFieldsComponent::FIELD_PLACEHOLDER),
         ]
     ],
     // Override the Cake ExceptionRenderer.

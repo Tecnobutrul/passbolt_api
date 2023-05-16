@@ -16,8 +16,10 @@ declare(strict_types=1);
  */
 namespace Passbolt\Sso\Test\TestCase\Controller\Settings;
 
+use Cake\Core\Configure;
 use Cake\Validation\Validation;
 use Passbolt\Sso\Model\Entity\SsoSetting;
+use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
@@ -27,13 +29,33 @@ class SsoSettingsViewCurrentControllerTest extends SsoIntegrationTestCase
     {
         SsoSettingsFactory::make()->azure()->active()->persist();
         $this->logInAsAdmin();
+
         $this->getJson('/sso/settings/current.json');
+
         $this->assertSuccess();
         $body = $this->_responseJsonBody;
-
+        $activeProviders = (new SsoActiveProvidersGetService())->get();
         $this->assertTrue(Validation::uuid($body->id));
         $this->assertEquals(SsoSetting::PROVIDER_AZURE, $body->provider);
-        $this->assertEquals(SsoSetting::ALLOWED_PROVIDERS, $body->providers);
+        $this->assertEquals($activeProviders, $body->providers);
+        $this->assertEquals(SsoSetting::STATUS_ACTIVE, $body->status);
+        $this->assertTrue(!isset($body->data));
+    }
+
+    public function testSsoSettingsViewCurrentController_SuccessProvidersDisabled(): void
+    {
+        SsoSettingsFactory::make()->azure()->active()->persist();
+        $this->logInAsAdmin();
+        Configure::write('passbolt.plugins.sso.providers', []);
+
+        $this->getJson('/sso/settings/current.json');
+
+        $this->assertSuccess();
+        $body = $this->_responseJsonBody;
+        $activeProviders = (new SsoActiveProvidersGetService())->get();
+        $this->assertTrue(Validation::uuid($body->id));
+        $this->assertEquals(SsoSetting::PROVIDER_AZURE, $body->provider);
+        $this->assertEquals($activeProviders, $body->providers);
         $this->assertEquals(SsoSetting::STATUS_ACTIVE, $body->status);
         $this->assertTrue(!isset($body->data));
     }
@@ -42,13 +64,15 @@ class SsoSettingsViewCurrentControllerTest extends SsoIntegrationTestCase
     {
         SsoSettingsFactory::make()->azure()->active()->persist();
         $this->logInAsAdmin();
+
         $this->getJson('/sso/settings/current.json?contain[data]=1');
+
         $this->assertSuccess();
         $body = $this->_responseJsonBody;
-
+        $activeProviders = (new SsoActiveProvidersGetService())->get();
         $this->assertTrue(Validation::uuid($body->id));
         $this->assertEquals(SsoSetting::PROVIDER_AZURE, $body->provider);
-        $this->assertEquals(SsoSetting::ALLOWED_PROVIDERS, $body->providers);
+        $this->assertEquals($activeProviders, $body->providers);
         $this->assertEquals(SsoSetting::STATUS_ACTIVE, $body->status);
         $this->assertEquals('https://login.microsoftonline.com', $body->data->url);
         $this->assertTrue(Validation::uuid($body->data->client_id));
@@ -110,12 +134,37 @@ class SsoSettingsViewCurrentControllerTest extends SsoIntegrationTestCase
         $this->assertNull($body->provider);
     }
 
-    public function testSsoSettingsViewCurrentController_SuccesEmpty(): void
+    public function testSsoSettingsViewCurrentController_SuccesEmptyUser(): void
     {
         $this->logInAsUser();
         $this->getJson('/sso/settings/current.json');
         $this->assertSuccess();
         $body = $this->_responseJsonBody;
         $this->assertNull($body->provider);
+    }
+
+    public function testSsoSettingsViewCurrentController_SuccesEmptyAdmin(): void
+    {
+        $this->logInAsAdmin();
+
+        $this->getJson('/sso/settings/current.json');
+
+        $this->assertSuccess();
+        $body = $this->_responseJsonBody;
+        $this->assertNull($body->provider);
+        $this->assertEqualsCanonicalizing([SsoSetting::PROVIDER_AZURE, SsoSetting::PROVIDER_GOOGLE], $body->providers);
+    }
+
+    public function testSsoSettingsViewCurrentController_SuccesEmptyAdminAllProvidersDisabled(): void
+    {
+        $this->logInAsAdmin();
+        Configure::write('passbolt.plugins.sso.providers', []);
+
+        $this->getJson('/sso/settings/current.json');
+
+        $this->assertSuccess();
+        $body = $this->_responseJsonBody;
+        $this->assertNull($body->provider);
+        $this->assertEqualsCanonicalizing([], $body->providers);
     }
 }

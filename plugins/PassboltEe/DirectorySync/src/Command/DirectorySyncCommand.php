@@ -62,7 +62,7 @@ class DirectorySyncCommand extends PassboltCommand
 
         $this->directoryOrgSettings = DirectoryOrgSettings::get();
         if (!$this->directoryOrgSettings->isEnabled()) {
-            $io->err(__('The ldap integration is not configured'));
+            $io->err(__('The ldap integration is not configured or it is disabled'));
             $io->info(
                 __(
                     'To fix this problem, you need to configure ldap: {0}.',
@@ -72,8 +72,25 @@ class DirectorySyncCommand extends PassboltCommand
             $this->error(__('aborting'), $io);
             $this->abort();
         }
+        $this->warnPersist($args, $io);
 
         return $this->successCode();
+    }
+
+    /**
+     * Check persist argument and displays a warning
+     *
+     * @param \Cake\Console\Arguments $args The command arguments
+     * @param \Cake\Console\ConsoleIo $io The console IO
+     * @return void
+     */
+    protected function warnPersist(Arguments $args, ConsoleIo $io)
+    {
+        if ($args->hasOption('persist') && !$args->getOption('persist') && !$args->getOption('dry-run')) {
+            $io->error(__(
+                'Warning: check config and pass option --persist to actually modify data. Running in dry-run mode.'
+            ), 2);
+        }
     }
 
     /**

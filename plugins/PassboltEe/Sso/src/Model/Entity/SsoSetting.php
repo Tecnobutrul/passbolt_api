@@ -41,9 +41,20 @@ class SsoSetting extends Entity
         self::STATUS_ACTIVE,
     ];
 
+    /**
+     * Providers.
+     */
     public const PROVIDER_AZURE = 'azure';
+    public const PROVIDER_GOOGLE = 'google';
+
+    /**
+     * List of supported providers.
+     *
+     * @var array
+     */
     public const ALLOWED_PROVIDERS = [
         self::PROVIDER_AZURE,
+        self::PROVIDER_GOOGLE,
     ];
 
     /**

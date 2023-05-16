@@ -143,10 +143,21 @@ class SsoSettingsGetService
     protected function decrypt(string $data): array
     {
         $gpg = OpenPGPBackendFactory::get();
-        $gpg->setDecryptKeyFromFingerprint(
-            Configure::read('passbolt.gpg.serverKey.fingerprint'),
-            Configure::read('passbolt.gpg.serverKey.passphrase')
-        );
+        $fingerprint = Configure::read('passbolt.gpg.serverKey.fingerprint');
+        $passphrase = Configure::read('passbolt.gpg.serverKey.passphrase');
+
+        try {
+            $gpg->setDecryptKeyFromFingerprint($fingerprint, $passphrase);
+        } catch (\Exception $exception) {
+            try {
+                $gpg->importServerKeyInKeyring();
+                $gpg->setDecryptKeyFromFingerprint($fingerprint, $passphrase);
+            } catch (\Exception $exception) {
+                $msg = __('The OpenPGP server key defined in the config cannot be used to decrypt.') . ' ';
+                $msg .= $exception->getMessage();
+                throw new InternalErrorException($msg, 500, $exception);
+            }
+        }
 
         try {
             $decryptedData = $gpg->decrypt($data);

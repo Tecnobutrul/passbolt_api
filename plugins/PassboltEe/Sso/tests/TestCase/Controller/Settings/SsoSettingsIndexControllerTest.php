@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\Sso\Test\TestCase\Controller\Settings;
 
+use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
 
@@ -23,12 +24,26 @@ class SsoSettingsIndexControllerTest extends SsoIntegrationTestCase
 {
     public function testSsoSettingsIndexController_SuccessAzure(): void
     {
-        $this->markTestIncomplete();
+        SsoSettingsFactory::make()->azure()->draft()->persist();
+        $this->logInAsAdmin();
+
+        $this->getJson('/sso/settings.json');
+
+        $response = $this->_responseJsonBody;
+        $this->assertCount(1, $response);
+        $this->assertSame(SsoSetting::PROVIDER_AZURE, $response[0]->provider);
+    }
+
+    public function testSsoSettingsIndexController_SuccessNoProviderConfigured(): void
+    {
+        $this->logInAsAdmin();
+        $this->getJson('/sso/settings.json');
+        $this->assertEmpty($this->_responseJsonBody);
     }
 
     public function testSsoSettingsIndexController_ErrorNotLoggedIn(): void
     {
-        $ssoSetting = SsoSettingsFactory::make()->azure()->draft()->persist();
+        SsoSettingsFactory::make()->azure()->draft()->persist();
         $this->getJson('/sso/settings.json');
         $this->assertAuthenticationError();
     }

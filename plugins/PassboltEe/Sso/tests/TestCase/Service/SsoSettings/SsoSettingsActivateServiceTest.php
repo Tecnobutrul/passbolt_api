@@ -21,6 +21,8 @@ use App\Model\Entity\Role;
 use App\Test\Factory\UserFactory;
 use App\Utility\ExtendedUserAccessControl;
 use App\Utility\UuidFactory;
+use Cake\Event\EventList;
+use Cake\Event\EventManager;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
@@ -35,6 +37,9 @@ class SsoSettingsActivateServiceTest extends SsoTestCase
 {
     public function testSsoSettingsActivateService_Success(): void
     {
+        // Setup events
+        EventManager::instance()->setEventList(new EventList());
+
         SsoSettingsFactory::make()->azure()->active()->persist();
         SsoSettingsFactory::make()->azure()->draft()->persist();
         $settings = SsoSettingsFactory::make()->azure()->persist();
@@ -67,6 +72,12 @@ class SsoSettingsActivateServiceTest extends SsoTestCase
         $this->assertEquals(SsoState::TYPE_SSO_SET_SETTINGS, $updatedToken->type);
         $this->assertFalse($updatedToken->active);
         $this->assertEquals(1, SsoSettingsFactory::count());
+        // Assert event is fired
+        $this->assertEventFiredWith(
+            SsoSettingsActivateService::AFTER_ACTIVATE_SSO_SETTINGS_EVENT,
+            'uac',
+            $uac
+        );
     }
 
     public function testSsoSettingsActivateService_Error_UserNotAdmin(): void

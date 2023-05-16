@@ -24,22 +24,36 @@ use App\Notification\Email\EmailCollection;
 use App\Notification\Email\SubscribedEmailRedactorInterface;
 use App\Notification\Email\SubscribedEmailRedactorTrait;
 use App\Utility\Purifier;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\Event\Event;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Passbolt\AccountRecovery\Model\Entity\AccountRecoveryRequest;
 use Passbolt\AccountRecovery\Service\AccountRecoveryRequests\AccountRecoveryRequestCreateService;
 use Passbolt\Locale\Service\GetUserLocaleService;
 use Passbolt\Locale\Service\LocaleService;
 
 /**
- * @property \App\Model\Table\UsersTable $Users
+ * Class AccountRecoveryRequestCreatedAdminEmailRedactor
  */
 class AccountRecoveryRequestCreatedAdminEmailRedactor implements SubscribedEmailRedactorInterface
 {
-    use ModelAwareTrait;
+    use LocatorAwareTrait;
     use SubscribedEmailRedactorTrait;
 
     public const ADMIN_TEMPLATE = 'Passbolt/AccountRecovery.Requests/admin_request';
+
+    /**
+     * @var \App\Model\Table\UsersTable
+     */
+    protected $Users;
+
+    /**
+     * AccountRecoveryRequestCreatedAdminEmailRedactor Constructor
+     */
+    public function __construct()
+    {
+        /** @phpstan-ignore-next-line */
+        $this->Users = $this->fetchTable('Users');
+    }
 
     /**
      * Return the list of events to which the redactor is subscribed and when it must create emails to be sent.
@@ -60,7 +74,6 @@ class AccountRecoveryRequestCreatedAdminEmailRedactor implements SubscribedEmail
     public function onSubscribedEvent(Event $event): EmailCollection
     {
         $emailCollection = new EmailCollection();
-        $this->loadModel('Users');
         /** @var \Passbolt\AccountRecovery\Model\Entity\AccountRecoveryRequest $request */
         $request = $event->getSubject();
 

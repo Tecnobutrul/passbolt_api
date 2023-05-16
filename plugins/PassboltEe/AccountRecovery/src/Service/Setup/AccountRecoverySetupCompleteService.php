@@ -23,15 +23,11 @@ use App\Service\Setup\SetupCompleteService;
 use App\Utility\UserAccessControl;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Http\ServerRequest;
-use Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable;
-use Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeysTable;
 use Passbolt\AccountRecovery\Service\AccountRecoveryOrganizationPolicies\AccountRecoveryOrganizationPolicyGetService;
 use Passbolt\AccountRecovery\Service\AccountRecoveryUserSettings\AccountRecoveryUserSettingsSetService;
 
 /**
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryUserSettingsTable $AccountRecoveryUserSettings
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeysTable $AccountRecoveryPrivateKeys
- * @property \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable $AccountRecoveryPrivateKeyPasswords
+ * Class AccountRecoverySetupCompleteService
  */
 class AccountRecoverySetupCompleteService extends SetupCompleteService
 {
@@ -39,6 +35,16 @@ class AccountRecoverySetupCompleteService extends SetupCompleteService
      * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryUserSettingsTable
      */
     public $AccountRecoveryUserSettings;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeysTable
+     */
+    protected $AccountRecoveryPrivateKeys;
+
+    /**
+     * @var \Passbolt\AccountRecovery\Model\Table\AccountRecoveryPrivateKeyPasswordsTable
+     */
+    protected $AccountRecoveryPrivateKeyPasswords;
 
     /**
      * @var \Passbolt\AccountRecovery\Model\Entity\AccountRecoveryOrganizationPolicy entity
@@ -61,9 +67,15 @@ class AccountRecoverySetupCompleteService extends SetupCompleteService
     public function __construct(?ServerRequest $request = null)
     {
         parent::__construct($request);
-        $this->loadModel('Passbolt/AccountRecovery.AccountRecoveryUserSettings');
-        $this->loadModel(AccountRecoveryPrivateKeysTable::class);
-        $this->loadModel(AccountRecoveryPrivateKeyPasswordsTable::class);
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryUserSettings = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryUserSettings');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryPrivateKeys = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryPrivateKeys');
+        /** @phpstan-ignore-next-line */
+        $this->AccountRecoveryPrivateKeyPasswords = $this
+            ->fetchTable('Passbolt/AccountRecovery.AccountRecoveryPrivateKeyPasswords');
 
         $service = new AccountRecoveryOrganizationPolicyGetService();
         $this->policy = $service->get();

@@ -35,6 +35,11 @@ class AllCommand extends DirectorySyncCommand
                 'help' => 'Don\'t save the changes',
                 'default' => 'true',
                 'boolean' => true,
+            ])
+            ->addOption('persist', [
+                'help' => 'Persist data, otherwise it won\'t save the changes',
+                'default' => false,
+                'boolean' => true,
             ]);
 
         return $parser;
@@ -50,7 +55,7 @@ class AllCommand extends DirectorySyncCommand
 
         try {
             $this->model = 'Users';
-            $dryRun = $args->getOption('dry-run');
+            $dryRun = $args->getOption('dry-run') || !$args->getOption('persist');
             $allSyncAction = new AllSyncAction();
             $reports = $allSyncAction->execute($dryRun);
         } catch (\Exception $exception) {
@@ -61,6 +66,8 @@ class AllCommand extends DirectorySyncCommand
 
         $this->displayReports($reports['users'], 'Users', $io);
         $this->displayReports($reports['groups'], 'Groups', $io);
+
+        $this->warnPersist($args, $io);
 
         return $this->successCode();
     }

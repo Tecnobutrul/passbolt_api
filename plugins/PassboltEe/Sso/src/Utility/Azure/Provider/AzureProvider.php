@@ -29,21 +29,21 @@ namespace Passbolt\Sso\Utility\Azure\Provider;
 
 use Cake\Http\Exception\InternalErrorException;
 use Cake\Http\Exception\NotImplementedException;
-use Cake\Validation\Validation;
 use Firebase\JWT\Key;
 use League\OAuth2\Client\Grant\AbstractGrant;
-use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Passbolt\Sso\Error\Exception\AzureException;
-use Passbolt\Sso\Utility\Azure\Grant\JwtBearer;
+use Passbolt\Sso\Utility\Azure\OpenId\AzureIdToken;
 use Passbolt\Sso\Utility\Azure\ResourceOwner\AzureResourceOwner;
-use Passbolt\Sso\Utility\OpenId\IdToken;
+use Passbolt\Sso\Utility\Grant\JwtBearer;
+use Passbolt\Sso\Utility\OpenId\BaseIdToken;
+use Passbolt\Sso\Utility\Provider\BaseOauth2Provider;
 use Psr\Http\Message\ResponseInterface;
 
-class AzureProvider extends AbstractProvider
+class AzureProvider extends BaseOauth2Provider
 {
     use BearerAuthorizationTrait;
 
@@ -56,11 +56,6 @@ class AzureProvider extends AbstractProvider
      * @var string default base url for login
      */
     public $urlLogin = 'https://login.microsoftonline.com';
-
-    /**
-     * @var array|null
-     */
-    protected $openIdConfiguration = null;
 
     /**
      * @var array $scope
@@ -78,50 +73,37 @@ class AzureProvider extends AbstractProvider
     public function __construct(array $options = [], array $collaborators = [])
     {
         parent::__construct($options, $collaborators);
+
         $this->tenant = $options['tenant'] ?? $this->tenant;
         $this->urlLogin = $options['urlLogin'] ?? $this->urlLogin;
         $this->grantFactory->setGrant('jwt_bearer', new JwtBearer());
     }
 
-    /*
+    /**
      * ABSTRACT METHODS
-     * See. AbstractProvider
+     *
+     * @see \League\OAuth2\Client\Provider\AbstractProvider
      */
 
     /**
      * @inheritDoc
      */
-    public function getBaseAuthorizationUrl(): string
+    protected function checkResponse(ResponseInterface $response, $data): void
     {
-        $openIdConfiguration = $this->getOpenIdConfiguration();
-
-        return $openIdConfiguration['authorization_endpoint'];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getBaseAccessTokenUrl(array $params): string
-    {
-        $openIdConfiguration = $this->getOpenIdConfiguration();
-
-        return $openIdConfiguration['token_endpoint'];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getResourceOwner(AccessToken $token): ResourceOwnerInterface
-    {
-        // We get resource owner information from id_token only
-        // We could fall back calling user info API user access_token but we rather not
-        if ($token instanceof IdToken) {
-            $data = $token->getIdTokenClaims();
-
-            return $this->createResourceOwner($data, $token);
+        if (isset($data['error'])) {
+            if (
+                is_string($data['error']) && isset($data['error_description'])
+                && is_string($data['error_description'])
+            ) {
+                throw new AzureException($data['error'], $data['error_description']);
+            } else {
+                throw new IdentityProviderException(
+                    $response->getReasonPhrase(),
+                    $response->getStatusCode(),
+                    (string)$response->getBody()
+                );
+            }
         }
-
-        throw new InternalErrorException('AccessToken should implement IdToken interface.');
     }
 
     /**
@@ -133,7 +115,7 @@ class AzureProvider extends AbstractProvider
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
     public function getOpenIdConfigurationUri(): string
     {
@@ -151,76 +133,9 @@ class AzureProvider extends AbstractProvider
     }
 
     /**
-     * @return string
-     */
-    public function getClientId(): string
-    {
-        return $this->clientId;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getOpenIdConfiguration(): array
-    {
-        if (isset($this->openIdConfiguration)) {
-            return $this->openIdConfiguration;
-        }
-
-        $factory = $this->getRequestFactory();
-        $request = $factory->getRequestWithOptions(
-            'get',
-            $this->getOpenIdConfigurationUri(),
-            []
-        );
-
-        try {
-            $response = $this->getParsedResponse($request);
-        } catch (\Exception $exception) {
-            throw new InternalErrorException($exception->getMessage(), 500, $exception);
-        }
-
-        $this->validateOpenIdConfiguration($response);
-        $this->openIdConfiguration = $response;
-
-        return $this->openIdConfiguration;
-    }
-
-    /**
-     * Check the endpoints info we expect to use later are present
-     *
-     * @param mixed $response from .well-known
-     * @return void
-     */
-    public function validateOpenIdConfiguration($response): void
-    {
-        if (!is_array($response)) {
-            throw new InternalErrorException('Invalid response.');
-        }
-        if (!isset($response['jwks_uri'])) {
-            throw new InternalErrorException('Invalid response. Missing JWKS URI');
-        }
-        if (!isset($response['authorization_endpoint'])) {
-            throw new InternalErrorException('Invalid response. Missing authorization endpoint.');
-        }
-        if (!isset($response['token_endpoint'])) {
-            throw new InternalErrorException('Invalid response. Missing token endpoint.');
-        }
-        if (!Validation::url($response['jwks_uri'])) {
-            throw new InternalErrorException('Invalid response. Invalid JWKS URI');
-        }
-        if (!Validation::url($response['authorization_endpoint'])) {
-            throw new InternalErrorException('Invalid response. Invalid authorization endpoint.');
-        }
-        if (!Validation::url($response['token_endpoint'])) {
-            throw new InternalErrorException('Invalid response. Invalid token endpoint.');
-        }
-    }
-
-    /**
      * @inheritDoc
      */
-    public function getResourceOwnerDetailsUrl(\League\OAuth2\Client\Token\AccessToken $token): string
+    public function getResourceOwnerDetailsUrl(AccessToken $token): string
     {
         // Not needed, we will get the resource owner information from JWT token claims
         // And not the userinfo_endpoint
@@ -250,10 +165,18 @@ class AzureProvider extends AbstractProvider
             throw new InternalErrorException(__('Invalid JWKS endpoint response. Keys missing.'));
         }
 
+        /**
+         * Here we are using custom method to check JWK key signature as we can't use `JWK::parseKeySet` method directly
+         * because Azure don't provide "kty" parameter in the keys.
+         *
+         * @see \Firebase\JWT\JWK::parseKeySet()
+         */
         return $this->parseJwksKeys($response['keys']);
     }
 
     /**
+     * Parse & check JWT keys signature from Azure.
+     *
      * @param array $responseKeys keys from Jwks endpoint
      * @return array of openssl compatible keys
      */
@@ -296,15 +219,16 @@ class AzureProvider extends AbstractProvider
         }
 
         if (empty($keys)) {
-            throw new InternalErrorException('Not JWT key defined for Azure service.');
+            throw new InternalErrorException('No JWT key defined for Azure service.');
         }
 
         return $keys;
     }
 
-    /*
+    /**
      * REDEFINED METHODS
-     * See AbstractProvider
+     *
+     * @see \League\OAuth2\Client\Provider\AbstractProvider
      */
 
     /**
@@ -328,7 +252,7 @@ class AzureProvider extends AbstractProvider
      */
     protected function createAccessToken(array $response, AbstractGrant $grant): AccessToken
     {
-        return new IdToken($response, $this);
+        return new AzureIdToken($response, $this);
     }
 
     /**
@@ -342,21 +266,16 @@ class AzureProvider extends AbstractProvider
     /**
      * @inheritDoc
      */
-    protected function checkResponse(ResponseInterface $response, $data): void
+    public function getResourceOwner(AccessToken $token): ResourceOwnerInterface
     {
-        if (isset($data['error'])) {
-            if (
-                is_string($data['error']) && isset($data['error_description'])
-                && is_string($data['error_description'])
-            ) {
-                throw new AzureException($data['error'], $data['error_description']);
-            } else {
-                throw new IdentityProviderException(
-                    $response->getReasonPhrase(),
-                    $response->getStatusCode(),
-                    (string)$response->getBody()
-                );
-            }
+        // We get resource owner information from id_token only
+        // We could fall back calling user info API user access_token but we rather not
+        if ($token instanceof BaseIdToken) {
+            $data = $token->getIdTokenClaims();
+
+            return $this->createResourceOwner($data, $token);
         }
+
+        throw new InternalErrorException('AccessToken should be an instance of BaseIdToken class.');
     }
 }
