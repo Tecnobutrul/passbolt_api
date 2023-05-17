@@ -19,6 +19,7 @@ namespace Passbolt\Sso\Model\Dto;
 
 use Cake\Chronos\ChronosInterface;
 use Passbolt\Sso\Form\SsoSettingsAzureDataForm;
+use Passbolt\Sso\Model\Entity\SsoSetting;
 
 /**
  * AzureDataDto Data Transfer Object
@@ -76,8 +77,10 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
         $this->tenant_id = $data['tenant_id'] ?? '';
         $this->client_secret = $data['client_secret'] ?? '';
         $this->client_secret_expiry = $data['client_secret_expiry'] ?? '';
-        $this->prompt = $data['prompt'] ?? SsoSettingsAzureDataForm::PROMPT_LOGIN; // Set "login" by default
-        $this->email_claim = $data['email_claim'] ?? '';
+        // Set "login" by default
+        $this->prompt = $data['prompt'] ?? SsoSettingsAzureDataForm::PROMPT_LOGIN;
+        // Set "email" by default for BC reason
+        $this->email_claim = $data['email_claim'] ?? SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_EMAIL;
     }
 
     /**
