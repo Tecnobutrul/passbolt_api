@@ -28,7 +28,6 @@ use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\TestCase\Service\Sso\TestableSsoService;
-use Passbolt\Sso\Utility\Azure\ResourceOwner\AzureResourceOwner;
 use Passbolt\SsoRecover\Service\SsoRecoverAssertService;
 
 /**
@@ -75,7 +74,7 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             ->ssoSettingsId($ssoSetting->id)
             ->persist();
         // Mock azure SSO service to return specific resource owner
-        $azureResourceOwner = new AzureResourceOwner(['email' => $user->username, 'nonce' => 'different']);
+        $azureResourceOwner = $this->mockAzureResourceOwner(['email' => $user->username, 'nonce' => 'different']);
         $ssoService = $this
             ->getMockBuilder(TestableSsoService::class)
             ->onlyMethods(['getResourceOwner', 'getSettings']) // let other methods do it's work(i.e. behave naturally)
@@ -108,7 +107,7 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             ->ssoSettingsId($ssoSetting->id)
             ->persist();
         // Mock azure SSO service to return specific resource owner
-        $azureResourceOwner = new AzureResourceOwner(['email' => 'foo@test.test', 'nonce' => $nonce]);
+        $azureResourceOwner = $this->mockAzureResourceOwner(['email' => 'foo@test.test', 'nonce' => $nonce]);
         $ssoService = $this
             ->getMockBuilder(TestableSsoService::class)
             ->onlyMethods(['getResourceOwner', 'getSettings']) // let other methods do it's work(i.e. behave naturally)
@@ -142,7 +141,7 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             ->ssoSettingsId($ssoSetting->id)
             ->persist();
         // Mock azure SSO service to return specific resource owner
-        $azureResourceOwner = new AzureResourceOwner(['email' => $user->username, 'nonce' => $nonce]);
+        $azureResourceOwner = $this->mockAzureResourceOwner(['email' => $user->username, 'nonce' => $nonce]);
         $ssoService = $this
             ->getMockBuilder(TestableSsoService::class)
             ->onlyMethods(['getResourceOwner', 'getSettings']) // let other methods do it's work(i.e. behave naturally)
@@ -177,7 +176,7 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             ->deleted()
             ->persist();
         // Mock azure SSO service to return specific resource owner
-        $azureResourceOwner = new AzureResourceOwner(['email' => $user->username, 'nonce' => $nonce]);
+        $azureResourceOwner = $this->mockAzureResourceOwner(['email' => $user->username, 'nonce' => $nonce]);
         $ssoService = $this
             ->getMockBuilder(TestableSsoService::class)
             ->onlyMethods(['getResourceOwner', 'getSettings']) // let other methods do it's work(i.e. behave naturally)
@@ -211,7 +210,7 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             ->ssoSettingsId($ssoSetting->id)
             ->persist();
         // Mock azure SSO service to return specific resource owner
-        $azureResourceOwner = new AzureResourceOwner(['email' => $user->username, 'nonce' => $nonce]);
+        $azureResourceOwner = $this->mockAzureResourceOwner(['email' => $user->username, 'nonce' => $nonce]);
         $ssoService = $this->getMockBuilder(TestableSsoService::class)->getMock();
         $ssoService->method('getResourceOwner')->willReturn($azureResourceOwner);
         $settingsDto = new SsoSettingsDto($ssoSetting, []);
@@ -246,7 +245,7 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             ->ssoSettingsId($ssoSetting->id)
             ->persist();
         // Mock azure SSO service to return specific resource owner
-        $azureResourceOwner = new AzureResourceOwner(['email' => $user->username, 'nonce' => $nonce]);
+        $azureResourceOwner = $this->mockAzureResourceOwner(['email' => $user->username, 'nonce' => $nonce]);
         $ssoService = $this->getMockBuilder(TestableSsoService::class)->getMock();
         $ssoService->method('getResourceOwner')->willReturn($azureResourceOwner);
         $settingsDto = new SsoSettingsDto($ssoSetting, []);
@@ -283,7 +282,7 @@ class SsoRecoverAssertServiceTest extends AppTestCase
         // Set self-registration data
         $this->setSelfRegistrationSettingsData();
         // Mock azure SSO service to return specific resource owner
-        $azureResourceOwner = new AzureResourceOwner(['email' => $userEmail, 'nonce' => $nonce]);
+        $azureResourceOwner = $this->mockAzureResourceOwner(['email' => $userEmail, 'nonce' => $nonce]);
         $ssoService = $this->getMockBuilder(TestableSsoService::class)->getMock();
         $ssoService->method('getResourceOwner')->willReturn($azureResourceOwner);
         $settingsDto = new SsoSettingsDto($ssoSetting, []);
@@ -313,7 +312,7 @@ class SsoRecoverAssertServiceTest extends AppTestCase
             ->ssoSettingsId($ssoSetting->id)
             ->persist();
         // Mock azure SSO service to return specific resource owner
-        $azureResourceOwner = new AzureResourceOwner(['email' => $userEmail, 'nonce' => $nonce]);
+        $azureResourceOwner = $this->mockAzureResourceOwner(['email' => $userEmail, 'nonce' => $nonce]);
         $ssoService = $this->getMockBuilder(TestableSsoService::class)->getMock();
         $ssoService->method('getResourceOwner')->willReturn($azureResourceOwner);
         $settingsDto = new SsoSettingsDto($ssoSetting, []);
@@ -348,7 +347,7 @@ class SsoRecoverAssertServiceTest extends AppTestCase
         // Set self-registration data
         $this->setSelfRegistrationSettingsData();
         // Mock azure SSO service to return specific resource owner
-        $azureResourceOwner = new AzureResourceOwner(['email' => $userEmail, 'nonce' => $nonce]);
+        $azureResourceOwner = $this->mockAzureResourceOwner(['email' => $userEmail, 'nonce' => $nonce]);
         $ssoService = $this->getMockBuilder(TestableSsoService::class)->getMock();
         $ssoService->method('getResourceOwner')->willReturn($azureResourceOwner);
         $settingsDto = new SsoSettingsDto($ssoSetting, []);

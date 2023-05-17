@@ -37,6 +37,7 @@ use CakephpTestSuiteLight\Fixture\TruncateDirtyTables;
 use Passbolt\EmailDigest\Utility\Digest\DigestsPool;
 use Passbolt\EmailDigest\Utility\Factory\DigestFactory;
 use Passbolt\EmailNotificationSettings\Utility\EmailNotificationSettings;
+use Passbolt\Sso\Test\Lib\MockAzureResourceOwnerTrait;
 
 abstract class AppTestCase extends TestCase
 {
@@ -56,6 +57,7 @@ abstract class AppTestCase extends TestCase
     use TruncateDirtyTables;
     use UserAccessControlTrait;
     use UsersModelTrait;
+    use MockAzureResourceOwnerTrait;
 
     public static $stringMasks = [];
 

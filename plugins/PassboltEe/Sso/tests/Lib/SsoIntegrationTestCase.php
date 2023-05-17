@@ -38,6 +38,7 @@ class SsoIntegrationTestCase extends SsoTestCase
     use JsonRequestTrait;
     use LoginTestTrait;
     use ErrorIntegrationTestTrait;
+    use MockAzureResourceOwnerTrait;
 
     public const IP_ADDRESS = '127.0.0.1';
     public const USER_AGENT = 'phpunit';
