@@ -30,7 +30,7 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
     /**
      * Azure provider
      */
-    public function testSsoSettingsCreateController_SuccessAzure(): void
+    public function testSsoSettingsCreateController_Success_Azure(): void
     {
         $this->logInAsAdmin();
         $data = [
@@ -42,12 +42,14 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
                 'client_secret' => UuidFactory::uuid(),
                 'client_secret_expiry' => Chronos::now()->addDays(365),
                 'prompt' => SsoSettingsAzureDataForm::PROMPT_LOGIN,
+                'email_claim' => SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_EMAIL,
             ],
         ];
+
         $this->postJson('/sso/settings.json', $data);
+
         $this->assertSuccess();
         $body = $this->_responseJsonBody;
-
         $this->assertTrue(Validation::uuid($body->id));
         $this->assertEquals(SsoSetting::PROVIDER_AZURE, $body->provider);
         $this->assertEquals((new SsoActiveProvidersGetService())->get(), $body->providers);
@@ -78,7 +80,7 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
         $this->assertError(400);
     }
 
-    public function testSsoSettingsCreateController_ErrorValidationData(): void
+    public function testSsoSettingsCreateController_ErrorValidationData_Azure(): void
     {
         $this->logInAsAdmin();
         $data = [
@@ -90,19 +92,22 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
                 'client_secret_expiry' => '🔥',
             ],
         ];
+
         $this->postJson('/sso/settings.json', $data);
+
         $this->assertError(400);
         $body = $this->_responseJsonBody;
-        $this->assertTrue(isset($body->data->url));
-        $this->assertTrue(isset($body->data->tenant_id));
-        $this->assertTrue(isset($body->data->client_id));
-        $this->assertTrue(isset($body->data->client_secret));
-        $this->assertTrue(isset($body->data->client_secret_expiry));
+        $this->assertObjectHasAttribute('url', $body->data);
+        $this->assertObjectHasAttribute('tenant_id', $body->data);
+        $this->assertObjectHasAttribute('client_id', $body->data);
+        $this->assertObjectHasAttribute('client_secret', $body->data);
+        $this->assertObjectHasAttribute('client_secret_expiry', $body->data);
+        $this->assertObjectHasAttribute('email_claim', $body->data);
         // Make sure prompt is optional
         $this->assertObjectNotHasAttribute('prompt', $body->data);
     }
 
-    public function testSsoSettingsCreateController_ErrorValidationData_InvalidPromptValue(): void
+    public function testSsoSettingsCreateController_ErrorValidationData_AzureInvalidPromptValue(): void
     {
         $this->logInAsAdmin();
         $data = [

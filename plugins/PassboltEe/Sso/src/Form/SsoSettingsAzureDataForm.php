@@ -19,6 +19,7 @@ namespace Passbolt\Sso\Form;
 use App\Model\Validation\DateTime\IsDateInFutureValidationRule;
 use Cake\I18n\FrozenTime;
 use Cake\Validation\Validator;
+use Passbolt\Sso\Model\Entity\SsoSetting;
 
 class SsoSettingsAzureDataForm extends BaseSsoSettingsForm
 {
@@ -48,6 +49,15 @@ class SsoSettingsAzureDataForm extends BaseSsoSettingsForm
      * @link https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#send-the-sign-in-request
      */
     public const SUPPORTED_PROMPT_VALUES = [self::PROMPT_LOGIN, self::PROMPT_NONE];
+
+    /**
+     * Supported email claim aliases.
+     */
+    public const SUPPORTED_EMAIL_CLAIM_ALIASES = [
+        SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_EMAIL,
+        SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_PREFERRED_USERNAME,
+        SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_UPN,
+    ];
 
     /**
      * @inheritDoc
@@ -87,6 +97,15 @@ class SsoSettingsAzureDataForm extends BaseSsoSettingsForm
         $dataValidator
             ->notEmptyString('prompt', __('The prompt should not be empty.'))
             ->inList('prompt', self::SUPPORTED_PROMPT_VALUES, __('The prompt is not supported.'));
+
+        $dataValidator
+            ->requirePresence('email_claim', __('An email claim is required.'))
+            ->notEmptyString('email_claim', __('The email claim should not be empty.'))
+            ->inList(
+                'email_claim',
+                self::SUPPORTED_EMAIL_CLAIM_ALIASES,
+                __('The email claim is not supported.')
+            );
 
         return $dataValidator;
     }

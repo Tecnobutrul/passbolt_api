@@ -56,6 +56,11 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
     public $prompt;
 
     /**
+     * @var string
+     */
+    public $email_claim;
+
+    /**
      * @param array $data with
      *  - url string
      *  - client_id string uuid
@@ -72,6 +77,7 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
         $this->client_secret = $data['client_secret'] ?? '';
         $this->client_secret_expiry = $data['client_secret_expiry'] ?? '';
         $this->prompt = $data['prompt'] ?? SsoSettingsAzureDataForm::PROMPT_LOGIN; // Set "login" by default
+        $this->email_claim = $data['email_claim'] ?? '';
     }
 
     /**
@@ -92,6 +98,7 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
             'client_secret' => $this->client_secret,
             'client_secret_expiry' => $this->client_secret_expiry,
             'prompt' => $this->prompt,
+            'email_claim' => $this->email_claim,
         ];
 
         // Serialize date if it's not already a string
