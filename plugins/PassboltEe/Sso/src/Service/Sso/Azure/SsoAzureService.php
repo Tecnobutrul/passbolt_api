@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Passbolt\Sso\Service\Sso\Azure;
 
+use App\Model\Entity\User;
 use App\Utility\ExtendedUserAccessControl;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Routing\Router;
@@ -88,6 +89,7 @@ class SsoAzureService extends AbstractSsoService
             'redirectUri' => Router::url('/sso/azure/redirect', true),
             'tenant' => $data->tenant_id,
             'urlLogin' => $data->url ?? null,
+            'emailClaim' => $data->email_claim,
         ]);
     }
 

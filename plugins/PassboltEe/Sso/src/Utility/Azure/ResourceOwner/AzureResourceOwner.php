@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 namespace Passbolt\Sso\Utility\Azure\ResourceOwner;
 
+use Cake\Log\Log;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface;
 
@@ -26,16 +27,23 @@ class AzureResourceOwner implements ResourceOwnerInterface, SsoResourceOwnerInte
      *
      * @var array
      */
-    protected $data;
+    private $data;
+
+    /**
+     * @var string
+     */
+    private $emailAliasField;
 
     /**
      * Creates new azure resource owner.
      *
      * @param array $data user data
+     * @param string $emailAliasField Field to use as an email.
      */
-    public function __construct($data = [])
+    public function __construct($data, $emailAliasField)
     {
         $this->data = $data;
+        $this->emailAliasField = $emailAliasField;
     }
 
     /**
@@ -55,7 +63,11 @@ class AzureResourceOwner implements ResourceOwnerInterface, SsoResourceOwnerInte
      */
     public function getEmail(): ?string
     {
-        return $this->data['email'] ?? null;
+        // TODO: Throw an exception?
+        Log::info('$this->emailAliasField: '.$this->emailAliasField);
+        Log::info($this->data[$this->emailAliasField]);
+
+        return $this->data[$this->emailAliasField] ?? null;
     }
 
     /**

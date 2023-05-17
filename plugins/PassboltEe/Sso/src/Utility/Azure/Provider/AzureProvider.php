@@ -68,6 +68,11 @@ class AzureProvider extends BaseOauth2Provider
     public $tenant = '';
 
     /**
+     * @var string $emailClaim Email claim alias field to check as username/email.
+     */
+    public $emailClaim;
+
+    /**
      * @inheritDoc
      */
     public function __construct(array $options = [], array $collaborators = [])
@@ -76,6 +81,8 @@ class AzureProvider extends BaseOauth2Provider
 
         $this->tenant = $options['tenant'] ?? $this->tenant;
         $this->urlLogin = $options['urlLogin'] ?? $this->urlLogin;
+        $this->emailClaim = $options['emailClaim'] ?? $this->urlLogin;
+
         $this->grantFactory->setGrant('jwt_bearer', new JwtBearer());
     }
 
@@ -260,7 +267,7 @@ class AzureProvider extends BaseOauth2Provider
      */
     protected function createResourceOwner(array $response, AccessToken $token): ResourceOwnerInterface
     {
-        return new AzureResourceOwner($response);
+        return new AzureResourceOwner($response, $this->emailClaim);
     }
 
     /**
