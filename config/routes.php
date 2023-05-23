@@ -347,19 +347,6 @@ $routes->scope('/setup', function ($routes) {
     $routes->connect('/recover/abort/{userId}', ['prefix' => 'Setup', 'controller' => 'RecoverAbort', 'action' => 'abort'])
         ->setPass(['userId'])
         ->setMethods(['PUT', 'POST']);
-
-    // Legacy v1 backward compatibility routes
-    $routes->connect('/install/{userId}/{tokenId}', ['prefix' => 'Setup', 'controller' => 'SetupStart', 'action' => 'start'])
-        ->setPass(['userId', 'tokenId'])
-        ->setMethods(['GET']);
-
-    $routes->connect('/recover/{userId}/{tokenId}', ['prefix' => 'Setup', 'controller' => 'RecoverStart', 'action' => 'start'])
-        ->setPass(['userId', 'tokenId'])
-        ->setMethods(['GET']);
-
-    $routes->connect('/completeRecovery/{userId}', ['prefix' => 'Setup', 'controller' => 'RecoverComplete', 'action' => 'complete'])
-        ->setPass(['userId'])
-        ->setMethods(['PUT', 'POST']);
 });
 
 /**
