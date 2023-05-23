@@ -53,8 +53,6 @@ class SetupStartControllerTest extends AppIntegrationTestCase
         $fails = [
             'no parameter given' => '/setup/start.json',
             'only one parameter given' => '/setup/start/' . UuidFactory::uuid() . '.json',
-            'no parameter given on legacy url' => '/setup/install.json',
-            'only one parameter given on legacy url' => '/setup/install/' . UuidFactory::uuid() . '.json',
         ];
         foreach ($fails as $case => $url) {
             $this->get($url);
