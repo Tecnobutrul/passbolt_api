@@ -18,8 +18,8 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Test\TestCase\Utility\Azure\ResourceOwner;
 
 use App\Utility\UuidFactory;
+use Cake\Http\Exception\BadRequestException;
 use Cake\TestSuite\TestCase;
-use Passbolt\Sso\Error\Exception\SsoFailedBadRequestException;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Utility\Azure\ResourceOwner\AzureResourceOwner;
@@ -56,7 +56,7 @@ class AzureResourceOwnerTest extends TestCase
             'auth_time' => time(),
         ];
 
-        $this->expectException(SsoFailedBadRequestException::class);
+        $this->expectException(BadRequestException::class);
 
         (new AzureResourceOwner($data, SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_UPN))->getEmail();
     }
@@ -72,7 +72,7 @@ class AzureResourceOwnerTest extends TestCase
             'auth_time' => time(),
         ];
 
-        $this->expectException(SsoFailedBadRequestException::class);
+        $this->expectException(BadRequestException::class);
 
         (new AzureResourceOwner($data, $emailAliasField))->getEmail();
     }

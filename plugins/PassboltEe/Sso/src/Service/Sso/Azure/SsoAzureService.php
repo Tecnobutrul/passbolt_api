@@ -22,7 +22,6 @@ use Cake\Http\Exception\BadRequestException;
 use Cake\Routing\Router;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use Passbolt\Sso\Form\SsoSettingsAzureDataForm;
-use Passbolt\Sso\Error\Exception\SsoFailedBadRequestException;
 use Passbolt\Sso\Model\Dto\SsoSettingsAzureDataDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoSetting;
@@ -145,7 +144,8 @@ class SsoAzureService extends AbstractSsoService
         }
 
         if ($authTime !== null && $authTime < $ssoStateCreatedAt) {
-            throw new SsoFailedBadRequestException(__('You must authenticate with Azure again.'));
+            $msg = __('Single sign-on failed.') . ' ' . __('You must authenticate with Azure again.');
+            throw new BadRequestException($msg);
         }
     }
 }

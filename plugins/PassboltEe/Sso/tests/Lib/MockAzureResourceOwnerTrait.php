@@ -23,8 +23,10 @@ use Passbolt\Sso\Utility\Azure\ResourceOwner\AzureResourceOwner;
 
 trait MockAzureResourceOwnerTrait
 {
-    public function mockAzureResourceOwner(array $data = [], $emailAliasField = null): AzureResourceOwner
-    {
+    public function mockAzureResourceOwner(
+        array $data = [],
+        $emailAliasField = SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_EMAIL
+    ): AzureResourceOwner {
         if (empty($data)) {
             $data = [
                 'oid' => UuidFactory::uuid(),
@@ -34,6 +36,6 @@ trait MockAzureResourceOwnerTrait
             ];
         }
 
-        return new AzureResourceOwner($data, $emailAliasField ?? SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_EMAIL);
+        return new AzureResourceOwner($data, $emailAliasField);
     }
 }

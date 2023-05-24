@@ -16,8 +16,8 @@ declare(strict_types=1);
  */
 namespace Passbolt\Sso\Utility\Azure\ResourceOwner;
 
+use Cake\Http\Exception\BadRequestException;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
-use Passbolt\Sso\Error\Exception\SsoFailedBadRequestException;
 use Passbolt\Sso\Utility\OpenId\SsoResourceOwnerInterface;
 
 class AzureResourceOwner implements ResourceOwnerInterface, SsoResourceOwnerInterface
@@ -60,14 +60,14 @@ class AzureResourceOwner implements ResourceOwnerInterface, SsoResourceOwnerInte
      * Retrieves email of the resource owner.
      *
      * @return string
-     * @throws \Passbolt\Sso\Error\Exception\SsoFailedBadRequestException When email alias field is not present in the data.
+     * @throws \Cake\Http\Exception\BadRequestException When email alias field is not present in the data.
      */
     public function getEmail(): string
     {
         if (!isset($this->data[$this->emailAliasField]) || is_null($this->data[$this->emailAliasField])) {
-            throw new SsoFailedBadRequestException(
-                __('The {0} claim is not present, please contact your administrator.', $this->emailAliasField)
-            );
+            $msg = __('Single sign-on failed.') . ' ';
+            $msg .= __('The {0} claim is not present, please contact your administrator.', $this->emailAliasField);
+            throw new BadRequestException($msg);
         }
 
         return $this->data[$this->emailAliasField];
