@@ -60,4 +60,20 @@ class AzureResourceOwnerTest extends TestCase
 
         (new AzureResourceOwner($data, SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_UPN))->getEmail();
     }
+
+    public function testAzureResourceOwner_Error_ClaimFieldIsNull(): void
+    {
+        $emailAliasField = SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_PREFERRED_USERNAME;
+
+        $data = [
+            'oid' => UuidFactory::uuid(),
+            $emailAliasField => null,
+            'nonce' => SsoState::generate(),
+            'auth_time' => time(),
+        ];
+
+        $this->expectException(SsoFailedBadRequestException::class);
+
+        (new AzureResourceOwner($data, $emailAliasField))->getEmail();
+    }
 }

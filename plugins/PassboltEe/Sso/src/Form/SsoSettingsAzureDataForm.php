@@ -96,7 +96,11 @@ class SsoSettingsAzureDataForm extends BaseSsoSettingsForm
 
         $dataValidator
             ->notEmptyString('prompt', __('The prompt should not be empty.'))
-            ->inList('prompt', self::SUPPORTED_PROMPT_VALUES, __('The prompt is not supported.'));
+            ->inList(
+                'prompt',
+                self::SUPPORTED_PROMPT_VALUES,
+                __('The prompt should be one of the following: {0}.', implode(', ', self::SUPPORTED_PROMPT_VALUES))
+            );
 
         $dataValidator
             ->requirePresence('email_claim', __('An email claim is required.'))
@@ -104,7 +108,10 @@ class SsoSettingsAzureDataForm extends BaseSsoSettingsForm
             ->inList(
                 'email_claim',
                 self::SUPPORTED_EMAIL_CLAIM_ALIASES,
-                __('The email claim is not supported.')
+                __(
+                    'The email claim should be one of the following: {0}.',
+                    implode(', ', self::SUPPORTED_EMAIL_CLAIM_ALIASES)
+                )
             );
 
         return $dataValidator;

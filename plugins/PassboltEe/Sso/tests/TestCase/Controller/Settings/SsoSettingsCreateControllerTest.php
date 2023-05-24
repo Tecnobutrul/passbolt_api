@@ -107,7 +107,7 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
         $this->assertObjectNotHasAttribute('prompt', $body->data);
     }
 
-    public function testSsoSettingsCreateController_ErrorValidationData_AzureInvalidPromptValue(): void
+    public function testSsoSettingsCreateController_ErrorValidationData_AzureInvalidValues(): void
     {
         $this->logInAsAdmin();
         $data = [
@@ -119,6 +119,7 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
                 'client_secret' => UuidFactory::uuid(),
                 'client_secret_expiry' => Chronos::now()->addDays(365),
                 'prompt' => 'foo',
+                'email_claim' => 'bar',
             ],
         ];
 
@@ -127,7 +128,14 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
         $this->assertError(400);
         $body = $this->_responseJsonBody;
         $this->assertTrue(isset($body->data->prompt));
-        $this->assertEquals('The prompt is not supported.', $body->data->prompt->inList);
+        $this->assertEquals(
+            'The prompt should be one of the following: login, none.',
+            $body->data->prompt->inList
+        );
+        $this->assertEquals(
+            'The email claim should be one of the following: email, preferred_username, upn.',
+            $body->data->email_claim->inList
+        );
     }
 
     /**

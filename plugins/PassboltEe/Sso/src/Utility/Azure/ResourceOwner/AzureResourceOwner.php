@@ -59,18 +59,18 @@ class AzureResourceOwner implements ResourceOwnerInterface, SsoResourceOwnerInte
     /**
      * Retrieves email of the resource owner.
      *
-     * @return string|null
+     * @return string
      * @throws \Passbolt\Sso\Error\Exception\SsoFailedBadRequestException When email alias field is not present in the data.
      */
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
-        if (!isset($this->data[$this->emailAliasField])) {
+        if (!isset($this->data[$this->emailAliasField]) || is_null($this->data[$this->emailAliasField])) {
             throw new SsoFailedBadRequestException(
-                __('The upn claim is not present, please contact your administrator.')
+                __('The {0} claim is not present, please contact your administrator.', $this->emailAliasField)
             );
         }
 
-        return $this->data[$this->emailAliasField] ?? null;
+        return $this->data[$this->emailAliasField];
     }
 
     /**

@@ -27,6 +27,7 @@ use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Test\Factory\SsoAuthenticationTokenFactory;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
 use Passbolt\Sso\Test\Factory\SsoStateFactory;
+use Passbolt\Sso\Test\Lib\MockAzureResourceOwnerTrait;
 use Passbolt\Sso\Test\TestCase\Service\Sso\TestableSsoService;
 use Passbolt\SsoRecover\Service\SsoRecoverAssertService;
 
@@ -36,6 +37,7 @@ use Passbolt\SsoRecover\Service\SsoRecoverAssertService;
 class SsoRecoverAssertServiceTest extends AppTestCase
 {
     use SelfRegistrationTestTrait;
+    use MockAzureResourceOwnerTrait;
 
     /**
      * @var \Passbolt\SsoRecover\Service\SsoRecoverAssertService
