@@ -92,10 +92,6 @@ abstract class AppIntegrationTestCase extends TestCase
         $this->disableFeaturePlugin('SsoRecover');
 
         Configure::write(CsrfProtectionMiddleware::PASSBOLT_SECURITY_CSRF_PROTECTION_ACTIVE_CONFIG, true);
-        OpenPGPBackendFactory::reset();
-        UserAction::destroy();
-        DigestsPool::clearInstance();
-        EmailNotificationSettings::flushCache();
     }
 
     /**
@@ -103,6 +99,10 @@ abstract class AppIntegrationTestCase extends TestCase
      */
     public function tearDown(): void
     {
+        OpenPGPBackendFactory::reset();
+        UserAction::destroy();
+        DigestsPool::clearInstance();
+        EmailNotificationSettings::flushCache();
         $this->clearPlugins();
         parent::tearDown();
     }
