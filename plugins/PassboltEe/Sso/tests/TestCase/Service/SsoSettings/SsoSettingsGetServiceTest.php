@@ -20,6 +20,7 @@ namespace Passbolt\Sso\Test\TestCase\Service\SsoSettings;
 use App\Utility\UuidFactory;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Http\Exception\InternalErrorException;
+use Passbolt\Sso\Form\SsoSettingsAzureDataForm;
 use Passbolt\Sso\Model\Dto\AbstractSsoSettingsDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDefaultDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
@@ -51,7 +52,7 @@ class SsoSettingsGetServiceTest extends SsoTestCase
         $this->assertNotEmpty($ssoSetting->modified);
         // Assert data
         $data = $ssoSettingsDto->data->toArray();
-        $this->assertSame('login', $data['prompt']);
+        $this->assertSame(SsoSettingsAzureDataForm::PROMPT_LOGIN, $data['prompt']);
     }
 
     public function testSsoSettingsGetService_getByIdOrFail_Error(): void
@@ -107,7 +108,7 @@ class SsoSettingsGetServiceTest extends SsoTestCase
         $this->assertTrue($ssoSetting instanceof SsoSettingsDto);
         $this->assertEquals(true, isset($ssoSetting->data));
         $data = $ssoSetting->data->toArray();
-        $this->assertSame('login', $data['prompt']);
+        $this->assertSame(SsoSettingsAzureDataForm::PROMPT_LOGIN, $data['prompt']);
     }
 
     public function testSsoSettingsGetService_getActiveOrDefault_SuccessDefault(): void

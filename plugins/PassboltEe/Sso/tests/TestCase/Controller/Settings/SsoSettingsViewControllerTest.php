@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Test\TestCase\Controller\Settings;
 
 use Cake\Validation\Validation;
+use Passbolt\Sso\Form\SsoSettingsAzureDataForm;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
@@ -40,7 +41,7 @@ class SsoSettingsViewControllerTest extends SsoIntegrationTestCase
         $this->assertEquals((new SsoActiveProvidersGetService())->get(), $body->providers);
         $this->assertEquals(SsoSetting::STATUS_DRAFT, $body->status);
         $this->assertEquals('https://login.microsoftonline.com', $body->data->url);
-        $this->assertEquals('login', $body->data->prompt);
+        $this->assertEquals(SsoSettingsAzureDataForm::PROMPT_LOGIN, $body->data->prompt);
         $this->assertTrue(Validation::uuid($body->data->client_id));
         $this->assertTrue(Validation::uuid($body->data->tenant_id));
         $this->assertTrue(is_string($body->data->client_secret));

@@ -19,6 +19,7 @@ namespace Passbolt\Sso\Test\TestCase\Controller\Settings;
 use App\Utility\UuidFactory;
 use Cake\Chronos\Chronos;
 use Cake\Validation\Validation;
+use Passbolt\Sso\Form\SsoSettingsAzureDataForm;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
 use Passbolt\Sso\Test\Factory\SsoSettingsFactory;
@@ -40,7 +41,7 @@ class SsoSettingsCreateControllerTest extends SsoIntegrationTestCase
                 'tenant_id' => UuidFactory::uuid(),
                 'client_secret' => UuidFactory::uuid(),
                 'client_secret_expiry' => Chronos::now()->addDays(365),
-                'prompt' => 'login',
+                'prompt' => SsoSettingsAzureDataForm::PROMPT_LOGIN,
             ],
         ];
         $this->postJson('/sso/settings.json', $data);
