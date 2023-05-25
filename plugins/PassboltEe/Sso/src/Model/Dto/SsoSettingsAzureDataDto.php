@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace Passbolt\Sso\Model\Dto;
 
 use Cake\Chronos\ChronosInterface;
+use Passbolt\Sso\Form\SsoSettingsAzureDataForm;
 
 /**
  * AzureDataDto Data Transfer Object
@@ -70,7 +71,7 @@ class SsoSettingsAzureDataDto implements SsoSettingsDataDtoInterface
         $this->tenant_id = $data['tenant_id'] ?? '';
         $this->client_secret = $data['client_secret'] ?? '';
         $this->client_secret_expiry = $data['client_secret_expiry'] ?? '';
-        $this->prompt = $data['prompt'] ?? 'login'; // Set "login" by default
+        $this->prompt = $data['prompt'] ?? SsoSettingsAzureDataForm::PROMPT_LOGIN; // Set "login" by default
     }
 
     /**

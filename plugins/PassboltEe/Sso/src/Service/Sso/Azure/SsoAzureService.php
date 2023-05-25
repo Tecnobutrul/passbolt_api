@@ -21,6 +21,7 @@ use App\Utility\ExtendedUserAccessControl;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Routing\Router;
 use League\OAuth2\Client\Provider\AbstractProvider;
+use Passbolt\Sso\Form\SsoSettingsAzureDataForm;
 use Passbolt\Sso\Model\Dto\SsoSettingsAzureDataDto;
 use Passbolt\Sso\Model\Dto\SsoSettingsDto;
 use Passbolt\Sso\Model\Entity\SsoSetting;
@@ -59,7 +60,7 @@ class SsoAzureService extends AbstractSsoService
          * 1. show login screen to enter credentials if user is not signed-in
          * 2. won't ask for credentials if user already signed-in into Azure AD
          */
-        if ($prompt === 'login') {
+        if ($prompt === SsoSettingsAzureDataForm::PROMPT_LOGIN) {
             $options['prompt'] = $prompt;
         }
 
@@ -137,7 +138,7 @@ class SsoAzureService extends AbstractSsoService
     {
         $ssoSettingsData = $this->getSettings()->getData()->toArray();
 
-        if ($ssoSettingsData['prompt'] === 'none') {
+        if ($ssoSettingsData['prompt'] === SsoSettingsAzureDataForm::PROMPT_NONE) {
             return;
         }
 

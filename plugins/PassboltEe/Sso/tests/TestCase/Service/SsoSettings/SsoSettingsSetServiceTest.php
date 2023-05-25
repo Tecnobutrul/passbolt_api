@@ -25,6 +25,7 @@ use App\Utility\UuidFactory;
 use Cake\Chronos\Chronos;
 use Cake\Core\Configure;
 use Cake\Validation\Validation;
+use Passbolt\Sso\Form\SsoSettingsAzureDataForm;
 use Passbolt\Sso\Model\Entity\SsoSetting;
 use Passbolt\Sso\Service\Providers\SsoActiveProvidersGetService;
 use Passbolt\Sso\Service\SsoSettings\SsoSettingsSetService;
@@ -50,7 +51,7 @@ class SsoSettingsSetServiceTest extends SsoTestCase
                 'tenant_id' => UuidFactory::uuid(),
                 'client_secret' => UuidFactory::uuid(),
                 'client_secret_expiry' => Chronos::now()->addDays(365),
-                'prompt' => 'none',
+                'prompt' => SsoSettingsAzureDataForm::PROMPT_NONE,
             ],
         ];
 

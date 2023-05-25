@@ -37,9 +37,17 @@ class SsoSettingsAzureDataForm extends BaseSsoSettingsForm
     ];
 
     /**
-     * Supported prompt values. Currently, we only accept "login" or "none".
+     * Prompt options.
      */
-    public const SUPPORTED_PROMPT_VALUES = ['login', 'none'];
+    public const PROMPT_LOGIN = 'login';
+    public const PROMPT_NONE = 'none';
+
+    /**
+     * Supported prompt values. Currently, we only accept "login" or "none".
+     *
+     * @link https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#send-the-sign-in-request
+     */
+    public const SUPPORTED_PROMPT_VALUES = [self::PROMPT_LOGIN, self::PROMPT_NONE];
 
     /**
      * @inheritDoc

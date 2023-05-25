@@ -23,6 +23,7 @@ use App\Utility\ExtendedUserAccessControl;
 use App\Utility\UuidFactory;
 use Cake\Http\Exception\BadRequestException;
 use Cake\I18n\FrozenTime;
+use Passbolt\Sso\Form\SsoSettingsAzureDataForm;
 use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Azure\SsoAzureService;
 use Passbolt\Sso\Test\Factory\SsoStateFactory;
@@ -173,7 +174,7 @@ class SsoAzureServiceTest extends SsoIntegrationTestCase
         ]);
 
         // Make sure prompt is "login", the error will only throw if prompt is "login"
-        $this->assertEquals('login', $settings->getData()->toArray()['prompt']);
+        $this->assertEquals(SsoSettingsAzureDataForm::PROMPT_LOGIN, $settings->getData()->toArray()['prompt']);
 
         $this->expectException(BadRequestException::class);
         $this->expectExceptionMessage('You must authenticate with Azure again');
