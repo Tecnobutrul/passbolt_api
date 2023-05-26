@@ -28,7 +28,6 @@ use Passbolt\Sso\Model\Entity\SsoState;
 use Passbolt\Sso\Service\Sso\Azure\SsoAzureService;
 use Passbolt\Sso\Test\Factory\SsoStateFactory;
 use Passbolt\Sso\Test\Lib\SsoIntegrationTestCase;
-use Passbolt\Sso\Utility\Azure\ResourceOwner\AzureResourceOwner;
 
 /**
  * @covers \Passbolt\Sso\Service\Sso\Azure\SsoAzureService
@@ -97,7 +96,7 @@ class SsoAzureServiceTest extends SsoIntegrationTestCase
             'created' => FrozenTime::now()->subMinutes(2),
         ])->withTypeSsoGetKey()->persist();
         // Mock resource owner object
-        $resourceOwner = new AzureResourceOwner([
+        $resourceOwner = $this->mockAzureResourceOwner([
             'oid' => UuidFactory::uuid(),
             'email' => 'ada@passbolt.com',
             'nonce' => $nonce,
@@ -120,7 +119,7 @@ class SsoAzureServiceTest extends SsoIntegrationTestCase
             'created' => FrozenTime::now()->subMinutes(2),
         ])->withTypeSsoGetKey()->persist();
         // Mock resource owner object
-        $resourceOwner = new AzureResourceOwner([
+        $resourceOwner = $this->mockAzureResourceOwner([
             'oid' => UuidFactory::uuid(),
             'email' => 'ada@passbolt.com',
             'nonce' => $nonce,
@@ -142,7 +141,7 @@ class SsoAzureServiceTest extends SsoIntegrationTestCase
             'created' => FrozenTime::now()->subMinutes(2),
         ])->withTypeSsoGetKey()->persist();
         // Mock resource owner object
-        $resourceOwner = new AzureResourceOwner([
+        $resourceOwner = $this->mockAzureResourceOwner([
             'oid' => UuidFactory::uuid(),
             'email' => 'ada@passbolt.com',
             'nonce' => SsoState::generate(), // different nonce value than sso state
@@ -166,7 +165,7 @@ class SsoAzureServiceTest extends SsoIntegrationTestCase
             'created' => FrozenTime::now(),
         ])->withTypeSsoGetKey()->persist();
         // Mock resource owner object
-        $resourceOwner = new AzureResourceOwner([
+        $resourceOwner = $this->mockAzureResourceOwner([
             'oid' => UuidFactory::uuid(),
             'email' => 'ada@passbolt.com',
             'nonce' => $nonce,

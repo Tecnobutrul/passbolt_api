@@ -78,12 +78,15 @@ class SsoSettingsViewCurrentControllerTest extends SsoIntegrationTestCase
         $this->assertEquals(SsoSetting::PROVIDER_AZURE, $body->provider);
         $this->assertEquals($activeProviders, $body->providers);
         $this->assertEquals(SsoSetting::STATUS_ACTIVE, $body->status);
+        // Assert data properties
         $this->assertEquals('https://login.microsoftonline.com', $body->data->url);
         $this->assertEquals(SsoSettingsAzureDataForm::PROMPT_LOGIN, $body->data->prompt);
         $this->assertTrue(Validation::uuid($body->data->client_id));
         $this->assertTrue(Validation::uuid($body->data->tenant_id));
         $this->assertTrue(is_string($body->data->client_secret));
         $this->assertTrue(is_string($body->data->client_secret_expiry));
+        $this->assertObjectHasAttribute('email_claim', $body->data);
+        $this->assertSame(SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_EMAIL, $body->data->email_claim);
     }
 
     public function testSsoSettingsViewCurrentController_SuccessNotLoggedIn(): void

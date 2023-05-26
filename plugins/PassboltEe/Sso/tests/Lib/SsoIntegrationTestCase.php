@@ -38,6 +38,7 @@ class SsoIntegrationTestCase extends SsoTestCase
     use JsonRequestTrait;
     use LoginTestTrait;
     use ErrorIntegrationTestTrait;
+    use MockAzureResourceOwnerTrait;
 
     public const IP_ADDRESS = '127.0.0.1';
     public const USER_AGENT = 'phpunit';
@@ -87,6 +88,7 @@ class SsoIntegrationTestCase extends SsoTestCase
                 'client_secret' => Configure::read('passbolt.selenium.sso.azure.secretId'),
                 'client_secret_expiry' => new FrozenTime(Configure::read('passbolt.selenium.sso.azure.secretExpiry')),
                 'prompt' => $options['prompt'] ?? SsoSettingsAzureDataForm::PROMPT_LOGIN,
+                'email_claim' => SsoSetting::AZURE_EMAIL_CLAIM_ALIAS_EMAIL,
             ],
         ];
 

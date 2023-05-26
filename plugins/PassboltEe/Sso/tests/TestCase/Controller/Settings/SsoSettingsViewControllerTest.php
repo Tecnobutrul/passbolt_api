@@ -46,6 +46,9 @@ class SsoSettingsViewControllerTest extends SsoIntegrationTestCase
         $this->assertTrue(Validation::uuid($body->data->tenant_id));
         $this->assertTrue(is_string($body->data->client_secret));
         $this->assertTrue(is_string($body->data->client_secret_expiry));
+        // Make sure we get "email" claim as fallback field if it's not present in database
+        $this->assertObjectHasAttribute('email_claim', $body->data);
+        $this->assertSame('email', $body->data->email_claim);
     }
 
     public function testSsoSettingsViewController_ErrorNotLoggedIn(): void
