@@ -271,6 +271,6 @@ class ResourcesTagsAddControllerTest extends TagPluginIntegrationTestCase
         $responseArray = $this->getResponseBodyAsArray();
         $this->assertCount(1, $responseArray);
         $this->assertNotSame($resourceTag->tag_id, $responseArray[0]['id']);
-        $this->assertCount(2, TagFactory::find()->where(['UPPER(slug)' => 'test']));
+        $this->assertCount(2, TagFactory::find()->where(['UPPER(slug)' => 'TEST']));
     }
 }
