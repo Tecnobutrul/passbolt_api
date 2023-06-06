@@ -48,12 +48,11 @@ class TagsUpdateController extends AppController
     /**
      * Tag update action
      *
-     * @param \Passbolt\Tags\Service\Tags\UpdatePersonalTagService $updatePersonalTagService Service class.
      * @param string|null $id Id of the tag to update
      * @return void
      * @throws \Cake\Http\Exception\NotFoundException If the Tag is not found or the user does not have access.
      */
-    public function update(UpdatePersonalTagService $updatePersonalTagService, ?string $id = null)
+    public function update(?string $id = null)
     {
         if (!Validation::uuid($id)) {
             throw new BadRequestException(__('The tag id is not valid.'));
@@ -74,7 +73,7 @@ class TagsUpdateController extends AppController
             throw new NotFoundException(__('The tag does not exist.'));
         }
 
-        $updatedTag = $updatePersonalTagService->update(
+        $updatedTag = (new UpdatePersonalTagService())->update(
             $this->User->getAccessControl(),
             $this->request->getData('slug'),
             $tag
