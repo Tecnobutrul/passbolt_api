@@ -132,6 +132,7 @@ class TagsTable extends Table
      *
      * @param array|null $slugs The slugs to search
      * @return \Cake\ORM\Query
+     * @throws \Cake\Database\Exception\DatabaseException if $slugs is empty
      */
     public function findAllBySlugs(?array $slugs = [])
     {

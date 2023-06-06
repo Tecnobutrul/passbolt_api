@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace App\Model\Traits\Query;
 
 use Cake\Database\Driver\Mysql;
+use Cake\ORM\Query;
 
 /**
  * Helper methods to get values that are used for case-sensitive comparisons.
@@ -29,7 +30,7 @@ trait CaseSensitiveCompareValueTrait
      * @param mixed $col Column value to convert into case-sensitive binary.
      * @return \Cake\Database\Expression\QueryExpression|string
      */
-    public function getCaseSensitiveValue(&$query, $col)
+    public function getCaseSensitiveValue(Query $query, $col)
     {
         /**
          * Mysql is case-insensitive by default, so have to make case-sensitive comparison via explicitly specifying charset.
@@ -39,31 +40,36 @@ trait CaseSensitiveCompareValueTrait
             return $col;
         }
 
-        $query = $query->bind(':val', $col, $this->getBindType($col));
+        $valuePlaceholder = ':value_case_insensitive_' . rand();
+        $query = $query->bind($valuePlaceholder, $col, $this->getBindType($col));
 
-        return $query->newExpr()->add('CONVERT(:val using utf8mb4) COLLATE utf8mb4_bin');
+        return $query->newExpr()->add("CONVERT({$valuePlaceholder} using utf8mb4) COLLATE utf8mb4_bin");
     }
 
     /**
      * @param \Cake\ORM\Query $query Reference query object.
-     * @param array $cols Array of column values to convert into case-sensitive binary.
+     * @param array $values Array of values to convert into case-sensitive binary.
      * @return array
      */
-    public function getCaseSensitiveValues(&$query, array $cols)
+    public function getCaseSensitiveValues(Query $query, array $values): array
     {
         /**
          * Mysql is case-insensitive by default, so have to make case-sensitive comparison via explicitly specifying charset.
          * Solution is inspired from here: https://stackoverflow.com/a/56283818
          */
         if (!$query->getConnection()->getDriver() instanceof Mysql) {
-            return $cols;
+            return $values;
         }
 
         $conditions = [];
-        foreach ($cols as $col) {
-            $conditions[] = $query->newExpr()->add('CONVERT(:col using utf8mb4) COLLATE utf8mb4_bin');
+        $values = array_unique($values);
+        foreach ($values as $value) {
+            $valuePlaceholder = ':value_case_insensitive_' . rand();
+            $conditions[] = $query
+                ->newExpr()
+                ->add("CONVERT({$valuePlaceholder} using utf8mb4) COLLATE utf8mb4_bin");
 
-            $query = $query->bind(':col', $col, $this->getBindType($col));
+            $query = $query->bind($valuePlaceholder, $value, $this->getBindType($value));
         }
 
         return $conditions;
