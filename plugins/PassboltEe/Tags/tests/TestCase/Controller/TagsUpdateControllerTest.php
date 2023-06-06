@@ -17,8 +17,6 @@ declare(strict_types=1);
 namespace Passbolt\Tags\Test\TestCase\Controller;
 
 use App\Utility\UuidFactory;
-use Cake\Database\Driver\Mysql;
-use Cake\Datasource\ConnectionManager;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Hash;
 use Passbolt\Tags\Model\Table\ResourcesTagsTable;
@@ -400,10 +398,6 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
      */
     public function testTagsUpdateController_RenameSlugWithDifferentCase()
     {
-        if (!ConnectionManager::get('default')->getDriver() instanceof Mysql) {
-            $this->markTestSkipped('Only required to run with MySQL database driver');
-        }
-
         $user = $this->logInAsUser();
         /** @var \Passbolt\Tags\Model\Entity\ResourcesTag $resourceTag */
         $resourceTag = ResourcesTagFactory::make()
@@ -426,7 +420,7 @@ class TagsUpdateControllerTest extends TagPluginIntegrationTestCase
         // Make sure new tag is created if case is different
         $this->assertNotSame($tagId, $responseArray['id']);
         // Make sure two entries are created if slug's case is different
-        $this->assertSame(2, TagFactory::find()->where(['slug' => 'TEST'])->count());
+        $this->assertSame(2, TagFactory::find()->where(['UPPER(slug)' => 'TEST'])->count());
     }
 
     /**

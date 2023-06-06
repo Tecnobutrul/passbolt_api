@@ -18,7 +18,6 @@ namespace Passbolt\Tags\Test\TestCase\Controller;
 
 use App\Test\Factory\ResourceFactory;
 use App\Utility\UuidFactory;
-use Cake\Database\Driver\Mysql;
 use Cake\Database\Driver\Postgres;
 use Cake\Datasource\ConnectionManager;
 use Cake\Datasource\Exception\RecordNotFoundException;
@@ -252,10 +251,6 @@ class ResourcesTagsAddControllerTest extends TagPluginIntegrationTestCase
 
     public function testResourcesTagsAddController_Success_SlugWithDifferentCase()
     {
-        if (!ConnectionManager::get('default')->getDriver() instanceof Mysql) {
-            $this->markTestSkipped('Only required to run with MySQL database driver');
-        }
-
         $user = $this->logInAsUser();
         $resource = ResourceFactory::make()->withCreatorAndPermission($user)->persist();
         /** @var \Passbolt\Tags\Model\Entity\ResourcesTag $resourceTag */
@@ -276,6 +271,6 @@ class ResourcesTagsAddControllerTest extends TagPluginIntegrationTestCase
         $responseArray = $this->getResponseBodyAsArray();
         $this->assertCount(1, $responseArray);
         $this->assertNotSame($resourceTag->tag_id, $responseArray[0]['id']);
-        $this->assertCount(2, TagFactory::find()->where(['slug' => 'test']));
+        $this->assertCount(2, TagFactory::find()->where(['UPPER(slug)' => 'test']));
     }
 }
