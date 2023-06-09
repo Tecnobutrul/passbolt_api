@@ -6,6 +6,7 @@ help_site_notes:
     GPG_KEY_GRIP: $GPG_KEYGRIP
   image: gitlab/glab
   script:
+    - apk --update add gpg
     - cat "$GPG_KEY" > "$GPG_KEY_PATH"
     - bash .gitlab-ci/scripts/bin/help_site.sh
   rules:
