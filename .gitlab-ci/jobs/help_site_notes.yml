@@ -6,6 +6,8 @@ help_site_notes:
     GPG_KEY_GRIP: $HELP_SITE_GPG_KEYGRIP
   image: gitlab/glab
   script:
+    - mkdir ~/.gnupg
+    - echo "allow-preset-passphrase" > ~/.gnupg/gpg-agent.conf
     - apk --update add gpg gpg-agent
     - cat "$HELP_SITE_GPG_KEY" > "$GPG_KEY_PATH"
     - bash .gitlab-ci/scripts/bin/help_site.sh
