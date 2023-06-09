@@ -1,5 +1,9 @@
 help_site_notes:
   stage: release
+  variables:
+    GPG_KEY_PATH: "/tmp/gpg-key"
+    GPG_PASSPHRASE: $VERSION_PIPELINE_GPG_PASSPHRASE
+    GPG_KEY_GRIP: $VERSION_PIPELINE_GPG_KEY_GRIP
   image: gitlab/glab
   script:
     - bash .gitlab-ci/scripts/bin/help_site.sh
