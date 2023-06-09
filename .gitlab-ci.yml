@@ -30,8 +30,8 @@ include:
   #- local: ".gitlab-ci/jobs/release.yml"
   - local: ".gitlab-ci/jobs/help_site_notes.yml"
 
-code_quality:
-  stage: unit-test
+    #code_quality:
+    #  stage: unit-test
 
 workflow:
   rules:
