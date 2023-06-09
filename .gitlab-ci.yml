@@ -17,6 +17,7 @@ variables:
 stages:
   - unit-test
   - unit-test-parallel
+  - release
   - packaging-trigger
 
 include:
