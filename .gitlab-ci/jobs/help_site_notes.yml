@@ -4,5 +4,6 @@ help_site_notes:
   script:
     - bash .gitlab-ci/scripts/bin/help_site.sh
   rules:
-    - if: '$CI_COMMIT_TAG && $CI_COMMIT_BRANCH =~ "master|release|feature/PB-24575-release-notes"'
+    #- if: '$CI_COMMIT_TAG && $CI_COMMIT_BRANCH =~ "master|release|feature/PB-24575-release-notes"'
+    - if: '$CI_COMMIT_BRANCH == "feature/PB-24575-release-notes"'
       when: on_success
