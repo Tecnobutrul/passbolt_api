@@ -2,7 +2,7 @@ help_site_notes:
   stage: release
   variables:
     GPG_KEY_PATH: "/tmp/gpg-key"
-    GPG_PASSPHRASE: $HELP_SITE_GPG_PASS
+    GPG_PASSPHRASE: $HELP_SITE_GPG_KEY_PASS
     GPG_KEY_GRIP: $HELP_SITE_GPG_KEYGRIP
   image: debian
   script:
