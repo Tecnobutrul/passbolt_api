@@ -48,6 +48,15 @@ setup_git_user "$GITLAB_USER_EMAIL" "$ACCESS_TOKEN_NAME"
 
 git clone -b master https://"$HELPSITE_TOKEN_NAME":"$HELPSITE_TOKEN"@"$HELP_SITE_REPO" "$PASSBOLT_HELP_DIR"
 cd "$PASSBOLT_HELP_DIR"
+
+#TODO: remove this when the help site is ready
+cat <<EOF > $PASSBOLT_HELP_DIR/RELEASE_NOTES.md
+---
+# Testing release notes
+
+This is a test release notes file for the help site.
+EOF
+
 create_release_notes
 git checkout -b release_notes_"$CI_COMMIT_TAG_TEST"
 git add _releases/"$PASSBOLT_FLAVOUR"/"$CI_COMMIT_TAG_TEST".md
