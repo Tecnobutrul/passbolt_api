@@ -17,12 +17,12 @@ HELP_SITE_REPO="gitlab.com/passbolt/passbolt-help.git"
 
 
 function create_release_notes() {
-    title="$(grep name config/version.php | awk -F "'" '{print $4}')"
-    slug="$(grep name config/version.php | awk -F "'" '{print $4}' | tr ' ' '_' | tr '[:upper:]' '[:lower:]')"
+    title="$(grep name ../config/version.php | awk -F "'" '{print $4}')"
+    slug="$(grep name ../config/version.php | awk -F "'" '{print $4}' | tr ' ' '_' | tr '[:upper:]' '[:lower:]')"
     categories="releases $PASSBOLT_FLAVOUR"
     song="$(grep 'Release song:' RELEASE_NOTES.md | awk '{print $2}')"
-    quote="$(grep name config/version.php | awk -F "'" '{print $4}')"
-    permalink="/releases/$PASSBOLT_FLAVOUR/$(grep name config/version.php | awk -F "'" '{print $4}' | tr ' ' '_' | tr '[:upper:]' '[:lower:]')"
+    quote="$(grep name ../config/version.php | awk -F "'" '{print $4}')"
+    permalink="/releases/$PASSBOLT_FLAVOUR/$(grep name ../config/version.php | awk -F "'" '{print $4}' | tr ' ' '_' | tr '[:upper:]' '[:lower:]')"
     date="$(date +'%Y-%m-%d')"
 
     cat << EOF >> _releases/"$PASSBOLT_FLAVOUR"/"$CI_COMMIT_TAG_TEST".md
