@@ -61,5 +61,6 @@ create_release_notes
 git checkout -b release_notes_"$CI_COMMIT_TAG_TEST"
 git add _releases/"$PASSBOLT_FLAVOUR"/"$CI_COMMIT_TAG_TEST".md
 git commit -m ":robot: Automatically added release notes for version $CI_COMMIT_TAG_TEST $PASSBOLT_FLAVOUR"
+glab auth login --token "$HELPSITE_TOKEN"
 glab mr create -s release_notes_"$CI_COMMIT_TAG_TEST" -b master -d ":robot: Release notes for $CI_COMMIT_TAG_TEST" -t "Release notes for $CI_COMMIT_TAG_TEST" --push --repo "passbolt/passbolt-help"
 bash .gitlab-ci/scripts/bin/slack-status-messages.sh ":notebook: New helpsite release notes created for $CI_COMMIT_TAG_TEST" "https://gitlab.com/passbolt/passbolt-help/-/merge_requests"
