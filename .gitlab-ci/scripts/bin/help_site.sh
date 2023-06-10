@@ -47,8 +47,6 @@ setup_gpg_key "$GPG_KEY_PATH" "$GPG_PASSPHRASE" "$GPG_KEY_GRIP"
 setup_git_user "$GITLAB_USER_EMAIL" "$ACCESS_TOKEN_NAME"
 
 git clone -b master https://"$HELPSITE_TOKEN_NAME":"$HELPSITE_TOKEN"@"$HELP_SITE_REPO" "$PASSBOLT_HELP_DIR"
-cd "$PASSBOLT_HELP_DIR"
-
 #TODO: remove this when the help site is ready
 cat <<EOF > $PASSBOLT_HELP_DIR/RELEASE_NOTES.md
 ---
@@ -56,6 +54,8 @@ cat <<EOF > $PASSBOLT_HELP_DIR/RELEASE_NOTES.md
 
 This is a test release notes file for the help site.
 EOF
+
+cd "$PASSBOLT_HELP_DIR"
 
 create_release_notes
 git checkout -b release_notes_"$CI_COMMIT_TAG_TEST"
