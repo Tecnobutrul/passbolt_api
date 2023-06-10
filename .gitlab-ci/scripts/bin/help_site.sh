@@ -13,6 +13,8 @@ GITLAB_USER_EMAIL="contact@passbolt.com"
 GIT_CI_TOKEN_NAME=${GIT_CI_TOKEN_NAME:-gitlab-ci-token}
 ACCESS_TOKEN_NAME="help-site-bot"
 CI_COMMIT_TAG_TEST="4.0.1-test-helpsite"
+HELP_SITE_REPO="gitlab.com/passbolt/passbolt-help.git"
+
 
 function create_release_notes() {
     title="$(grep name config/version.php | awk -F "'" '{print $4}')"
@@ -44,7 +46,7 @@ EOF
 setup_gpg_key "$GPG_KEY_PATH" "$GPG_PASSPHRASE" "$GPG_KEY_GRIP"
 setup_git_user "$GITLAB_USER_EMAIL" "$ACCESS_TOKEN_NAME"
 
-git clone -b master https://"$GIT_CI_TOKEN_NAME":"$CI_JOB_TOKEN"@"$HELP_SITE_REPO" "$PASSBOLT_HELP_DIR"
+git clone -b master https://"$HELPSITE_TOKEN_NAME":"$HELPSITE_TOKEN"@"$HELP_SITE_REPO" "$PASSBOLT_HELP_DIR"
 cd "$PASSBOLT_HELP_DIR"
 create_release_notes
 git checkout -b release_notes_"$CI_COMMIT_TAG_TEST"
