@@ -7,7 +7,7 @@ function setup_gpg_key() {
   echo "allow-preset-passphrase" > ~/.gnupg/gpg-agent.conf
   gpg-agent --allow-preset-passphrase --homedir ~/.gnupg --use-standard-socket --daemon
   gpg-connect-agent reloadagent /bye
-  /usr/libexec/gpg-preset-passphrase -c "$grip" <<< "$passphrase"
+  /usr/lib/gnupg/gpg-preset-passphrase -c "$grip" <<< "$passphrase"
   echo "Pienentry"
   gpg --pinentry-mode loopback --passphrase "$passphrase" --import "$key_path"
 }
