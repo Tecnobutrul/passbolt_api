@@ -5,7 +5,7 @@ set -eo
 
 case "$1" in
     gitlab)
-      glab auth login -t "$GLAB_CLI_TOKEN"
+      glab auth login -t "$CI_JOB_TOKEN"
       if [ -f RELEASE_NOTES.md ]; then
           glab release create "$CI_COMMIT_TAG" -F RELEASE_NOTES.md
       else

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 
-set -euo
+set -euo pipefail
 
 CI_SCRIPTS_DIR=$(dirname "$0")/..
 
@@ -12,7 +12,6 @@ PASSBOLT_HELP_DIR="passbolt_help"
 GITLAB_USER_EMAIL="contact@passbolt.com"
 GIT_CI_TOKEN_NAME=${GIT_CI_TOKEN_NAME:-gitlab-ci-token}
 ACCESS_TOKEN_NAME="help-site-bot"
-CI_COMMIT_TAG_TEST="4.0.1-test-helpsite"
 HELP_SITE_REPO="gitlab.com/passbolt/passbolt-help.git"
 
 
@@ -25,13 +24,13 @@ function create_release_notes() {
     permalink="/releases/$PASSBOLT_FLAVOUR/$(grep name ../config/version.php | awk -F "'" '{print $4}' | tr ' ' '_' | tr '[:upper:]' '[:lower:]')"
     date="$(date +'%Y-%m-%d')"
 
-    cat << EOF >> _releases/"$PASSBOLT_FLAVOUR"/"$CI_COMMIT_TAG_TEST".md
+    cat << EOF >> _releases/"$PASSBOLT_FLAVOUR"/"$CI_COMMIT_TAG".md
 ---
 title: $title
 slug: $slug
 layout: release
 categories: $categories
-version: $CI_COMMIT_TAG_TEST
+version: $CI_COMMIT_TAG
 product: $PASSBOLT_FLAVOUR
 song: $song
 quote: $quote
@@ -40,28 +39,21 @@ date: $date
 ---
 EOF
 
-    cat RELEASE_NOTES.md >> _releases/"$PASSBOLT_FLAVOUR"/"$CI_COMMIT_TAG_TEST".md
+    cat ../RELEASE_NOTES.md >> _releases/"$PASSBOLT_FLAVOUR"/"$CI_COMMIT_TAG".md
 }
 
 setup_gpg_key "$GPG_KEY_PATH" "$GPG_PASSPHRASE" "$GPG_KEY_GRIP"
 setup_git_user "$GITLAB_USER_EMAIL" "$ACCESS_TOKEN_NAME"
 
 git clone -b master https://"$HELPSITE_TOKEN_NAME":"$HELPSITE_TOKEN"@"$HELP_SITE_REPO" "$PASSBOLT_HELP_DIR"
-#TODO: remove this when the help site is ready
-cat <<EOF > $PASSBOLT_HELP_DIR/RELEASE_NOTES.md
----
-# Testing release notes
-
-This is a test release notes file for the help site.
-EOF
 
 cd "$PASSBOLT_HELP_DIR"
 
 create_release_notes
-git checkout -b release_notes_"$CI_COMMIT_TAG_TEST"
-git add _releases/"$PASSBOLT_FLAVOUR"/"$CI_COMMIT_TAG_TEST".md
-git commit -m ":robot: Automatically added release notes for version $CI_COMMIT_TAG_TEST $PASSBOLT_FLAVOUR"
+git checkout -b release_notes_"$CI_COMMIT_TAG"
+git add _releases/"$PASSBOLT_FLAVOUR"/"$CI_COMMIT_TAG".md
+git commit -m ":robot: Automatically added release notes for version $CI_COMMIT_TAG $PASSBOLT_FLAVOUR"
 glab auth login --token "$HELPSITE_TOKEN"
-glab mr create -s release_notes_"$CI_COMMIT_TAG_TEST" -b master -d ":robot: Release notes for $CI_COMMIT_TAG_TEST" -t "Release notes for $CI_COMMIT_TAG_TEST" --push --repo "passbolt/passbolt-help"
+mr_url=$(glab mr create -s release_notes_"$CI_COMMIT_TAG" -b master -d ":robot: Release notes for $CI_COMMIT_TAG $PASSBOLT_FLAVOUR" -t "Release notes for $CI_COMMIT_TAG" --push --repo "passbolt/passbolt-help" | grep 'https://gitlab.com/passbolt/passbolt-help/-/merge_requests/')
 cd -
-bash .gitlab-ci/scripts/bin/slack-status-messages.sh ":notebook: New helpsite release notes created for $CI_COMMIT_TAG_TEST" "https://gitlab.com/passbolt/passbolt-help/-/merge_requests"
+bash .gitlab-ci/scripts/bin/slack-status-messages.sh ":notebook: New helpsite release notes created for $CI_COMMIT_TAG $PASSBOLT_FLAVOUR" "$mr_url"
