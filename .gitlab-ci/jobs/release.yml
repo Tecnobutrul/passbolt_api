@@ -1,5 +1,5 @@
 release_notes:
-  image: debian:bullseye-slim
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
   release:
     description: './RELEASE_NOTES.md'
     tag_name: $CI_COMMIT_TAG
@@ -8,11 +8,9 @@ release_notes:
       when: on_success
   script: |
     source .gitlab-ci/scripts/bin/set-env.sh "$CI_COMMIT_TAG"
-    if is_release_candidate "$tag"; then
+    if is_release_candidate "$CI_COMMIT_TAG"; then
       echo "The tag is for a release candidate. Skipping release notes creation..."
       exit 0
     fi
-    apt update && apt install -y git curl
-    curl -L https://gitlab.com/gitlab-org/cli/-/releases/v1.30.0/downloads/glab_1.30.0_Linux_x86_64.deb  --output glab.deb
-    dpkg -i glab.deb
+    echo "Creating relase notes for $CI_COMMIT_TAG"
   stage: release
