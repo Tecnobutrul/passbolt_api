@@ -17,5 +17,5 @@ help_site_notes:
     cat "$HELP_SITE_GPG_KEY" > "$GPG_KEY_PATH"
     bash .gitlab-ci/scripts/bin/help_site.sh
   rules:
-    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/'
       when: on_success
