@@ -7,8 +7,6 @@ CI_SCRIPTS_DIR=$(dirname "$BASH_SOURCE")/..
 source "$CI_SCRIPTS_DIR"/lib/version-check.sh
 source "$CI_SCRIPTS_DIR"/lib/set-env.sh
 
-API_VERSION_PREFIX="v"
-
 declare -a version_config
 tag="$1"
 
@@ -19,7 +17,7 @@ if [[ $tag == "" ]]; then
   read -r -a version_config <<< "$(parse_commit_message "$CI_COMMIT_MESSAGE")"
 else
   # This line doesn't work on zsh shell
-  read -r -a version_config <<< "$(parse_tag "$API_VERSION_PREFIX$tag")"
+  read -r -a version_config <<< "$(parse_tag "$tag")"
 fi
 
 echo "Exporting the following variables"
