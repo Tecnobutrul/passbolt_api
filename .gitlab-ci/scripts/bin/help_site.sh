@@ -13,7 +13,6 @@ GITLAB_USER_EMAIL="contact@passbolt.com"
 GIT_CI_TOKEN_NAME=${GIT_CI_TOKEN_NAME:-gitlab-ci-token}
 ACCESS_TOKEN_NAME="help-site-bot"
 HELP_SITE_REPO="gitlab.com/passbolt/passbolt-help.git"
-CI_COMMIT_TAG="v4.0.4"
 RELEASE_NOTES_PATH="../RELEASE_NOTES.md"
 
 

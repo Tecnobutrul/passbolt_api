@@ -21,17 +21,17 @@ stages:
   - packaging-trigger
 
 include:
-  #- template: Code-Quality.gitlab-ci.yml
-  #  - local: "/.gitlab-ci/jobs/php_unit_tests/runner.yml"
-  #- local: "/.gitlab-ci/jobs/php_unit_tests/sequential/php_unit_tests.yml"
-  #- local: "/.gitlab-ci/jobs/style_check.yml"
-  #- local: "/.gitlab-ci/jobs/security_check.yml"
-  #- local: ".gitlab-ci/jobs/packaging_trigger/package_trigger.yml"
+  - template: Code-Quality.gitlab-ci.yml
+  #- local: "/.gitlab-ci/jobs/php_unit_tests/runner.yml"
+  - local: "/.gitlab-ci/jobs/php_unit_tests/sequential/php_unit_tests.yml"
+  - local: "/.gitlab-ci/jobs/style_check.yml"
+  - local: "/.gitlab-ci/jobs/security_check.yml"
+  - local: ".gitlab-ci/jobs/packaging_trigger/package_trigger.yml"
   - local: ".gitlab-ci/jobs/release.yml"
   - local: ".gitlab-ci/jobs/help_site_notes.yml"
 
-    #code_quality:
-    #  stage: unit-test
+code_quality:
+  stage: unit-test
 
 workflow:
   rules:
